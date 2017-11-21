@@ -1,0 +1,166 @@
+/*-
+ * ===============LICENSE_START=======================================================
+ * Acumos
+ * ===================================================================================
+ * Copyright (C) 2017 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+ * ===================================================================================
+ * This Acumos software file is distributed by AT&T and Tech Mahindra
+ * under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *  
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * This file is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ===============LICENSE_END=========================================================
+ */
+
+package org.acumos.cds.domain;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.Type;
+
+/**
+ * Model for solution website metadata. In a one:one relationship with solution.
+ * 
+ * This separates updates ON a solution made by the owner (e.g., description)
+ * from updates ABOUT a solution made by the system (e.g., downloads).
+ */
+@Entity
+@Table(name = "C_SOLUTION_WEB")
+public class MLPSolutionWeb implements MLPEntity, Serializable {
+
+	private static final long serialVersionUID = 5613267071143825368L;
+
+	@Id
+	@Column(name = "SOLUTION_ID", nullable = false, columnDefinition = "CHAR(36)")
+	@Size(max = 36)
+	private String solutionId;
+
+	@Column(name = "VIEW_COUNT", columnDefinition = "INT")
+	private Long viewCount = 0L;
+
+	@Column(name = "DOWNLOAD_COUNT", columnDefinition = "INT")
+	private Long downloadCount = 0L;
+
+	@Column(name = "LAST_DOWNLOAD", columnDefinition = "TIMESTAMP")
+	private Date lastDownload;
+
+	@Column(name = "RATING_COUNT", columnDefinition = "INT")
+	private Long ratingCount = 0L;
+
+	@Column(name = "RATING_AVG_TENTHS", columnDefinition = "INT")
+	private Long ratingAverageTenths = 0L;
+
+	@Column(name = "FEATURED_YN", columnDefinition = "CHAR(1)")
+	@Type(type = "yes_no")
+	private boolean featured;
+
+	/**
+	 * No-arg constructor
+	 */
+	public MLPSolutionWeb() {
+		// no-arg constructor
+	}
+
+	/**
+	 * This constructor accepts the required fields; i.e., the minimum that the user
+	 * must supply to create a valid instance.
+	 * 
+	 * @param solutionId
+	 *            ID of solution
+	 */
+	public MLPSolutionWeb(String solutionId) {
+		this.solutionId = solutionId;
+	}
+
+	public String getSolutionId() {
+		return solutionId;
+	}
+
+	public void setSolutionId(String solutionId) {
+		this.solutionId = solutionId;
+	}
+
+	public Long getViewCount() {
+		return viewCount;
+	}
+
+	public void setViewCount(Long viewCount) {
+		this.viewCount = viewCount;
+	}
+
+	public Long getDownloadCount() {
+		return downloadCount;
+	}
+
+	public void setDownloadCount(Long downloadCount) {
+		this.downloadCount = downloadCount;
+	}
+
+	public Date getLastDownload() {
+		return lastDownload;
+	}
+
+	public void setLastDownload(Date lastDownload) {
+		this.lastDownload = lastDownload;
+	}
+
+	public Long getRatingCount() {
+		return ratingCount;
+	}
+
+	public void setRatingCount(Long ratingCount) {
+		this.ratingCount = ratingCount;
+	}
+
+	public Long getRatingAverageTenths() {
+		return ratingAverageTenths;
+	}
+
+	public void setRatingAverageTenths(Long ratingAverageTenths) {
+		this.ratingAverageTenths = ratingAverageTenths;
+	}
+
+	public boolean isFeatured() {
+		return featured;
+	}
+
+	public void setFeatured(boolean featured) {
+		this.featured = featured;
+	}
+
+	@Override
+	public boolean equals(Object that) {
+		if (that == null)
+			return false;
+		if (!(that instanceof MLPSolutionWeb))
+			return false;
+		MLPSolutionWeb thatObj = (MLPSolutionWeb) that;
+		return Objects.equals(solutionId, thatObj.solutionId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(solutionId, downloadCount, viewCount);
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + "[solutionId=" + solutionId + ", views=" + viewCount + ", downloads=" + downloadCount + ", ratings="
+				+ ratingCount + ", ..]";
+	}
+
+}

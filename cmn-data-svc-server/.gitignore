@@ -1,0 +1,7 @@
+.classpath
+.project
+/.settings/
+/target/
+/logs/
+/derby.log
+/application.properties
