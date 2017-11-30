@@ -23,11 +23,12 @@ package org.acumos.cds.repository;
 import org.acumos.cds.domain.MLPSolution;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface SolutionRepository extends PagingAndSortingRepository<MLPSolution, String> {
+public interface SolutionRepository extends JpaRepository<MLPSolution, String>, JpaSpecificationExecutor<MLPSolution>  {
 
 	/**
 	 * Finds solutions using a LIKE query on the text columns NAME and DESCRIPTION.
@@ -41,18 +42,6 @@ public interface SolutionRepository extends PagingAndSortingRepository<MLPSoluti
 	@Query("SELECT s FROM MLPSolution s " + " WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))"
 			+ " OR LOWER(s.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
 	Page<MLPSolution> findBySearchTerm(@Param("searchTerm") String searchTerm, Pageable pageRequest);
-
-	/**
-	 * Gets all solutions with the specified toolkit type.
-	 * 
-	 * @param toolkitTypeCode
-	 *            Toolkit type code value
-	 * @param pageRequest
-	 *            Page and sort criteria
-	 * @return Page of MLPSolution
-	 */
-	@Query(value = "select s from MLPSolution s where s.toolkitTypeCode = :toolkitTypeCode")
-	Page<MLPSolution> findByToolkitType(@Param("toolkitTypeCode") String toolkitTypeCode, Pageable pageRequest);
 
 	/**
 	 * Gets all solutions that use the specified tag.

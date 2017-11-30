@@ -67,6 +67,9 @@ import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
 import org.acumos.cds.domain.MLPValidationType;
+import org.acumos.cds.query.SearchCriteria;
+import org.acumos.cds.query.SearchCriterion;
+import org.acumos.cds.query.SearchOperation;
 import org.acumos.cds.transport.RestPageRequest;
 import org.acumos.cds.transport.RestPageResponse;
 import org.acumos.cds.transport.SuccessTransport;
@@ -528,11 +531,22 @@ public class CdsControllerTest {
 			Assert.assertTrue(sl2 != null && sl2.getSize() > 0);
 
 			logger.info("Querying for active PB solutions");
-			Map<String, Object> queryParameters = new HashMap<>();
-			queryParameters.put("accessTypeCode", AccessTypeCode.PB.name());
-			queryParameters.put("active", Boolean.TRUE);
-			List<MLPSolution> sols = client.searchSolutions(queryParameters, false);
-			logger.info("Active PB solution count {}", sols.size());
+			List<String> codeList = new ArrayList<>();
+			codeList.add(AccessTypeCode.PB.name());
+			codeList.add(AccessTypeCode.PR.name());
+			// Cover query parser
+			SearchCriteria criteria = new SearchCriteria(
+					new SearchCriterion("accessTypeCode", SearchOperation.EQUALS, AccessTypeCode.PB.name()))
+							.or(new SearchCriterion("accessTypeCode", SearchOperation.NOT_EQUALS, "Y"))
+							.or(new SearchCriterion("accessTypeCode", SearchOperation.IN,
+									new String[] { AccessTypeCode.PB.name(), AccessTypeCode.PR.name() }))
+							.or(new SearchCriterion("accessTypeCode", SearchOperation.IN, codeList))
+							.or(new SearchCriterion("accessTypeCode", SearchOperation.LIKE, "X"))
+							.or(new SearchCriterion("accessTypeCode", SearchOperation.LTE, "X"))
+							.or(new SearchCriterion("accessTypeCode", SearchOperation.GTE, "X"));
+			RestPageResponse<MLPSolution> sols = client.searchSolutions(criteria, new RestPageRequest(0, 1));
+			Assert.assertTrue(sols != null && sols.getSize() > 0);
+			logger.info("Active PB solution count {}", sols.getSize());
 
 			MLPSolutionRevision cr = new MLPSolutionRevision();
 			cr.setSolutionId(cs.getSolutionId());
@@ -568,6 +582,9 @@ public class CdsControllerTest {
 			ur.setCreated(new Date());
 			ur = client.createSolutionRating(ur);
 			logger.info("Created solution rating {}", ur);
+			MLPSolutionRating rating = client.getSolutionRating(cs.getSolutionId(), cu.getUserId());
+			Assert.assertNotNull(rating);
+			logger.info("Fetched solution rating {}", rating);
 			ur.setTextReview("Yet awesomer");
 			ur.setRating(5);
 			client.updateSolutionRating(ur);
@@ -696,7 +713,7 @@ public class CdsControllerTest {
 			} // cleanup
 
 		} catch (HttpStatusCodeException ex) {
-			logger.error("createSolutionWithArtifacts failed", ex);
+			logger.error("createSolutionWithArtifacts failed: " + ex.getResponseBodyAsString(), ex);
 			throw ex;
 		}
 
@@ -1270,9 +1287,9 @@ public class CdsControllerTest {
 		cs.setOwnerId(cu.getUserId());
 
 		try {
-			Map<String, Object> queryParameters = new HashMap<>();
-			queryParameters.put("bogusFieldName", "bogusFieldFValue");
-			client.searchSolutions(queryParameters, false);
+			SearchCriteria criteria = new SearchCriteria(
+					new SearchCriterion("bogusFieldName", SearchOperation.EQUALS, "bogusFieldValue"));
+			client.searchSolutions(criteria, new RestPageRequest(0, 1));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search solution failed as expected: {}", ex.getResponseBodyAsString());
@@ -1677,14 +1694,14 @@ public class CdsControllerTest {
 		try {
 			solDep.setUserId(cu.getUserId());
 			// Field too large
-			solDep.setTarget(s64+s64);
+			solDep.setTarget(s64 + s64);
 			client.createSolutionDeployment(solDep);
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create solution deployment failed on constraints as expected: {}",
 					ex.getResponseBodyAsString());
 		}
-				
+
 		try {
 			client.updateSolutionDeployment(solDep);
 			throw new Exception("Unexpected success");

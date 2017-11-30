@@ -61,6 +61,7 @@ import org.acumos.cds.domain.MLPUserRoleMap;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
 import org.acumos.cds.domain.MLPValidationType;
+import org.acumos.cds.query.SearchCriteria;
 import org.acumos.cds.transport.CountTransport;
 import org.acumos.cds.transport.LoginTransport;
 import org.acumos.cds.transport.RestPageRequest;
@@ -104,6 +105,15 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	private final String baseUrl;
 	private final RestTemplate restTemplate;
+
+	/**
+	 * Privileged access for subclasses.
+	 * 
+	 * @return RestTemplate configured for access to remote CDS server.
+	 */
+	protected RestTemplate getRestTemplate() {
+		return restTemplate;
+	}
 
 	/**
 	 * Creates an instance to access the remote endpoint using the specified
@@ -190,7 +200,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		if (queryParams != null && queryParams.size() > 0) {
 			for (Map.Entry<String, ? extends Object> entry : queryParams.entrySet()) {
 				Object value;
-				// Server expect Date as Long.
+				// Server expects Date type as Long (not String)
 				if (entry.getValue() instanceof Date)
 					value = ((Date) entry.getValue()).getTime();
 				else
@@ -362,13 +372,14 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public List<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr) {
-		Map<String, Object> copy = new HashMap<>(queryParameters);
-		copy.put("j", isOr ? "o" : "a");
-		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH }, copy, null);
+	public RestPageResponse<MLPSolution> searchSolutions(SearchCriteria searchCriteria, RestPageRequest pageRequest) {
+		Map<String, Object> params = new HashMap<>();
+		params.put(SearchCriteria.QUERY_PARAM_NAME, searchCriteria.toString());
+		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH }, params,
+				pageRequest);
 		logger.debug("searchSolutions: uri {}", uri);
-		ResponseEntity<List<MLPSolution>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<MLPSolution>>() {
+		ResponseEntity<RestPageResponse<MLPSolution>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPSolution>>() {
 				});
 		return response.getBody();
 	}
@@ -792,7 +803,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		ResponseEntity<CountTransport> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<CountTransport>() {
 				});
-		return response.getBody().getCount();		
+		return response.getBody().getCount();
 	}
 
 	@Override
@@ -829,8 +840,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public void updateUserRoles(String userId, List<String> roleIds) {
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.ROLE_PATH }, null,
-				null);
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.ROLE_PATH }, null, null);
 		logger.debug("updateUserRoles: uri {}", uri);
 		restTemplate.put(uri, roleIds);
 	}
@@ -845,8 +855,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public void addUsersInRole(List<String> userIds, String roleId) {
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.ROLE_PATH, roleId }, null,
-				null);
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.ROLE_PATH, roleId }, null, null);
 		logger.debug("addUsersInRole: uri {}", uri);
 		UsersRoleRequest request = new UsersRoleRequest(true, userIds, roleId);
 		restTemplate.put(uri, request);
@@ -854,8 +863,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public void dropUsersInRole(List<String> userIds, String roleId) {
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.ROLE_PATH, roleId }, null,
-				null);
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.ROLE_PATH, roleId }, null, null);
 		logger.debug("dropUsersInRole: uri {}", uri);
 		UsersRoleRequest request = new UsersRoleRequest(false, userIds, roleId);
 		restTemplate.put(uri, request);
@@ -863,9 +871,10 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public long getRoleUsersCount(String roleId) {
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.ROLE_PATH, roleId, CCDSConstants.COUNT_PATH }, null,
-				null);
-		logger.debug("getRoleUsersCount: uri {}", uri);	
+		URI uri = buildUri(
+				new String[] { CCDSConstants.USER_PATH, CCDSConstants.ROLE_PATH, roleId, CCDSConstants.COUNT_PATH },
+				null, null);
+		logger.debug("getRoleUsersCount: uri {}", uri);
 		ResponseEntity<CountTransport> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<CountTransport>() {
 				});
@@ -1066,6 +1075,17 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		logger.debug("getSolutionRatings: uri {}", uri);
 		ResponseEntity<RestPageResponse<MLPSolutionRating>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<RestPageResponse<MLPSolutionRating>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public MLPSolutionRating getSolutionRating(String solutionId, String userId) {
+		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, solutionId, CCDSConstants.RATING_PATH,
+				CCDSConstants.USER_PATH, userId }, null, null);
+		logger.debug("getSolutionRating: uri {}", uri);
+		ResponseEntity<MLPSolutionRating> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<MLPSolutionRating>() {
 				});
 		return response.getBody();
 	}

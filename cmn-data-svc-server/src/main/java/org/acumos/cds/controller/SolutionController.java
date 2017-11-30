@@ -21,6 +21,7 @@
 package org.acumos.cds.controller;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -42,6 +43,8 @@ import org.acumos.cds.domain.MLPSolutionValidation.SolutionValidationPK;
 import org.acumos.cds.domain.MLPSolutionWeb;
 import org.acumos.cds.domain.MLPTag;
 import org.acumos.cds.domain.MLPUser;
+import org.acumos.cds.query.SearchCriteria;
+import org.acumos.cds.query.SearchCriterion;
 import org.acumos.cds.repository.ArtifactRepository;
 import org.acumos.cds.repository.SolRevArtMapRepository;
 import org.acumos.cds.repository.SolTagMapRepository;
@@ -55,7 +58,7 @@ import org.acumos.cds.repository.SolutionValidationRepository;
 import org.acumos.cds.repository.SolutionWebRepository;
 import org.acumos.cds.repository.TagRepository;
 import org.acumos.cds.repository.UserRepository;
-import org.acumos.cds.service.SolutionSearchService;
+import org.acumos.cds.specification.MLPSolutionSpecificationBuilder;
 import org.acumos.cds.transport.CountTransport;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
@@ -64,6 +67,7 @@ import org.acumos.cds.util.EELFLoggerDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -88,8 +92,6 @@ public class SolutionController extends AbstractController {
 
 	@Autowired
 	private SolutionRepository solutionRepository;
-	@Autowired
-	private SolutionSearchService solutionSearchService;
 	@Autowired
 	private SolutionRevisionRepository revisionRepository;
 	@Autowired
@@ -200,25 +202,27 @@ public class SolutionController extends AbstractController {
 
 	/**
 	 * @param queryParameters
-	 *            Map of String (field name) to String (value) for restricting the
-	 *            query
+	 *            Expect a single parameter "search" with a complex criteria string.
+	 * @param pageRequest
+	 *            Page and sort criteria
 	 * @param response
 	 *            HttpServletResponse
 	 * @return List of solutions
 	 */
-	@ApiOperation(value = "Gets a list of solutions, optionally restricted by field name - field value pairs specified as query parameters.", response = MLPSolution.class, responseContainer = "List")
+	@ApiOperation(value = "Gets a page of solutions that match the criteria.", response = MLPSolution.class, responseContainer = "Page")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchSolutions(@RequestParam Map<String, String> queryParameters, HttpServletResponse response) {
+	public Object searchSolutions(@RequestParam Map<String, String> queryParameters, Pageable pageRequest, HttpServletResponse response) {
 		try {
-			Map<String, Object> convertedQryParm = null;
-			boolean isOr = false;
-			if (queryParameters != null && queryParameters.size() > 0) {
-				String junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
-				isOr = junction != null && "o".equals(junction);
-				convertedQryParm = convertQueryParameters(MLPSolution.class, queryParameters);
-			}
-			return solutionSearchService.getSolutions(convertedQryParm, isOr);
+			String criteriaString = queryParameters.get(SearchCriteria.QUERY_PARAM_NAME);
+			SearchCriteria searchCriteria = new SearchCriteria(criteriaString);
+			convertSearchCriteriaValues(MLPSolution.class, searchCriteria);
+			MLPSolutionSpecificationBuilder builder = new MLPSolutionSpecificationBuilder();
+			Iterator<SearchCriterion> iter = searchCriteria.iterator();
+			while (iter.hasNext()) 
+				builder.with(iter.next());
+			Specification<MLPSolution> spec = builder.build(); 
+			return solutionRepository.findAll(spec, pageRequest);
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "searchSolutions failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -524,7 +528,8 @@ public class SolutionController extends AbstractController {
 	public Object updateSolutionRevision(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, @RequestBody MLPSolutionRevision revision,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "updateSolutionRevision: solution ID {}, revision ID {}", solutionId, revisionId);
+		logger.debug(EELFLoggerDelegate.debugLogger, "updateSolutionRevision: solution ID {}, revision ID {}",
+				solutionId, revisionId);
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No solution for ID " + solutionId, null);
@@ -833,7 +838,7 @@ public class SolutionController extends AbstractController {
 	 *            HttpServletResponse
 	 * @return A list of solution ratings
 	 */
-	@ApiOperation(value = "Gets the user ratings for the specified solution.", response = MLPSolutionRating.class, responseContainer = "List")
+	@ApiOperation(value = "Gets all user ratings for the specified solution.", response = MLPSolutionRating.class, responseContainer = "List")
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.RATING_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getListOfSolutionRating(@PathVariable("solutionId") String solutionId, Pageable pageRequest,
@@ -841,9 +846,42 @@ public class SolutionController extends AbstractController {
 		Iterable<MLPSolutionRating> sr = solutionRatingRepository.findBySolutionId(solutionId, pageRequest);
 		if (sr == null || !sr.iterator().hasNext()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entries for solution " + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entries for solution " + solutionId,
+					null);
 		}
 		return sr;
+	}
+
+	/**
+	 * @param solutionId
+	 *            Path parameter with solution ID
+	 * @param userId
+	 *            Path parameter with user ID
+	 * @param response
+	 *            HttpServletResponse
+	 * @return MLPSolutionRating
+	 */
+	@ApiOperation(value = "Gets an existing solution rating.", response = MLPSolutionRating.class)
+	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.RATING_PATH + "/" + CCDSConstants.USER_PATH
+			+ "/{userId}", method = RequestMethod.GET)
+	@ResponseBody
+	public Object getSolutionRating(@PathVariable("solutionId") String solutionId,
+			@PathVariable("userId") String userId, HttpServletResponse response) {
+		if (solutionRepository.findOne(solutionId) == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No solution " + solutionId, null);
+		}
+		if (userRepository.findOne(userId) == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + userId, null);
+		}
+		MLPSolutionRating da = solutionRatingRepository.findOne(new SolutionRatingPK(solutionId, userId));
+		if (da == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+					"No rating for solution ID " + solutionId + " by user " + userId, null);
+		}
+		return da;
 	}
 
 	/**

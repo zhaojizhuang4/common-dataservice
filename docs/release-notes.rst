@@ -5,18 +5,24 @@ Release Notes
 The server and client are released together.  The server is deployed within a Docker image
 in the Docker registry.  The client is deployed as a jar file to a Maven Nexus repository.
 
+Version 1.9.1, 30 November 2017
+-------------------------------
+
+* Add method to get rating by key fields solution ID and user ID
+* Revise searchSolutions method to accept complex query criteria
+
 Version 1.9.0, 16 November 2017
 -------------------------------
 
 * Add methods to get role count, users-in-role count
 * Add methods for bulk update of users in roles
-* Add "options" attribute to Peer Subscription 
+* Add "options" attribute to Peer Subscription
 
 Version 1.8.0, 9 November 2017
 ------------------------------
 
-* Add artifact ID to the solution download record 
-* Add last-download date to the solution web record 
+* Add artifact ID to the solution download record
+* Add last-download date to the solution web record
 
 Version 1.7.0, 3 November 2017
 ------------------------------

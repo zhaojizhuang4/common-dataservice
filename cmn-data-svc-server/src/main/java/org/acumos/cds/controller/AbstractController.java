@@ -21,11 +21,15 @@
 package org.acumos.cds.controller;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import org.acumos.cds.query.SearchCriteria;
+import org.acumos.cds.query.SearchCriterion;
 import org.acumos.cds.util.EELFLoggerDelegate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -107,6 +111,71 @@ public abstract class AbstractController {
 			throw new IllegalArgumentException("Failed to find field name " + fieldName);
 		}
 		return convertedQryParm;
+	}
+
+	/**
+	 * Converts criteria Strings to appropriately typed values. Uses reflection on
+	 * the clas to discover field types, then converts the values appropriately.
+	 * Note that any field may be declared on a superclass, so must recurse up the
+	 * inheritance path.
+	 * 
+	 * @param modelClass
+	 *            Model class with fields named in the query criteria
+	 * @param searchCriteria
+	 *            List of field, operator, value tuples
+	 * @throws NoSuchFieldException
+	 *             on unknown field
+	 * @throws NumberFormatException
+	 *             on unparseable number
+	 */
+	protected void convertSearchCriteriaValues(Class<?> modelClass, SearchCriteria searchCriteria)
+			throws NoSuchFieldException {
+
+		// Set up to detect unknown field names
+		List<String> fieldNames = new ArrayList<String>();
+		Iterator<SearchCriterion> iter = searchCriteria.iterator();
+		while (iter.hasNext())
+			fieldNames.add(iter.next().getKey());
+		
+		Class<?> clazz = modelClass;
+		while (clazz != null) {
+			logger.trace(EELFLoggerDelegate.debugLogger, "convertSearchCriteriaValues: checking class {}",
+					clazz.getName());
+			Field[] fields = clazz.getDeclaredFields();
+			Iterator<SearchCriterion> scIter = searchCriteria.iterator();
+			while (scIter.hasNext()) {
+				SearchCriterion criterion = scIter.next();
+				Field f = null;
+				for (Field field : fields)
+					if (criterion.getKey().equals(field.getName())) {
+						f = field;
+						break;
+					}
+				if (f == null)
+					continue;
+				// Found the field
+				fieldNames.remove(criterion.getKey());
+				logger.trace(EELFLoggerDelegate.debugLogger, "convertSearchCriteriaValues: type is " + f.getType());
+				if (f.getType().equals(String.class))
+					; // nothing to do, it's already String
+				else if (f.getType().equals(Boolean.class) || f.getType().equals(boolean.class))
+					criterion.setValue(Boolean.valueOf(criterion.getValue().toString()));
+				else if (f.getType().equals(Integer.class))
+					criterion.setValue(Integer.parseInt(criterion.getValue().toString()));
+				else if (f.getType().equals(Long.class))
+					criterion.setValue(Long.parseLong(criterion.getValue().toString()));
+				else if (f.getType().equals(Date.class))
+					criterion.setValue(new Date(Long.parseLong(criterion.getValue().toString())));
+				else
+					throw new IllegalArgumentException("Unhandled type " + f.getType().toString() + " on field "
+							+ f.getName() + " in class " + clazz.getName());
+			}
+			// recurse up
+			clazz = clazz.getSuperclass();
+		}
+		// Check if any params were missed
+		if (fieldNames.size() > 0)
+			throw new IllegalArgumentException("Failed to find field name " + fieldNames.get(0));
 	}
 
 	/**

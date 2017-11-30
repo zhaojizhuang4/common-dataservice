@@ -61,6 +61,8 @@ import org.acumos.cds.domain.MLPUserLoginProvider;
 import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPUserRoleMap;
 import org.acumos.cds.domain.MLPValidationStatus;
+import org.acumos.cds.query.SearchCriterion;
+import org.acumos.cds.query.SearchOperation;
 import org.acumos.cds.repository.AccessTypeRepository;
 import org.acumos.cds.repository.ArtifactRepository;
 import org.acumos.cds.repository.ArtifactTypeRepository;
@@ -90,8 +92,9 @@ import org.acumos.cds.repository.ValidationStatusRepository;
 import org.acumos.cds.service.ArtifactSearchService;
 import org.acumos.cds.service.PeerSearchService;
 import org.acumos.cds.service.RoleSearchService;
-import org.acumos.cds.service.SolutionSearchService;
 import org.acumos.cds.service.UserSearchService;
+import org.acumos.cds.specification.MLPSolutionSpecification;
+import org.acumos.cds.specification.MLPSolutionSpecificationBuilder;
 import org.acumos.cds.util.EELFLoggerDelegate;
 import org.junit.Assert;
 import org.junit.Test;
@@ -100,6 +103,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.TransactionSystemException;
 
@@ -120,7 +125,7 @@ public class CdsRepositoryServiceTest {
 	@Autowired
 	private ArtifactTypeRepository artifactTypeRepository;
 	@Autowired
-	private LoginProviderRepository loginProviderRepository;	
+	private LoginProviderRepository loginProviderRepository;
 	@Autowired
 	private ModelTypeRepository modelTypeRepository;
 	@Autowired
@@ -173,8 +178,6 @@ public class CdsRepositoryServiceTest {
 	@Autowired
 	private RoleSearchService roleSearchService;
 	@Autowired
-	private SolutionSearchService solutionSearchService;
-	@Autowired
 	private UserSearchService userService;
 
 	@Test
@@ -224,7 +227,7 @@ public class CdsRepositoryServiceTest {
 			Assert.assertNotNull(notif.getNotificationId());
 			Assert.assertNotNull(notif.getCreated());
 			logger.info("\t\tNotification: " + notif);
-			
+
 			// put it in the map NotifUserMapRepository
 			MLPNotifUserMap notifMap = null;
 			notifMap = new MLPNotifUserMap();
@@ -232,11 +235,11 @@ public class CdsRepositoryServiceTest {
 			notifMap.setUserId(cu.getUserId());
 			notifMap = notifUserMapRepository.save(notifMap);
 			logger.info("\t\tNotification Map: " + notifMap);
-			
+
 			logger.info("NotificationRepository Info");
 			Iterable<MLPUserNotification> nList = notificationRepository.findActiveByUser(cu.getUserId(), null);
 			logger.info("User notifications for user {}: {}", cu.getUserId(), nList);
-			
+
 			logger.info("Fetching loginProviders");
 			Iterable<MLPLoginProvider> loginProviderList = loginProviderRepository.findAll();
 			logger.info("Login providers {}", loginProviderList);
@@ -249,21 +252,21 @@ public class CdsRepositoryServiceTest {
 			ulp.setRank(0);
 			ulp = userLoginProviderRepository.save(ulp);
 			Assert.assertNotNull(ulp.getCreated());
-			
+
 			logger.info("UserLoginProviderRepository Info");
 			Iterable<MLPUserLoginProvider> ulpList = userLoginProviderRepository.findByUser(cu.getUserId());
 			logger.info("User Login provider list {}", ulpList);
-			
+
 			logger.info("Fetching Validation Status Codes");
 			Iterable<MLPValidationStatus> validStatusList = validationStatusRepository.findAll();
 			Assert.assertTrue(validStatusList.iterator().hasNext());
 			logger.info("Validation status code list {}", validStatusList);
-			
+
 			logger.info("Fetching Toolkit Types");
 			Iterable<MLPToolkitType> toolkitTypeList = toolkitTypeRepository.findAll();
 			Assert.assertTrue(toolkitTypeList.iterator().hasNext());
 			logger.info("Toolkit type list {}", toolkitTypeList);
-			
+
 			// Create Peer
 			MLPPeer pr = new MLPPeer();
 			pr.setName("Peer-" + Long.toString(new Date().getTime()));
@@ -275,23 +278,23 @@ public class CdsRepositoryServiceTest {
 			pr = peerRepository.save(pr);
 			Assert.assertNotNull(pr.getPeerId());
 			Assert.assertNotNull(pr.getCreated());
-			
+
 			// Fetch back
-			Map<String,String> peerParms = new HashMap<>();
+			Map<String, String> peerParms = new HashMap<>();
 			peerParms.put("name", pr.getName());
 			List<MLPPeer> searchPeers = peerSearchService.getPeers(peerParms, false);
 			Assert.assertTrue(searchPeers.size() == 1);
-			
+
 			MLPPeerSubscription ps = new MLPPeerSubscription();
 			ps.setPeerId(pr.getPeerId());
-			ps = peerSubscriptionRepository.save(ps);			
+			ps = peerSubscriptionRepository.save(ps);
 			logger.info("Peer subscription {}", ps);
-			
+
 			logger.info("Fetching PeerSubscriptions");
 			Iterable<MLPPeerSubscription> peerSubscriptionList = peerSubscriptionRepository.findByPeer(pr.getPeerId());
 			Assert.assertTrue(peerSubscriptionList.iterator().hasNext());
 			logger.info("Peer subscription list {}", peerSubscriptionList);
-			
+
 			logger.info("Creating test role");
 			MLPRole cr2 = new MLPRole();
 			cr2.setName("MLP System User4");
@@ -301,21 +304,21 @@ public class CdsRepositoryServiceTest {
 			long count = roleRepository.count();
 			Assert.assertTrue(count > 0);
 			logger.info("Role count: {}", count);
-			
-			Map<String,String> roleParms = new HashMap<>();
+
+			Map<String, String> roleParms = new HashMap<>();
 			roleParms.put("name", cr2.getName());
 			List<MLPRole> searchRoles = roleSearchService.getRoles(roleParms, false);
 			Assert.assertTrue(searchRoles.size() == 1);
-			
+
 			MLPRoleFunction crf = new MLPRoleFunction();
 			final String roleFuncName = "My test role function";
 			crf.setName(roleFuncName);
 			crf.setRoleId(cr2.getRoleId());
 			crf = roleFunctionRepository.save(crf);
 			Assert.assertNotNull(crf.getRoleFunctionId());
-			
+
 			logger.info("User Info {}", cu);
-			userRoleMapRepository.save(new MLPUserRoleMap(cu.getUserId(),cr2.getRoleId()));
+			userRoleMapRepository.save(new MLPUserRoleMap(cu.getUserId(), cr2.getRoleId()));
 
 			long usersInRole = userRoleMapRepository.getRoleUsersCount(cr2.getRoleId());
 			Assert.assertTrue(usersInRole > 0);
@@ -329,14 +332,14 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(resrf.iterator().hasNext());
 			MLPRoleFunction roleFuncOne = resrf.iterator().next();
 			Assert.assertEquals(roleFuncName, roleFuncOne.getName());
-			
+
 			logger.info("RoleRepository Info");
 			final String UserID = cu.getUserId();
 			Iterable<MLPRole> roleList = roleRepository.findByUser(UserID);
 			logger.info("Role list {}", roleList);
-			
-			userRoleMapRepository.delete(new MLPUserRoleMap.UserRoleMapPK(cu.getUserId(),cr2.getRoleId()));
-					
+
+			userRoleMapRepository.delete(new MLPUserRoleMap.UserRoleMapPK(cu.getUserId(), cr2.getRoleId()));
+
 			logger.info("Deleting test role function");
 			roleFunctionRepository.delete(roleFuncOne);
 
@@ -355,13 +358,14 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(artifactRepository.count() > 0);
 
 			// Fetch artifact back
-			Map<String,String> artParms = new HashMap<>();
+			Map<String, String> artParms = new HashMap<>();
 			artParms.put("name", ca.getName());
 			List<MLPArtifact> searchArts = artifactSearchService.getArtifacts(artParms, false);
 			Assert.assertTrue(searchArts.size() > 0);
-			
+
 			MLPSolution cs = new MLPSolution();
-			cs.setName("solution name");
+			final String solName = "solution name";
+			cs.setName(solName);
 			cs.setActive(true);
 			cs.setOwnerId(cu.getUserId());
 			cs.setProvider("Big Data Org");
@@ -373,11 +377,21 @@ public class CdsRepositoryServiceTest {
 			Assert.assertNotNull("Solution ID", cs.getSolutionId());
 			logger.info("Created solution " + cs.getSolutionId());
 
-			Map<String,String> solParms = new HashMap<>();
-			solParms.put("name",  cs.getName());
-			List<MLPSolution> searchSols = solutionSearchService.getSolutions(solParms, false);
-			Assert.assertTrue(searchSols.size() == 1);
-			
+			String [] nameArray = { solName };
+			MLPSolutionSpecification spec1 = new MLPSolutionSpecification(
+					new SearchCriterion("name", SearchOperation.IN, nameArray));
+			MLPSolutionSpecification spec2 = new MLPSolutionSpecification(
+					new SearchCriterion("ownerId", SearchOperation.EQUALS, cu.getUserId()));
+			Page<MLPSolution> specSearchResults = solutionRepository.findAll(Specifications.where(spec1).and(spec2),
+					new PageRequest(0, 5, null));
+			Assert.assertTrue(specSearchResults.getNumberOfElements() == 1);
+
+			Specification<MLPSolution> spec = new MLPSolutionSpecificationBuilder()
+					.with(new SearchCriterion("name", SearchOperation.EQUALS, solName))
+					.with(new SearchCriterion("ownerId", SearchOperation.EQUALS, cu.getUserId())).build();
+			Page<MLPSolution> specSearchResults2 = solutionRepository.findAll(spec, new PageRequest(0, 5, null));
+			Assert.assertTrue(specSearchResults2.getNumberOfElements() == 1);
+
 			MLPSolutionRevision cr = new MLPSolutionRevision();
 			cr.setSolutionId(cs.getSolutionId());
 			cr.setVersion("1.0R");
@@ -390,8 +404,8 @@ public class CdsRepositoryServiceTest {
 			logger.info("Adding artifact to revision");
 			solRevArtMapRepository.save(new MLPSolRevArtMap(cr.getRevisionId(), ca.getArtifactId()));
 
-			logger.info("Added"+cr.getRevisionId()+" and "+ca.getArtifactId());
-						
+			logger.info("Added" + cr.getRevisionId() + " and " + ca.getArtifactId());
+
 			logger.info("Querying for artifact by partial match");
 			Iterable<MLPArtifact> al = artifactRepository.findBySearchTerm("name", new PageRequest(0, 5, null));
 			Assert.assertTrue(al != null && al.iterator().hasNext());
@@ -407,7 +421,8 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(sl != null && sl.iterator().hasNext());
 
 			logger.info("Querying for revisions by solution");
-			Iterable<MLPSolutionRevision> revs = revisionRepository.findBySolution(new String[] {si.getSolutionId(), cs.getSolutionId()});
+			Iterable<MLPSolutionRevision> revs = revisionRepository
+					.findBySolution(new String[] { si.getSolutionId(), cs.getSolutionId() });
 			Assert.assertTrue(revs.iterator().hasNext());
 			for (MLPSolutionRevision r : revs) {
 				logger.info("\tRevision: " + r.toString());
@@ -416,7 +431,7 @@ public class CdsRepositoryServiceTest {
 				for (MLPArtifact a : arts)
 					logger.info("\t\tArtifact: " + a.toString());
 			}
-			
+
 			// Create Solution download
 			MLPSolutionDownload sd = new MLPSolutionDownload(cs.getSolutionId(), ca.getArtifactId(), cu.getUserId());
 			sd = solutionDownloadRepository.save(sd);
@@ -430,46 +445,44 @@ public class CdsRepositoryServiceTest {
 			logger.info("Solution download count: " + downloadCount);
 
 			logger.info("Querying for solution downloads for the specified solution ID");
-			Iterable<MLPSolutionDownload> soldown = solutionDownloadRepository.findBySolutionId(cs.getSolutionId(),new PageRequest(0, 5, null));
+			Iterable<MLPSolutionDownload> soldown = solutionDownloadRepository.findBySolutionId(cs.getSolutionId(),
+					new PageRequest(0, 5, null));
 			logger.info("solutionDownloadRepository list {}", soldown);
-			
+
 			MLPSolutionRating solrate = new MLPSolutionRating(cs.getSolutionId(), cu.getUserId(), 2);
 			solrate.setTextReview("Review text");
 			solrate.setCreated(new Date());
 			solrate = solutionRatingRepository.save(solrate);
 			Assert.assertNotNull(solrate.getSolutionId());
-			logger.info("Created Solution Rating " + solrate.getSolutionId() + " Rating is " +  solrate.getRating());
-					
+			logger.info("Created Solution Rating " + solrate.getSolutionId() + " Rating is " + solrate.getRating());
+
 			logger.info("Querying for solution rating for the specified solution ID");
-			Iterable<MLPSolutionRating> solrating = solutionRatingRepository.findBySolutionId(cs.getSolutionId(),new PageRequest(0, 5, null));
+			Iterable<MLPSolutionRating> solrating = solutionRatingRepository.findBySolutionId(cs.getSolutionId(),
+					new PageRequest(0, 5, null));
 			logger.info("SolutionRatingRepository list: {}", solrating);
- 
+
 			logger.info("Creating solution tag");
 			MLPTag tag1 = new MLPTag("Java");
 			tag1 = solutionTagRepository.save(tag1);
 			Iterable<MLPTag> tags = solutionTagRepository.findAll();
 			Assert.assertTrue(tags.iterator().hasNext());
 			logger.info("First tag fetched back is " + tags.iterator().next());
-			
+
 			MLPSolTagMap solTagMap1 = new MLPSolTagMap(cs.getSolutionId(), tag1.getTag());
 			solTagMapRepository.save(solTagMap1);
-			
+
 			MLPSolTagMap soltag = null;
 			soltag = new MLPSolTagMap();
 			soltag.setSolutionId(cs.getSolutionId());
 			soltag.setTag("Java");
 			Assert.assertNotNull(soltag.getSolutionId());
-			logger.info("Created Solution Tag " + soltag.getSolutionId() + " Tag is " +  soltag.getTag());
+			logger.info("Created Solution Tag " + soltag.getSolutionId() + " Tag is " + soltag.getTag());
 			soltag = solTagMapRepository.save(soltag);
-			
+
 			Iterable<MLPTag> soltag2 = solutionTagRepository.findBySolution(soltag.getSolutionId());
 			logger.info("Solution tag: {}", soltag2);
 			logger.info("Solution Tag list above");
-			
-			logger.info("Fetching Solution by Toolkit Types"); 
-			Iterable<MLPSolution> solbytooltype= solutionRepository.findByToolkitType("SK", new PageRequest(0, 5, null));
-			logger.info("Solutions: {}", solbytooltype);
-			
+
 			logger.info("Querying for revisions by artifact");
 			Iterable<MLPSolutionRevision> revsByArt = revisionRepository.findByArtifact(ca.getArtifactId());
 			Assert.assertTrue(revsByArt != null && revsByArt.iterator().hasNext());
@@ -481,31 +494,32 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(rl != null && rl.iterator().hasNext());
 			logger.info("Revision list: {}", rl);
 			logger.info("revisionRepository list above");
-			
+
 			logger.info("Querying for user by partial match");
 			Iterable<MLPUser> sul = userRepository.findBySearchTerm("Test", new PageRequest(0, 5, null));
 			Assert.assertTrue(sul != null && sul.iterator().hasNext());
 			logger.info("User list: {}", sul);
-		
+
 			Iterable<MLPSolution> solbytag = solutionRepository.findByTag("Java", new PageRequest(0, 5, null));
 			logger.info("Solutions by tag: {}", solbytag);
-			
+
 			MLPUser founduser = userRepository.findByLoginOrEmail("test_user7");
 			logger.info("Found user: {}", founduser);
-			
+
 			logger.info("Dropping artifact from revision");
 			solRevArtMapRepository.delete(new MLPSolRevArtMap.SolRevArtMapPK(cr.getRevisionId(), ca.getArtifactId()));
-			logger.info("Dropped"+cr.getRevisionId()+" and "+ca.getArtifactId());
-			
+			logger.info("Dropped" + cr.getRevisionId() + " and " + ca.getArtifactId());
+
 			MLPSiteConfig cc = new MLPSiteConfig("myKey", " { 'json' : 'block' }", cu.getUserId());
 			cc = siteConfigRepository.save(cc);
 			Assert.assertNotNull(cc);
 			logger.info("Created site config {}", cc);
-			
+
 			if (cleanup) {
 				logger.info("Removing newly added entities");
 				// Dropping the revision above; don't need delete here
-				//solRevArtMapRepository.delete(new MLPSolRevArtMap.SolRevArtMapPK(cr.getRevisionId(), ca.getArtifactId()));
+				// solRevArtMapRepository.delete(new
+				// MLPSolRevArtMap.SolRevArtMapPK(cr.getRevisionId(), ca.getArtifactId()));
 				revisionRepository.delete(cr);
 				solutionRatingRepository.delete(solrate);
 				MLPSolTagMap.SolTagMapPK solTagMapKey = new MLPSolTagMap.SolTagMapPK(cs.getSolutionId(), tag1.getTag());
@@ -559,7 +573,6 @@ public class CdsRepositoryServiceTest {
 			logger.info("Caught expected constraint violation exception: " + ex.getMessage());
 		}
 	}
-
 
 	@Test
 	public void createSolutionWithArtifacts() throws Exception {
@@ -736,10 +749,6 @@ public class CdsRepositoryServiceTest {
 			cs2 = solutionRepository.save(cs2);
 			Assert.assertNotNull("Solution 2 ID", cs2.getSolutionId());
 			logger.info("Created solution 2 " + cs2.getSolutionId());
-
-			// Find solution by toolkit
-			Page<MLPSolution> toolkitSols = solutionRepository.findByToolkitType(ToolkitTypeCode.SK.toString(), null);
-			Assert.assertTrue(toolkitSols.getNumberOfElements() > 0);
 
 			MLPSolutionRevision cr = new MLPSolutionRevision();
 			cr.setSolutionId(cs.getSolutionId());
@@ -1006,5 +1015,5 @@ public class CdsRepositoryServiceTest {
 		logger.error(EELFLoggerDelegate.applicationLogger, "An error {}", "message");
 		logger.error(EELFLoggerDelegate.applicationLogger, "An error message", new Exception());
 	}
-	
+
 }

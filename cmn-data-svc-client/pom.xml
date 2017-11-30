@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.acumos.common-dataservice</groupId>
 	<artifactId>cmn-data-svc-client</artifactId>
-	<version>1.9.0-SNAPSHOT</version>
+	<version>1.9.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Acumos Common Data Service Client</name>
 	<description>Client library for the Acumos Common Data Service</description>
@@ -99,10 +99,18 @@
 			</exclusions>
 		</dependency>
 
+		<!-- org.springframework.data artifacts have different versions -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
-			<version>1.13.4.RELEASE</version>
+			<version>1.13.9.RELEASE</version>
+		</dependency>
+
+		<!-- org.springframework.data artifacts have different versions -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-jpa</artifactId>
+			<version>1.11.9.RELEASE</version>
 		</dependency>
 
 		<dependency>
@@ -138,8 +146,8 @@
 				<artifactId>license-maven-plugin</artifactId>
 				<version>1.14</version>
 				<configuration>
-        				<licenseName>acumos</licenseName>
-        				<licenseResolver>${project.baseUri}/src/license</licenseResolver>
+					<licenseName>acumos</licenseName>
+					<licenseResolver>${project.baseUri}/src/license</licenseResolver>
 					<addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
 					<processStartTag>===============LICENSE_START=======================================================</processStartTag>
 					<processEndTag>===============LICENSE_END=========================================================</processEndTag>

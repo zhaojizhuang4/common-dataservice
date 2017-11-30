@@ -52,6 +52,7 @@ import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
 import org.acumos.cds.domain.MLPValidationType;
+import org.acumos.cds.query.SearchCriteria;
 import org.acumos.cds.transport.RestPageRequest;
 import org.acumos.cds.transport.RestPageResponse;
 import org.acumos.cds.transport.SuccessTransport;
@@ -177,18 +178,16 @@ public interface ICommonDataServiceRestClient {
 	RestPageResponse<MLPSolution> findSolutionsByTag(String tag, RestPageRequest pageRequest);
 
 	/**
-	 * Searches the solutions.
+	 * Gets a page of solutions that match the specified criteria.
 	 * 
-	 * @param queryParameters
-	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Accepts Boolean, Date, Integer, Long, String.
-	 * @param isOr
-	 *            If true, finds matches on any field-value pair (conditions are
-	 *            OR-ed together); otherwise finds matches on all field-value pairs
-	 *            (conditions are AND-ed together).
-	 * @return List of solution objects.
+	 * @param searchCriteria
+	 *            Query criteria expressed as tuples of Java field name, operation,
+	 *            field value string.
+	 * @param pageRequest
+	 *            Page index, page size, sort information; ignored if null.
+	 * @return Page of solution objects.
 	 */
-	List<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr);
+	RestPageResponse<MLPSolution> searchSolutions(SearchCriteria searchCriteria, RestPageRequest pageRequest);
 
 	/**
 	 * Gets the solution with the specified ID.
@@ -958,7 +957,7 @@ public interface ICommonDataServiceRestClient {
 	void deleteSolutionFavorite(MLPSolutionFavorite fs);
 
 	/**
-	 * Gets the ratings for the specified solution.
+	 * Gets the user ratings for the specified solution.
 	 * 
 	 * @param solutionId
 	 *            Instance ID
@@ -967,6 +966,17 @@ public interface ICommonDataServiceRestClient {
 	 * @return List of solution ratings
 	 */
 	RestPageResponse<MLPSolutionRating> getSolutionRatings(String solutionId, RestPageRequest pageRequest);
+
+	/**
+	 * Gets a rating for the specified solution and user.
+	 * 
+	 * @param solutionId
+	 *            Solution ID
+	 * @param userId
+	 *            User ID
+	 * @return Solution rating
+	 */
+	MLPSolutionRating getSolutionRating(String solutionId, String userId);
 
 	/**
 	 * Creates a solution rating.
