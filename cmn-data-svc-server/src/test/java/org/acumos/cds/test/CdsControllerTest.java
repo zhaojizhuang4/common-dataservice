@@ -41,6 +41,7 @@ import org.acumos.cds.client.ICommonDataServiceRestClient;
 import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
+import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPModelType;
@@ -60,6 +61,7 @@ import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionValidation;
 import org.acumos.cds.domain.MLPSolutionWeb;
 import org.acumos.cds.domain.MLPTag;
+import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
@@ -100,6 +102,9 @@ public class CdsControllerTest {
 
 	// Defined in the default application.properties file
 	private final String hostname = "localhost";
+
+	// For tripping length constraints
+	private final String s64 = "12345678901234567890123456789012345678901234567890123456789012345";
 
 	// From properties
 	@Value("${server.contextPath}")
@@ -534,7 +539,7 @@ public class CdsControllerTest {
 			List<String> codeList = new ArrayList<>();
 			codeList.add(AccessTypeCode.PB.name());
 			codeList.add(AccessTypeCode.PR.name());
-			// Cover query parser
+			// Cover query parser as much as possible
 			SearchCriteria criteria = new SearchCriteria(
 					new SearchCriterion("accessTypeCode", SearchOperation.EQUALS, AccessTypeCode.PB.name()))
 							.or(new SearchCriterion("accessTypeCode", SearchOperation.NOT_EQUALS, "Y"))
@@ -543,7 +548,8 @@ public class CdsControllerTest {
 							.or(new SearchCriterion("accessTypeCode", SearchOperation.IN, codeList))
 							.or(new SearchCriterion("accessTypeCode", SearchOperation.LIKE, "X"))
 							.or(new SearchCriterion("accessTypeCode", SearchOperation.LTE, "X"))
-							.or(new SearchCriterion("accessTypeCode", SearchOperation.GTE, "X"));
+							.or(new SearchCriterion("accessTypeCode", SearchOperation.GTE, "X"))
+							.or(new SearchCriterion("created", SearchOperation.EQUALS, new Date()));
 			RestPageResponse<MLPSolution> sols = client.searchSolutions(criteria, new RestPageRequest(0, 1));
 			Assert.assertTrue(sols != null && sols.getSize() > 0);
 			logger.info("Active PB solution count {}", sols.getSize());
@@ -970,10 +976,198 @@ public class CdsControllerTest {
 	}
 
 	@Test
-	public void testErrorConditions() throws Exception {
+	public void testThreadsComments() throws Exception {
+		MLPUser cu = new MLPUser("commentUser", true);
+		cu = client.createUser(cu);
+		Assert.assertNotNull(cu.getUserId());
 
-		// For tripping length constraints
-		final String s64 = "12345678901234567890123456789012345678901234567890123456789012345";
+		MLPThread thread = client.createThread(new MLPThread("url"));
+		Assert.assertTrue(thread != null && thread.getThreadId() != null);
+		RestPageResponse<MLPThread> threads = client.getThreads(new RestPageRequest(0, 1));
+		Assert.assertTrue(threads != null && threads.getSize() > 0);
+
+		MLPThread retrieved = client.getThread(thread.getThreadId());
+		Assert.assertNotNull(retrieved);
+
+		long threadCount = client.getThreadCount();
+		Assert.assertTrue(threadCount > 0);
+
+		thread.setTitle("thread title");
+		client.updateThread(thread);
+
+		// Violate contraints
+		try {
+			MLPThread t = new MLPThread("too large");
+			t.setTitle(s64 + s64);
+			client.createThread(t);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed constraints on create as expected {}", ex.getResponseBodyAsString());
+		}
+		try {
+			thread.setTitle(s64 + s64);
+			client.updateThread(thread);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed constraints on update as expected {}", ex.getResponseBodyAsString());
+		}
+		// set back old title
+		thread.setTitle("thread title");
+
+		// Recreate should fail
+		try {
+			client.createThread(thread);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to create dupe as expected {}", ex.getResponseBodyAsString());
+		}
+		MLPThread bogus = new MLPThread("bogus");
+		bogus.setThreadId("bogus");
+		try {
+			client.getThread("bogus");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to get missing as expected {}", ex.getResponseBodyAsString());
+		}
+		// Update of missing should fail
+		try {
+			client.updateThread(bogus);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to update missing as expected {}", ex.getResponseBodyAsString());
+		}
+		// Delete of missing should fail
+		try {
+			client.deleteThread("bogus");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to delete missing as expected {}", ex.getResponseBodyAsString());
+		}
+
+		MLPComment parent = client.createComment(new MLPComment(thread.getThreadId(), cu.getUserId(), "parent text"));
+		Assert.assertTrue(parent != null && parent.getCommentId() != null);
+		logger.info("Created parent comment: " + parent.toString());
+
+		parent = client.getComment(thread.getThreadId(), parent.getCommentId());
+		Assert.assertNotNull(parent);
+
+		MLPComment reply = new MLPComment(thread.getThreadId(), cu.getUserId(), "child text");
+		reply.setParentId(parent.getCommentId());
+		reply = client.createComment(reply);
+		Assert.assertTrue(reply != null && reply.getCommentId() != null);
+		logger.info("Created reply comment: " + reply.toString());
+
+		reply.setText(s64);
+		client.updateComment(reply);
+
+		long commentCount = client.getThreadCommentCount(thread.getThreadId());
+		Assert.assertTrue(commentCount > 0);
+
+		RestPageResponse<MLPComment> threadComments = client.getThreadComments(thread.getThreadId(), new RestPageRequest(0,1));
+		Assert.assertTrue(threadComments != null && threadComments.hasContent());
+
+		try {
+			client.getComment("bogus", "bogus");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to get missing comment as expected {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPComment c = new MLPComment("thread", "user", "text");
+			c.setParentId("bogus");
+			client.createComment(c);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to create comment bad parent as expected {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createComment(new MLPComment("bogus", "bogus", "text"));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to create comment bad thread as expected {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createComment(new MLPComment(thread.getThreadId(), "bogus", "text"));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to create comment bad user as expected {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPComment large = new MLPComment(thread.getThreadId(), cu.getUserId(), "text");
+			large.setUrl(s64+s64+s64+s64+s64+s64+s64+s64+s64+s64);
+			client.createComment(large);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to create comment with large URL as expected {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createComment(reply);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to create dupe as expected {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPComment c = new MLPComment("bogus", "bogus", "text");
+			c.setCommentId("bogus");
+			client.updateComment(c);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to update missing comment as expected {}", ex.getResponseBodyAsString());
+			reply.setThreadId(thread.getThreadId());
+		}
+		try {
+			reply.setThreadId("bogus");
+			client.updateComment(reply);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to update with bad thread as expected {}", ex.getResponseBodyAsString());
+			reply.setThreadId(thread.getThreadId());
+		}
+		try {
+			reply.setParentId("bogus");
+			client.updateComment(reply);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to update with bad parent as expected {}", ex.getResponseBodyAsString());
+			reply.setParentId(parent.getCommentId());
+		}
+		try {
+			reply.setUserId("bogus");
+			client.updateComment(reply);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to update with bad user as expected {}", ex.getResponseBodyAsString());
+			reply.setUserId(cu.getUserId());
+		}
+		try {
+			reply.setUrl(s64+s64+s64+s64+s64+s64+s64+s64+s64+s64);
+			client.updateComment(reply);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to update existing comment with large URL as expected {}", ex.getResponseBodyAsString());
+			reply.setUrl("short");
+		}		
+		try {
+			client.updateComment(new MLPComment(thread.getThreadId(), "bogus", "text"));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to update missing comment as expected {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.deleteComment("bogus", "bogus");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed to delete missing as expected {}", ex.getResponseBodyAsString());
+		}
+
+		client.deleteComment(thread.getThreadId(), parent.getCommentId());
+		client.deleteComment(thread.getThreadId(), reply.getCommentId());
+		client.deleteThread(thread.getThreadId());
+		client.deleteUser(cu.getUserId());
+	}
+
+	@Test
+	public void testErrorConditions() throws Exception {
 
 		MLPUser cu = new MLPUser();
 		cu.setUserId(UUID.randomUUID().toString());

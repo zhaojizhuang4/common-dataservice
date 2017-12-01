@@ -65,6 +65,6 @@ public interface SolutionDownloadRepository
 	@Modifying
 	@Transactional // throws exception without this
 	@Query(value = "DELETE FROM MLPSolutionDownload d WHERE d.solutionId = :solutionId")
-	void deleteDownloadsForSolution(@Param("solutionId") String solutionId);
+	void deleteBySolutionId(@Param("solutionId") String solutionId);
 
 }

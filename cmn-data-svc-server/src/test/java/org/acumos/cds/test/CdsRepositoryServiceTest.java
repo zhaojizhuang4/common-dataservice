@@ -36,6 +36,7 @@ import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
+import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPModelType;
 import org.acumos.cds.domain.MLPNotifUserMap;
@@ -55,6 +56,7 @@ import org.acumos.cds.domain.MLPSolutionRating.SolutionRatingPK;
 import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionWeb;
 import org.acumos.cds.domain.MLPTag;
+import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
@@ -66,6 +68,7 @@ import org.acumos.cds.query.SearchOperation;
 import org.acumos.cds.repository.AccessTypeRepository;
 import org.acumos.cds.repository.ArtifactRepository;
 import org.acumos.cds.repository.ArtifactTypeRepository;
+import org.acumos.cds.repository.CommentRepository;
 import org.acumos.cds.repository.LoginProviderRepository;
 import org.acumos.cds.repository.ModelTypeRepository;
 import org.acumos.cds.repository.NotifUserMapRepository;
@@ -84,6 +87,7 @@ import org.acumos.cds.repository.SolutionRepository;
 import org.acumos.cds.repository.SolutionRevisionRepository;
 import org.acumos.cds.repository.SolutionWebRepository;
 import org.acumos.cds.repository.TagRepository;
+import org.acumos.cds.repository.ThreadRepository;
 import org.acumos.cds.repository.ToolkitTypeRepository;
 import org.acumos.cds.repository.UserLoginProviderRepository;
 import org.acumos.cds.repository.UserRepository;
@@ -125,6 +129,8 @@ public class CdsRepositoryServiceTest {
 	@Autowired
 	private ArtifactTypeRepository artifactTypeRepository;
 	@Autowired
+	private CommentRepository commentRepository;
+	@Autowired
 	private LoginProviderRepository loginProviderRepository;
 	@Autowired
 	private ModelTypeRepository modelTypeRepository;
@@ -161,6 +167,8 @@ public class CdsRepositoryServiceTest {
 	@Autowired
 	private TagRepository solutionTagRepository;
 	@Autowired
+	private ThreadRepository threadRepository;
+	@Autowired
 	private ToolkitTypeRepository toolkitTypeRepository;
 	@Autowired
 	private UserLoginProviderRepository userLoginProviderRepository;
@@ -170,7 +178,6 @@ public class CdsRepositoryServiceTest {
 	private UserRoleMapRepository userRoleMapRepository;
 	@Autowired
 	private ValidationStatusRepository validationStatusRepository;
-
 	@Autowired
 	private ArtifactSearchService artifactSearchService;
 	@Autowired
@@ -514,6 +521,17 @@ public class CdsRepositoryServiceTest {
 			cc = siteConfigRepository.save(cc);
 			Assert.assertNotNull(cc);
 			logger.info("Created site config {}", cc);
+
+			MLPThread thread = threadRepository.save(new MLPThread("a"));
+			MLPComment mc = commentRepository.save(new MLPComment(thread.getThreadId(), "b", "c"));
+			long crc = commentRepository.count();
+			Assert.assertTrue(crc > 0);
+			long tcc = commentRepository.countThreadComments(thread.getThreadId());
+			Assert.assertTrue(tcc > 0);
+			Page<MLPComment> commentList = commentRepository.findByThreadId(thread.getThreadId(), new PageRequest(0,5));
+			Assert.assertTrue(commentList != null && commentList.hasContent());
+			commentRepository.delete(mc.getCommentId());
+			threadRepository.delete(thread.getThreadId());
 
 			if (cleanup) {
 				logger.info("Removing newly added entities");

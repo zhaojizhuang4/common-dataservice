@@ -20,8 +20,7 @@
 
 package org.acumos.cds.repository;
 
-import org.acumos.cds.domain.MLPSolution;
-import org.acumos.cds.domain.MLPSolutionFavorite;
+import org.acumos.cds.domain.MLPComment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
@@ -30,31 +29,38 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface SolutionFavoriteRepository
-		extends PagingAndSortingRepository<MLPSolutionFavorite, MLPSolutionFavorite.SolutionFavoritePK> {
+public interface CommentRepository extends PagingAndSortingRepository<MLPComment, String> {
 
 	/**
-	 * Gets a page of solutions marked as favorite for the specified user ID.
+	 * Gets the count of comments within a thread.
 	 * 
-	 * @param userId
-	 *            User ID
-	 * @param pageRequest
-	 *            Start index, page size, sort criteria
-	 * @return Page of MLPSolution
+	 * @param threadId
+	 *            Thread ID
+	 * @return Count of comments
 	 */
-	@Query("SELECT s FROM MLPSolution s, MLPSolutionFavorite f WHERE s.solutionId = f.solutionId and f.userId = :userId")
-	Page<MLPSolution> findByUserId(@Param("userId") String userId, Pageable pageRequest);
+	@Query("SELECT COUNT(commentId) FROM MLPComment WHERE threadId = :threadId")
+	Long countThreadComments(@Param("threadId") String threadId);
 
 	/**
-	 * Deletes all entries for the specified solution, which supports cascading
-	 * delete.
+	 * Gets a page of comments with the specified thread ID using Spring magic.
 	 * 
-	 * @param solutionId
-	 *            Solution ID
+	 * @param threadId
+	 *            Thread ID
+	 * @param pageable
+	 *            Page and sort criteria
+	 * @return Page of MLPComment
+	 */
+	Page<MLPComment> findByThreadId(String threadId, Pageable pageable);
+	
+	/**
+	 * Deletes all entries for the specified thread ID
+	 * 
+	 * @param threadId
+	 *            Thread ID
 	 */
 	@Modifying
 	@Transactional // throws exception without this
-	@Query(value = "DELETE FROM MLPSolutionFavorite f WHERE f.solutionId = :solutionId")
-	void deleteBySolutionId(@Param("solutionId") String solutionId);
+	@Query(value = "DELETE FROM MLPComment d WHERE d.threadId = :threadId")
+	void deleteThreadComments(@Param("threadId") String threadId);
 
 }

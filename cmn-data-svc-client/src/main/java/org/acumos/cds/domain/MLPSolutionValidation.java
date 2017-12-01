@@ -126,8 +126,8 @@ public class MLPSolutionValidation extends MLPTimestampedEntity implements Seria
 	/**
 	 * JSON expected
 	 */
-	@Column(name = "DETAIL", columnDefinition = "VARCHAR(1024)")
-	@Size(max = 1024)
+	@Column(name = "DETAIL", columnDefinition = "VARCHAR(8192)")
+	@Size(max = 8192)
 	private String detail;
 
 	/**

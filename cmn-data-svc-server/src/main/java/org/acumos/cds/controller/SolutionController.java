@@ -51,6 +51,7 @@ import org.acumos.cds.repository.SolTagMapRepository;
 import org.acumos.cds.repository.SolUserAccMapRepository;
 import org.acumos.cds.repository.SolutionDeploymentRepository;
 import org.acumos.cds.repository.SolutionDownloadRepository;
+import org.acumos.cds.repository.SolutionFavoriteRepository;
 import org.acumos.cds.repository.SolutionRatingRepository;
 import org.acumos.cds.repository.SolutionRepository;
 import org.acumos.cds.repository.SolutionRevisionRepository;
@@ -99,6 +100,8 @@ public class SolutionController extends AbstractController {
 	@Autowired
 	private SolRevArtMapRepository solRevArtMapRepository;
 	@Autowired
+	private SolutionDeploymentRepository solutionDeploymentRepository;
+	@Autowired
 	private SolutionDownloadRepository solutionDownloadRepository;
 	@Autowired
 	private SolutionRatingRepository solutionRatingRepository;
@@ -107,13 +110,13 @@ public class SolutionController extends AbstractController {
 	@Autowired
 	private SolTagMapRepository solTagMapRepository;
 	@Autowired
-	private SolutionWebRepository solutionStatsRepository;
-	@Autowired
 	private SolUserAccMapRepository solUserAccMapRepository;
+	@Autowired
+	private SolutionFavoriteRepository solutionFavoriteRepository;
 	@Autowired
 	private SolutionValidationRepository solutionValidationRepository;
 	@Autowired
-	private SolutionDeploymentRepository solutionDeploymentRepository;
+	private SolutionWebRepository solutionWebRepository;
 	@Autowired
 	private UserRepository userRepository;
 
@@ -129,10 +132,10 @@ public class SolutionController extends AbstractController {
 	private void updateSolutionDownloadStats(String solutionId) {
 		Long count = solutionDownloadRepository.getSolutionDownloadCount(solutionId);
 		if (count != null) {
-			MLPSolutionWeb stats = solutionStatsRepository.findOne(solutionId);
+			MLPSolutionWeb stats = solutionWebRepository.findOne(solutionId);
 			stats.setDownloadCount(count);
 			stats.setLastDownload(new Date());
-			solutionStatsRepository.save(stats);
+			solutionWebRepository.save(stats);
 		}
 	}
 
@@ -149,10 +152,10 @@ public class SolutionController extends AbstractController {
 		Long count = solutionRatingRepository.getSolutionRatingCount(solutionId);
 		Double avg = solutionRatingRepository.getSolutionRatingAverage(solutionId);
 		if (count != null && avg != null) {
-			MLPSolutionWeb stats = solutionStatsRepository.findOne(solutionId);
+			MLPSolutionWeb stats = solutionWebRepository.findOne(solutionId);
 			stats.setRatingCount(count);
 			stats.setRatingAverageTenths(Math.round(10 * avg));
-			solutionStatsRepository.save(stats);
+			solutionWebRepository.save(stats);
 		}
 	}
 
@@ -300,7 +303,7 @@ public class SolutionController extends AbstractController {
 			// ALSO send back the model for client convenience
 			result = solutionRepository.save(solution);
 			// Cascade the create manually to the stats table
-			solutionStatsRepository.save(new MLPSolutionWeb(solution.getSolutionId()));
+			solutionWebRepository.save(new MLPSolutionWeb(solution.getSolutionId()));
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			// This is a hack to create the location path.
 			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.SOLUTION_PATH + "/" + solution.getSolutionId());
@@ -375,7 +378,7 @@ public class SolutionController extends AbstractController {
 		}
 		MLPTransportModel result = null;
 		try {
-			solutionStatsRepository.incrementViewCount(solutionId);
+			solutionWebRepository.incrementViewCount(solutionId);
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			logger.error(EELFLoggerDelegate.errorLogger, "incrementViewCount failed", ex);
@@ -403,13 +406,15 @@ public class SolutionController extends AbstractController {
 			HttpServletResponse response) {
 		try {
 			// Manually cascade the delete
+			// what about composite solutions?
 			solutionDeploymentRepository.deleteDeploymentsForSolution(solutionId);
 			solTagMapRepository.deleteTagsForSolution(solutionId);
-			solutionDownloadRepository.deleteDownloadsForSolution(solutionId);
-			solutionRatingRepository.deleteRatingsForSolution(solutionId);
+			solutionDownloadRepository.deleteBySolutionId(solutionId);
+			solutionRatingRepository.deleteBySolutionId(solutionId);
 			solutionValidationRepository.deleteBySolutionId(solutionId);
 			solUserAccMapRepository.deleteUsersForSolution(solutionId);
-			solutionStatsRepository.delete(solutionId);
+			solutionFavoriteRepository.deleteBySolutionId(solutionId);
+			solutionWebRepository.delete(solutionId);
 			for (MLPSolutionRevision r : revisionRepository.findBySolution(new String[] { solutionId })) {
 				for (MLPArtifact a : artifactRepository.findByRevision(r.getRevisionId()))
 					solRevArtMapRepository
@@ -1023,7 +1028,7 @@ public class SolutionController extends AbstractController {
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.WEB_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getSolutionStats(@PathVariable("solutionId") String solutionId, HttpServletResponse response) {
-		MLPSolutionWeb stats = solutionStatsRepository.findOne(solutionId);
+		MLPSolutionWeb stats = solutionWebRepository.findOne(solutionId);
 		if (stats == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + solutionId,
