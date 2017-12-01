@@ -2,7 +2,7 @@ package org.acumos.cds.query;
 
 /**
  * Defines operations in a tiny REST-friendly query language. Avoid characters
- * '?', '=' and '&'.
+ * '?', '=' and '&amp;'.
  */
 public enum SearchOperation {
 

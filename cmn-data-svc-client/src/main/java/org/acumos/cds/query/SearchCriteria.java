@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Supports a list of criteria in a tiny REST-friendly query language. Builds or
  * parses a complex query criteria that's usable as a GET request parameter.
- * Avoid characters '?', '=' and '&'.
+ * Avoid characters '?', '=' and '&amp;'.
  */
 public class SearchCriteria {
 

@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 /**
  * Supports a single criterion in a tiny REST-friendly query language. Avoid
- * characters '?', '=' and '&' because those are magic in a GET request.
+ * characters '?', '=' and '&amp;' because those are magic in a GET request.
  */
 public class SearchCriterion {
 
