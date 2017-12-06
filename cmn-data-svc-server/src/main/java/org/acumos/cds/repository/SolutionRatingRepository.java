@@ -77,6 +77,6 @@ public interface SolutionRatingRepository
 	@Modifying
 	@Transactional // throws exception without this
 	@Query(value = "DELETE FROM MLPSolutionRating r WHERE r.solutionId = :solutionId")
-	void deleteRatingsForSolution(@Param("solutionId") String solutionId);
+	void deleteBySolutionId(@Param("solutionId") String solutionId);
 
 }

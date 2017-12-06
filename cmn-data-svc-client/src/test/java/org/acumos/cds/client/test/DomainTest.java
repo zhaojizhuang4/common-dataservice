@@ -23,6 +23,7 @@ package org.acumos.cds.client.test;
 import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
+import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPModelType;
@@ -46,6 +47,7 @@ import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionValidation;
 import org.acumos.cds.domain.MLPSolutionWeb;
 import org.acumos.cds.domain.MLPTag;
+import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
@@ -109,7 +111,7 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertFalse(m.equals(new Object()));
-		Assert.assertTrue(m.equals(m));		
+		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
 	}
@@ -121,6 +123,29 @@ public class DomainTest extends AbstractModelTest {
 		m.setTypeName(s2);
 		Assert.assertEquals(s1, m.getTypeCode());
 		Assert.assertEquals(s2, m.getTypeName());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		logger.info(m.toString());
+	}
+
+	@Test
+	public void testMLPComment() {
+		MLPComment m = new MLPComment();
+		m = new MLPComment(s1, s2, s3);
+		m.setCommentId(s1);
+		m.setParentId(s2);
+		m.setText(s3);
+		m.setThreadId(s4);
+		m.setUrl(s5);
+		m.setUserId(s6);
+		Assert.assertEquals(s1, m.getCommentId());
+		Assert.assertEquals(s2, m.getParentId());
+		Assert.assertEquals(s3, m.getText());
+		Assert.assertEquals(s4, m.getThreadId());
+		Assert.assertEquals(s5, m.getUrl());
+		Assert.assertEquals(s6, m.getUserId());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -653,6 +678,23 @@ public class DomainTest extends AbstractModelTest {
 		m = new MLPTag();
 		m.setTag(s1);
 		Assert.assertEquals(s1, m.getTag());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		logger.info(m.toString());
+	}
+
+	@Test
+	public void testMLPThread() {
+		MLPThread m = new MLPThread("");
+		m = new MLPThread();
+		m.setThreadId(s1);
+		m.setTitle(s2);
+		m.setUrl(s3);
+		Assert.assertEquals(s1, m.getThreadId());
+		Assert.assertEquals(s2, m.getTitle());
+		Assert.assertEquals(s3, m.getUrl());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));

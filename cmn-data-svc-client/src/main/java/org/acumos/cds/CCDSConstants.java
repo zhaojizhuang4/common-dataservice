@@ -63,6 +63,8 @@ public abstract class CCDSConstants {
 	public static final String WEB_PATH = "web";
 	public static final String DEPLOYMENT_PATH = "deploy";
 	public static final String CONFIG_PATH = "config";
+	public static final String THREAD_PATH = "thread";
+	public static final String COMMENT_PATH = "comment";
 	
 	// Actions on entities
 	public static final String LIKE_PATH = "like";

@@ -32,6 +32,7 @@ import org.acumos.cds.CCDSConstants;
 import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
+import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPModelType;
@@ -53,6 +54,7 @@ import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionValidation;
 import org.acumos.cds.domain.MLPSolutionWeb;
 import org.acumos.cds.domain.MLPTag;
+import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
@@ -1452,6 +1454,115 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	public void deleteSiteConfig(String configKey) {
 		URI uri = buildUri(new String[] { CCDSConstants.CONFIG_PATH, configKey }, null, null);
 		logger.debug("deleteSiteConfig: url {}", uri);
+		restTemplate.delete(uri);
+	}
+
+	@Override
+	public long getThreadCount() {
+		URI uri = buildUri(
+				new String[] { CCDSConstants.THREAD_PATH, CCDSConstants.COUNT_PATH }, null,
+				null);
+		logger.debug("getThreadCount: uri {}", uri);
+		ResponseEntity<CountTransport> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<CountTransport>() {
+				});
+		return response.getBody().getCount();
+	}
+
+	@Override
+	public RestPageResponse<MLPThread> getThreads(RestPageRequest pageRequest) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH }, null, pageRequest);
+		logger.debug("getThreads: uri {}", uri);
+		ResponseEntity<RestPageResponse<MLPThread>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPThread>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public MLPThread getThread(String threadId) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId }, null,
+				null);
+		logger.debug("getThread: uri {}", uri);
+		ResponseEntity<MLPThread> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<MLPThread>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public MLPThread createThread(MLPThread thread) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH }, null, null);
+		logger.debug("createThread: uri {}", uri);
+		return restTemplate.postForObject(uri, thread, MLPThread.class);
+	}
+
+	@Override
+	public void updateThread(MLPThread thread) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, thread.getThreadId() },
+				null, null);
+		logger.debug("updateThread: url {}", uri);
+		restTemplate.put(uri, thread);
+	}
+
+	@Override
+	public void deleteThread(String threadId) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId }, null,
+				null);
+		logger.debug("deleteThread: url {}", uri);
+		restTemplate.delete(uri);
+	}
+
+	@Override
+	public long getThreadCommentCount(String threadId) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId, CCDSConstants.COMMENT_PATH, CCDSConstants.COUNT_PATH }, null, null);
+		logger.debug("getCommentCount: uri {}", uri);
+		ResponseEntity<CountTransport> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<CountTransport>() {
+				});
+		return response.getBody().getCount();
+	}
+
+	@Override
+	public RestPageResponse<MLPComment> getThreadComments(String threadId, RestPageRequest pageRequest) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId, CCDSConstants.COMMENT_PATH }, null,
+				pageRequest);
+		logger.debug("getThreadComments: uri {}", uri);
+		ResponseEntity<RestPageResponse<MLPComment>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPComment>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public MLPComment getComment(String threadId, String commentId) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId, CCDSConstants.COMMENT_PATH, commentId }, null,
+				null);
+		logger.debug("getComment: uri {}", uri);
+		ResponseEntity<MLPComment> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<MLPComment>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public MLPComment createComment(MLPComment comment) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, comment.getThreadId(), CCDSConstants.COMMENT_PATH }, null, null);
+		logger.debug("createComment: uri {}", uri);
+		return restTemplate.postForObject(uri, comment, MLPComment.class);
+	}
+
+	@Override
+	public void updateComment(MLPComment comment) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, comment.getThreadId(), CCDSConstants.COMMENT_PATH, comment.getCommentId() }, null, null);
+		logger.debug("updateComment: url {}", uri);
+		restTemplate.put(uri, comment);
+	}
+
+	@Override
+	public void deleteComment(String threadId, String commentId) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId, CCDSConstants.COMMENT_PATH, commentId }, null, null);
+		logger.debug("deleteComment: url {}", uri);
 		restTemplate.delete(uri);
 	}
 

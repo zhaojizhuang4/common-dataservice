@@ -132,7 +132,7 @@ public abstract class AbstractController {
 			throws NoSuchFieldException {
 
 		// Set up to detect unknown field names
-		List<String> fieldNames = new ArrayList<String>();
+		List<String> fieldNames = new ArrayList<>();
 		Iterator<SearchCriterion> iter = searchCriteria.iterator();
 		while (iter.hasNext())
 			fieldNames.add(iter.next().getKey());
@@ -174,7 +174,7 @@ public abstract class AbstractController {
 			clazz = clazz.getSuperclass();
 		}
 		// Check if any params were missed
-		if (fieldNames.size() > 0)
+		if (!fieldNames.isEmpty())
 			throw new IllegalArgumentException("Failed to find field name " + fieldNames.get(0));
 	}
 

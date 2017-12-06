@@ -26,6 +26,7 @@ import java.util.Map;
 import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
+import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPModelType;
@@ -45,6 +46,7 @@ import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionValidation;
 import org.acumos.cds.domain.MLPSolutionWeb;
 import org.acumos.cds.domain.MLPTag;
+import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
@@ -1309,5 +1311,115 @@ public interface ICommonDataServiceRestClient {
 	 *            key of instance to delete
 	 */
 	void deleteSiteConfig(String configKey);
+
+	/**
+	 * Gets count of threads.
+	 * 
+	 * @return Count of threads.
+	 */
+	long getThreadCount();
+
+	/**
+	 * Gets a page of threads
+	 * 
+	 * @param pageRequest
+	 *            Page index, page size, sort information; ignored if null.
+	 * @return Page of objects.
+	 */
+	RestPageResponse<MLPThread> getThreads(RestPageRequest pageRequest);
+
+	/**
+	 * Gets the thread with the specified ID.
+	 * 
+	 * @param threadId
+	 *            thread ID
+	 * @return Thread object
+	 */
+	MLPThread getThread(String threadId);
+
+	/**
+	 * Creates a thread
+	 * 
+	 * @param thread
+	 *            Thread data. If the ID field is null a new value is generated;
+	 *            otherwise the ID value is used if valid and not already known.
+	 * @return Complete object, with generated information such as ID
+	 */
+	MLPThread createThread(MLPThread thread);
+
+	/**
+	 * Updates a thread
+	 * 
+	 * @param thread
+	 *            Thread data
+	 */
+	void updateThread(MLPThread thread);
+
+	/**
+	 * Deletes a thread. Cascades the delete to comment associations.
+	 * 
+	 * @param threadId
+	 *            thread ID
+	 */
+	void deleteThread(String threadId);
+
+	/**
+	 * Gets count of comments in a thread.
+	 * 
+	 * @param threadId
+	 *            Thread ID
+	 * @return Count of comments
+	 */
+	long getThreadCommentCount(String threadId);
+
+	/**
+	 * Gets one page of a thread of comments.
+	 * 
+	 * @param threadId
+	 *            Thread ID
+	 * @param pageRequest
+	 *            Page index, page size, sort information; ignored if null.
+	 * @return One page of comments in the thread, sorted as specified.
+	 */
+	RestPageResponse<MLPComment> getThreadComments(String threadId, RestPageRequest pageRequest);
+
+	/**
+	 * Gets the comment with the specified IDs.
+	 * 
+	 * @param threadId
+	 *            Thread ID
+	 * @param commentId
+	 *            comment ID
+	 * @return Comment object
+	 */
+	MLPComment getComment(String threadId, String commentId);
+
+	/**
+	 * Creates a comment
+	 * 
+	 * @param comment
+	 *            Comment data. If the ID field is null a new value is generated;
+	 *            otherwise the ID value is used if valid and not already known.
+	 * @return Complete object, with generated information such as ID
+	 */
+	MLPComment createComment(MLPComment comment);
+
+	/**
+	 * Updates a comment
+	 * 
+	 * @param comment
+	 *            Comment data
+	 */
+	void updateComment(MLPComment comment);
+
+	/**
+	 * Deletes a comment.
+	 * 
+	 * @param threadId
+	 *            Thread ID
+	 * @param commentId
+	 *            comment ID
+	 */
+	void deleteComment(String threadId, String commentId);
 
 }

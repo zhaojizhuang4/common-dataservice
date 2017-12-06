@@ -5,7 +5,7 @@
 	<artifactId>cmn-data-svc-server</artifactId>
 	<!-- This version number is used to tag the Docker image. No need for maven 
 		snapshot convention here, registry allows replace -->
-	<version>1.9.1</version>
+	<version>1.10.0</version>
 	<name>Acumos Common Data Service Server</name>
 	<description>Micro service based on Spring-Boot</description>
 

@@ -18,10 +18,20 @@ public class MLPSolutionSpecificationBuilder {
 
 	private final List<SearchCriterion> criteria;
 
+	/**
+	 * No-arg ctor
+	 */
 	public MLPSolutionSpecificationBuilder() {
-		criteria = new ArrayList<SearchCriterion>();
+		criteria = new ArrayList<>();
 	}
 
+	/**
+	 * Adds the specified criterion to the list.
+	 * 
+	 * @param criterion
+	 *            SearchCriterion
+	 * @return Self
+	 */
 	public MLPSolutionSpecificationBuilder with(SearchCriterion criterion) {
 		criteria.add(criterion);
 		return this;
@@ -33,7 +43,7 @@ public class MLPSolutionSpecificationBuilder {
 	 * @return Specification that implements the search criteria
 	 */
 	public Specification<MLPSolution> build() {
-		if (criteria.size() == 0)
+		if (criteria.isEmpty())
 			throw new IllegalArgumentException("no criteria");
 
 		// The Specifications class is deprecated in v2.0, but using the recommended

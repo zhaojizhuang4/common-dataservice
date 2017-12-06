@@ -5,6 +5,12 @@ Release Notes
 The server and client are released together.  The server is deployed within a Docker image
 in the Docker registry.  The client is deployed as a jar file to a Maven Nexus repository.
 
+Version 1.10.0, ? December 2017
+-------------------------------
+
+* Increase size of details column for solution validation
+* Support threads and comments.
+
 Version 1.9.1, 30 November 2017
 -------------------------------
 
