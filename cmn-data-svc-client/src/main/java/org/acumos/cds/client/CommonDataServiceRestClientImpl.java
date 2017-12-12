@@ -63,7 +63,6 @@ import org.acumos.cds.domain.MLPUserRoleMap;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
 import org.acumos.cds.domain.MLPValidationType;
-import org.acumos.cds.query.SearchCriteria;
 import org.acumos.cds.transport.CountTransport;
 import org.acumos.cds.transport.LoginTransport;
 import org.acumos.cds.transport.RestPageRequest;
@@ -190,7 +189,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	 *            Array of path segments
 	 * @param queryParams
 	 *            key-value pairs; ignored if null or empty. Gives special treatment
-	 *            to Date-type values.
+	 *            to Date-type and Array values.
 	 * @param restPageRequest
 	 *            page, size and sort specification; ignored if null.
 	 * @return
@@ -203,10 +202,23 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 			for (Map.Entry<String, ? extends Object> entry : queryParams.entrySet()) {
 				Object value;
 				// Server expects Date type as Long (not String)
-				if (entry.getValue() instanceof Date)
+				if (entry.getValue() instanceof Date) {
 					value = ((Date) entry.getValue()).getTime();
-				else
+				} else if (entry.getValue().getClass().isArray()) {
+					Object[] array = (Object[]) entry.getValue();
+					StringBuilder sb = new StringBuilder();
+					for (int i = 0; i < array.length; ++i) {
+						if (i > 0)
+							sb.append(',');
+						if (array[i] == null)
+							sb.append("null");
+						else
+							sb.append(array[i].toString());
+					}
+					value = sb.toString();
+				} else {
 					value = entry.getValue().toString();
+				}
 				builder.queryParam(entry.getKey(), value);
 			}
 		}
@@ -374,14 +386,44 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public RestPageResponse<MLPSolution> searchSolutions(SearchCriteria searchCriteria, RestPageRequest pageRequest) {
-		Map<String, Object> params = new HashMap<>();
-		params.put(SearchCriteria.QUERY_PARAM_NAME, searchCriteria.toString());
-		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH }, params,
-				pageRequest);
-		logger.debug("searchSolutions: uri {}", uri);
+	public RestPageResponse<MLPSolution> findPortalSolutions(String nameKeyword, String descriptionKeyword,
+			String authorKeyword, boolean active, String[] accessTypeCodes, String[] modelTypeCodes,
+			String[] validationStatusCodes, String[] tags, RestPageRequest pageRequest) {
+		HashMap<String, Object> parms = new HashMap<>();
+		// This is required
+		parms.put(CCDSConstants.SEARCH_ACTIVE, active);
+		if (accessTypeCodes != null && accessTypeCodes.length > 0)
+			parms.put(CCDSConstants.SEARCH_ACCESS_TYPES, accessTypeCodes);
+		if (authorKeyword != null && authorKeyword.length() > 0)
+			parms.put(CCDSConstants.SEARCH_AUTHOR, authorKeyword);
+		if (descriptionKeyword != null && descriptionKeyword.length() > 0)
+			parms.put(CCDSConstants.SEARCH_DESC, descriptionKeyword);
+		if (modelTypeCodes != null && modelTypeCodes.length > 0)
+			parms.put(CCDSConstants.SEARCH_MODEL_TYPES, modelTypeCodes);
+		if (nameKeyword != null && nameKeyword.length() > 0)
+			parms.put(CCDSConstants.SEARCH_NAME, nameKeyword);
+		if (tags != null && tags.length > 0)
+			parms.put(CCDSConstants.SEARCH_TAGS, tags);
+		if (validationStatusCodes != null && validationStatusCodes.length > 0)
+			parms.put(CCDSConstants.SEARCH_VAL_STATUSES, validationStatusCodes);
+		URI uri = buildUri(
+				new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH, CCDSConstants.PORTAL_PATH },
+				parms, pageRequest);
+		logger.debug("findPortalSolutions: uri {}", uri);
 		ResponseEntity<RestPageResponse<MLPSolution>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<RestPageResponse<MLPSolution>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public List<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr) {
+		Map<String, Object> copy = new HashMap<>(queryParameters);
+		copy.put("j", isOr ? "o" : "a");
+		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH }, copy, null);
+		logger.debug("searchSolutions: uri {}", uri);
+		ResponseEntity<List<MLPSolution>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<MLPSolution>>() {
 				});
 		return response.getBody();
 	}
@@ -1459,9 +1501,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public long getThreadCount() {
-		URI uri = buildUri(
-				new String[] { CCDSConstants.THREAD_PATH, CCDSConstants.COUNT_PATH }, null,
-				null);
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, CCDSConstants.COUNT_PATH }, null, null);
 		logger.debug("getThreadCount: uri {}", uri);
 		ResponseEntity<CountTransport> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<CountTransport>() {
@@ -1481,8 +1521,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public MLPThread getThread(String threadId) {
-		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId }, null,
-				null);
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId }, null, null);
 		logger.debug("getThread: uri {}", uri);
 		ResponseEntity<MLPThread> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<MLPThread>() {
@@ -1499,23 +1538,22 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public void updateThread(MLPThread thread) {
-		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, thread.getThreadId() },
-				null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, thread.getThreadId() }, null, null);
 		logger.debug("updateThread: url {}", uri);
 		restTemplate.put(uri, thread);
 	}
 
 	@Override
 	public void deleteThread(String threadId) {
-		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId }, null,
-				null);
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId }, null, null);
 		logger.debug("deleteThread: url {}", uri);
 		restTemplate.delete(uri);
 	}
 
 	@Override
 	public long getThreadCommentCount(String threadId) {
-		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId, CCDSConstants.COMMENT_PATH, CCDSConstants.COUNT_PATH }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId, CCDSConstants.COMMENT_PATH,
+				CCDSConstants.COUNT_PATH }, null, null);
 		logger.debug("getCommentCount: uri {}", uri);
 		ResponseEntity<CountTransport> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<CountTransport>() {
@@ -1536,8 +1574,8 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public MLPComment getComment(String threadId, String commentId) {
-		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId, CCDSConstants.COMMENT_PATH, commentId }, null,
-				null);
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId, CCDSConstants.COMMENT_PATH, commentId },
+				null, null);
 		logger.debug("getComment: uri {}", uri);
 		ResponseEntity<MLPComment> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<MLPComment>() {
@@ -1547,21 +1585,25 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public MLPComment createComment(MLPComment comment) {
-		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, comment.getThreadId(), CCDSConstants.COMMENT_PATH }, null, null);
+		URI uri = buildUri(
+				new String[] { CCDSConstants.THREAD_PATH, comment.getThreadId(), CCDSConstants.COMMENT_PATH }, null,
+				null);
 		logger.debug("createComment: uri {}", uri);
 		return restTemplate.postForObject(uri, comment, MLPComment.class);
 	}
 
 	@Override
 	public void updateComment(MLPComment comment) {
-		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, comment.getThreadId(), CCDSConstants.COMMENT_PATH, comment.getCommentId() }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, comment.getThreadId(), CCDSConstants.COMMENT_PATH,
+				comment.getCommentId() }, null, null);
 		logger.debug("updateComment: url {}", uri);
 		restTemplate.put(uri, comment);
 	}
 
 	@Override
 	public void deleteComment(String threadId, String commentId) {
-		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId, CCDSConstants.COMMENT_PATH, commentId }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId, CCDSConstants.COMMENT_PATH, commentId },
+				null, null);
 		logger.debug("deleteComment: url {}", uri);
 		restTemplate.delete(uri);
 	}

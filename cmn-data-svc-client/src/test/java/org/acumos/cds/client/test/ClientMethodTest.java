@@ -47,7 +47,6 @@ import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
 import org.acumos.cds.domain.MLPValidationSequence;
-import org.acumos.cds.query.SearchCriteria;
 import org.acumos.cds.transport.RestPageRequest;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -165,7 +164,7 @@ public class ClientMethodTest {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
 		try {
-			client.searchSolutions(new SearchCriteria("a:b"), new RestPageRequest());
+			client.searchSolutions(new HashMap<String, Object>(), true);
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}

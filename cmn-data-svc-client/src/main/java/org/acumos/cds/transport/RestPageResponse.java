@@ -56,13 +56,13 @@ public class RestPageResponse<T> extends PageImpl<T> {
 	}
 
 	/**
-	 * Builds an object with the specified list
+	 * Builds an object with the specified list.
 	 * 
 	 * @param content
 	 *            List of content
 	 */
 	public RestPageResponse(List<T> content) {
-		super(content);
+		this(content, null, 0);
 	}
 
 	/**
@@ -77,6 +77,8 @@ public class RestPageResponse<T> extends PageImpl<T> {
 	 */
 	public RestPageResponse(List<T> content, Pageable pageable, long total) {
 		super(content, pageable, total);
+		if (content != null)
+			this.numberOfElements = content.size(); 
 	}
 
 	/**
@@ -122,15 +124,6 @@ public class RestPageResponse<T> extends PageImpl<T> {
 
 	public void setNumberOfElements(int numberOfElements) {
 		this.numberOfElements = numberOfElements;
-	}
-
-	@Override
-	public long getTotalElements() {
-		return totalElements;
-	}
-
-	public void setTotalElements(long totalElements) {
-		this.totalElements = totalElements;
 	}
 
 	public boolean isPreviousPage() {

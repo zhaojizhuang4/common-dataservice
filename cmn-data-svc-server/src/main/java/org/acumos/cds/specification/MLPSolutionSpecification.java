@@ -45,6 +45,8 @@ public class MLPSolutionSpecification implements Specification<MLPSolution> {
 		} else if (SearchOperation.LTE == criterion.getOperation()) {
 			return builder.lessThanOrEqualTo(queryRoot.<String>get(criterion.getKey()),
 					criterion.getValue().toString());
+		} else if (SearchOperation.NULL == criterion.getOperation()) {
+			return builder.isNull(queryRoot.<String>get(criterion.getKey()));
 		} else if (SearchOperation.IN == criterion.getOperation()) {
 			Expression<String> exp = queryRoot.<String>get(criterion.getKey());
 			if (criterion.getValue().getClass().isArray()) {

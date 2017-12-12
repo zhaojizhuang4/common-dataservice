@@ -20,6 +20,7 @@
 
 package org.acumos.cds.test;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -96,6 +97,7 @@ import org.acumos.cds.repository.ValidationStatusRepository;
 import org.acumos.cds.service.ArtifactSearchService;
 import org.acumos.cds.service.PeerSearchService;
 import org.acumos.cds.service.RoleSearchService;
+import org.acumos.cds.service.SolutionSearchService;
 import org.acumos.cds.service.UserSearchService;
 import org.acumos.cds.specification.MLPSolutionSpecification;
 import org.acumos.cds.specification.MLPSolutionSpecificationBuilder;
@@ -107,6 +109,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -184,6 +187,8 @@ public class CdsRepositoryServiceTest {
 	private PeerSearchService peerSearchService;
 	@Autowired
 	private RoleSearchService roleSearchService;
+	@Autowired
+	private SolutionSearchService solutionSearchService;
 	@Autowired
 	private UserSearchService userService;
 
@@ -370,9 +375,15 @@ public class CdsRepositoryServiceTest {
 			List<MLPArtifact> searchArts = artifactSearchService.getArtifacts(artParms, false);
 			Assert.assertTrue(searchArts.size() > 0);
 
+			final String tagName = "soltag";
+			MLPTag solTag = new MLPTag(tagName);
+			solTag = solutionTagRepository.save(solTag);
+
 			MLPSolution cs = new MLPSolution();
 			final String solName = "solution name";
+			final String solDesc = "description";
 			cs.setName(solName);
+			cs.setDescription(solDesc);
 			cs.setActive(true);
 			cs.setOwnerId(cu.getUserId());
 			cs.setProvider("Big Data Org");
@@ -380,11 +391,19 @@ public class CdsRepositoryServiceTest {
 			cs.setModelTypeCode(ModelTypeCode.CL.name());
 			cs.setToolkitTypeCode(ToolkitTypeCode.SK.name());
 			cs.setValidationStatusCode(ValidationStatusCode.SB.name());
+			// tags must exist; they are not created here
+			cs.getTags().add(new MLPTag(tagName));
 			cs = solutionRepository.save(cs);
 			Assert.assertNotNull("Solution ID", cs.getSolutionId());
+			Assert.assertTrue(cs.getTags().size() == 1);
 			logger.info("Created solution " + cs.getSolutionId());
 
-			String [] nameArray = { solName };
+			Map<String,String> solParms = new HashMap<>();
+			solParms.put("name",  cs.getName());
+			List<MLPSolution> searchSols = solutionSearchService.getSolutions(solParms, false);
+			Assert.assertTrue(searchSols.size() == 1);
+
+			String[] nameArray = { solName };
 			MLPSolutionSpecification spec1 = new MLPSolutionSpecification(
 					new SearchCriterion("name", SearchOperation.IN, nameArray));
 			MLPSolutionSpecification spec2 = new MLPSolutionSpecification(
@@ -398,6 +417,36 @@ public class CdsRepositoryServiceTest {
 					.with(new SearchCriterion("ownerId", SearchOperation.EQUALS, cu.getUserId())).build();
 			Page<MLPSolution> specSearchResults2 = solutionRepository.findAll(spec, new PageRequest(0, 5, null));
 			Assert.assertTrue(specSearchResults2.getNumberOfElements() == 1);
+
+			List<SearchCriterion> criterionList = new ArrayList<>();
+			criterionList.add(new SearchCriterion("accessTypeCode", SearchOperation.EQUALS, AccessTypeCode.PB.name()));
+			criterionList.add(new SearchCriterion(true, "accessTypeCode", SearchOperation.NOT_EQUALS, "Y"));
+			criterionList.add(new SearchCriterion("accessTypeCode", SearchOperation.IN,
+					new String[] { AccessTypeCode.PB.name(), AccessTypeCode.PR.name() }));
+			criterionList.add(new SearchCriterion("accessTypeCode", SearchOperation.LIKE, "X"));
+			criterionList.add(new SearchCriterion("accessTypeCode", SearchOperation.LTE, "X"));
+			criterionList.add(new SearchCriterion("accessTypeCode", SearchOperation.GTE, "X"));
+			criterionList.add(new SearchCriterion("created", SearchOperation.EQUALS, new Date()));
+			criterionList.add(new SearchCriterion("created", SearchOperation.NULL, null));
+			MLPSolutionSpecificationBuilder specBuilder = new MLPSolutionSpecificationBuilder(criterionList);
+			Specification<MLPSolution> messySpec = specBuilder.build();
+			List<MLPSolution> messyResult = solutionRepository.findAll(messySpec);
+			Assert.assertNotNull(messyResult);
+
+			logger.info("Finding portal solutions");
+			String solKw = solName;
+			String descKw = solDesc;
+			String authorKw = null;
+			boolean active = true;
+			String[] accessTypeCodes = { null, AccessTypeCode.PB.name() };
+			String[] modelTypeCodes = { ModelTypeCode.CL.name() };
+			String[] valStatusCodes = { ValidationStatusCode.SB.name() };
+			String[] searchTags = { tagName };
+			Page<MLPSolution> portalSearchResult = solutionSearchService.findPortalSolutions(solKw, descKw, authorKw,
+					active, accessTypeCodes, modelTypeCodes, valStatusCodes, searchTags,
+					new PageRequest(0, 2, Direction.ASC, "name"));
+			Assert.assertTrue(portalSearchResult != null && portalSearchResult.getNumberOfElements() > 0);
+			logger.info("Found portal solution total " + portalSearchResult.getTotalElements());
 
 			MLPSolutionRevision cr = new MLPSolutionRevision();
 			cr.setSolutionId(cs.getSolutionId());
@@ -528,7 +577,8 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(crc > 0);
 			long tcc = commentRepository.countThreadComments(thread.getThreadId());
 			Assert.assertTrue(tcc > 0);
-			Page<MLPComment> commentList = commentRepository.findByThreadId(thread.getThreadId(), new PageRequest(0,5));
+			Page<MLPComment> commentList = commentRepository.findByThreadId(thread.getThreadId(),
+					new PageRequest(0, 5));
 			Assert.assertTrue(commentList != null && commentList.hasContent());
 			commentRepository.delete(mc.getCommentId());
 			threadRepository.delete(thread.getThreadId());

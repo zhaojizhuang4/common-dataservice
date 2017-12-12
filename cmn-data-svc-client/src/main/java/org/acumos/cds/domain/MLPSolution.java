@@ -21,12 +21,17 @@
 package org.acumos.cds.domain;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -109,6 +114,15 @@ public class MLPSolution extends MLPTimestampedEntity implements Serializable {
 	@Column(name = "VALIDATION_STATUS_CD", columnDefinition = "CHAR(2)")
 	@Size(max = 2)
 	private String validationStatusCode;
+
+	/**
+	 * Tags assigned to the solution via a join table.
+	 */
+	@ManyToMany /* no cascade: (cascade = { CascadeType.ALL }) */
+	@JoinTable(name = MLPSolTagMap.TABLE_NAME, //
+			joinColumns = { @JoinColumn(name = MLPSolTagMap.SOL_ID_COL_NAME) }, //
+			inverseJoinColumns = { @JoinColumn(name = MLPSolTagMap.TAG_COL_NAME) })
+	private Set<MLPTag> tags = new HashSet<>(0);
 
 	/**
 	 * No-arg constructor
@@ -242,6 +256,14 @@ public class MLPSolution extends MLPTimestampedEntity implements Serializable {
 		this.validationStatusCode = validationStatusCode;
 	}
 
+	public Set<MLPTag> getTags() {
+		return tags;
+	}
+
+	public void setTags(Set<MLPTag> tags) {
+		this.tags = tags;
+	}
+
 	@Override
 	public boolean equals(Object that) {
 		if (that == null)
@@ -260,7 +282,10 @@ public class MLPSolution extends MLPTimestampedEntity implements Serializable {
 	@Override
 	public String toString() {
 		return this.getClass().getName() + "[solutionId=" + solutionId + ", ownerId=" + ownerId + ", name=" + name
-				+ ", desc=" + description + ", created=" + getCreated() + ", modified=" + getModified() + "]";
+				+ ", desc=" + description + ", active=" + active + ", accessTypeCode=" + accessTypeCode
+				+ ", modelTypeCode=" + modelTypeCode + ", validationStatusCode=" + validationStatusCode 
+				+ ", provider=" + provider + ", created=" + getCreated() + ", modified=" + getModified()
+				+ "]";
 	}
 
 }

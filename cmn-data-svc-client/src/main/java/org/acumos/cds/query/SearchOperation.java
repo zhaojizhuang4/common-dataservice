@@ -6,7 +6,7 @@ package org.acumos.cds.query;
  */
 public enum SearchOperation {
 
-	EQUALS(':'), NOT_EQUALS('!'), LIKE('~'), LTE('<'), GTE('>'), IN('_');
+	EQUALS(':'), NOT_EQUALS('!'), NULL('@'), LIKE('~'), LTE('<'), GTE('>'), IN('_');
 
 	private char code;
 

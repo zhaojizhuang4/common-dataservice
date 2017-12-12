@@ -85,8 +85,8 @@ public class EELFLoggerDelegate extends SLF4jWrapper implements EELFLogger {
 	}
 
 	/**
-	 * Gets a logger for the specified class name. If the logger does not
-	 * already exist in the map, this creates a new logger.
+	 * Gets a logger for the specified class name. If the logger does not already
+	 * exist in the map, this creates a new logger.
 	 * 
 	 * @param className
 	 *            If null or empty, uses EELFLoggerDelegate as the class name.
@@ -114,11 +114,9 @@ public class EELFLoggerDelegate extends SLF4jWrapper implements EELFLogger {
 	 *            message to log
 	 */
 	public void trace(EELFLogger logger, String msg) {
-		if (logger.isTraceEnabled()) {
-			MDC.put(MDC_CLASS_NAME, className);
-			logger.trace(msg);
-			MDC.remove(MDC_CLASS_NAME);
-		}
+		MDC.put(MDC_CLASS_NAME, className);
+		logger.trace(msg);
+		MDC.remove(MDC_CLASS_NAME);
 	}
 
 	/**
@@ -132,11 +130,9 @@ public class EELFLoggerDelegate extends SLF4jWrapper implements EELFLogger {
 	 *            arguments to interpolate into message
 	 */
 	public void trace(EELFLogger logger, String msg, Object... arguments) {
-		if (logger.isTraceEnabled()) {
-			MDC.put(MDC_CLASS_NAME, className);
-			logger.trace(msg, arguments);
-			MDC.remove(MDC_CLASS_NAME);
-		}
+		MDC.put(MDC_CLASS_NAME, className);
+		logger.trace(msg, arguments);
+		MDC.remove(MDC_CLASS_NAME);
 	}
 
 	/**
@@ -150,11 +146,9 @@ public class EELFLoggerDelegate extends SLF4jWrapper implements EELFLogger {
 	 *            throwable to show as a stack trace
 	 */
 	public void trace(EELFLogger logger, String msg, Throwable th) {
-		if (logger.isTraceEnabled()) {
-			MDC.put(MDC_CLASS_NAME, className);
-			logger.trace(msg, th);
-			MDC.remove(MDC_CLASS_NAME);
-		}
+		MDC.put(MDC_CLASS_NAME, className);
+		logger.trace(msg, th);
+		MDC.remove(MDC_CLASS_NAME);
 	}
 
 	/**
@@ -166,11 +160,9 @@ public class EELFLoggerDelegate extends SLF4jWrapper implements EELFLogger {
 	 *            message to log
 	 */
 	public void debug(EELFLogger logger, String msg) {
-		if (logger.isDebugEnabled()) {
-			MDC.put(MDC_CLASS_NAME, className);
-			logger.debug(msg);
-			MDC.remove(MDC_CLASS_NAME);
-		}
+		MDC.put(MDC_CLASS_NAME, className);
+		logger.debug(msg);
+		MDC.remove(MDC_CLASS_NAME);
 	}
 
 	/**
@@ -184,11 +176,9 @@ public class EELFLoggerDelegate extends SLF4jWrapper implements EELFLogger {
 	 *            arguments to interpolate into message
 	 */
 	public void debug(EELFLogger logger, String msg, Object... arguments) {
-		if (logger.isDebugEnabled()) {
-			MDC.put(MDC_CLASS_NAME, className);
-			logger.debug(msg, arguments);
-			MDC.remove(MDC_CLASS_NAME);
-		}
+		MDC.put(MDC_CLASS_NAME, className);
+		logger.debug(msg, arguments);
+		MDC.remove(MDC_CLASS_NAME);
 	}
 
 	/**
@@ -202,11 +192,9 @@ public class EELFLoggerDelegate extends SLF4jWrapper implements EELFLogger {
 	 *            throwable to show as a stack trace
 	 */
 	public void debug(EELFLogger logger, String msg, Throwable th) {
-		if (logger.isDebugEnabled()) {
-			MDC.put(MDC_CLASS_NAME, className);
-			logger.debug(msg, th);
-			MDC.remove(MDC_CLASS_NAME);
-		}
+		MDC.put(MDC_CLASS_NAME, className);
+		logger.debug(msg, th);
+		MDC.remove(MDC_CLASS_NAME);
 	}
 
 	/**

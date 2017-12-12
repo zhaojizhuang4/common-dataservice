@@ -97,14 +97,13 @@ public class TransportTest extends AbstractModelTest {
 	public void testRestPageResponse() {
 		RestPageResponse<String> t = new RestPageResponse<>();
 		t = new RestPageResponse<>(new ArrayList<String>());
-		t = new RestPageResponse<>(new ArrayList<String>(), null, 0L);
+		t = new RestPageResponse<>(new ArrayList<String>(), null, l1);
 		t.setFirst(true);
 		t.setLast(false);
 		t.setNextPage(true);
 		t.setNumber(i1);
 		t.setNumberOfElements(i2);
 		t.setSize(i3);
-		t.setTotalElements(l1);
 		t.setTotalPages(i4);
 		t.setPreviousPage(true);
 		t.setNextPage(true);

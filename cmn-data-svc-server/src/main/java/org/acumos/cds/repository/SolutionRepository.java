@@ -39,7 +39,8 @@ public interface SolutionRepository extends JpaRepository<MLPSolution, String>, 
 	 *            Page and sort criteria
 	 * @return Page of MLPSolution
 	 */
-	@Query("SELECT s FROM MLPSolution s " + " WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))"
+	@Query("SELECT s FROM MLPSolution s " //
+			+ " WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" //
 			+ " OR LOWER(s.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
 	Page<MLPSolution> findBySearchTerm(@Param("searchTerm") String searchTerm, Pageable pageRequest);
 

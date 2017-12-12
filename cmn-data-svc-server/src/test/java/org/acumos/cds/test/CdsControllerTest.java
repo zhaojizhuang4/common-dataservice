@@ -69,9 +69,6 @@ import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
 import org.acumos.cds.domain.MLPValidationType;
-import org.acumos.cds.query.SearchCriteria;
-import org.acumos.cds.query.SearchCriterion;
-import org.acumos.cds.query.SearchOperation;
 import org.acumos.cds.transport.RestPageRequest;
 import org.acumos.cds.transport.RestPageResponse;
 import org.acumos.cds.transport.SuccessTransport;
@@ -316,7 +313,9 @@ public class CdsControllerTest {
 			logger.info("Created user {}", cu);
 
 			RestPageResponse<MLPUser> users = client.getUsers(rp);
-			Assert.assertTrue(users.getSize() > 0);
+			Assert.assertTrue(users.getNumberOfElements() > 0);
+			for (MLPUser u : users.getContent()) 
+				logger.info("Fetched user: " + u);
 
 			// Login
 			MLPUser loggedIn = client.loginUser(loginName, loginPass);
@@ -376,7 +375,7 @@ public class CdsControllerTest {
 			client.updatePeer(pr);
 
 			RestPageResponse<MLPPeer> peerPage = client.getPeers(rp);
-			Assert.assertTrue(peerPage.getSize() > 0);
+			Assert.assertTrue(peerPage.getNumberOfElements() > 0);
 
 			HashMap<String, Object> peerRestr = new HashMap<>();
 			peerRestr.put("name", peerName);
@@ -481,8 +480,10 @@ public class CdsControllerTest {
 			cs.setModelTypeCode(ModelTypeCode.CL.name());
 			cs.setToolkitTypeCode(ToolkitTypeCode.CP.name());
 			cs.setActive(true);
+			cs.getTags().add(tag1);
 			cs = client.createSolution(cs);
 			Assert.assertNotNull(cs.getSolutionId());
+			Assert.assertFalse(cs.getTags().isEmpty());
 			logger.info("Created solution {}", cs);
 
 			// Check count
@@ -507,19 +508,6 @@ public class CdsControllerTest {
 			Assert.assertTrue(solTags.size() > 0);
 			logger.info("Found tag on solution {}", solTags.get(0));
 
-			// Add user access
-			client.addSolutionUserAccess(cs.getSolutionId(), cu.getUserId());
-
-			// Query two ways
-			List<MLPUser> solUserAccList = client.getSolutionAccessUsers(cs.getSolutionId());
-			Assert.assertTrue(solUserAccList != null && solUserAccList.size() > 0);
-			logger.info("Got users with access to solution {}", cs.getSolutionId());
-			RestPageResponse<MLPSolution> userSolAccList = client.getUserAccessSolutions(cu.getUserId(),
-					new RestPageRequest(0, 1));
-			Assert.assertTrue(userSolAccList != null && userSolAccList.getSize() > 0);
-			logger.info("Got solutions accessible by user {}", cu.getUserId());
-			client.dropSolutionUserAccess(cs.getSolutionId(), cu.getUserId());
-
 			logger.info("Getting all solutions");
 			RestPageResponse<MLPSolution> page = client.getSolutions(new RestPageRequest(0, 2));
 			Assert.assertTrue(page != null && page.getNumberOfElements() > 0);
@@ -529,12 +517,21 @@ public class CdsControllerTest {
 			Assert.assertTrue(s != null);
 			logger.info("Solution {}", s);
 
+			logger.info("Querying for active PB solutions");
+			Map<String, Object> queryParameters = new HashMap<>();
+			queryParameters.put("accessTypeCode", AccessTypeCode.PB.name());
+			queryParameters.put("active", Boolean.TRUE);
+			List<MLPSolution> sols = client.searchSolutions(queryParameters, false);
+			Assert.assertTrue(sols != null && !sols.isEmpty());
+			logger.info("Active PB solution count {}", sols.size());
+
 			logger.info("Querying for solutions with similar names");
 			RestPageResponse<MLPSolution> sl1 = client.findSolutionsBySearchTerm("solution", new RestPageRequest(0, 1));
-			Assert.assertTrue(sl1 != null && sl1.getSize() > 0);
+			Assert.assertTrue(sl1 != null && sl1.getNumberOfElements() > 0);
 			RestPageResponse<MLPSolution> sl2 = client.findSolutionsByTag(tagName1, new RestPageRequest(0, 1));
-			Assert.assertTrue(sl2 != null && sl2.getSize() > 0);
+			Assert.assertTrue(sl2 != null && sl2.getNumberOfElements() > 0);
 
+			/* 1.10.0 search method
 			logger.info("Querying for active PB solutions");
 			List<String> codeList = new ArrayList<>();
 			codeList.add(AccessTypeCode.PB.name());
@@ -551,8 +548,44 @@ public class CdsControllerTest {
 							.or(new SearchCriterion("accessTypeCode", SearchOperation.GTE, "X"))
 							.or(new SearchCriterion("created", SearchOperation.EQUALS, new Date()));
 			RestPageResponse<MLPSolution> sols = client.searchSolutions(criteria, new RestPageRequest(0, 1));
-			Assert.assertTrue(sols != null && sols.getSize() > 0);
-			logger.info("Active PB solution count {}", sols.getSize());
+			Assert.assertTrue(sols != null && sols.getNumberOfElements() > 0);
+			logger.info("Active PB solution count {}", sols.getNumberOfElements());
+			
+			SearchCriteria onboardSearchCriteria = new SearchCriteria(
+					new SearchCriterion("ownerId", SearchOperation.EQUALS, cs.getOwnerId())
+					//).and(
+					//	new SearchCriterion("name", SearchOperation.EQUALS, cs.getName())
+						);
+			RestPageResponse<MLPSolution> onboardMatches = client.searchSolutions(onboardSearchCriteria,
+					new RestPageRequest(0, 1));
+			Assert.assertTrue(onboardMatches != null && onboardMatches.getNumberOfElements() > 0);
+			logger.info("Onboard solution count {}", onboardMatches.getNumberOfElements());
+			*/
+
+			// Portal dynamic search
+			String nameKw = null;
+			String descKw = null;
+			String authKw = null;
+			String [] accessTypeCodes = { AccessTypeCode.PB.name() };
+			String [] modelTypeCodes = null;
+			String [] valStatusCodes = { ValidationStatusCode.IP.name(), "null" };
+			String [] searchTags = null;
+			RestPageResponse<MLPSolution> portalMatches = client.findPortalSolutions(nameKw, descKw, authKw, true, accessTypeCodes, modelTypeCodes, valStatusCodes, searchTags, 
+					new RestPageRequest(0, 1));
+			Assert.assertTrue(portalMatches != null && portalMatches.getNumberOfElements() > 0);
+			
+			// Add user access
+			client.addSolutionUserAccess(cs.getSolutionId(), cu.getUserId());
+
+			// Query two ways
+			List<MLPUser> solUserAccList = client.getSolutionAccessUsers(cs.getSolutionId());
+			Assert.assertTrue(solUserAccList != null && solUserAccList.size() > 0);
+			logger.info("Got users with access to solution {}", cs.getSolutionId());
+			RestPageResponse<MLPSolution> userSolAccList = client.getUserAccessSolutions(cu.getUserId(),
+					new RestPageRequest(0, 1));
+			Assert.assertTrue(userSolAccList != null && userSolAccList.getNumberOfElements() > 0);
+			logger.info("Got solutions accessible by user {}", cu.getUserId());
+			client.dropSolutionUserAccess(cs.getSolutionId(), cu.getUserId());
 
 			MLPSolutionRevision cr = new MLPSolutionRevision();
 			cr.setSolutionId(cs.getSolutionId());
@@ -597,8 +630,8 @@ public class CdsControllerTest {
 			logger.info("Updated solution rating {}", ur);
 			RestPageResponse<MLPSolutionRating> ratings = client.getSolutionRatings(cs.getSolutionId(),
 					new RestPageRequest(0, 1));
-			Assert.assertTrue(ratings != null && ratings.getSize() > 0);
-			logger.info("Solution rating count {}", ratings.getSize());
+			Assert.assertTrue(ratings != null && ratings.getNumberOfElements() > 0);
+			logger.info("Solution rating count {}", ratings.getNumberOfElements());
 
 			// Compute the average rating
 			stats = client.getSolutionWebMetadata(cs.getSolutionId());
@@ -635,7 +668,7 @@ public class CdsControllerTest {
 
 			// Query for downloads
 			RestPageResponse<MLPSolutionDownload> dnls = client.getSolutionDownloads(cs.getSolutionId(), rp);
-			Assert.assertTrue(dnls.getSize() > 0);
+			Assert.assertTrue(dnls.getNumberOfElements() > 0);
 
 			// Count the downloads
 			MLPSolutionWeb readStats = client.getSolutionWebMetadata(cs.getSolutionId());
@@ -653,7 +686,7 @@ public class CdsControllerTest {
 			// Get favorite solutions
 			RestPageResponse<MLPSolution> favePage = client.getFavoriteSolutions(cu.getUserId(), rp);
 			Assert.assertNotNull(favePage);
-			Assert.assertTrue(favePage.getSize() > 0);
+			Assert.assertTrue(favePage.getNumberOfElements() > 0);
 			for (MLPSolution mlpsol : favePage)
 				logger.info("Favorite Solution for user {} is {}, name {}", cu.getUserId(), mlpsol.getSolutionId(),
 						mlpsol.getName());
@@ -673,13 +706,13 @@ public class CdsControllerTest {
 
 			// Query for solution deployments
 			RestPageResponse<MLPSolutionDeployment> userDeps = client.getUserDeployments(cu.getUserId(), rp);
-			Assert.assertTrue(userDeps != null & userDeps.getSize() > 0);
+			Assert.assertTrue(userDeps != null & userDeps.getNumberOfElements() > 0);
 			RestPageResponse<MLPSolutionDeployment> deps = client.getSolutionDeployments(cs.getSolutionId(),
 					cr.getRevisionId(), rp);
-			Assert.assertTrue(deps != null && deps.getSize() > 0);
+			Assert.assertTrue(deps != null && deps.getNumberOfElements() > 0);
 			RestPageResponse<MLPSolutionDeployment> userSolDeps = client.getUserSolutionDeployments(cs.getSolutionId(),
 					cr.getRevisionId(), cu.getUserId(), rp);
-			Assert.assertTrue(userSolDeps != null && userSolDeps.getSize() > 0);
+			Assert.assertTrue(userSolDeps != null && userSolDeps.getNumberOfElements() > 0);
 
 			// delete the deployment
 			client.deleteSolutionDeployment(dep);
@@ -767,7 +800,7 @@ public class CdsControllerTest {
 			Assert.assertTrue(roleCount > 0);
 
 			RestPageResponse<MLPRole> roles = client.getRoles(new RestPageRequest(0, 1));
-			Assert.assertTrue(roles.getSize() > 0);
+			Assert.assertTrue(roles.getNumberOfElements() > 0);
 
 			HashMap<String, Object> roleRestr = new HashMap<>();
 			roleRestr.put("name", roleName);
@@ -984,7 +1017,7 @@ public class CdsControllerTest {
 		MLPThread thread = client.createThread(new MLPThread("url"));
 		Assert.assertTrue(thread != null && thread.getThreadId() != null);
 		RestPageResponse<MLPThread> threads = client.getThreads(new RestPageRequest(0, 1));
-		Assert.assertTrue(threads != null && threads.getSize() > 0);
+		Assert.assertTrue(threads != null && threads.getNumberOfElements() > 0);
 
 		MLPThread retrieved = client.getThread(thread.getThreadId());
 		Assert.assertNotNull(retrieved);
@@ -1063,7 +1096,8 @@ public class CdsControllerTest {
 		long commentCount = client.getThreadCommentCount(thread.getThreadId());
 		Assert.assertTrue(commentCount > 0);
 
-		RestPageResponse<MLPComment> threadComments = client.getThreadComments(thread.getThreadId(), new RestPageRequest(0,1));
+		RestPageResponse<MLPComment> threadComments = client.getThreadComments(thread.getThreadId(),
+				new RestPageRequest(0, 1));
 		Assert.assertTrue(threadComments != null && threadComments.hasContent());
 
 		try {
@@ -1094,7 +1128,7 @@ public class CdsControllerTest {
 		}
 		try {
 			MLPComment large = new MLPComment(thread.getThreadId(), cu.getUserId(), "text");
-			large.setUrl(s64+s64+s64+s64+s64+s64+s64+s64+s64+s64);
+			large.setUrl(s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64);
 			client.createComment(large);
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
@@ -1140,13 +1174,14 @@ public class CdsControllerTest {
 			reply.setUserId(cu.getUserId());
 		}
 		try {
-			reply.setUrl(s64+s64+s64+s64+s64+s64+s64+s64+s64+s64);
+			reply.setUrl(s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64);
 			client.updateComment(reply);
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("Failed to update existing comment with large URL as expected {}", ex.getResponseBodyAsString());
+			logger.info("Failed to update existing comment with large URL as expected {}",
+					ex.getResponseBodyAsString());
 			reply.setUrl("short");
-		}		
+		}
 		try {
 			client.updateComment(new MLPComment(thread.getThreadId(), "bogus", "text"));
 			throw new Exception("Unexpected success");
@@ -1481,9 +1516,9 @@ public class CdsControllerTest {
 		cs.setOwnerId(cu.getUserId());
 
 		try {
-			SearchCriteria criteria = new SearchCriteria(
-					new SearchCriterion("bogusFieldName", SearchOperation.EQUALS, "bogusFieldValue"));
-			client.searchSolutions(criteria, new RestPageRequest(0, 1));
+			Map<String, Object> queryParameters = new HashMap<>();
+			queryParameters.put("bogusFieldName", "bogusFieldFValue");
+			client.searchSolutions(queryParameters, false);
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search solution failed as expected: {}", ex.getResponseBodyAsString());

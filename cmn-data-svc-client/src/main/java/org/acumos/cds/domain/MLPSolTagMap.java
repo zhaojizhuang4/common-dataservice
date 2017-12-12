@@ -39,9 +39,14 @@ import org.acumos.cds.domain.MLPSolTagMap.SolTagMapPK;
  */
 @Entity
 @IdClass(SolTagMapPK.class)
-@Table(name = "C_SOL_TAG_MAP")
+@Table(name = MLPSolTagMap.TABLE_NAME)
 public class MLPSolTagMap implements MLPEntity, Serializable {
 
+	// Define constants so names can be reused in many-many annotation.
+	/* package */ static final String TABLE_NAME = "C_SOL_TAG_MAP";
+	/* package */ static final String SOL_ID_COL_NAME = "SOLUTION_ID";
+	/* package */ static final String TAG_COL_NAME = "TAG";
+	
 	private static final long serialVersionUID = -7814665924253912856L;
 
 	/**
@@ -86,12 +91,12 @@ public class MLPSolTagMap implements MLPEntity, Serializable {
 	}
 
 	@Id
-	@Column(name = "SOLUTION_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = MLPSolTagMap.SOL_ID_COL_NAME, updatable = false, nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
 	private String solutionId;
 
 	@Id
-	@Column(name = "TAG", updatable = false, nullable = false, columnDefinition = "VARCHAR(32)")
+	@Column(name = MLPSolTagMap.TAG_COL_NAME, updatable = false, nullable = false, columnDefinition = "VARCHAR(32)")
 	@Size(max = 36)
 	private String tag;
 

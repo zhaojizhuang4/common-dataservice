@@ -54,7 +54,6 @@ import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
 import org.acumos.cds.domain.MLPValidationType;
-import org.acumos.cds.query.SearchCriteria;
 import org.acumos.cds.transport.RestPageRequest;
 import org.acumos.cds.transport.RestPageResponse;
 import org.acumos.cds.transport.SuccessTransport;
@@ -180,16 +179,54 @@ public interface ICommonDataServiceRestClient {
 	RestPageResponse<MLPSolution> findSolutionsByTag(String tag, RestPageRequest pageRequest);
 
 	/**
-	 * Gets a page of solutions that match the specified criteria.
+	 * Searches solutions for matches on every specified condition. Special-purpose
+	 * method to support the dynamic search on the portal interface.
 	 * 
-	 * @param searchCriteria
-	 *            Query criteria expressed as tuples of Java field name, operation,
-	 *            field value string.
+	 * TODO: Return a solution DTO with related information such as download count.
+	 * 
+	 * @param nameKeyword
+	 *            Keyword to perform "LIKE" search in Name field; ignored if null or
+	 *            empty
+	 * @param descriptionKeyword
+	 *            Keyword to perform "LIKE" search in Description field; ignored if
+	 *            null or empty
+	 * @param authorKeyword
+	 *            Keyword to perform "LIKE" search in user name; ignored if null or
+	 *            empty; TODO not implemented yet
+	 * @param active
+	 *            Solution active status (required)
+	 * @param accessTypeCodes
+	 *            Access type codes; use four-letter sequence "null" to match a null
+	 *            value; ignored if null or empty
+	 * @param modelTypeCodes
+	 *            Model type codes; use four-letter sequence "null" to match a null
+	 *            value; ignored if null or empty
+	 * @param validationStatusCodes
+	 *            Validation status codes; use four-letter sequence "null" to match
+	 *            a null value; ignored if null or empty
+	 * @param tags
+	 *            Solution tag names; ignored if null or empty
 	 * @param pageRequest
 	 *            Page index, page size, sort information; ignored if null.
 	 * @return Page of solution objects.
 	 */
-	RestPageResponse<MLPSolution> searchSolutions(SearchCriteria searchCriteria, RestPageRequest pageRequest);
+	RestPageResponse<MLPSolution> findPortalSolutions(String nameKeyword, String descriptionKeyword,
+			String authorKeyword, boolean active, String[] accessTypeCodes, String[] modelTypeCodes,
+			String[] validationStatusCodes, String[] tags, RestPageRequest pageRequest);
+
+	/**
+	 * Searches the solutions.
+	 * 
+	 * @param queryParameters
+	 *            Map of field-name, field-value pairs to use as query criteria.
+	 *            Accepts Boolean, Date, Integer, Long, String.
+	 * @param isOr
+	 *            If true, finds matches on any field-value pair (conditions are
+	 *            OR-ed together); otherwise finds matches on all field-value pairs
+	 *            (conditions are AND-ed together).
+	 * @return List of solution objects.
+	 */
+	List<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr);
 
 	/**
 	 * Gets the solution with the specified ID.
@@ -1093,7 +1130,8 @@ public interface ICommonDataServiceRestClient {
 	void setUserViewedNotification(String notificationId, String userId);
 
 	/**
-	 * Gets website metadata about the specified solution.
+	 * Gets website metadata about the specified solution including average rating
+	 * and total download count.
 	 * 
 	 * @param solutionId
 	 *            Solution ID
