@@ -51,7 +51,7 @@ public interface CommentRepository extends PagingAndSortingRepository<MLPComment
 	 * @return Page of MLPComment
 	 */
 	Page<MLPComment> findByThreadId(String threadId, Pageable pageable);
-	
+
 	/**
 	 * Deletes all entries for the specified thread ID
 	 * 

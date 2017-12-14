@@ -65,7 +65,7 @@ public abstract class CCDSConstants {
 	public static final String CONFIG_PATH = "config";
 	public static final String THREAD_PATH = "thread";
 	public static final String COMMENT_PATH = "comment";
-	
+
 	// Actions on entities
 	public static final String LIKE_PATH = "like";
 	public static final String SEARCH_PATH = "search";
@@ -78,11 +78,11 @@ public abstract class CCDSConstants {
 	// Portal search interface
 	public static final String SEARCH_ACCESS_TYPES = "atc";
 	public static final String SEARCH_ACTIVE = "active";
-	public static final String SEARCH_AUTHOR = "author";
+	public static final String SEARCH_OWNERS = "owner";
 	public static final String SEARCH_DESC = "desc";
 	public static final String SEARCH_MODEL_TYPES = "mtc";
 	public static final String SEARCH_NAME = "name";
-	public static final String SEARCH_TAGS = "tags";
+	public static final String SEARCH_TAGS = "tag";
 	public static final String SEARCH_VAL_STATUSES = "vsc";
 
 	// Sonar wants a private constructor, placed after all fields

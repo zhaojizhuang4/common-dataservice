@@ -2,28 +2,55 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<groupId>org.acumos.common-dataservice</groupId>
 	<artifactId>cmn-data-svc-parent</artifactId>
 	<version>0</version>
 	<packaging>pom</packaging>
 	<name>Acumos Common Data Service</name>
-
 	<modules>
 		<!-- Child modules do NOT name this parent. -->
-		<!-- Defined for build convenience only! -->
 		<module>cmn-data-svc-server</module>
 		<module>cmn-data-svc-client</module>
 	</modules>
-
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+	<!-- DO NOT install or deploy the repo root pom as it's only needed to initiate 
+		a build -->
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.sonarsource.scanner.maven</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
-				<version>3.0.1</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.5.2</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<!-- Silence error javax.interceptor.InterceptorBinding not found -->
+					<additionalDependencies>
+						<additionalDependency>
+							<groupId>javax.interceptor</groupId>
+							<artifactId>javax.interceptor-api</artifactId>
+							<version>1.2</version>
+						</additionalDependency>
+					</additionalDependencies>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

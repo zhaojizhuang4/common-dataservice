@@ -34,7 +34,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
 /**
  * Utility class to enable Basic HTTP Authentication with Spring REST templates.
- *   
+ * 
  * From:
  * http://www.baeldung.com/2012/04/16/how-to-use-resttemplate-with-basic-authentication-in-spring-3-1/
  */
@@ -44,7 +44,7 @@ public class HttpComponentsClientHttpRequestFactoryBasicAuth extends HttpCompone
 
 	/**
 	 * @param host
-	 * HttpHost
+	 *            HttpHost
 	 */
 	public HttpComponentsClientHttpRequestFactoryBasicAuth(HttpHost host) {
 		this.host = host;

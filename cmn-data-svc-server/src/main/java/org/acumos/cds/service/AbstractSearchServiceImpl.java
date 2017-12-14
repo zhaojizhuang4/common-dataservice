@@ -35,7 +35,7 @@ public abstract class AbstractSearchServiceImpl {
 	/**
 	 * Populates a criteria object for Hibernate.
 	 * 
-	 * @param Criteria
+	 * @param criteria
 	 *            Criteria object to extend
 	 * @param queryParameters
 	 *            Map of parameters; ignored if null or empty

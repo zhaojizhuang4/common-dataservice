@@ -34,7 +34,7 @@ public class MLPSolutionSpecificationBuilder {
 	public MLPSolutionSpecificationBuilder(List<SearchCriterion> criteria) {
 		this.criteria = criteria;
 	}
-	
+
 	/**
 	 * Adds the specified criterion to the list.
 	 * 
@@ -46,7 +46,7 @@ public class MLPSolutionSpecificationBuilder {
 		criteria.add(criterion);
 		return this;
 	}
-	
+
 	/**
 	 * Builds a query, honoring the logical predicates in the criteria
 	 * 

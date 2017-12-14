@@ -27,7 +27,7 @@ import org.springframework.data.repository.Repository;
  * Only exposes the single get-all method.
  */
 public interface ArtifactTypeRepository extends Repository<MLPArtifactType, String> {
-	
+
 	/**
 	 * Returns all instances of the type.
 	 * 

@@ -44,7 +44,7 @@ public class UserSearchServiceImpl extends AbstractSearchServiceImpl implements 
 
 	@Autowired
 	private SessionFactory sessionFactory;
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<MLPUser> getUsers(Map<String, ? extends Object> queryParameters, boolean isOr) {
@@ -53,7 +53,7 @@ public class UserSearchServiceImpl extends AbstractSearchServiceImpl implements 
 		Transaction tx = sessionFactory.getCurrentSession().beginTransaction();
 		List<MLPUser> items = criteria.list();
 		tx.commit();
-		logger.debug(EELFLoggerDelegate.debugLogger,"getUsers: result size={}", items.size());
+		logger.debug(EELFLoggerDelegate.debugLogger, "getUsers: result size={}", items.size());
 		return items;
 	}
 

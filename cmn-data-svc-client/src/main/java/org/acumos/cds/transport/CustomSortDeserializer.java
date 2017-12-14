@@ -34,8 +34,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * Required to make use of PageRequest field Sort.
- *  
- * https://stackoverflow.com/questions/30974286/com-fasterxml-jackson-databind-jsonmappingexception-can-not-deserialize-instanc 
+ * 
+ * https://stackoverflow.com/questions/30974286/com-fasterxml-jackson-databind-jsonmappingexception-can-not-deserialize-instanc
  */
 public class CustomSortDeserializer extends JsonDeserializer<Sort> {
 	@Override

@@ -20,6 +20,8 @@
 
 package org.acumos.cds.config;
 
+import java.util.ArrayList;
+
 import org.acumos.cds.CdsApplication;
 import org.acumos.cds.controller.AbstractController;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +31,7 @@ import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
+import springfox.documentation.service.VendorExtension;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -39,7 +42,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfiguration {
-	
+
 	/**
 	 * @return new Docket
 	 */
@@ -52,18 +55,20 @@ public class SwaggerConfiguration {
 				.apiInfo(apiInfo());
 	}
 
+	@SuppressWarnings("rawtypes")
 	private ApiInfo apiInfo() {
 		final String version = CdsApplication.class.getPackage().getImplementationVersion();
 		return new ApiInfo("Acumos Common Data Service REST API", // title
-				"Provides create, retrieve, update and delete (CRUD) services " //
-						+ " for data about solutions, artifacts and users."//
+				"Provides create, retrieve, update and delete (CRUD) services for " //
+						+ " Acumos data including solutions, artifacts and users."//
 						+ " All service endpoints require basic HTTP authentication.", // description
 				version == null ? "version not available" : version, // version
 				"Terms of service", // TOS
-				new Contact("Acumos Data Model Team",
-                                                "https://acumos.org/to-be-determined",
-						"cds.someday@acumos.org"), // Contact
-				"License of API", // License
-				"API license URL"); // License URL
+				new Contact("Acumos Data Model Team", // name
+						"https://acumos.org/to-be-determined", // URL
+						"cds.someday@acumos.org"), // email
+				"Apache 2.0", // License
+				"https://www.apache.org/licenses/LICENSE-2.0", // License URL
+				new ArrayList<VendorExtension>()); // vendor extensions
 	}
 }

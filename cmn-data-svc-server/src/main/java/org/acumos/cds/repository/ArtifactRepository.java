@@ -41,7 +41,7 @@ public interface ArtifactRepository extends PagingAndSortingRepository<MLPArtifa
 	 */
 	@Query(value = "select a from MLPArtifact a, MLPSolRevArtMap m " //
 			+ " where a.artifactId =  m.artifactId " //
-			+ " and m.revisionId = :revisionId") 
+			+ " and m.revisionId = :revisionId")
 	Iterable<MLPArtifact> findByRevision(@Param("revisionId") String revisionId);
 
 	/**

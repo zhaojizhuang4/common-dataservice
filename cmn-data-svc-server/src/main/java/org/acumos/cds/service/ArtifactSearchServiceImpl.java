@@ -52,7 +52,7 @@ public class ArtifactSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		Transaction tx = sessionFactory.getCurrentSession().beginTransaction();
 		List<MLPArtifact> items = criteria.list();
 		tx.commit();
-		logger.debug(EELFLoggerDelegate.debugLogger,"getArtifacts: result size={}", items.size());
+		logger.debug(EELFLoggerDelegate.debugLogger, "getArtifacts: result size={}", items.size());
 		return items;
 	}
 

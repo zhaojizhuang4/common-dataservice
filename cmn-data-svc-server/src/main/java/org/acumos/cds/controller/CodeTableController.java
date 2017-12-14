@@ -197,10 +197,6 @@ public class CodeTableController extends AbstractController {
 
 	/**
 	 * @param sequence
-	 *            sequence number
-	 * @param valTypeCode
-	 *            validation type code
-	 * @param sequence
 	 *            Instance to save (redundant; the path parameters have all the
 	 *            required data)
 	 * @param response

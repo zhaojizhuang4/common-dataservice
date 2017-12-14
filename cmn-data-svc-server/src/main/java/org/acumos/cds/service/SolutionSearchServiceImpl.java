@@ -20,6 +20,7 @@
 
 package org.acumos.cds.service;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -60,21 +61,21 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 		List<MLPSolution> items = criteria.list();
-		logger.debug(EELFLoggerDelegate.debugLogger,"getSolutions: result size={}", items.size());
+		logger.debug(EELFLoggerDelegate.debugLogger, "getSolutions: result size={}", items.size());
 		return items;
 	}
 
 	/**
-	 * Builds a disjunction ("OR") criterion to check all values in the list, with
-	 * special handling for null.
+	 * Builds a disjunction ("OR") criterion to check exact match of any value in
+	 * the list, with special handling for null.
 	 * 
 	 * @param fieldName
 	 *            POJO field name
 	 * @param values
-	 *            String values; null is permittedØ
+	 *            String values; null is permitted
 	 * @return Criterion
 	 */
-	private Criterion buildValueListCriterion(String fieldName, String[] values) {
+	private Criterion buildEqualsListCriterion(String fieldName, String[] values) {
 		Junction junction = Restrictions.disjunction();
 		for (String v : values) {
 			if (v == null)
@@ -85,10 +86,31 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		return junction;
 	}
 
+	/**
+	 * Builds a disjunction ("OR") criterion to check approximate match of any value
+	 * in the list; null is not permitted.
+	 * 
+	 * @param fieldName
+	 *            POJO field name
+	 * @param values
+	 *            String values; null is forbidden
+	 * @return Criterion
+	 */
+	private Criterion buildLikeListCriterion(String fieldName, String[] values) {
+		Junction junction = Restrictions.disjunction();
+		for (String v : values) {
+			if (v == null)
+				throw new IllegalArgumentException("Null not permitted in value list");
+			else
+				junction.add(Restrictions.like(fieldName, '%' + v + '%'));
+		}
+		return junction;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
-	public Page<MLPSolution> findPortalSolutions(String nameKeyword, String descKeyword, String authorKeyword,
-			boolean active, String[] accessTypeCode, String[] modelTypeCode, String[] validationStatusCode,
+	public Page<MLPSolution> findPortalSolutions(String[] nameKeywords, String[] descKeywords, boolean active,
+			String[] ownerIds, String[] accessTypeCode, String[] modelTypeCode, String[] validationStatusCode,
 			String[] tags, Pageable pageable) {
 
 		Criteria solCriteria = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class);
@@ -96,24 +118,18 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		// Always check active status
 		solCriteria.add(Restrictions.eq("active", new Boolean(active)));
 
-		if (nameKeyword != null && !nameKeyword.isEmpty()) {
-			Criterion criterion = Restrictions.ilike("name", '%' + nameKeyword + '%');
-			solCriteria.add(criterion);
-		}
-		if (descKeyword != null && !descKeyword.isEmpty()) {
-			Criterion criterion = Restrictions.ilike("description", '%' + descKeyword + '%');
-			solCriteria.add(criterion);
-		}
-		if (authorKeyword != null && !authorKeyword.isEmpty()) {
-			// TODO
-			logger.info("findPortalSolutions: Author not implemented");
-		}
+		if (nameKeywords != null && nameKeywords.length > 0)
+			solCriteria.add(buildLikeListCriterion("name", nameKeywords));
+		if (descKeywords != null && descKeywords.length > 0)
+			solCriteria.add(buildLikeListCriterion("description", descKeywords));
+		if (ownerIds != null && ownerIds.length > 0)
+			solCriteria.add(Restrictions.in("ownerId", ownerIds));
 		if (accessTypeCode != null && accessTypeCode.length > 0)
-			solCriteria.add(buildValueListCriterion("accessTypeCode", accessTypeCode));
+			solCriteria.add(buildEqualsListCriterion("accessTypeCode", accessTypeCode));
 		if (modelTypeCode != null && modelTypeCode.length > 0)
-			solCriteria.add(buildValueListCriterion("modelTypeCode", modelTypeCode));
+			solCriteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode));
 		if (validationStatusCode != null && validationStatusCode.length > 0)
-			solCriteria.add(buildValueListCriterion("validationStatusCode", validationStatusCode));
+			solCriteria.add(buildEqualsListCriterion("validationStatusCode", validationStatusCode));
 		if (tags != null && tags.length > 0) {
 			// "tags" is the field name in MLPSolution
 			Criteria tagCriteria = solCriteria.createCriteria("tags");
@@ -124,6 +140,8 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		// Count the total rows
 		solCriteria.setProjection(Projections.rowCount());
 		Long count = (Long) solCriteria.uniqueResult();
+		if (count == 0)
+			return new RestPageResponse<>(new ArrayList<MLPSolution>(), pageable, count);
 
 		// Reset the criteria, add pagination and sort
 		solCriteria.setProjection(null);
@@ -146,9 +164,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		List<MLPSolution> items = solCriteria.list();
 
 		logger.debug(EELFLoggerDelegate.debugLogger, "findPortalSolutions: result size={}", items.size());
-		RestPageResponse<MLPSolution> page = new RestPageResponse<>(items, pageable, count);
-
-		return page;
+		return new RestPageResponse<>(items, pageable, count);
 	}
 
 }

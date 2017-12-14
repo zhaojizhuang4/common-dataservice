@@ -42,20 +42,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	/**
 	 * Open access to the documentation.
 	 */
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**");
-    }
-    
-    /**
-     * Open access to the health and version endpoints.
-     */
-    @Override
+	@Override
+	public void configure(WebSecurity web) throws Exception {
+		web.ignoring().antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**");
+	}
+
+	/**
+	 * Open access to the health and version endpoints.
+	 */
+	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable().authorizeRequests() //
-		 .antMatchers("/" + CCDSConstants.HEALTHCHECK_PATH).permitAll()
-		 .antMatchers("/" + CCDSConstants.VERSION_PATH).permitAll()
-		 .antMatchers("/**").authenticated().and().httpBasic();
+				.antMatchers("/" + CCDSConstants.HEALTHCHECK_PATH).permitAll()
+				.antMatchers("/" + CCDSConstants.VERSION_PATH).permitAll().antMatchers("/**").authenticated().and()
+				.httpBasic();
 	}
-    
+
 }

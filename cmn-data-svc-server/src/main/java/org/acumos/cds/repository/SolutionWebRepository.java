@@ -30,9 +30,11 @@ import org.springframework.transaction.annotation.Transactional;
 public interface SolutionWebRepository extends CrudRepository<MLPSolutionWeb, String> {
 
 	/**
-	 * Increments the solution view count by 1, with special handling for the first time.
+	 * Increments the solution view count by 1, with special handling for the first
+	 * time.
 	 * 
 	 * @param solutionId
+	 *            Solution ID
 	 */
 	@Modifying
 	@Transactional // throws exception without this

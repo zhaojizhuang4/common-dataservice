@@ -152,7 +152,7 @@ public interface ICommonDataServiceRestClient {
 	 * 
 	 * @param pageRequest
 	 *            Page index, page size, sort information; ignored if null.
-	 * @return List of objects.
+	 * @return Page of objects.
 	 */
 	RestPageResponse<MLPSolution> getSolutions(RestPageRequest pageRequest);
 
@@ -179,22 +179,19 @@ public interface ICommonDataServiceRestClient {
 	RestPageResponse<MLPSolution> findSolutionsByTag(String tag, RestPageRequest pageRequest);
 
 	/**
-	 * Searches solutions for matches on every specified condition. Special-purpose
-	 * method to support the dynamic search on the portal interface.
+	 * Finds solutions that match every specified condition. Special-purpose method
+	 * to support the dynamic search page on the portal interface.
 	 * 
-	 * TODO: Return a solution DTO with related information such as download count.
-	 * 
-	 * @param nameKeyword
-	 *            Keyword to perform "LIKE" search in Name field; ignored if null or
-	 *            empty
-	 * @param descriptionKeyword
-	 *            Keyword to perform "LIKE" search in Description field; ignored if
+	 * @param nameKeywords
+	 *            Keywords to perform "LIKE" search in Name field; ignored if null
+	 *            or empty
+	 * @param descriptionKeywords
+	 *            Keywords to perform "LIKE" search in Description field; ignored if
 	 *            null or empty
-	 * @param authorKeyword
-	 *            Keyword to perform "LIKE" search in user name; ignored if null or
-	 *            empty; TODO not implemented yet
 	 * @param active
-	 *            Solution active status (required)
+	 *            Solution active status; true for active, false for inactive
+	 * @param ownerIds
+	 *            User IDs who created the solution; ignored if null or empty
 	 * @param accessTypeCodes
 	 *            Access type codes; use four-letter sequence "null" to match a null
 	 *            value; ignored if null or empty
@@ -210,8 +207,8 @@ public interface ICommonDataServiceRestClient {
 	 *            Page index, page size, sort information; ignored if null.
 	 * @return Page of solution objects.
 	 */
-	RestPageResponse<MLPSolution> findPortalSolutions(String nameKeyword, String descriptionKeyword,
-			String authorKeyword, boolean active, String[] accessTypeCodes, String[] modelTypeCodes,
+	RestPageResponse<MLPSolution> findPortalSolutions(String[] nameKeywords, String[] descriptionKeywords,
+			boolean active, String[] ownerIds, String[] accessTypeCodes, String[] modelTypeCodes,
 			String[] validationStatusCodes, String[] tags, RestPageRequest pageRequest);
 
 	/**
@@ -536,7 +533,7 @@ public interface ICommonDataServiceRestClient {
 	 *            String to find
 	 * @param pageRequest
 	 *            Page index, page size, sort information; ignored if null.
-	 * @return List of user objects.
+	 * @return Page of user objects.
 	 */
 	RestPageResponse<MLPUser> findUsersBySearchTerm(String searchTerm, RestPageRequest pageRequest);
 
@@ -746,7 +743,7 @@ public interface ICommonDataServiceRestClient {
 	 * 
 	 * @param pageRequest
 	 *            Page index, page size, sort information; ignored if null.
-	 * @return List of MLPRoles
+	 * @return Page of MLPRoles
 	 */
 	RestPageResponse<MLPRole> getRoles(RestPageRequest pageRequest);
 
@@ -942,7 +939,7 @@ public interface ICommonDataServiceRestClient {
 	 *            Instance ID
 	 * @param pageRequest
 	 *            Page index, page size, sort information; ignored if null.
-	 * @return List of solution downloads
+	 * @return Page of solution downloads
 	 */
 	RestPageResponse<MLPSolutionDownload> getSolutionDownloads(String solutionId, RestPageRequest pageRequest);
 
@@ -1002,7 +999,7 @@ public interface ICommonDataServiceRestClient {
 	 *            Instance ID
 	 * @param pageRequest
 	 *            Page index, page size, sort information; ignored if null.
-	 * @return List of solution ratings
+	 * @return Page of solution ratings
 	 */
 	RestPageResponse<MLPSolutionRating> getSolutionRatings(String solutionId, RestPageRequest pageRequest);
 
@@ -1229,7 +1226,7 @@ public interface ICommonDataServiceRestClient {
 	/**
 	 * Gets the validation sequence records.
 	 * 
-	 * @return List of validation seqeuence
+	 * @return List of validation sequence
 	 */
 	List<MLPValidationSequence> getValidationSequences();
 

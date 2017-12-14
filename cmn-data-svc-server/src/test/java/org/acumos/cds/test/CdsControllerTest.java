@@ -158,6 +158,9 @@ public class CdsControllerTest {
 
 			cs.setDescription("some description");
 			client.updateSolution(cs);
+			
+			MLPSolution fetched = client.getSolution(cs.getSolutionId());
+			Assert.assertTrue(fetched != null && fetched.getTags() != null && fetched.getWebStats() != null);
 
 			MLPSolutionRevision cr = new MLPSolutionRevision();
 			cr.setSolutionId(cs.getSolutionId());
@@ -189,7 +192,7 @@ public class CdsControllerTest {
 			client.deleteSolution(cs.getSolutionId());
 			client.deleteUser(cu.getUserId());
 		} catch (HttpStatusCodeException ex) {
-			logger.error("basicSequenceDemo failed", ex);
+			logger.error("basicSequenceDemo failed: " + ex.getResponseBodyAsString(), ex);
 			throw ex;
 		}
 	}
@@ -486,6 +489,19 @@ public class CdsControllerTest {
 			Assert.assertFalse(cs.getTags().isEmpty());
 			logger.info("Created solution {}", cs);
 
+			MLPSolution inactive = new MLPSolution();
+			inactive.setName("inactive solution name");
+			inactive.setOwnerId(cu.getUserId());
+			inactive.setValidationStatusCode(ValidationStatusCode.FA.name());
+			inactive.setProvider("Inactive Data Org");
+			inactive.setAccessTypeCode(AccessTypeCode.OR.name());
+			inactive.setModelTypeCode(ModelTypeCode.DS.name());
+			inactive.setToolkitTypeCode(ToolkitTypeCode.SK.name());
+			inactive.setActive(false);
+			inactive = client.createSolution(inactive);
+			Assert.assertNotNull(inactive.getSolutionId());
+			logger.info("Created inactive solution {}", inactive);
+
 			// Check count
 			long solCountTrans = client.getSolutionCount();
 			Assert.assertTrue(solCountTrans > 0);
@@ -503,6 +519,11 @@ public class CdsControllerTest {
 			client.addSolutionTag(cs.getSolutionId(), tagName2);
 			client.dropSolutionTag(cs.getSolutionId(), tagName2);
 
+			logger.info("Fetching back newly created solution");
+			MLPSolution s = client.getSolution(cs.getSolutionId());
+			Assert.assertTrue(s != null && !s.getTags().isEmpty() && s.getWebStats() != null);
+			logger.info("Solution {}", s);
+
 			// Query for tags
 			List<MLPTag> solTags = client.getSolutionTags(cs.getSolutionId());
 			Assert.assertTrue(solTags.size() > 0);
@@ -512,18 +533,26 @@ public class CdsControllerTest {
 			RestPageResponse<MLPSolution> page = client.getSolutions(new RestPageRequest(0, 2));
 			Assert.assertTrue(page != null && page.getNumberOfElements() > 0);
 
-			logger.info("Fetching back newly created solution");
-			MLPSolution s = client.getSolution(cs.getSolutionId());
-			Assert.assertTrue(s != null);
-			logger.info("Solution {}", s);
+			cs.setDescription("some description");
+			client.updateSolution(cs);
+			logger.info("Fetching back updated solution");
+			MLPSolution updated = client.getSolution(cs.getSolutionId());
+			Assert.assertTrue(updated != null && !updated.getTags().isEmpty() && updated.getWebStats() != null && updated.getWebStats().getViewCount() > 0);
 
 			logger.info("Querying for active PB solutions");
-			Map<String, Object> queryParameters = new HashMap<>();
-			queryParameters.put("accessTypeCode", AccessTypeCode.PB.name());
-			queryParameters.put("active", Boolean.TRUE);
-			List<MLPSolution> sols = client.searchSolutions(queryParameters, false);
-			Assert.assertTrue(sols != null && !sols.isEmpty());
-			logger.info("Active PB solution count {}", sols.size());
+			Map<String, Object> activePb = new HashMap<>();
+			activePb.put("accessTypeCode", AccessTypeCode.PB.name());
+			activePb.put("active", Boolean.TRUE);
+			List<MLPSolution> activePbList = client.searchSolutions(activePb, false);
+			Assert.assertTrue(activePbList != null && !activePbList.isEmpty());
+			logger.info("Active PB solution count {}", activePbList.size());
+
+			logger.info("Querying for inactive solutions");
+			Map<String, Object> inactiveSols = new HashMap<>();
+			inactiveSols.put("active", Boolean.TRUE);
+			List<MLPSolution> inactiveSolList = client.searchSolutions(inactiveSols, false);
+			Assert.assertTrue(inactiveSolList != null && !inactiveSolList.isEmpty());
+			logger.info("Inactive PB solution count {}", inactiveSolList.size());
 
 			logger.info("Querying for solutions with similar names");
 			RestPageResponse<MLPSolution> sl1 = client.findSolutionsBySearchTerm("solution", new RestPageRequest(0, 1));
@@ -531,49 +560,32 @@ public class CdsControllerTest {
 			RestPageResponse<MLPSolution> sl2 = client.findSolutionsByTag(tagName1, new RestPageRequest(0, 1));
 			Assert.assertTrue(sl2 != null && sl2.getNumberOfElements() > 0);
 
-			/* 1.10.0 search method
-			logger.info("Querying for active PB solutions");
-			List<String> codeList = new ArrayList<>();
-			codeList.add(AccessTypeCode.PB.name());
-			codeList.add(AccessTypeCode.PR.name());
-			// Cover query parser as much as possible
-			SearchCriteria criteria = new SearchCriteria(
-					new SearchCriterion("accessTypeCode", SearchOperation.EQUALS, AccessTypeCode.PB.name()))
-							.or(new SearchCriterion("accessTypeCode", SearchOperation.NOT_EQUALS, "Y"))
-							.or(new SearchCriterion("accessTypeCode", SearchOperation.IN,
-									new String[] { AccessTypeCode.PB.name(), AccessTypeCode.PR.name() }))
-							.or(new SearchCriterion("accessTypeCode", SearchOperation.IN, codeList))
-							.or(new SearchCriterion("accessTypeCode", SearchOperation.LIKE, "X"))
-							.or(new SearchCriterion("accessTypeCode", SearchOperation.LTE, "X"))
-							.or(new SearchCriterion("accessTypeCode", SearchOperation.GTE, "X"))
-							.or(new SearchCriterion("created", SearchOperation.EQUALS, new Date()));
-			RestPageResponse<MLPSolution> sols = client.searchSolutions(criteria, new RestPageRequest(0, 1));
-			Assert.assertTrue(sols != null && sols.getNumberOfElements() > 0);
-			logger.info("Active PB solution count {}", sols.getNumberOfElements());
-			
-			SearchCriteria onboardSearchCriteria = new SearchCriteria(
-					new SearchCriterion("ownerId", SearchOperation.EQUALS, cs.getOwnerId())
-					//).and(
-					//	new SearchCriterion("name", SearchOperation.EQUALS, cs.getName())
-						);
-			RestPageResponse<MLPSolution> onboardMatches = client.searchSolutions(onboardSearchCriteria,
-					new RestPageRequest(0, 1));
-			Assert.assertTrue(onboardMatches != null && onboardMatches.getNumberOfElements() > 0);
-			logger.info("Onboard solution count {}", onboardMatches.getNumberOfElements());
-			*/
-
 			// Portal dynamic search
-			String nameKw = null;
-			String descKw = null;
-			String authKw = null;
+			String [] searchTags = new String [] { tagName1 };
+			RestPageResponse<MLPSolution> portalTagMatches = client.findPortalSolutions(null, null, true, null, null, null, null, searchTags, 
+					new RestPageRequest(0, 1));
+			Assert.assertTrue(portalTagMatches != null && portalTagMatches.getNumberOfElements() > 0);
+	
+			String [] bogusTags = new String [] { "bogus" };
+			RestPageResponse<MLPSolution> portalTagNoMatches = client.findPortalSolutions(null, null, true, null, null, null, null, bogusTags, 
+					new RestPageRequest(0, 1));
+			Assert.assertTrue(portalTagNoMatches != null && portalTagNoMatches.getNumberOfElements() == 0);
+
+			RestPageResponse<MLPSolution> portalInactiveMatches = client.findPortalSolutions(null, null, false, null, null, null, null, null, 
+					new RestPageRequest(0, 1));
+			Assert.assertTrue(portalInactiveMatches != null && portalInactiveMatches.getNumberOfElements() > 0);
+
+			String [] nameKw = null;
+			String [] descKw = null;
+			String [] owners = { cu.getUserId() };
 			String [] accessTypeCodes = { AccessTypeCode.PB.name() };
 			String [] modelTypeCodes = null;
 			String [] valStatusCodes = { ValidationStatusCode.IP.name(), "null" };
-			String [] searchTags = null;
-			RestPageResponse<MLPSolution> portalMatches = client.findPortalSolutions(nameKw, descKw, authKw, true, accessTypeCodes, modelTypeCodes, valStatusCodes, searchTags, 
+			searchTags = null;
+			RestPageResponse<MLPSolution> portalActiveMatches = client.findPortalSolutions(nameKw, descKw, true, owners, accessTypeCodes, modelTypeCodes, valStatusCodes, searchTags, 
 					new RestPageRequest(0, 1));
-			Assert.assertTrue(portalMatches != null && portalMatches.getNumberOfElements() > 0);
-			
+			Assert.assertTrue(portalActiveMatches != null && portalActiveMatches.getNumberOfElements() > 0);
+
 			// Add user access
 			client.addSolutionUserAccess(cs.getSolutionId(), cu.getUserId());
 
@@ -742,8 +754,8 @@ public class CdsControllerTest {
 				client.deleteUser(cu.getUserId());
 
 				try {
-					client.getSolution(cs.getSolutionId());
-					throw new Exception("Found a deleted solution: " + cs.getSolutionId());
+					MLPSolution deleted = client.getSolution(cs.getSolutionId());
+					throw new Exception("Found a deleted solution: " + deleted);
 				} catch (HttpClientErrorException ex) {
 					// this is expected, the item should not exist
 					logger.info("Caught expected exception: " + ex.getResponseBodyAsString());

@@ -29,14 +29,17 @@ import org.acumos.cds.domain.MLPArtifact;
  * Defines methods to manipulate Artifact information.
  */
 public interface ArtifactSearchService {
-		
+
 	/**
 	 * Gets all instances matching the specified query parameters.
 	 * 
-	 * @param queryParameters field-name, field-value pairs; ignored if null or empty.
-	 * @param isOr If true, the query is a disjunction ("or"); otherwise the query is a conjunction ("and").
+	 * @param queryParameters
+	 *            field-name, field-value pairs; ignored if null or empty.
+	 * @param isOr
+	 *            If true, the query is a disjunction ("or"); otherwise the query is
+	 *            a conjunction ("and").
 	 * @return List of instances, which may be empty.
 	 */
-	List<MLPArtifact> getArtifacts(Map<String,? extends Object> queryParameters, boolean isOr);
+	List<MLPArtifact> getArtifacts(Map<String, ? extends Object> queryParameters, boolean isOr);
 
 }

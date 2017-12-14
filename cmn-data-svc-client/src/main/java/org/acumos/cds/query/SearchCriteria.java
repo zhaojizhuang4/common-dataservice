@@ -28,7 +28,8 @@ public class SearchCriteria {
 	}
 
 	/**
-	 * Creates a list of criterion elements by parsing the string. For example: "a:b;|c_e,f".
+	 * Creates a list of criterion elements by parsing the string. For example:
+	 * "a:b;|c_e,f".
 	 * 
 	 * @param criteriaString
 	 *            Criteria to be parsed

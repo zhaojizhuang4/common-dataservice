@@ -56,8 +56,6 @@ public class TagController extends AbstractController {
 	/**
 	 * @param pageable
 	 *            Sort and page criteria
-	 * @param response
-	 *            HttpServletResponse
 	 * @return Page of tags
 	 */
 	@ApiOperation(value = "Gets a page of tags, optionally sorted.", response = MLPTag.class, responseContainer = "Page")

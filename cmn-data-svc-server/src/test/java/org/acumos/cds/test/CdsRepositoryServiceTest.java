@@ -375,9 +375,9 @@ public class CdsRepositoryServiceTest {
 			List<MLPArtifact> searchArts = artifactSearchService.getArtifacts(artParms, false);
 			Assert.assertTrue(searchArts.size() > 0);
 
-			final String tagName = "soltag";
-			MLPTag solTag = new MLPTag(tagName);
-			solTag = solutionTagRepository.save(solTag);
+			// This tag is existing
+			MLPTag solTag1 = new MLPTag("soltag1");
+			solTag1 = solutionTagRepository.save(solTag1);
 
 			MLPSolution cs = new MLPSolution();
 			final String solName = "solution name";
@@ -392,7 +392,7 @@ public class CdsRepositoryServiceTest {
 			cs.setToolkitTypeCode(ToolkitTypeCode.SK.name());
 			cs.setValidationStatusCode(ValidationStatusCode.SB.name());
 			// tags must exist; they are not created here
-			cs.getTags().add(new MLPTag(tagName));
+			cs.getTags().add(solTag1);
 			cs = solutionRepository.save(cs);
 			Assert.assertNotNull("Solution ID", cs.getSolutionId());
 			Assert.assertTrue(cs.getTags().size() == 1);
@@ -434,16 +434,16 @@ public class CdsRepositoryServiceTest {
 			Assert.assertNotNull(messyResult);
 
 			logger.info("Finding portal solutions");
-			String solKw = solName;
-			String descKw = solDesc;
-			String authorKw = null;
+			String [] solKw = { solName };
+			String [] descKw = { solDesc };
 			boolean active = true;
+			String[] ownerIds = { cu.getUserId() };
 			String[] accessTypeCodes = { null, AccessTypeCode.PB.name() };
 			String[] modelTypeCodes = { ModelTypeCode.CL.name() };
 			String[] valStatusCodes = { ValidationStatusCode.SB.name() };
-			String[] searchTags = { tagName };
-			Page<MLPSolution> portalSearchResult = solutionSearchService.findPortalSolutions(solKw, descKw, authorKw,
-					active, accessTypeCodes, modelTypeCodes, valStatusCodes, searchTags,
+			String[] searchTags = { solTag1.getTag() };
+			Page<MLPSolution> portalSearchResult = solutionSearchService.findPortalSolutions(solKw, descKw,
+					active, ownerIds, accessTypeCodes, modelTypeCodes, valStatusCodes, searchTags,
 					new PageRequest(0, 2, Direction.ASC, "name"));
 			Assert.assertTrue(portalSearchResult != null && portalSearchResult.getNumberOfElements() > 0);
 			logger.info("Found portal solution total " + portalSearchResult.getTotalElements());
@@ -778,7 +778,8 @@ public class CdsRepositoryServiceTest {
 
 			MLPSolutionWeb stats = new MLPSolutionWeb();
 			stats.setSolutionId(cs.getSolutionId());
-			solutionWebRepository.save(stats);
+			stats = solutionWebRepository.save(stats);
+			Assert.assertNotNull(stats);
 			final Long countBefore = stats.getViewCount();
 			logger.info("Solution view count before: " + countBefore);
 			solutionWebRepository.incrementViewCount(cs.getSolutionId());
@@ -791,12 +792,11 @@ public class CdsRepositoryServiceTest {
 			MLPSolTagMap solTagMap1 = new MLPSolTagMap(cs.getSolutionId(), tag1.getTag());
 			solTagMapRepository.save(solTagMap1);
 
-			// add user to access control list
-			MLPSolUserAccMap solUserAccMap = new MLPSolUserAccMap(cs.getSolutionId(), cu.getUserId());
-			solUserAccMapRepository.save(solUserAccMap);
-			Iterable<MLPUser> usersWithAccess = solUserAccMapRepository.getUsersForSolution(cs.getSolutionId());
-			Assert.assertTrue(usersWithAccess.iterator().hasNext());
-
+			// Get the solution by ID
+			MLPSolution solById = solutionRepository.findOne(cs.getSolutionId());
+			Assert.assertTrue(solById != null && !solById.getTags().isEmpty());
+			logger.info("Fetched solution: " + solById);
+			
 			// Query for tags on the solution
 			Iterable<MLPTag> solTags = solutionTagRepository.findBySolution(cs.getSolutionId());
 			Assert.assertTrue(solTags.iterator().hasNext());
@@ -804,6 +804,12 @@ public class CdsRepositoryServiceTest {
 			// Find solution by tag
 			Page<MLPSolution> taggedSolutions = solutionRepository.findByTag(tag1.getTag(), null);
 			Assert.assertTrue(taggedSolutions.getNumberOfElements() > 0);
+
+			// add user to access control list
+			MLPSolUserAccMap solUserAccMap = new MLPSolUserAccMap(cs.getSolutionId(), cu.getUserId());
+			solUserAccMapRepository.save(solUserAccMap);
+			Iterable<MLPUser> usersWithAccess = solUserAccMapRepository.getUsersForSolution(cs.getSolutionId());
+			Assert.assertTrue(usersWithAccess.iterator().hasNext());
 
 			MLPSolution cs2 = new MLPSolution();
 			cs2.setName("solution name");

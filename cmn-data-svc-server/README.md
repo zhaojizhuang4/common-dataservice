@@ -1,6 +1,4 @@
-===================================
-Acumos Common Data Service - Server
-===================================
+# Acumos Common Data Service Server
 
 This project has the Spring-Boot application that provides common data services to components in the Acumos machine-learning platform.
 

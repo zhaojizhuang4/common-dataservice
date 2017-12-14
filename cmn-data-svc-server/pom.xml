@@ -5,45 +5,43 @@
 	<artifactId>cmn-data-svc-server</artifactId>
 	<!-- This version number is used to tag the Docker image. No need for maven 
 		snapshot convention here, registry allows replace -->
-	<version>1.10.1</version>
+	<version>1.10.2</version>
 	<name>Acumos Common Data Service Server</name>
 	<description>Micro service based on Spring-Boot</description>
-
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.4.RELEASE</version>
+		<version>1.5.7.RELEASE</version>
 		<!-- silence warning about parent relative path -->
 		<relativePath />
 	</parent>
-
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<!-- Stand-alone RESTFul application -->
 		<start-class>org.acumos.cds.CdsApplication</start-class>
 		<!-- Client jar is in nexus repo -->
 		<client.version>${project.version}-SNAPSHOT</client.version>
-		<swagger.version>2.6.1</swagger.version>
-		<!-- All acumos.nexus.* are overridden by Jenkins settings -->
-		<acumos.nexus.url>http://cognita-nexus01.eastus.cloudapp.azure.com:8081</acumos.nexus.url>
-		<acumos.nexus.snapshot.path>repository/repo_cognita_platform_maven_snapshots</acumos.nexus.snapshot.path>
-		<acumos.nexus.release.path>repository/repo_cognita_platform_maven</acumos.nexus.release.path>
-		<!-- EELF jar is in ONAP nexus repo -->
-		<onap.nexus.url>https://nexus.onap.org</onap.nexus.url>
-		<onap.nexus.snapshot.path>content/repositories/snapshots/</onap.nexus.snapshot.path>
-		<onap.nexus.release.path>content/repositories/releases/</onap.nexus.release.path>
+		<springfox.version>2.7.0</springfox.version>
 		<!-- Jenkins invokes mvn with argument -Dbuild.number=${BUILD_NUMBER} -->
 		<build.number>0</build.number>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<!-- Docker daemon; overridden by Jenkins settings -->
-		<docker.host.url>unix:/var/run/docker.sock</docker.host.url>
-		<!-- Docker image registry; all overriden by Jenkins settings -->
+		<!-- EELF jar is in ONAP nexus repo -->
+		<onap.nexus.url>https://nexus.onap.org</onap.nexus.url>
+		<!-- Azure Docker settings are overriden by Jenkins settings -->
+		<docker.host.url>set by Jenkins</docker.host.url>
 		<docker.registry.url>set by Jenkins</docker.registry.url>
 		<docker.registry.login>set by Jenkins</docker.registry.login>
 		<docker.registry.password>set by Jenkins</docker.registry.password>
+		<!-- LF Docker coordinates -->
+		<docker.registry>nexus3.acumos.org:10003</docker.registry>
+		<!-- All acumos.nexus.* are overridden by Azure Jenkins settings -->
+		<acumos.nexus.url>http://cognita-nexus01.eastus.cloudapp.azure.com:8081</acumos.nexus.url>
+		<acumos.nexus.snapshot.path>repository/repo_cognita_platform_maven_snapshots</acumos.nexus.snapshot.path>
+		<acumos.nexus.release.path>repository/repo_cognita_platform_maven</acumos.nexus.release.path>
 	</properties>
 
 	<repositories>
+		<!-- begin Azure repositories -->
 		<repository>
 			<id>acumos-snapshots</id>
 			<name>acumos-repository-snapshots</name>
@@ -54,6 +52,16 @@
 			<name>acumos-repository-releases</name>
 			<url>${acumos.nexus.url}/${acumos.nexus.release.path}</url>
 		</repository>
+		<!-- end Azure repositories -->
+		<!-- LF: Specify repositories here to avoid coordination of ~/.m2/settings.xml 
+			files among developers. Use values (not properties) so oparent can be resolved. 
+			The IDs should match Jenkins template values. -->
+		<!-- LF <repository> <id>releases</id> <name>Acumos Release Repository</name> 
+			<url>https://nexus.acumos.org/content/repositories/releases</url> </repository> 
+			<repository> <id>snapshots</id> <name>Acumos Snapshot Repository</name> <url>https://nexus.acumos.org/content/repositories/snapshots</url> 
+			</repository> <repository> <id>public</id> <url>https://nexus.acumos.org/content/groups/public</url> 
+			</repository> LF -->
+		<!-- begin ONAP repositories for EELF -->
 		<repository>
 			<id>onap-snapshots</id>
 			<name>ONAP Snapshot Repository</name>
@@ -64,6 +72,7 @@
 			<name>ONAP Release Repository</name>
 			<url>${onap.nexus.url}/${onap.nexus.release.path}</url>
 		</repository>
+		<!-- end ONAP repositories for EELF -->
 	</repositories>
 
 	<dependencies>
@@ -71,26 +80,6 @@
 			<groupId>org.acumos.common-dataservice</groupId>
 			<artifactId>cmn-data-svc-client</artifactId>
 			<version>${client.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.att.eelf</groupId>
-			<artifactId>eelf-core</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<!-- Spring chooses <version>${slf4j.version}</version> -->
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<!-- Spring chooses <version>${logback.version}</version> -->
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<!-- Spring chooses <version>${logback.version}</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -112,16 +101,36 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.att.eelf</groupId>
+			<artifactId>eelf-core</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<!-- Spring-boot sets the version -->
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<!-- Spring-boot sets the version -->
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<!-- Spring-boot sets the version -->
+		</dependency>
+		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<!-- Spring specifies the <version>1.10</version> -->
+			<!-- Spring-boot sets the version -->
 		</dependency>
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
-			<!-- Spring specifies a version here -->
+			<!-- Spring-boot sets the version -->
 		</dependency>
-		<!-- Added for encrypted password in properties -->
+		<!-- encrypted password in properties -->
 		<dependency>
 			<groupId>com.github.ulisesbocchio</groupId>
 			<artifactId>jasypt-spring-boot-starter</artifactId>
@@ -130,38 +139,35 @@
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
-			<version>${swagger.version}</version>
+			<version>${springfox.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
-			<version>${swagger.version}</version>
+			<version>${springfox.version}</version>
 		</dependency>
 		<!-- Derby is always included, altho primarily used for testing -->
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
-			<!-- Spring sets the <version>10.13.1.1</version> -->
+			<!-- Spring-boot sets the version -->
 		</dependency>
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<!-- Spring-boot sets the version -->
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<!-- Spring sets the <version>4.11</version> -->
+			<!-- Spring-boot sets the version -->
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
-
 	<build>
-
 		<plugins>
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
@@ -182,7 +188,6 @@
 					<emptyLineAfterHeader>true</emptyLineAfterHeader>
 				</configuration>
 			</plugin>
-
 			<!-- Require Java 1.8 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -193,7 +198,6 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-
 			<!-- Add the build number to the manifest. Spring-Boot uses a complex 
 				packaging process that makes access to the original Manifest.MF very difficult. 
 				However, Java provides access to the implementation version for a package, 
@@ -213,7 +217,6 @@
 					</archive>
 				</configuration>
 			</plugin>
-
 			<!-- Build a single jar with all dependencies -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -227,7 +230,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<!-- Skip the deploy-jar-to-nexus step -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -237,7 +239,6 @@
 					<skip>true</skip>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
@@ -258,25 +259,27 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<!-- https://stackoverflow.com/questions/39126226/fabric8-springboot-full-example -->
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.21.0</version>
+				<version>0.22.1</version>
 				<configuration>
 					<verbose>true</verbose>
 					<dockerHost>${docker.host.url}</dockerHost>
+					<!-- docker runs on the LF build machine -->
+					<!-- LF <dockerHost>unix:///var/run/docker.sock</dockerHost> LF -->
 					<registry>${docker.registry.url}</registry>
-					<authConfig>
-						<username>${docker.registry.login}</username>
-						<password>${docker.registry.password}</password>
-					</authConfig>
+					<!-- no auth config, jenkins logs in -->
 					<images>
 						<image>
 							<name>common-dataservice:${project.version}</name>
 							<build>
 								<from>frolvlad/alpine-oraclejdk8:slim</from>
+								<tags>
+									<tag>${project.version}</tag>
+									<tag>${maven.build.timestamp}</tag>
+								</tags>
 								<assembly>
 									<descriptorRef>artifact</descriptorRef>
 								</assembly>
@@ -288,8 +291,26 @@
 						</image>
 					</images>
 				</configuration>
+				<!-- build Docker images in install phase, push in deploy phase -->
+				<!-- TODO <executions> <execution> <goals> <goal>build</goal> <goal>push</goal> 
+					</goals> </execution> </executions> TODO -->
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<!-- <version>3.0.0</version> -->
+				<configuration>
+					<!-- Silence error javax.interceptor.InterceptorBinding not found -->
+					<additionalDependencies>
+						<additionalDependency>
+							<groupId>javax.interceptor</groupId>
+							<artifactId>javax.interceptor-api</artifactId>
+							<version>1.2</version>
+						</additionalDependency>
+					</additionalDependencies>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+	<!-- No distributionManagement section, jars are not deployed -->
 </project>

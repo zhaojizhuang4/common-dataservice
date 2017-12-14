@@ -36,6 +36,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 
 /**
  * Tests getters and setters of transport classes.
@@ -97,7 +98,7 @@ public class TransportTest extends AbstractModelTest {
 	public void testRestPageResponse() {
 		RestPageResponse<String> t = new RestPageResponse<>();
 		t = new RestPageResponse<>(new ArrayList<String>());
-		t = new RestPageResponse<>(new ArrayList<String>(), null, l1);
+		t = new RestPageResponse<>(new ArrayList<String>(), new PageRequest(0, 1), l1);
 		t.setFirst(true);
 		t.setLast(false);
 		t.setNextPage(true);

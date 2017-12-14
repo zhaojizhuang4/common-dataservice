@@ -386,22 +386,22 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public RestPageResponse<MLPSolution> findPortalSolutions(String nameKeyword, String descriptionKeyword,
-			String authorKeyword, boolean active, String[] accessTypeCodes, String[] modelTypeCodes,
-			String[] validationStatusCodes, String[] tags, RestPageRequest pageRequest) {
+	public RestPageResponse<MLPSolution> findPortalSolutions(String[] nameKeywords, String[] descriptionKeywords,
+			boolean active, String [] ownerIds, String[] accessTypeCodes, String[] modelTypeCodes, String[] validationStatusCodes,
+			String[] tags, RestPageRequest pageRequest) {
 		HashMap<String, Object> parms = new HashMap<>();
 		// This is required
 		parms.put(CCDSConstants.SEARCH_ACTIVE, active);
+		if (nameKeywords != null && nameKeywords.length > 0)
+			parms.put(CCDSConstants.SEARCH_NAME, nameKeywords);
+		if (descriptionKeywords != null && descriptionKeywords.length > 0)
+			parms.put(CCDSConstants.SEARCH_DESC, descriptionKeywords);
+		if (ownerIds != null && ownerIds.length > 0)
+			parms.put(CCDSConstants.SEARCH_OWNERS, ownerIds);
 		if (accessTypeCodes != null && accessTypeCodes.length > 0)
 			parms.put(CCDSConstants.SEARCH_ACCESS_TYPES, accessTypeCodes);
-		if (authorKeyword != null && authorKeyword.length() > 0)
-			parms.put(CCDSConstants.SEARCH_AUTHOR, authorKeyword);
-		if (descriptionKeyword != null && descriptionKeyword.length() > 0)
-			parms.put(CCDSConstants.SEARCH_DESC, descriptionKeyword);
 		if (modelTypeCodes != null && modelTypeCodes.length > 0)
 			parms.put(CCDSConstants.SEARCH_MODEL_TYPES, modelTypeCodes);
-		if (nameKeyword != null && nameKeyword.length() > 0)
-			parms.put(CCDSConstants.SEARCH_NAME, nameKeyword);
 		if (tags != null && tags.length > 0)
 			parms.put(CCDSConstants.SEARCH_TAGS, tags);
 		if (validationStatusCodes != null && validationStatusCodes.length > 0)

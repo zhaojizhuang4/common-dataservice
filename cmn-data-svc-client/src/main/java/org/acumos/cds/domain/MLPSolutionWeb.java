@@ -34,18 +34,22 @@ import org.hibernate.annotations.Type;
 
 /**
  * Model for solution website metadata. In a one:one relationship with solution.
+ * The relationship is mapped via annotations on MLPSolution (unidirectional).
  * 
- * This separates updates ON a solution made by the owner (e.g., description)
- * from updates ABOUT a solution made by the system (e.g., downloads).
+ * The separation was made to distinguish updates ON a solution made by the
+ * owner (e.g., description) from updates ABOUT a solution made by the system
+ * (e.g., downloads or views).
  */
 @Entity
 @Table(name = "C_SOLUTION_WEB")
 public class MLPSolutionWeb implements MLPEntity, Serializable {
 
+	/* package */ static final String SOL_ID_COL_NAME = "SOLUTION_ID";
+
 	private static final long serialVersionUID = 5613267071143825368L;
 
 	@Id
-	@Column(name = "SOLUTION_ID", nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = SOL_ID_COL_NAME, nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
 	private String solutionId;
 
@@ -159,8 +163,8 @@ public class MLPSolutionWeb implements MLPEntity, Serializable {
 
 	@Override
 	public String toString() {
-		return this.getClass().getName() + "[solutionId=" + solutionId + ", views=" + viewCount + ", downloads=" + downloadCount + ", ratings="
-				+ ratingCount + ", ..]";
+		return this.getClass().getName() + "[solutionId=" + solutionId + ", views=" + viewCount + ", downloads="
+				+ downloadCount + ", ratings=" + ratingCount + ", ..]";
 	}
 
 }

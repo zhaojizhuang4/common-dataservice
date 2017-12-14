@@ -59,8 +59,8 @@ public abstract class AbstractController {
 	 * @param queryParameters
 	 *            Maps field names to expected field values
 	 * @return Map of String to Object
-	 * @throws Exception
-	 *             on any failure; e.g., unknown field, unparseable number, etc.
+	 * @throws NoSuchFieldException
+	 *             If a field name is not found in the class
 	 */
 	protected Map<String, Object> convertQueryParameters(Class<?> modelClass, Map<String, String> queryParameters)
 			throws NoSuchFieldException {

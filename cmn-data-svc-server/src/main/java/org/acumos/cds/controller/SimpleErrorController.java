@@ -54,9 +54,10 @@ public class SimpleErrorController implements ErrorController {
 	private final ErrorAttributes errorAttributes;
 
 	/**
-	 * Constructor 
+	 * Constructor
+	 * 
 	 * @param errorAttributes
-	 * error attributes must not be null
+	 *            error attributes must not be null
 	 */
 	@Autowired
 	public SimpleErrorController(ErrorAttributes errorAttributes) {
@@ -71,10 +72,10 @@ public class SimpleErrorController implements ErrorController {
 
 	/**
 	 * Builds a map with error details
+	 * 
 	 * @param aRequest
-	 * HttpServletRequest
-	 * @return
-	 * Map of String to Object
+	 *            HttpServletRequest
+	 * @return Map of String to Object
 	 */
 	@RequestMapping(ERROR_PATH)
 	public Map<String, Object> error(HttpServletRequest aRequest) {

@@ -29,13 +29,12 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface SolutionDownloadRepository
-		extends PagingAndSortingRepository<MLPSolutionDownload, Long> {
+public interface SolutionDownloadRepository extends PagingAndSortingRepository<MLPSolutionDownload, Long> {
 
 	/**
 	 * Gets the count of downloads for the specified solution ID by iterating over
-	 * the table that tracks downloads, which is slightly cheaper than getting
-	 * the entire list, but far more expensive than a cached statistic.
+	 * the table that tracks downloads, which is slightly cheaper than getting the
+	 * entire list, but far more expensive than a cached statistic.
 	 * 
 	 * @param solutionId
 	 *            Solution ID

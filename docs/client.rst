@@ -11,11 +11,11 @@ The client jar is deployed to these Nexus repositories::
 
 	<repository>
 		<id>snapshots</id>
-		<url>http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_platform_maven_snapshots/</url> 
+		<url>https://nexus.acumos.org/content/repositories/snapshots</url> 
 	</repository>
 	<repository>
 		<id>releases</id>
-		<url>http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_platform_maven/</url> 
+		<url>https://nexus.acumos.org/content/repositories/releases</url> 
 	</repository>
 
 TODO: Replace with Linux Foundation Nexus coordinates.
@@ -25,7 +25,7 @@ Use this dependency information; please note the version number shown below migh
 	<dependency>
 		<groupId>org.acumos.cds</groupId>
 		<artifactId>cmn-data-svc-client</artifactId>
-		<version>1.9.0-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</dependency>
 
 Building and Packaging

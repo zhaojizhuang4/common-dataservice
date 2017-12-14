@@ -49,8 +49,8 @@ public class ErrorTransport implements MLPTransportModel {
 	}
 
 	/**
-	 * Builds an object with the specified status code, message and a String
-	 * version of the exception.
+	 * Builds an object with the specified status code, message and a String version
+	 * of the exception.
 	 * 
 	 * @param statusCode
 	 *            Integer value like 500

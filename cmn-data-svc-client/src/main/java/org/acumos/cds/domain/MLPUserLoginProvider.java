@@ -47,7 +47,7 @@ public class MLPUserLoginProvider extends MLPTimestampedEntity implements Serial
 	private static final long serialVersionUID = 939345324516269571L;
 
 	/**
-	 * Embedded key for Hibernate 
+	 * Embedded key for Hibernate
 	 */
 	@Embeddable
 	public static class UserLoginProviderPK implements Serializable {

@@ -33,7 +33,7 @@ import javax.validation.constraints.Size;
  * Tags have only a name.
  * 
  * This participates in a many-many relationship with solution via a join table.
- * The relationship is mapped via annotations in the Solution; not mapped here.
+ * The relationship is mapped via annotations on MLPSolution (unidirectional).
  */
 @Entity
 @Table(name = "C_SOLUTION_TAG")
@@ -45,7 +45,7 @@ public class MLPTag implements MLPEntity, Serializable {
 	@Column(name = "TAG", updatable = false, nullable = false, columnDefinition = "VARCHAR(32)")
 	@Size(max = 32)
 	private String tag;
-	    
+
 	/**
 	 * No-arg constructor
 	 */

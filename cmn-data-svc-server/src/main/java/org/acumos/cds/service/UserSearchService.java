@@ -31,7 +31,8 @@ import org.acumos.cds.domain.MLPUser;
 public interface UserSearchService {
 
 	/**
-	 * Gets all instances matching all query parameters; i.e., the conditions are AND-ed together.
+	 * Gets all instances matching all query parameters; i.e., the conditions are
+	 * AND-ed together.
 	 * 
 	 * @param queryParameters
 	 *            field-name, field-value pairs; ignored if null or empty.

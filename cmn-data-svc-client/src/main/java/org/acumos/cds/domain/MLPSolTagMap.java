@@ -46,7 +46,7 @@ public class MLPSolTagMap implements MLPEntity, Serializable {
 	/* package */ static final String TABLE_NAME = "C_SOL_TAG_MAP";
 	/* package */ static final String SOL_ID_COL_NAME = "SOLUTION_ID";
 	/* package */ static final String TAG_COL_NAME = "TAG";
-	
+
 	private static final long serialVersionUID = -7814665924253912856L;
 
 	/**

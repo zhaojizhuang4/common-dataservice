@@ -44,7 +44,7 @@ public class PeerSearchServiceImpl extends AbstractSearchServiceImpl implements 
 
 	@Autowired
 	private SessionFactory sessionFactory;
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<MLPPeer> getPeers(Map<String, ? extends Object> queryParameters, boolean isOr) {
@@ -53,7 +53,7 @@ public class PeerSearchServiceImpl extends AbstractSearchServiceImpl implements 
 		Transaction tx = sessionFactory.getCurrentSession().beginTransaction();
 		List<MLPPeer> items = criteria.list();
 		tx.commit();
-		logger.debug(EELFLoggerDelegate.debugLogger,"getPeers: result size={}", items.size());
+		logger.debug(EELFLoggerDelegate.debugLogger, "getPeers: result size={}", items.size());
 		return items;
 	}
 }

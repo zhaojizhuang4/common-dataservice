@@ -32,11 +32,11 @@ import org.hibernate.id.UUIDGenerator;
  * https://stackoverflow.com/questions/3194721/bypass-generatedvalue-in-hibernate-merge-data-not-in-db/8535006#8535006
  */
 public class UseExistingOrNewUUIDGenerator extends UUIDGenerator {
-	
+
 	@Override
 	public Serializable generate(SessionImplementor session, Object object) {
 		Serializable id = session.getEntityPersister(null, object).getClassMetadata().getIdentifier(object, session);
 		return id != null ? id : super.generate(session, object);
 	}
-	
+
 }

@@ -27,11 +27,13 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -116,13 +118,40 @@ public class MLPSolution extends MLPTimestampedEntity implements Serializable {
 	private String validationStatusCode;
 
 	/**
-	 * Tags assigned to the solution via a join table.
+	 * Tags assigned to the solution via a join table. Tags can be reused by many
+	 * solutions, so this is a many-many (not one-many) relationship.
+	 * 
+	 * Unidirectional relationship - the MLPTag object is not annotated.
+	 * 
+	 * This does NOT use cascade; e.g., "cascade = { CascadeType.ALL }". With that
+	 * annotation, use of an EXISTING tag when creating a solution yields a SQL
+	 * constraint-violation error, Hibernate attempts to insert a duplicate row to
+	 * the join table, also see https://hibernate.atlassian.net/browse/HHH-6776
+	 * 
 	 */
-	@ManyToMany /* no cascade: (cascade = { CascadeType.ALL }) */
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = MLPSolTagMap.TABLE_NAME, //
 			joinColumns = { @JoinColumn(name = MLPSolTagMap.SOL_ID_COL_NAME) }, //
 			inverseJoinColumns = { @JoinColumn(name = MLPSolTagMap.TAG_COL_NAME) })
 	private Set<MLPTag> tags = new HashSet<>(0);
+
+	/**
+	 * Statistics about downloads, ratings etc. Should always exist, but don't mark
+	 * as required.
+	 * 
+	 * Unidirectional relationship - the MLPSolutionWeb object is not annotated.
+	 * 
+	 * This is optional (the default) because of the unidirectional relationship.
+	 * Without annotation and a setter on the MLPSolutionWeb object there's no way
+	 * to create a solution.
+	 * 
+	 * This does NOT use cascade; e.g., "cascade = { CascadeType.ALL }". Tests WITH
+	 * that annotation revealed no problems, but the controller does not accept
+	 * updates to the web stats via the solution object, so there is no need.
+	 */
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = MLPSolutionWeb.SOL_ID_COL_NAME)
+	private MLPSolutionWeb webStats;
 
 	/**
 	 * No-arg constructor
@@ -256,12 +285,46 @@ public class MLPSolution extends MLPTimestampedEntity implements Serializable {
 		this.validationStatusCode = validationStatusCode;
 	}
 
+	/**
+	 * Solution tags may be updated by modifying this set, but all tag objects must
+	 * exist; i.e., have been created previously.
+	 * 
+	 * @return Set of MLPTag, which may be empty.
+	 */
 	public Set<MLPTag> getTags() {
 		return tags;
 	}
 
+	/**
+	 * Solution tags may be updated via this method, but all tag objects must exist;
+	 * i.e., have been created previously.
+	 * 
+	 * @param tags
+	 *            Set of MLPTag
+	 */
 	public void setTags(Set<MLPTag> tags) {
 		this.tags = tags;
+	}
+
+	/**
+	 * Provides counts of user activity such as downloads. These counts CANNOT be
+	 * updated via this object; all changes made here are discarded.
+	 * 
+	 * @return MLPSolutionWeb object
+	 */
+	public MLPSolutionWeb getWebStats() {
+		return webStats;
+	}
+
+	/**
+	 * User activity counts CANNOT be updated via this object; all changes made here
+	 * are discarded.
+	 * 
+	 * @param webStats
+	 *            MLPSolutionWeb object
+	 */
+	public void setWebStats(MLPSolutionWeb webStats) {
+		this.webStats = webStats;
 	}
 
 	@Override
@@ -283,9 +346,8 @@ public class MLPSolution extends MLPTimestampedEntity implements Serializable {
 	public String toString() {
 		return this.getClass().getName() + "[solutionId=" + solutionId + ", ownerId=" + ownerId + ", name=" + name
 				+ ", desc=" + description + ", active=" + active + ", accessTypeCode=" + accessTypeCode
-				+ ", modelTypeCode=" + modelTypeCode + ", validationStatusCode=" + validationStatusCode 
-				+ ", provider=" + provider + ", created=" + getCreated() + ", modified=" + getModified()
-				+ "]";
+				+ ", modelTypeCode=" + modelTypeCode + ", validationStatusCode=" + validationStatusCode + ", provider="
+				+ provider + ", created=" + getCreated() + ", modified=" + getModified() + "]";
 	}
 
 }

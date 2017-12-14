@@ -29,11 +29,12 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 /**
- * Defines createdDate and modifiedDate fields, getters and setters to avoid code repetitions.
+ * Defines createdDate and modifiedDate fields, getters and setters to avoid
+ * code repetitions.
  * 
  * Spring has a bit of magic for everything, must use @MappedSuperclass here.
  */
-@MappedSuperclass 
+@MappedSuperclass
 public abstract class MLPTimestampedEntity implements MLPEntity {
 
 	@CreationTimestamp

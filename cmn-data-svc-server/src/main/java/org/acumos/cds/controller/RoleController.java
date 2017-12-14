@@ -196,7 +196,8 @@ public class RoleController extends AbstractController {
 		MLPRole existing = roleRepository.findOne(rowId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + rowId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + rowId,
+					null);
 		}
 		MLPTransportModel result = null;
 		try {
@@ -340,7 +341,8 @@ public class RoleController extends AbstractController {
 		}
 		if (roleFunctionRepository.findOne(functionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No role function for ID " + functionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No role function for ID " + functionId,
+					null);
 		}
 		Object result;
 		try {

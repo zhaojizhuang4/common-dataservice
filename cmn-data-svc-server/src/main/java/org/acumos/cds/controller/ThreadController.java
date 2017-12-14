@@ -78,8 +78,6 @@ public class ThreadController extends AbstractController {
 	/**
 	 * @param pageable
 	 *            Sort and page criteria
-	 * @param response
-	 *            HttpServletResponse
 	 * @return Page of threads
 	 */
 	@ApiOperation(value = "Gets a page of threads, optionally sorted.", response = MLPThread.class, responseContainer = "Page")

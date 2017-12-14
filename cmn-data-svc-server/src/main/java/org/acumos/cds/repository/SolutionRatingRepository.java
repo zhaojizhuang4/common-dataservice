@@ -33,9 +33,9 @@ public interface SolutionRatingRepository
 		extends PagingAndSortingRepository<MLPSolutionRating, MLPSolutionRating.SolutionRatingPK> {
 
 	/**
-	 * Gets the count of ratings for the specified solution ID by iterating over
-	 * the table that tracks user ratings, which is slightly cheaper than getting
-	 * the entire list, but far more expensive than a cached statistic.
+	 * Gets the count of ratings for the specified solution ID by iterating over the
+	 * table that tracks user ratings, which is slightly cheaper than getting the
+	 * entire list, but far more expensive than a cached statistic.
 	 * 
 	 * @param solutionId
 	 *            Solution ID

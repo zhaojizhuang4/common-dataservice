@@ -27,18 +27,18 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 /**
- * Runs when Spring-Boot starts. 
+ * Runs when Spring-Boot starts.
  */
 @Component
-public class ContextRefreshedListener implements ApplicationListener<ContextRefreshedEvent>{
+public class ContextRefreshedListener implements ApplicationListener<ContextRefreshedEvent> {
 
 	private final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(ContextRefreshedListener.class);
 
 	@Value("${spring.datasource.url}")
 	private String dbUrl;
 
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-    	logger.info("onApplicationEvent: Spring-Boot context refreshed using data source URL {}", dbUrl);
-    }
+	@Override
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+		logger.info("onApplicationEvent: Spring-Boot context refreshed using data source URL {}", dbUrl);
+	}
 }

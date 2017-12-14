@@ -295,14 +295,14 @@ public class SolutionController extends AbstractController {
 			// This parameter is required
 			Boolean active = new Boolean(queryParameters.get(CCDSConstants.SEARCH_ACTIVE));
 			// All remaining parameters are optional
-			String nameKw = queryParameters.get(CCDSConstants.SEARCH_NAME);
-			String descKw = queryParameters.get(CCDSConstants.SEARCH_DESC);
-			String authorKw = queryParameters.get(CCDSConstants.SEARCH_AUTHOR);
+			String[] nameKws = getOptCsvParameter(CCDSConstants.SEARCH_NAME, queryParameters);
+			String[] descKws = getOptCsvParameter(CCDSConstants.SEARCH_DESC, queryParameters);
+			String[] ownerIds = getOptCsvParameter(CCDSConstants.SEARCH_OWNERS, queryParameters);
 			String[] accessTypeCodes = getOptCsvParameter(CCDSConstants.SEARCH_ACCESS_TYPES, queryParameters);
 			String[] modelTypeCodes = getOptCsvParameter(CCDSConstants.SEARCH_MODEL_TYPES, queryParameters);
 			String[] valStatusCodes = getOptCsvParameter(CCDSConstants.SEARCH_VAL_STATUSES, queryParameters);
 			String[] tags = getOptCsvParameter(CCDSConstants.SEARCH_TAGS, queryParameters);
-			return solutionSearchService.findPortalSolutions(nameKw, descKw, authorKw, active, accessTypeCodes,
+			return solutionSearchService.findPortalSolutions(nameKws, descKws, active, ownerIds, accessTypeCodes,
 					modelTypeCodes, valStatusCodes, tags, pageRequest);
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "findPortalSolutions failed", ex);
@@ -355,14 +355,17 @@ public class SolutionController extends AbstractController {
 					return result;
 				}
 			}
+			// Ensure web stat object is empty
+			solution.setWebStats(null);
 			// Create a new row
 			// ALSO send back the model for client convenience
-			result = solutionRepository.save(solution);
-			// Cascade the create manually to the stats table
-			solutionWebRepository.save(new MLPSolutionWeb(solution.getSolutionId()));
-			response.setStatus(HttpServletResponse.SC_CREATED);
+			MLPSolution persisted = solutionRepository.save(solution);
+			// Cascade manually - create an empty web stats entry.
+			solutionWebRepository.save(new MLPSolutionWeb(persisted.getSolutionId()));
 			// This is a hack to create the location path.
+			response.setStatus(HttpServletResponse.SC_CREATED);
 			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.SOLUTION_PATH + "/" + solution.getSolutionId());
+			result = persisted;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "createSolution", cve.toString());
@@ -398,6 +401,8 @@ public class SolutionController extends AbstractController {
 		try {
 			// Use the path-parameter id; don't trust the one in the object
 			solution.setSolutionId(solutionId);
+			// Discard any stats object; updates don't happen via this interface
+			// solution.setWebStats(null);
 			// Update the existing row
 			solutionRepository.save(solution);
 			// Answer "OK"
@@ -426,14 +431,14 @@ public class SolutionController extends AbstractController {
 	public Object incrementViewCount(@PathVariable("solutionId") String solutionId, HttpServletResponse response) {
 		logger.debug(EELFLoggerDelegate.debugLogger, "incrementViewCount: id {} ", solutionId);
 		// Get the existing one
-		MLPSolution existing = solutionRepository.findOne(solutionId);
+		MLPSolutionWeb existing = solutionWebRepository.findOne(solutionId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No solution with id " + solutionId,
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No solution with id " + solutionId, null);
 		}
 		MLPTransportModel result = null;
 		try {
+			// Have the database do the increment to avoid race conditions
 			solutionWebRepository.incrementViewCount(solutionId);
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
@@ -460,6 +465,11 @@ public class SolutionController extends AbstractController {
 	@ResponseBody
 	public MLPTransportModel deleteSolution(@PathVariable("solutionId") String solutionId,
 			HttpServletResponse response) {
+		MLPSolution existing = solutionRepository.findOne(solutionId);
+		if (existing == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No solution with id " + solutionId, null);
+		}
 		try {
 			// Manually cascade the delete
 			// what about composite solutions?
@@ -470,7 +480,11 @@ public class SolutionController extends AbstractController {
 			solutionValidationRepository.deleteBySolutionId(solutionId);
 			solUserAccMapRepository.deleteUsersForSolution(solutionId);
 			solutionFavoriteRepository.deleteBySolutionId(solutionId);
-			solutionWebRepository.delete(solutionId);
+			existing.setWebStats(null);
+			// The web stats are annotated as optional, so be cautious when deleting
+			MLPSolutionWeb webStats = solutionWebRepository.findOne(solutionId);
+			if (webStats != null)
+				solutionWebRepository.delete(solutionId);
 			for (MLPSolutionRevision r : solutionRevisionRepository.findBySolution(new String[] { solutionId })) {
 				for (MLPArtifact a : artifactRepository.findByRevision(r.getRevisionId()))
 					solRevArtMapRepository
@@ -491,11 +505,9 @@ public class SolutionController extends AbstractController {
 	/**
 	 * @param solutionId
 	 *            Array of solution IDs (comma-separated values - the name should be
-	 *            plural but it's declared above)
+	 *            plural but it's declared above). Spring will split the list if the
+	 *            path variable is declared as String array or List of String.
 	 * @return List of solutions
-	 * 
-	 *         Spring will split the list if the path variable is declared as
-	 *         String[] or List<String>.
 	 */
 	@ApiOperation(value = "Gets a list of revisions for the specified solution IDs.", response = MLPSolutionRevision.class, responseContainer = "List")
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH, method = RequestMethod.GET)
@@ -650,8 +662,6 @@ public class SolutionController extends AbstractController {
 	 *            solution ID
 	 * @param revisionId
 	 *            revision ID
-	 * @param artifactId
-	 *            artifact ID
 	 * @param response
 	 *            HttpServletResponse
 	 * @return Success indicator
@@ -948,8 +958,6 @@ public class SolutionController extends AbstractController {
 	/**
 	 * @param solutionId
 	 *            Solution ID
-	 * @param rating
-	 *            rating value to save
 	 * @param userId
 	 *            User who gave the rating
 	 * @param sr
@@ -996,8 +1004,6 @@ public class SolutionController extends AbstractController {
 	/**
 	 * @param solutionId
 	 *            Solution ID
-	 * @param rating
-	 *            rating value to save
 	 * @param userId
 	 *            User who gave the rating
 	 * @param sr
@@ -1042,8 +1048,6 @@ public class SolutionController extends AbstractController {
 	/**
 	 * @param solutionId
 	 *            solution ID
-	 * @param rating
-	 *            rating value to save
 	 * @param userId
 	 *            User who gave the rating
 	 * @param response
@@ -1096,8 +1100,6 @@ public class SolutionController extends AbstractController {
 	/**
 	 * @param solutionId
 	 *            Solution ID
-	 * @param userId
-	 *            User ID
 	 * @return List of users
 	 */
 	@ApiOperation(value = "Gets ACL of users for the specified solution.", response = MLPUser.class, responseContainer = "List")

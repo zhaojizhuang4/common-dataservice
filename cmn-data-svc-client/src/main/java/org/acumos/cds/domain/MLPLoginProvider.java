@@ -43,7 +43,7 @@ public class MLPLoginProvider implements MLPEntity, Serializable {
 	@Size(max = 2)
 	private String providerCode;
 
-	@Column(name = "PROVIDER_NAME", columnDefinition="VARCHAR(100)")
+	@Column(name = "PROVIDER_NAME", columnDefinition = "VARCHAR(100)")
 	@Size(max = 100)
 	private String providerName;
 

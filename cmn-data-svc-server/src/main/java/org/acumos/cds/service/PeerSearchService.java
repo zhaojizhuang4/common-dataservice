@@ -33,8 +33,11 @@ public interface PeerSearchService {
 	/**
 	 * Gets all instances matching the query parameters.
 	 * 
-	 * @param queryParameters field-name, field-value pairs; ignored if null or empty.
-	 * @param isOr If true, the query is a disjunction ("or"); otherwise the query is a conjunction ("and").
+	 * @param queryParameters
+	 *            field-name, field-value pairs; ignored if null or empty.
+	 * @param isOr
+	 *            If true, the query is a disjunction ("or"); otherwise the query is
+	 *            a conjunction ("and").
 	 * @return List of instances, which may be empty.
 	 */
 	public List<MLPPeer> getPeers(Map<String, ? extends Object> queryParameters, boolean isOr);

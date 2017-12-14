@@ -332,7 +332,8 @@ public class PeerController extends AbstractController {
 		MLPPeerSubscription existingPeer = peerSubRepository.findOne(subId);
 		if (existingPeer == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + subId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + subId,
+					null);
 		}
 		MLPTransportModel result = null;
 		try {

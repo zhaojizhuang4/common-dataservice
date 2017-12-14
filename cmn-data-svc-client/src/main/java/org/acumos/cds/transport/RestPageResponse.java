@@ -62,7 +62,9 @@ public class RestPageResponse<T> extends PageImpl<T> {
 	 *            List of content
 	 */
 	public RestPageResponse(List<T> content) {
-		this(content, null, 0);
+		super(content);
+		if (content != null)
+			this.numberOfElements = content.size();
 	}
 
 	/**
@@ -78,7 +80,7 @@ public class RestPageResponse<T> extends PageImpl<T> {
 	public RestPageResponse(List<T> content, Pageable pageable, long total) {
 		super(content, pageable, total);
 		if (content != null)
-			this.numberOfElements = content.size(); 
+			this.numberOfElements = content.size();
 	}
 
 	/**

@@ -151,8 +151,6 @@ public class SiteConfigController extends AbstractController {
 	/**
 	 * @param configKey
 	 *            config key
-	 * @param sc
-	 *            SiteConfig model
 	 * @param response
 	 *            HttpServletResponse
 	 * @return Success or error model
