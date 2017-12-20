@@ -278,7 +278,6 @@
 								<from>frolvlad/alpine-oraclejdk8:slim</from>
 								<tags>
 									<tag>${project.version}</tag>
-									<tag>${maven.build.timestamp}</tag>
 								</tags>
 								<assembly>
 									<descriptorRef>artifact</descriptorRef>
