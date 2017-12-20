@@ -270,7 +270,12 @@
 					<!-- docker runs on the LF build machine -->
 					<!-- LF <dockerHost>unix:///var/run/docker.sock</dockerHost> LF -->
 					<registry>${docker.registry.url}</registry>
-					<!-- no auth config, jenkins logs in -->
+					<!-- begin azure credentials -->
+					<authConfig>
+						<username>${docker.registry.login}</username>
+						<password>${docker.registry.password}</password>
+					</authConfig>
+					<!-- end azure credentials -->
 					<images>
 						<image>
 							<name>common-dataservice:${project.version}</name>
