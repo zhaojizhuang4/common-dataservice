@@ -2,13 +2,13 @@
 Release Notes
 =============
 
-The server and client are released together.  The server is deployed within a Docker image
-in the Docker registry.  The client is deployed as a jar file to a Maven Nexus repository.
+The client and server are released together.  The client is deployed as a jar file to a 
+Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.  
 
-Version 1.10.2, 14 December 2017
+Version 1.10.2, 20 December 2017
 -------------------------------
 
-* Extend MLPSolution with solution web statistics via annotations
+* Extend MLPSolution with tags and solution web statistics via unidirectional annotations 
 * Extend the find-solutions method for Portal/Marketplace dynamic search
 * Requires database schema version 1.10
 
