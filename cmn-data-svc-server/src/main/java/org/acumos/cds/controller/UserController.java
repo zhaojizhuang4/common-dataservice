@@ -160,7 +160,7 @@ public class UserController extends AbstractController {
 	@ApiOperation(value = "Gets a page of users, optionally sorted on fields.", response = MLPUser.class, responseContainer = "Page")
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	public Page<MLPUser> getPageOfUsers(Pageable pageable) {
+	public Page<MLPUser> getUsers(Pageable pageable) {
 		Page<MLPUser> page = userRepository.findAll(pageable);
 		for (MLPUser user : page.getContent()) {
 			// detach from Hibernate
@@ -801,7 +801,7 @@ public class UserController extends AbstractController {
 	@RequestMapping(value = "/{userId}/" + CCDSConstants.FAVORITE_PATH + "/"
 			+ CCDSConstants.SOLUTION_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object getPageOfFavoriteSolutions(@PathVariable("userId") String userId, Pageable pageRequest,
+	public Object getFavoriteSolutions(@PathVariable("userId") String userId, Pageable pageRequest,
 			HttpServletResponse response) {
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

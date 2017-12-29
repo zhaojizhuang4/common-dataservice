@@ -765,17 +765,22 @@ public class ClientMethodTest {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
 		try {
+			client.getSolutionRevisionThreads("", "", new RestPageRequest(0,1));
+		} catch (ResourceAccessException ex) {
+			logger.info("Client failed as expected: {}", ex.toString());
+		}
+		try {
 			client.getThread("threadId");
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
 		try {
-			client.createThread(new MLPThread("a"));
+			client.createThread(new MLPThread());
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
 		try {
-			client.updateThread(new MLPThread("a"));
+			client.updateThread(new MLPThread());
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
@@ -791,6 +796,11 @@ public class ClientMethodTest {
 		}
 		try {
 			client.getThreadComments("threadId", new RestPageRequest(0,1));
+		} catch (ResourceAccessException ex) {
+			logger.info("Client failed as expected: {}", ex.toString());
+		}
+		try {
+			client.getSolutionRevisionComments("", "", new RestPageRequest(0,1));
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}

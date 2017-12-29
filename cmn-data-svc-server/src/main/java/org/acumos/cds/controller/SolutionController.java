@@ -180,7 +180,7 @@ public class SolutionController extends AbstractController {
 	@ApiOperation(value = "Gets a page of solutions, optionally sorted on fields.", response = MLPSolution.class, responseContainer = "Page")
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	public Page<MLPSolution> getPageOfSolutions(Pageable pageable, HttpServletResponse response) {
+	public Page<MLPSolution> getSolutions(Pageable pageable, HttpServletResponse response) {
 		return solutionRepository.findAll(pageable);
 	}
 
@@ -804,7 +804,7 @@ public class SolutionController extends AbstractController {
 	@ApiOperation(value = "Gets a page of download records for the specified solution ID.", response = MLPSolutionDownload.class, responseContainer = "Page")
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.DOWNLOAD_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object getPageOfSolutionDownloads(@PathVariable("solutionId") String solutionId, Pageable pageRequest,
+	public Object getSolutionDownloads(@PathVariable("solutionId") String solutionId, Pageable pageRequest,
 			HttpServletResponse response) {
 		Iterable<MLPSolutionDownload> da = solutionDownloadRepository.findBySolutionId(solutionId, pageRequest);
 		if (da == null || !da.iterator().hasNext()) {
@@ -1180,7 +1180,7 @@ public class SolutionController extends AbstractController {
 	@RequestMapping(value = CCDSConstants.USER_PATH + "/{userId}/"
 			+ CCDSConstants.ACCESS_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object getPageOfAccessibleSolutions(@PathVariable("userId") String userId, Pageable pageable,
+	public Object getAccessibleSolutions(@PathVariable("userId") String userId, Pageable pageable,
 			HttpServletResponse response) {
 		return solUserAccMapRepository.getSolutionsForUser(userId, pageable);
 	}

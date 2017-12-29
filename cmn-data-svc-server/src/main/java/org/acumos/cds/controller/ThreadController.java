@@ -83,8 +83,26 @@ public class ThreadController extends AbstractController {
 	@ApiOperation(value = "Gets a page of threads, optionally sorted.", response = MLPThread.class, responseContainer = "Page")
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	public Page<MLPThread> getPageOfThreads(Pageable pageable) {
+	public Page<MLPThread> getThreads(Pageable pageable) {
 		return threadRepository.findAll(pageable);
+	}
+
+	/**
+	 * @param solutionId
+	 *            Solution ID
+	 * @param revisionId
+	 *            Revision ID
+	 * @param pageable
+	 *            Sort and page criteria
+	 * @return Page of threads for specified solution and revision
+	 */
+	@ApiOperation(value = "Gets a page of threads for the solution and revision IDs, optionally sorted.", response = MLPThread.class, responseContainer = "Page")
+	@RequestMapping(value = CCDSConstants.SOLUTION_PATH + "/{solutionId}/" + CCDSConstants.REVISION_PATH
+			+ "/{revisionId}", method = RequestMethod.GET)
+	@ResponseBody
+	public Page<MLPThread> getSolutionRevisionThreads(@PathVariable("solutionId") String solutionId,
+			@PathVariable("revisionId") String revisionId, Pageable pageable) {
+		return threadRepository.findBySolutionIdAndRevisionId(solutionId, revisionId, pageable);
 	}
 
 	/**
@@ -240,6 +258,24 @@ public class ThreadController extends AbstractController {
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find thread " + threadId, null);
 		}
 		return commentRepository.findByThreadId(threadId, pageable);
+	}
+
+	/**
+	 * @param solutionId
+	 *            Solution ID
+	 * @param revisionId
+	 *            Revision ID
+	 * @param pageable
+	 *            Sort and page criteria
+	 * @return Page of comments for specified solution and revision, which may include multiple threads
+	 */
+	@ApiOperation(value = "Gets a page of comments for the solution and revision IDs, optionally sorted.", response = MLPThread.class, responseContainer = "Page")
+	@RequestMapping(value = CCDSConstants.SOLUTION_PATH + "/{solutionId}/" + CCDSConstants.REVISION_PATH
+			+ "/{revisionId}/" + CCDSConstants.COMMENT_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public Page<MLPComment> getSolutionRevisionComments(@PathVariable("solutionId") String solutionId,
+			@PathVariable("revisionId") String revisionId, Pageable pageable) {
+		return commentRepository.findBySolutionIdAndRevisionId(solutionId, revisionId, pageable);
 	}
 
 	/**

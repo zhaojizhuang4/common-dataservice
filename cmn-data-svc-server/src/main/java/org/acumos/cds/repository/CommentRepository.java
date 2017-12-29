@@ -53,6 +53,25 @@ public interface CommentRepository extends PagingAndSortingRepository<MLPComment
 	Page<MLPComment> findByThreadId(String threadId, Pageable pageable);
 
 	/**
+	 * Gets a page of comments with the specified IDs by joining on the thread
+	 * table.
+	 * 
+	 * @param solutionId
+	 *            Solution ID
+	 * @param revisionId
+	 *            Revision ID
+	 * @param pageable
+	 *            Page and sort criteria
+	 * @return Page of MLPComment
+	 */
+	@Query(value = "select c from MLPComment c, MLPThread t " //
+			+ " where c.threadId =  t.threadId " //
+			+ " and t.solutionId = :solutionId" //
+			+ " and t.revisionId = :revisionId")
+	Page<MLPComment> findBySolutionIdAndRevisionId(@Param("solutionId") String solutionId,
+			@Param("revisionId") String revisionId, Pageable pageable);
+
+	/**
 	 * Deletes all entries for the specified thread ID
 	 * 
 	 * @param threadId

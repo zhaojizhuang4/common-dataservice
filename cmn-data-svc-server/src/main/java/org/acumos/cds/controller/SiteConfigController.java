@@ -90,7 +90,8 @@ public class SiteConfigController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Key exists: " + sc.getConfigKey(), null);
 		}
-		if (userRepository.findOne(sc.getUserId()) == null) {
+		// UserID is optional
+		if (sc.getUserId() != null && userRepository.findOne(sc.getUserId()) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + sc.getUserId(), null);
 		}

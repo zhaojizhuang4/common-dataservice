@@ -28,6 +28,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -90,6 +92,12 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	@Size(max = 100)
 	private String contact2;
 
+	@Column(name = "TRUST_LEVEL", nullable = false, columnDefinition = "SMALLINT DEFAULT 0")
+	@NotNull(message = "TrustLevel cannot be null")
+	@Min(value = 0)
+	@Max(value = 10)
+	private Integer trustLevel = 0;
+
 	/**
 	 * No-arg constructor.
 	 */
@@ -117,9 +125,11 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	 *            Primary contact details
 	 * @param contact2
 	 *            Alternate contact details
+	 * @param trustLevel
+	 *            Value in range [0..10]
 	 */
 	public MLPPeer(String name, String subjectName, String apiUrl, String webUrl, boolean isActive, boolean isSelf,
-			String contact1, String contact2) {
+			String contact1, String contact2, int trustLevel) {
 		this.name = name;
 		this.subjectName = subjectName;
 		this.apiUrl = apiUrl;
@@ -128,6 +138,7 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 		this.isSelf = isSelf;
 		this.contact1 = contact1;
 		this.contact2 = contact2;
+		this.trustLevel = trustLevel;
 	}
 
 	/**
@@ -280,6 +291,14 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 		this.contact2 = contact2;
 	}
 
+	public Integer getTrustLevel() {
+		return trustLevel;
+	}
+
+	public void setTrustLevel(Integer trustLevel) {
+		this.trustLevel = trustLevel;
+	}
+
 	@Override
 	public boolean equals(Object that) {
 		if (that == null)
@@ -292,13 +311,12 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(peerId, name, subjectName, webUrl);
+		return Objects.hash(peerId, name, subjectName, webUrl, trustLevel);
 	}
 
 	@Override
 	public String toString() {
 		return this.getClass().getName() + "[peerId=" + peerId + ", name=" + name + ", subjectName=" + subjectName
-				+ ", ...]";
+				+ "webUrl=" + webUrl + ", trustLevel=" + trustLevel + "]";
 	}
-
 }

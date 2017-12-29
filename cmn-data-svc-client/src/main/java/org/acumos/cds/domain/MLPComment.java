@@ -64,10 +64,6 @@ public class MLPComment extends MLPTimestampedEntity implements Serializable {
 	@Size(max = 8192)
 	private String text;
 
-	@Column(name = "URL", columnDefinition = "VARCHAR(512)")
-	@Size(max = 512)
-	private String url;
-
 	/**
 	 * No-arg constructor
 	 */
@@ -132,14 +128,6 @@ public class MLPComment extends MLPTimestampedEntity implements Serializable {
 		this.text = text;
 	}
 
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
 	@Override
 	public boolean equals(Object that) {
 		if (that == null)
@@ -152,13 +140,13 @@ public class MLPComment extends MLPTimestampedEntity implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(commentId, threadId, userId, text, url);
+		return Objects.hash(commentId, threadId, userId, text);
 	}
 
 	@Override
 	public String toString() {
 		return this.getClass().getName() + "[commentId=" + commentId + ", threadId=" + threadId + ", userId=" + userId
-				+ ", text=" + text + ", url=" + url + "]";
+				+ ", text=" + text + "]";
 	}
 
 }

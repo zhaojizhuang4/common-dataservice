@@ -87,7 +87,7 @@ public class RoleController extends AbstractController {
 	@ApiOperation(value = "Gets a page of roles, optionally sorted on fields.", response = MLPRole.class, responseContainer = "Page")
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	public Page<MLPRole> getPageOfRoles(Pageable pageable) {
+	public Page<MLPRole> getRoles(Pageable pageable) {
 		return roleRepository.findAll(pageable);
 	}
 

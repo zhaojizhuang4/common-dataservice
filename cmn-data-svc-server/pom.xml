@@ -15,6 +15,7 @@
 		<!-- silence warning about parent relative path -->
 		<relativePath />
 	</parent>
+	<!-- No repositories section. -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -39,42 +40,6 @@
 		<acumos.nexus.snapshot.path>repository/repo_cognita_platform_maven_snapshots</acumos.nexus.snapshot.path>
 		<acumos.nexus.release.path>repository/repo_cognita_platform_maven</acumos.nexus.release.path>
 	</properties>
-
-	<repositories>
-		<!-- begin Azure repositories -->
-		<repository>
-			<id>acumos-snapshots</id>
-			<name>acumos-repository-snapshots</name>
-			<url>${acumos.nexus.url}/${acumos.nexus.snapshot.path}</url>
-		</repository>
-		<repository>
-			<id>acumos-releases</id>
-			<name>acumos-repository-releases</name>
-			<url>${acumos.nexus.url}/${acumos.nexus.release.path}</url>
-		</repository>
-		<!-- end Azure repositories -->
-		<!-- LF: Specify repositories here to avoid coordination of ~/.m2/settings.xml 
-			files among developers. Use values (not properties) so oparent can be resolved. 
-			The IDs should match Jenkins template values. -->
-		<!-- LF <repository> <id>releases</id> <name>Acumos Release Repository</name> 
-			<url>https://nexus.acumos.org/content/repositories/releases</url> </repository> 
-			<repository> <id>snapshots</id> <name>Acumos Snapshot Repository</name> <url>https://nexus.acumos.org/content/repositories/snapshots</url> 
-			</repository> <repository> <id>public</id> <url>https://nexus.acumos.org/content/groups/public</url> 
-			</repository> LF -->
-		<!-- begin ONAP repositories for EELF -->
-		<repository>
-			<id>onap-snapshots</id>
-			<name>ONAP Snapshot Repository</name>
-			<url>${onap.nexus.url}/${onap.nexus.snapshot.path}</url>
-		</repository>
-		<repository>
-			<id>onap-releases</id>
-			<name>ONAP Release Repository</name>
-			<url>${onap.nexus.url}/${onap.nexus.release.path}</url>
-		</repository>
-		<!-- end ONAP repositories for EELF -->
-	</repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.acumos.common-dataservice</groupId>
@@ -296,8 +261,14 @@
 					</images>
 				</configuration>
 				<!-- build Docker images in install phase, push in deploy phase -->
-				<!-- TODO <executions> <execution> <goals> <goal>build</goal> <goal>push</goal> 
-					</goals> </execution> </executions> TODO -->
+				<executions>
+					<execution>
+						<goals>
+							<goal>build</goal>
+							<goal>push</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

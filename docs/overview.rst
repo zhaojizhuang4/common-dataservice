@@ -7,10 +7,18 @@ The server component is a Spring-Boot application that provides REST service to 
 The client component is a Java library that provides business objects (models) and
 methods to simplify the use of the REST service.
 
-TODO: Put Linux Foundation Bitbucket URL here.
+The source is available from the Linux Foundation Gerrit server:
 
-TODO: Put Linux Foundation Jenkins job URL here.
+    https://gerrit.acumos.org/r/gitweb?p=common-dataservice.git;a=summary
 
-TODO: Put Linux Foundation Jira page URL here.
+The CI/CD jobs are in the Linux Foundation Jenkins server:
 
-TODO: Put Linux Foundation wiki page URL here.
+    https://jenkins.acumos.org/view/common-dataservice/
+
+Issues are tracked in the Linux Foundation Jira server:
+
+    https://jira.acumos.org/secure/Dashboard.jspa
+
+Further information is available from the Linux Foundation Wiki:
+
+    https://wiki.acumos.org/

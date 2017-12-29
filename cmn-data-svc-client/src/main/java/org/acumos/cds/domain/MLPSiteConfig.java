@@ -42,10 +42,11 @@ public class MLPSiteConfig extends MLPTimestampedEntity implements Serializable 
 	@Column(name = "CONFIG_KEY", updatable = false, nullable = false, columnDefinition = "VARCHAR(50)")
 	private String configKey;
 
-	@Column(name = "CONFIG_VAL", nullable = false, columnDefinition = "VARCHAR(1024)")
+	@Column(name = "CONFIG_VAL", nullable = false, columnDefinition = "VARCHAR(8192)")
 	private String configValue;
 
-	@Column(name = "USER_ID", nullable = false, columnDefinition = "CHAR(36)")
+	// Optional
+	@Column(name = "USER_ID", columnDefinition = "CHAR(36)")
 	private String userId;
 
 	/**
@@ -63,14 +64,11 @@ public class MLPSiteConfig extends MLPTimestampedEntity implements Serializable 
 	 *            Row ID
 	 * @param configValue
 	 *            Configuration block, validated as JSON
-	 * @param userId
-	 *            ID of user who made the change
 	 * 
 	 */
-	public MLPSiteConfig(String configKey, String configValue, String userId) {
+	public MLPSiteConfig(String configKey, String configValue) {
 		this.configKey = configKey;
 		this.configValue = configValue;
-		this.userId = userId;
 	}
 
 	public String getConfigKey() {

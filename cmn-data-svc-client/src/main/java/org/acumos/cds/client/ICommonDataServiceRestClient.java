@@ -1117,7 +1117,7 @@ public interface ICommonDataServiceRestClient {
 	void dropUserFromNotification(String notificationId, String userId);
 
 	/**
-	 * Store that the user has viewed the notification.
+	 * Sets the indicator that the user has viewed the notification.
 	 * 
 	 * @param notificationId
 	 *            notification ID
@@ -1188,7 +1188,7 @@ public interface ICommonDataServiceRestClient {
 	void updatePassword(MLPUser user, MLPPasswordChangeRequest changeRequest);
 
 	/**
-	 * Gets the validation results for the specified solution revision.
+	 * Gets the validation results for the specified solution and revision.
 	 * 
 	 * @param solutionId
 	 *            Instance ID
@@ -1355,13 +1355,26 @@ public interface ICommonDataServiceRestClient {
 	long getThreadCount();
 
 	/**
-	 * Gets a page of threads
+	 * Gets a page of threads.
 	 * 
 	 * @param pageRequest
 	 *            Page index, page size, sort information; ignored if null.
-	 * @return Page of objects.
+	 * @return Page of threads.
 	 */
 	RestPageResponse<MLPThread> getThreads(RestPageRequest pageRequest);
+
+	/**
+	 * Gets a page of threads for the specified solution and revision.
+	 * 
+	 * @param solutionId
+	 *            Solution ID
+	 * @param revisionId
+	 *            Revision ID
+	 * @param pageRequest
+	 *            Page index, page size, sort information; ignored if null.
+	 * @return Page of threads.
+	 */
+	RestPageResponse<MLPThread> getSolutionRevisionThreads(String solutionId, String revisionId, RestPageRequest pageRequest);
 
 	/**
 	 * Gets the thread with the specified ID.
@@ -1373,7 +1386,7 @@ public interface ICommonDataServiceRestClient {
 	MLPThread getThread(String threadId);
 
 	/**
-	 * Creates a thread
+	 * Creates a thread.
 	 * 
 	 * @param thread
 	 *            Thread data. If the ID field is null a new value is generated;
@@ -1383,7 +1396,7 @@ public interface ICommonDataServiceRestClient {
 	MLPThread createThread(MLPThread thread);
 
 	/**
-	 * Updates a thread
+	 * Updates a thread.
 	 * 
 	 * @param thread
 	 *            Thread data
@@ -1419,7 +1432,21 @@ public interface ICommonDataServiceRestClient {
 	RestPageResponse<MLPComment> getThreadComments(String threadId, RestPageRequest pageRequest);
 
 	/**
-	 * Gets the comment with the specified IDs.
+	 * Gets one page of comments for the specified solution and revision IDs, which
+	 * may include multiple threads.
+	 * 
+	 * @param solutionId
+	 *            Solution ID
+	 * @param revisionId
+	 *            Revision ID
+	 * @param pageRequest
+	 *            Page index, page size, sort information; ignored if null.
+	 * @return One page of comments for the specified IDs, sorted as specified.
+	 */
+	RestPageResponse<MLPComment> getSolutionRevisionComments(String solutionId, String revisionId, RestPageRequest pageRequest);
+
+	/**
+	 * Gets the comment with the specified ID.
 	 * 
 	 * @param threadId
 	 *            Thread ID
@@ -1430,7 +1457,7 @@ public interface ICommonDataServiceRestClient {
 	MLPComment getComment(String threadId, String commentId);
 
 	/**
-	 * Creates a comment
+	 * Creates a comment.
 	 * 
 	 * @param comment
 	 *            Comment data. If the ID field is null a new value is generated;
@@ -1440,7 +1467,7 @@ public interface ICommonDataServiceRestClient {
 	MLPComment createComment(MLPComment comment);
 
 	/**
-	 * Updates a comment
+	 * Updates a comment.
 	 * 
 	 * @param comment
 	 *            Comment data

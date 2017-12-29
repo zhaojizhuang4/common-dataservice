@@ -138,13 +138,11 @@ public class DomainTest extends AbstractModelTest {
 		m.setParentId(s2);
 		m.setText(s3);
 		m.setThreadId(s4);
-		m.setUrl(s5);
 		m.setUserId(s6);
 		Assert.assertEquals(s1, m.getCommentId());
 		Assert.assertEquals(s2, m.getParentId());
 		Assert.assertEquals(s3, m.getText());
 		Assert.assertEquals(s4, m.getThreadId());
-		Assert.assertEquals(s5, m.getUrl());
 		Assert.assertEquals(s6, m.getUserId());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
@@ -263,7 +261,7 @@ public class DomainTest extends AbstractModelTest {
 
 	@Test
 	public void testMLPPeer() {
-		MLPPeer m = new MLPPeer(s1, s1, s1, s1, b1, b1, s1, s1);
+		MLPPeer m = new MLPPeer(s1, s1, s1, s1, b1, b1, s1, s1, i1);
 		m = new MLPPeer();
 		m.setActive(b1);
 		m.setApiUrl(s1);
@@ -277,6 +275,7 @@ public class DomainTest extends AbstractModelTest {
 		m.setSelf(b2);
 		m.setSubjectName(s7);
 		m.setWebUrl(s8);
+		m.setTrustLevel(i1);
 		Assert.assertEquals(b1, m.isActive());
 		Assert.assertEquals(s1, m.getApiUrl());
 		Assert.assertEquals(s2, m.getContact1());
@@ -289,6 +288,7 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertEquals(b2, m.isSelf());
 		Assert.assertEquals(s7, m.getSubjectName());
 		Assert.assertEquals(s8, m.getWebUrl());
+		Assert.assertEquals(i1,  m.getTrustLevel());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -365,7 +365,7 @@ public class DomainTest extends AbstractModelTest {
 
 	@Test
 	public void testMLPSiteConfig() {
-		MLPSiteConfig m = new MLPSiteConfig(s1, s1, s1);
+		MLPSiteConfig m = new MLPSiteConfig(s1, s1);
 		m = new MLPSiteConfig();
 		m.setConfigKey(s1);
 		m.setConfigValue(s2);
@@ -687,14 +687,15 @@ public class DomainTest extends AbstractModelTest {
 
 	@Test
 	public void testMLPThread() {
-		MLPThread m = new MLPThread("");
-		m = new MLPThread();
-		m.setThreadId(s1);
-		m.setTitle(s2);
-		m.setUrl(s3);
-		Assert.assertEquals(s1, m.getThreadId());
-		Assert.assertEquals(s2, m.getTitle());
-		Assert.assertEquals(s3, m.getUrl());
+		MLPThread m = new MLPThread();
+		m.setRevisionId(s1);
+		m.setSolutionId(s2);
+		m.setThreadId(s3);
+		m.setTitle(s4);
+		Assert.assertEquals(s1, m.getRevisionId());
+		Assert.assertEquals(s2, m.getSolutionId());
+		Assert.assertEquals(s3, m.getThreadId());
+		Assert.assertEquals(s4, m.getTitle());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));

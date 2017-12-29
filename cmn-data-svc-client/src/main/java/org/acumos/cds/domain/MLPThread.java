@@ -33,7 +33,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
- * A comment thread.
+ * A thread of comments.  A thread is bound to a single solution revision.
  */
 @Entity
 @Table(name = "C_THREAD")
@@ -48,13 +48,17 @@ public class MLPThread implements MLPEntity, Serializable {
 	@Size(max = 36)
 	private String threadId;
 
+	@Column(name = "SOLUTION_ID", nullable = false, columnDefinition = "CHAR(36)")
+	@Size(max = 36)
+	private String solutionId;
+
+	@Column(name = "REVISION_ID", nullable = false, columnDefinition = "CHAR(36)")
+	@Size(max = 36)
+	private String revisionId;
+
 	@Column(name = "TITLE", columnDefinition = "VARCHAR(100)")
 	@Size(max = 100)
 	private String title;
-
-	@Column(name = "URL", columnDefinition = "VARCHAR(512)")
-	@Size(max = 512)
-	private String url;
 
 	/**
 	 * No-arg constructor
@@ -67,11 +71,14 @@ public class MLPThread implements MLPEntity, Serializable {
 	 * This constructor accepts the required fields; i.e., the minimum that the user
 	 * must supply to create a valid instance.
 	 * 
-	 * @param url
-	 *            The URL
+	 * @param solutionId
+	 *            Solution ID
+	 * @param revisionId
+	 *            Revision ID
 	 */
-	public MLPThread(String url) {
-		this.url = url;
+	public MLPThread(String solutionId, String revisionId) {
+		this.solutionId = solutionId;
+		this.revisionId = revisionId;
 	}
 
 	public String getThreadId() {
@@ -82,20 +89,28 @@ public class MLPThread implements MLPEntity, Serializable {
 		this.threadId = threadId;
 	}
 
+	public String getSolutionId() {
+		return solutionId;
+	}
+
+	public void setSolutionId(String solutionId) {
+		this.solutionId = solutionId;
+	}
+
+	public String getRevisionId() {
+		return revisionId;
+	}
+
+	public void setRevisionId(String revisionId) {
+		this.revisionId = revisionId;
+	}
+
 	public String getTitle() {
 		return title;
 	}
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
 	}
 
 	@Override
@@ -110,12 +125,13 @@ public class MLPThread implements MLPEntity, Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(threadId, title, url);
+		return Objects.hash(threadId, solutionId, revisionId, title);
 	}
 
 	@Override
 	public String toString() {
-		return this.getClass().getName() + "[threadId=" + threadId + ", title=" + title + ", url=" + url + "]";
+		return this.getClass().getName() + "[threadId=" + threadId + ", solutionId=" + solutionId + ", revisionId="
+				+ revisionId + ", title=" + title + "]";
 	}
 
 }

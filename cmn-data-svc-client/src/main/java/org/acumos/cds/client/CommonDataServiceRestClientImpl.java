@@ -387,8 +387,8 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public RestPageResponse<MLPSolution> findPortalSolutions(String[] nameKeywords, String[] descriptionKeywords,
-			boolean active, String [] ownerIds, String[] accessTypeCodes, String[] modelTypeCodes, String[] validationStatusCodes,
-			String[] tags, RestPageRequest pageRequest) {
+			boolean active, String[] ownerIds, String[] accessTypeCodes, String[] modelTypeCodes,
+			String[] validationStatusCodes, String[] tags, RestPageRequest pageRequest) {
 		HashMap<String, Object> parms = new HashMap<>();
 		// This is required
 		parms.put(CCDSConstants.SEARCH_ACTIVE, active);
@@ -1520,6 +1520,17 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
+	public RestPageResponse<MLPThread> getSolutionRevisionThreads(String solutionId, String revisionId, RestPageRequest pageRequest) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, CCDSConstants.SOLUTION_PATH, solutionId,
+				CCDSConstants.REVISION_PATH, revisionId }, null, pageRequest);
+		logger.debug("getThreads: uri {}", uri);
+		ResponseEntity<RestPageResponse<MLPThread>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPThread>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
 	public MLPThread getThread(String threadId) {
 		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId }, null, null);
 		logger.debug("getThread: uri {}", uri);
@@ -1566,6 +1577,18 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, threadId, CCDSConstants.COMMENT_PATH }, null,
 				pageRequest);
 		logger.debug("getThreadComments: uri {}", uri);
+		ResponseEntity<RestPageResponse<MLPComment>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPComment>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public RestPageResponse<MLPComment> getSolutionRevisionComments(String solutionId, String revisionId,
+			RestPageRequest pageRequest) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, CCDSConstants.SOLUTION_PATH, solutionId,
+				CCDSConstants.REVISION_PATH, revisionId, CCDSConstants.COMMENT_PATH }, null, pageRequest);
+		logger.debug("getSolutionRevisionComments: uri {}", uri);
 		ResponseEntity<RestPageResponse<MLPComment>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<RestPageResponse<MLPComment>>() {
 				});

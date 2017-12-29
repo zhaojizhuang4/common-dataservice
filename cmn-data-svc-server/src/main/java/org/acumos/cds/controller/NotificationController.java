@@ -85,7 +85,7 @@ public class NotificationController extends AbstractController {
 	@ApiOperation(value = "Gets a page of notifications, optionally sorted.", response = MLPNotification.class, responseContainer = "Page")
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	public Page<MLPNotification> getPageOfNotifications(Pageable pageable) {
+	public Page<MLPNotification> getNotifications(Pageable pageable) {
 		return notificationRepository.findAll(pageable);
 	}
 
