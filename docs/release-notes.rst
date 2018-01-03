@@ -5,8 +5,8 @@ Release Notes
 The client and server are released together.  The client is deployed as a jar file to a 
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.  
 
-Version 1.11, 3 January 2018
-----------------------------
+Version 1.11.0, 3 January 2018
+------------------------------
 
 * Revise MLPSiteConfig to make userId optional
 * Revise MLPThread to add solutionId and revisionId; drop url
