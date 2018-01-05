@@ -15,7 +15,6 @@
 		<!-- silence warning about parent relative path -->
 		<relativePath />
 	</parent>
-	<!-- No repositories section. -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -26,20 +25,11 @@
 		<springfox.version>2.7.0</springfox.version>
 		<!-- Jenkins invokes mvn with argument -Dbuild.number=${BUILD_NUMBER} -->
 		<build.number>0</build.number>
-		<!-- EELF jar is in ONAP nexus repo -->
-		<onap.nexus.url>https://nexus.onap.org</onap.nexus.url>
-		<!-- Azure Docker settings are overriden by Jenkins settings -->
-		<docker.host.url>set by Jenkins</docker.host.url>
-		<docker.registry.url>set by Jenkins</docker.registry.url>
-		<docker.registry.login>set by Jenkins</docker.registry.login>
-		<docker.registry.password>set by Jenkins</docker.registry.password>
-		<!-- LF Docker coordinates -->
-		<docker.registry>nexus3.acumos.org:10003</docker.registry>
-		<!-- All acumos.nexus.* are overridden by Azure Jenkins settings -->
-		<acumos.nexus.url>http://cognita-nexus01.eastus.cloudapp.azure.com:8081</acumos.nexus.url>
-		<acumos.nexus.snapshot.path>repository/repo_cognita_platform_maven_snapshots</acumos.nexus.snapshot.path>
-		<acumos.nexus.release.path>repository/repo_cognita_platform_maven</acumos.nexus.release.path>
+		<!-- LF Docker coordinates; pull is a proxy for external -->
+		<docker.pull.registry>nexus3.acumos.org:10001</docker.pull.registry>
+		<docker.push.registry>nexus3.acumos.org:10003</docker.push.registry>
 	</properties>
+	<!-- No repositories section. -->
 	<dependencies>
 		<dependency>
 			<groupId>org.acumos.common-dataservice</groupId>
@@ -228,19 +218,14 @@
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.22.1</version>
+				<version>0.23.0</version>
 				<configuration>
 					<verbose>true</verbose>
-					<dockerHost>${docker.host.url}</dockerHost>
-					<!-- docker runs on the LF build machine -->
+					<!-- docker runs on the LF build minion so the default value is ok -->
 					<!-- LF <dockerHost>unix:///var/run/docker.sock</dockerHost> LF -->
-					<registry>${docker.registry.url}</registry>
-					<!-- begin azure credentials -->
-					<authConfig>
-						<username>${docker.registry.login}</username>
-						<password>${docker.registry.password}</password>
-					</authConfig>
-					<!-- end azure credentials -->
+					<pullRegistry>${docker.pull.registry}</pullRegistry>
+					<pushRegistry>${docker.push.registry}</pushRegistry>
+					<!-- LF credentials are not supplied here -->
 					<images>
 						<image>
 							<name>common-dataservice:${project.version}</name>
@@ -248,6 +233,7 @@
 								<from>frolvlad/alpine-oraclejdk8:slim</from>
 								<tags>
 									<tag>${project.version}</tag>
+									<tag>${project.version}-b${build.number}</tag>
 								</tags>
 								<assembly>
 									<descriptorRef>artifact</descriptorRef>

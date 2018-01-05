@@ -66,6 +66,7 @@ public abstract class AbstractController {
 			throws NoSuchFieldException {
 		Class<?> clazz = modelClass;
 		HashMap<String, Object> convertedQryParm = new HashMap<>();
+		// Copy then remove as processed to detect missing items
 		HashMap<String, String> queryParamsCopy = new HashMap<>();
 		queryParamsCopy.putAll(queryParameters);
 		while (clazz != null) {

@@ -1819,6 +1819,15 @@ public class CdsControllerTest {
 			logger.info("Find sols by tag failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
+			String [] searchTags = new String [] { "%" };
+			client.findPortalSolutions(null, null, true, null, null, null, null, searchTags, new RestPageRequest(0,1)); 
+			// I have not been able to make findPortalSolutions fail.
+			// all arguments are optional; there is no illegal value; etc.
+			// TODO: throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Find portal solutions failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
 			client.addSolutionTag("bogus", "bogus");
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {

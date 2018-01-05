@@ -38,17 +38,25 @@ public abstract class AbstractSearchServiceImpl {
 	 * @param criteria
 	 *            Criteria object to extend
 	 * @param queryParameters
-	 *            Map of parameters; ignored if null or empty
+	 *            Map of field name - field value pairs; ignored if null or empty.
+	 *            An "equals" criterion is created, unless the field value is n
+	 *            array, in which case a "in" criterion is created.
 	 * @param isOr
-	 *            If true, treat query as disjunction; else as conjunction.
+	 *            If true, treat the query as a disjunction; else as a conjunction.
 	 */
 	protected void buildCriteria(Criteria criteria, Map<String, ? extends Object> queryParameters, boolean isOr) {
 		if (queryParameters != null && queryParameters.size() > 0) {
 			Junction junction = isOr ? Restrictions.disjunction() : Restrictions.conjunction();
 			criteria.add(junction);
 			for (Map.Entry<String, ? extends Object> entry : queryParameters.entrySet()) {
-				Criterion equals = Restrictions.eq(entry.getKey(), entry.getValue());
-				junction.add(equals);
+				Criterion criterion = null;
+				if (entry.getValue().getClass().isArray()) {
+					Object[] array = (Object[]) entry.getValue();
+					criterion = Restrictions.in(entry.getKey(), array);
+				} else {
+					criterion = Restrictions.eq(entry.getKey(), entry.getValue());
+				}
+				junction.add(criterion);
 			}
 		}
 	}

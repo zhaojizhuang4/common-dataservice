@@ -114,6 +114,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPArtifact(null, null, null, null, null, 0);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -149,6 +155,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPComment(null, null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -218,6 +230,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPNotification(null, null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -242,6 +260,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(pk.equals(pk));
 		Assert.assertFalse(pk.hashCode() == 0);
 		logger.info(pk.toString());
+		try {
+			new MLPNotifUserMap(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -257,6 +281,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPPasswordChangeRequest(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -288,12 +318,18 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertEquals(b2, m.isSelf());
 		Assert.assertEquals(s7, m.getSubjectName());
 		Assert.assertEquals(s8, m.getWebUrl());
-		Assert.assertEquals(i1,  m.getTrustLevel());
+		Assert.assertEquals(i1, m.getTrustLevel());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPPeer(null, null, null, null, b1, b1, null, null, i1);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -321,6 +357,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPPeerSubscription(null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -340,6 +382,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPRole(null, true);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -361,6 +409,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPRoleFunction(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -382,6 +436,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPSiteConfig(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -397,6 +457,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPSolRevArtMap(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 		MLPSolRevArtMap.SolRevArtMapPK pk = new MLPSolRevArtMap.SolRevArtMapPK();
 		pk = new MLPSolRevArtMap.SolRevArtMapPK(s1, s2);
 		Assert.assertFalse(pk.equals(null));
@@ -418,6 +484,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
+		try {
+			new MLPSolTagMap(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 		logger.info(m.toString());
 		MLPSolTagMap.SolTagMapPK pk = new MLPSolTagMap.SolTagMapPK();
 		pk = new MLPSolTagMap.SolTagMapPK(s1, s2);
@@ -441,6 +513,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPSolUserAccMap(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 		MLPSolUserAccMap.SolUserAccessMapPK pk = new MLPSolUserAccMap.SolUserAccessMapPK();
 		pk = new MLPSolUserAccMap.SolUserAccessMapPK(s1, s2);
 		Assert.assertFalse(pk.equals(null));
@@ -485,6 +563,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPSolution(null, null, true);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -513,6 +597,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPSolutionDeployment(null, null, null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -534,6 +624,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPSolutionDownload(null, null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -549,6 +645,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPSolutionFavorite(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 		MLPSolutionFavorite.SolutionFavoritePK pk = new MLPSolutionFavorite.SolutionFavoritePK();
 		pk = new MLPSolutionFavorite.SolutionFavoritePK(s1, s2);
 		Assert.assertFalse(pk.equals(null));
@@ -577,6 +679,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPSolutionRating(null, null, 0);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 		MLPSolutionRating.SolutionRatingPK pk = new MLPSolutionRating.SolutionRatingPK();
 		pk = new MLPSolutionRating.SolutionRatingPK(s1, s2);
 		Assert.assertFalse(pk.equals(null));
@@ -611,6 +719,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPSolutionRevision(null, null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -638,6 +752,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPSolutionValidation(null, null, null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 		MLPSolutionValidation.SolutionValidationPK pk = new MLPSolutionValidation.SolutionValidationPK();
 		pk = new MLPSolutionValidation.SolutionValidationPK(s1, s2, s3);
 		Assert.assertFalse(pk.equals(null));
@@ -670,6 +790,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPSolutionWeb(null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -683,11 +809,18 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPTag(null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
 	public void testMLPThread() {
-		MLPThread m = new MLPThread();
+		MLPThread m = new MLPThread(s1, s1);
+		m = new MLPThread();
 		m.setRevisionId(s1);
 		m.setSolutionId(s2);
 		m.setThreadId(s3);
@@ -701,6 +834,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPThread(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -755,6 +894,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPUser(null, true);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -788,7 +933,13 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
-		logger.info(m.toString());
+		logger.info(m.toString());	
+		try {
+			new MLPUserLoginProvider(null, null, null, null, 0);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 		MLPUserLoginProvider.UserLoginProviderPK pk = new MLPUserLoginProvider.UserLoginProviderPK();
 		pk = new MLPUserLoginProvider.UserLoginProviderPK(s1, s2, s3);
 		MLPUserLoginProvider.UserLoginProviderPK pk2 = new MLPUserLoginProvider.UserLoginProviderPK(s1, s2, s3);
@@ -841,6 +992,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPUserRoleMap(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 		MLPUserRoleMap.UserRoleMapPK pk = new MLPUserRoleMap.UserRoleMapPK();
 		pk = new MLPUserRoleMap.UserRoleMapPK(s1, s2);
 		Assert.assertFalse(pk.equals(null));
@@ -865,6 +1022,12 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+		try {
+			new MLPValidationSequence(-1, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 		MLPValidationSequence.ValidationSequencePK pk = new MLPValidationSequence.ValidationSequencePK();
 		pk = new MLPValidationSequence.ValidationSequencePK(i1, s1);
 		Assert.assertFalse(pk.equals(null));

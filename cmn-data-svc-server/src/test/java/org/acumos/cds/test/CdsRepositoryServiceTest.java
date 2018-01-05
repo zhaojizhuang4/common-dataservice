@@ -392,11 +392,18 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(cs.getTags().size() == 1);
 			logger.info("Created solution " + cs.getSolutionId());
 
+			// Search for a single value
 			Map<String, String> solParms = new HashMap<>();
 			solParms.put("name", cs.getName());
 			List<MLPSolution> searchSols = solutionSearchService.getSolutions(solParms, false);
 			Assert.assertTrue(searchSols.size() == 1);
 
+			// Search for a list
+			Map<String, Object> solListParms = new HashMap<>();
+			solListParms.put("name", new String [] {cs.getName()});
+			List<MLPSolution> searchListSols = solutionSearchService.getSolutions(solListParms, false);
+			Assert.assertTrue(searchListSols.size() == 1);
+			
 			logger.info("Finding portal solutions");
 			String[] solKw = { solName };
 			String[] descKw = { solDesc };
