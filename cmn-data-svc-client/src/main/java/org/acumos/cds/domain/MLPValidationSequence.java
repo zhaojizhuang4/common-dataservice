@@ -59,6 +59,14 @@ public class MLPValidationSequence extends MLPTimestampedEntity implements Seria
 			// no-arg constructor
 		}
 
+		/**
+		 * Convenience constructor
+		 * 
+		 * @param sequence
+		 *            Sequence
+		 * @param valTypeCode
+		 *            validation type code
+		 */
 		public ValidationSequencePK(Integer sequence, String valTypeCode) {
 			this.sequence = sequence;
 			this.valTypeCode = valTypeCode;
@@ -107,7 +115,18 @@ public class MLPValidationSequence extends MLPTimestampedEntity implements Seria
 		// no-arg constructor
 	}
 
+	/**
+	 * This constructor accepts the required fields; i.e., the minimum that the user
+	 * must supply to create a valid instance.
+	 * 
+	 * @param sequence
+	 *            Sequence
+	 * @param valTypeCode
+	 *            validation type code
+	 */
 	public MLPValidationSequence(Integer sequence, String valTypeCode) {
+		if (sequence == null || valTypeCode == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.sequence = sequence;
 		this.valTypeCode = valTypeCode;
 	}

@@ -58,6 +58,8 @@ public class MLPPasswordChangeRequest implements MLPEntity, Serializable {
 	 *            New password cleartext
 	 */
 	public MLPPasswordChangeRequest(String oldLoginPass, String newLoginPass) {
+		if (oldLoginPass == null || newLoginPass == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.oldLoginPass = oldLoginPass;
 		this.newLoginPass = newLoginPass;
 	}

@@ -231,12 +231,12 @@ public class SolutionController extends AbstractController {
 	 *            Map key
 	 * @param queryParameters
 	 *            Map of parameters
-	 * @return String array; null if key is not present
+	 * @return String array; empty if key is not present
 	 */
 	private String[] getOptCsvParameter(String parmName, Map<String, String> queryParameters) {
 		String val = queryParameters.get(parmName);
 		if (val == null)
-			return null;
+			return new String[0];
 		String[] vals = val.split(",");
 		for (int i = 0; i < vals.length; ++i)
 			if ("null".equals(vals[i]))
@@ -402,7 +402,7 @@ public class SolutionController extends AbstractController {
 			// Use the path-parameter id; don't trust the one in the object
 			solution.setSolutionId(solutionId);
 			// Discard any stats object; updates don't happen via this interface
-			// solution.setWebStats(null);
+			solution.setWebStats(null);
 			// Update the existing row
 			solutionRepository.save(solution);
 			// Answer "OK"
@@ -835,7 +835,7 @@ public class SolutionController extends AbstractController {
 	public Object createSolutionDownload(@PathVariable("solutionId") String solutionId,
 			@PathVariable("userId") String userId, @PathVariable("artifactId") String artifactId,
 			@RequestBody MLPSolutionDownload sd, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "create: received object: {} ", sd);
+		logger.debug(EELFLoggerDelegate.debugLogger, "createSolutionDownload: received object: {} ", sd);
 		// These validations duplicate the constraints but are much user friendlier.
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -972,7 +972,7 @@ public class SolutionController extends AbstractController {
 	@ResponseBody
 	public Object createSolutionRating(@PathVariable("solutionId") String solutionId,
 			@PathVariable("userId") String userId, @RequestBody MLPSolutionRating sr, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "create: received object: {} ", sr);
+		logger.debug(EELFLoggerDelegate.debugLogger, "createSolutionRating: received object: {} ", sr);
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No solution " + solutionId, null);
@@ -1411,7 +1411,7 @@ public class SolutionController extends AbstractController {
 	public Object createSolutionDeployment(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, @RequestBody MLPSolutionDeployment sd,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "create: received object: {} ", sd);
+		logger.debug(EELFLoggerDelegate.debugLogger, "createSolutionDeployment: received object: {} ", sd);
 		Object result;
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

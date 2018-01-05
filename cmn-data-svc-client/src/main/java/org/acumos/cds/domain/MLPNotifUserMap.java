@@ -58,6 +58,14 @@ public class MLPNotifUserMap implements MLPEntity, Serializable {
 			// no-arg constructor
 		}
 
+		/**
+		 * Builds an instance with the required fields.
+		 * 
+		 * @param notificationId
+		 *            Notification ID
+		 * @param userId
+		 *            User ID
+		 */
 		public NotifUserMapPK(String notificationId, String userId) {
 			this.notificationId = notificationId;
 			this.userId = userId;
@@ -100,7 +108,17 @@ public class MLPNotifUserMap implements MLPEntity, Serializable {
 		// no-arg constructor
 	}
 
+	/**
+	 * Builds an instance with the required fields.
+	 * 
+	 * @param notificationId
+	 *            Notification ID
+	 * @param userId
+	 *            User ID
+	 */
 	public MLPNotifUserMap(String notificationId, String userId) {
+		if (notificationId == null || userId == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.notificationId = notificationId;
 		this.userId = userId;
 	}

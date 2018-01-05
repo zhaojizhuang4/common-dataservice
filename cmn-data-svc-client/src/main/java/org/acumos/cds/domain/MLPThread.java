@@ -33,7 +33,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
- * A thread of comments.  A thread is bound to a single solution revision.
+ * A thread of comments. A thread is bound to a single solution revision.
  */
 @Entity
 @Table(name = "C_THREAD")
@@ -77,6 +77,8 @@ public class MLPThread implements MLPEntity, Serializable {
 	 *            Revision ID
 	 */
 	public MLPThread(String solutionId, String revisionId) {
+		if (solutionId == null || revisionId == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.solutionId = solutionId;
 		this.revisionId = revisionId;
 	}

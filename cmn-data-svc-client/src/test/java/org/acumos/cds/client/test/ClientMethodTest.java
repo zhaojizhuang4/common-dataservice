@@ -159,6 +159,12 @@ public class ClientMethodTest {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
 		try {
+			String[] array = new String[] { "I'm a string" };
+			client.findPortalSolutions(array, array, true, array, array, array, array, array, new RestPageRequest(0, 1));
+		} catch (ResourceAccessException ex) {
+			logger.info("Client failed as expected: {}", ex.toString());
+		}
+		try {
 			client.findSolutionsByTag("tag", new RestPageRequest());
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
@@ -760,12 +766,12 @@ public class ClientMethodTest {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
 		try {
-			client.getThreads(new RestPageRequest(0,1));
+			client.getThreads(new RestPageRequest(0, 1));
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
 		try {
-			client.getSolutionRevisionThreads("", "", new RestPageRequest(0,1));
+			client.getSolutionRevisionThreads("", "", new RestPageRequest(0, 1));
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
@@ -788,19 +794,19 @@ public class ClientMethodTest {
 			client.deleteThread("threadId");
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
-		}		
+		}
 		try {
 			client.getThreadCommentCount("threadId");
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
 		try {
-			client.getThreadComments("threadId", new RestPageRequest(0,1));
+			client.getThreadComments("threadId", new RestPageRequest(0, 1));
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
 		try {
-			client.getSolutionRevisionComments("", "", new RestPageRequest(0,1));
+			client.getSolutionRevisionComments("", "", new RestPageRequest(0, 1));
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}

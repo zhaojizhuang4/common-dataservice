@@ -92,6 +92,8 @@ public class MLPNotification extends MLPTimestampedEntity implements Serializabl
 	 *            Latest date of the active period
 	 */
 	public MLPNotification(String title, Date startDate, Date endDate) {
+		if (title == null || startDate == null || endDate == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.title = title;
 		this.start = startDate;
 		this.end = endDate;

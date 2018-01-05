@@ -61,6 +61,8 @@ public class MLPTag implements MLPEntity, Serializable {
 	 *            The tag
 	 */
 	public MLPTag(String tag) {
+		if (tag == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.tag = tag;
 	}
 

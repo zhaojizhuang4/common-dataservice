@@ -172,6 +172,8 @@ public class MLPSolution extends MLPTimestampedEntity implements Serializable {
 	 *            Boolean flag
 	 */
 	public MLPSolution(String name, String ownerId, boolean active) {
+		if (name == null || ownerId == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.name = name;
 		this.ownerId = ownerId;
 		this.active = active;

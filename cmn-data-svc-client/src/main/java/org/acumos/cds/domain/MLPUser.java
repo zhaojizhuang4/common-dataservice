@@ -127,6 +127,8 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	 *            boolean flag
 	 */
 	public MLPUser(String loginName, boolean active) {
+		if (loginName == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.loginName = loginName;
 		this.active = active;
 	}

@@ -58,6 +58,14 @@ public class MLPSolRevArtMap implements MLPEntity, Serializable {
 			// no-arg constructor
 		}
 
+		/**
+		 * Convenience constructor
+		 * 
+		 * @param revisionId
+		 *            revision ID
+		 * @param artifactId
+		 *            artifact ID
+		 */
 		public SolRevArtMapPK(String revisionId, String artifactId) {
 			this.revisionId = revisionId;
 			this.artifactId = artifactId;
@@ -90,9 +98,6 @@ public class MLPSolRevArtMap implements MLPEntity, Serializable {
 	@Size(max = 36)
 	private String artifactId;
 
-	/**
-	 * No-arg constructor
-	 */
 	public MLPSolRevArtMap() {
 		// no-arg constructor
 	}
@@ -106,6 +111,8 @@ public class MLPSolRevArtMap implements MLPEntity, Serializable {
 	 *            artifact ID
 	 */
 	public MLPSolRevArtMap(String revisionId, String artifactId) {
+		if (revisionId == null || artifactId == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.revisionId = revisionId;
 		this.artifactId = artifactId;
 	}

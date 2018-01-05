@@ -99,6 +99,8 @@ public class MLPSolutionDeployment extends MLPTimestampedEntity implements Seria
 	 *            Value from the table
 	 */
 	public MLPSolutionDeployment(String solutionId, String revisionId, String userId, String deploymentStatusCode) {
+		if (solutionId == null || revisionId == null || userId == null || deploymentStatusCode == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.solutionId = solutionId;
 		this.revisionId = revisionId;
 		this.userId = userId;

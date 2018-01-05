@@ -57,6 +57,14 @@ public class MLPSolutionRating extends MLPTimestampedEntity implements Serializa
 			// no-arg constructor
 		}
 
+		/**
+		 * Convenience constructor
+		 * 
+		 * @param solutionId
+		 *            solution ID
+		 * @param userId
+		 *            user ID
+		 */
 		public SolutionRatingPK(String solutionId, String userId) {
 			this.solutionId = solutionId;
 			this.userId = userId;
@@ -122,6 +130,8 @@ public class MLPSolutionRating extends MLPTimestampedEntity implements Serializa
 	 *            Numeric rating
 	 */
 	public MLPSolutionRating(String solutionId, String userId, Integer rating) {
+		if (solutionId == null || userId == null || rating == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.solutionId = solutionId;
 		this.userId = userId;
 		this.rating = rating;

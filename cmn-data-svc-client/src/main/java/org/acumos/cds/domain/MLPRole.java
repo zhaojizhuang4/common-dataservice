@@ -79,6 +79,8 @@ public class MLPRole extends MLPTimestampedEntity implements Serializable {
 	 *            True if active
 	 */
 	public MLPRole(String name, boolean active) {
+		if (name == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.name = name;
 		this.active = active;
 	}

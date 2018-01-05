@@ -1374,7 +1374,8 @@ public interface ICommonDataServiceRestClient {
 	 *            Page index, page size, sort information; ignored if null.
 	 * @return Page of threads.
 	 */
-	RestPageResponse<MLPThread> getSolutionRevisionThreads(String solutionId, String revisionId, RestPageRequest pageRequest);
+	RestPageResponse<MLPThread> getSolutionRevisionThreads(String solutionId, String revisionId,
+			RestPageRequest pageRequest);
 
 	/**
 	 * Gets the thread with the specified ID.
@@ -1443,7 +1444,8 @@ public interface ICommonDataServiceRestClient {
 	 *            Page index, page size, sort information; ignored if null.
 	 * @return One page of comments for the specified IDs, sorted as specified.
 	 */
-	RestPageResponse<MLPComment> getSolutionRevisionComments(String solutionId, String revisionId, RestPageRequest pageRequest);
+	RestPageResponse<MLPComment> getSolutionRevisionComments(String solutionId, String revisionId,
+			RestPageRequest pageRequest);
 
 	/**
 	 * Gets the comment with the specified ID.

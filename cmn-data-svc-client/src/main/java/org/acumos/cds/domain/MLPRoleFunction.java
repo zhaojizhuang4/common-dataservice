@@ -78,6 +78,8 @@ public class MLPRoleFunction extends MLPTimestampedEntity implements Serializabl
 	 *            Role function name
 	 */
 	public MLPRoleFunction(String roleId, String name) {
+		if (roleId == null || name == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.roleId = roleId;
 		this.name = name;
 	}

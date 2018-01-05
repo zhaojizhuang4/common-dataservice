@@ -31,8 +31,14 @@ import org.springframework.data.domain.Sort;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-/* https://blog.thecookinkitchen.com/how-to-consume-page-response-from-a-service-in-spring-boot-97293c18ba */
-
+/**
+ * Contains a page of data fetched via REST.
+ * 
+ * https://blog.thecookinkitchen.com/how-to-consume-page-response-from-a-service-in-spring-boot-97293c18ba
+ * 
+ * @param <T>
+ *            Wrapped model class
+ */
 public class RestPageResponse<T> extends PageImpl<T> {
 
 	private static final long serialVersionUID = 5835593096562217592L;

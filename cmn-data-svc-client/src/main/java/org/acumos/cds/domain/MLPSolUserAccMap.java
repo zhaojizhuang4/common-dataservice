@@ -57,6 +57,14 @@ public class MLPSolUserAccMap implements MLPEntity, Serializable {
 			// no-arg constructor
 		}
 
+		/**
+		 * Convenience constructor
+		 * 
+		 * @param solutionId
+		 *            solution ID
+		 * @param userId
+		 *            user ID
+		 */
 		public SolUserAccessMapPK(String solutionId, String userId) {
 			this.solutionId = solutionId;
 			this.userId = userId;
@@ -93,7 +101,17 @@ public class MLPSolUserAccMap implements MLPEntity, Serializable {
 		// no-arg constructor
 	}
 
+	/**
+	 * Convenience constructor
+	 * 
+	 * @param solutionId
+	 *            solution ID
+	 * @param userId
+	 *            user ID
+	 */
 	public MLPSolUserAccMap(String solutionId, String userId) {
+		if (solutionId == null || userId == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.solutionId = solutionId;
 		this.userId = userId;
 	}

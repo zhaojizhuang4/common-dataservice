@@ -59,6 +59,16 @@ public class MLPSolutionValidation extends MLPTimestampedEntity implements Seria
 			// no-arg constructor
 		}
 
+		/**
+		 * Convenience constructor
+		 * 
+		 * @param solutionId
+		 *            solution ID
+		 * @param revisionId
+		 *            revision ID
+		 * @param taskId
+		 *            task ID
+		 */
 		public SolutionValidationPK(String solutionId, String revisionId, String taskId) {
 			this.solutionId = solutionId;
 			this.revisionId = revisionId;
@@ -151,6 +161,8 @@ public class MLPSolutionValidation extends MLPTimestampedEntity implements Seria
 	 *            Validation type code
 	 */
 	public MLPSolutionValidation(String solutionId, String revisionId, String taskId, String validationTypeCode) {
+		if (solutionId == null || revisionId == null || taskId == null || validationTypeCode == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.solutionId = solutionId;
 		this.revisionId = revisionId;
 		this.taskId = taskId;

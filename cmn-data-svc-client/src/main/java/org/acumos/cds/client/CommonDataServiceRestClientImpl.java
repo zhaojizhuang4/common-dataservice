@@ -108,15 +108,6 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	private final RestTemplate restTemplate;
 
 	/**
-	 * Privileged access for subclasses.
-	 * 
-	 * @return RestTemplate configured for access to remote CDS server.
-	 */
-	protected RestTemplate getRestTemplate() {
-		return restTemplate;
-	}
-
-	/**
 	 * Creates an instance to access the remote endpoint using the specified
 	 * credentials.
 	 * 
@@ -179,6 +170,15 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	 */
 	public static ICommonDataServiceRestClient getInstance(String webapiUrl, String user, String pass) {
 		return new CommonDataServiceRestClientImpl(webapiUrl, user, pass);
+	}
+
+	/**
+	 * Privileged access for subclasses.
+	 * 
+	 * @return RestTemplate configured for access to remote CDS server.
+	 */
+	protected RestTemplate getRestTemplate() {
+		return restTemplate;
 	}
 
 	/**
@@ -878,8 +878,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 				null);
 		logger.debug("addUserRole: uri {}", uri);
 		MLPUserRoleMap map = new MLPUserRoleMap(userId, roleId);
-		SuccessTransport result = restTemplate.postForObject(uri, map, SuccessTransport.class);
-		logger.debug("addUserRole: result {}", result);
+		restTemplate.postForObject(uri, map, SuccessTransport.class);
 	}
 
 	@Override
@@ -1263,8 +1262,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 				null);
 		logger.debug("addNotificationUser: url {}", uri);
 		MLPNotifUserMap map = new MLPNotifUserMap(notificationId, userId);
-		SuccessTransport result = restTemplate.postForObject(uri, map, SuccessTransport.class);
-		logger.debug("addNotificationUser: result {}", result);
+		restTemplate.postForObject(uri, map, SuccessTransport.class);
 	}
 
 	@Override
@@ -1326,8 +1324,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 				CCDSConstants.ACCESS_PATH }, null, null);
 		logger.debug("addSolutionUserAccess: url {}", uri);
 		MLPSolUserAccMap map = new MLPSolUserAccMap(solutionId, userId);
-		SuccessTransport result = restTemplate.postForObject(uri, map, SuccessTransport.class);
-		logger.debug("addNotificationUser: result {}", result);
+		restTemplate.postForObject(uri, map, SuccessTransport.class);
 	}
 
 	@Override
@@ -1520,7 +1517,8 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public RestPageResponse<MLPThread> getSolutionRevisionThreads(String solutionId, String revisionId, RestPageRequest pageRequest) {
+	public RestPageResponse<MLPThread> getSolutionRevisionThreads(String solutionId, String revisionId,
+			RestPageRequest pageRequest) {
 		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, CCDSConstants.SOLUTION_PATH, solutionId,
 				CCDSConstants.REVISION_PATH, revisionId }, null, pageRequest);
 		logger.debug("getThreads: uri {}", uri);

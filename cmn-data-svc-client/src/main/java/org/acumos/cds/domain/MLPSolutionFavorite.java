@@ -58,6 +58,14 @@ public class MLPSolutionFavorite implements MLPEntity, Serializable {
 			// no-arg constructor
 		}
 
+		/**
+		 * Convenience constructor
+		 * 
+		 * @param solutionId
+		 *            solution ID
+		 * @param userId
+		 *            user ID
+		 */
 		public SolutionFavoritePK(String solutionId, String userId) {
 			this.solutionId = solutionId;
 			this.userId = userId;
@@ -109,6 +117,8 @@ public class MLPSolutionFavorite implements MLPEntity, Serializable {
 	 *            User ID
 	 */
 	public MLPSolutionFavorite(String solutionId, String userId) {
+		if (solutionId == null || userId == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.solutionId = solutionId;
 		this.userId = userId;
 	}

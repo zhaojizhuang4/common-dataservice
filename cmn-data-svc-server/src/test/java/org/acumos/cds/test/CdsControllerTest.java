@@ -1896,7 +1896,9 @@ public class CdsControllerTest {
 			logger.info("Create rating failed on bad user as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.createSolutionRating(new MLPSolutionRating(cs.getSolutionId(), cu.getUserId(), null));
+			MLPSolutionRating rating = new MLPSolutionRating(cs.getSolutionId(), cu.getUserId(), 0);
+			rating.setRating(null);
+			client.createSolutionRating(rating);
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create rating failed on constraint as expected: {}", ex.getResponseBodyAsString());

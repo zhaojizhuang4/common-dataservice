@@ -83,6 +83,8 @@ public class MLPPeerSubscription extends MLPTimestampedEntity implements Seriali
 	 *            Peer ID
 	 */
 	public MLPPeerSubscription(String peerId) {
+		if (peerId == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.peerId = peerId;
 	}
 

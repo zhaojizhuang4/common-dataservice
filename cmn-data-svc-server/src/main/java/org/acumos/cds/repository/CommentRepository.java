@@ -29,6 +29,9 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Adds methods to count, find and delete comments.
+ */
 public interface CommentRepository extends PagingAndSortingRepository<MLPComment, String> {
 
 	/**

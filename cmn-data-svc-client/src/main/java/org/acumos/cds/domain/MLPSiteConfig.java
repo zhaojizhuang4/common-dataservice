@@ -67,6 +67,8 @@ public class MLPSiteConfig extends MLPTimestampedEntity implements Serializable 
 	 * 
 	 */
 	public MLPSiteConfig(String configKey, String configValue) {
+		if (configKey == null || configValue == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.configKey = configKey;
 		this.configValue = configValue;
 	}

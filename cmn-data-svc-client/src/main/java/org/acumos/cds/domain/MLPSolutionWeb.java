@@ -87,6 +87,8 @@ public class MLPSolutionWeb implements MLPEntity, Serializable {
 	 *            ID of solution
 	 */
 	public MLPSolutionWeb(String solutionId) {
+		if (solutionId == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.solutionId = solutionId;
 	}
 

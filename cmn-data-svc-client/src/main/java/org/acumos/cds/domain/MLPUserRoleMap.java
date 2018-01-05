@@ -58,6 +58,14 @@ public class MLPUserRoleMap implements MLPEntity, Serializable {
 			// no-arg constructor
 		}
 
+		/**
+		 * Convenience constructor
+		 * 
+		 * @param userId
+		 *            user ID
+		 * @param roleId
+		 *            role ID
+		 */
 		public UserRoleMapPK(String userId, String roleId) {
 			this.userId = userId;
 			this.roleId = roleId;
@@ -90,14 +98,22 @@ public class MLPUserRoleMap implements MLPEntity, Serializable {
 	@Size(max = 36)
 	private String roleId;
 
-	/**
-	 * No-arg constructor
-	 */
 	public MLPUserRoleMap() {
 		// no-arg constructor
 	}
 
+	/**
+	 * This constructor accepts the required fields; i.e., the minimum that the user
+	 * must supply to create a valid instance.
+	 * 
+	 * @param userId
+	 *            user ID
+	 * @param roleId
+	 *            role ID
+	 */
 	public MLPUserRoleMap(String userId, String roleId) {
+		if (userId == null || roleId == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.userId = userId;
 		this.roleId = roleId;
 	}

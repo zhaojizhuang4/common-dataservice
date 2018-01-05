@@ -90,6 +90,8 @@ public class MLPSolutionDownload implements MLPEntity, Serializable {
 	 *            User ID
 	 */
 	public MLPSolutionDownload(String solutionId, String artifactId, String userId) {
+		if (solutionId == null || artifactId == null || userId == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.solutionId = solutionId;
 		this.artifactId = artifactId;
 		this.userId = userId;

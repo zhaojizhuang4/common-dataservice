@@ -118,6 +118,8 @@ public final class MLPArtifact extends MLPTimestampedEntity implements Serializa
 	 *            Length
 	 */
 	public MLPArtifact(String version, String artifactTypeCode, String name, String uri, String ownerId, int size) {
+		if (version == null || artifactTypeCode == null || name == null || uri == null || ownerId == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.version = version;
 		this.artifactTypeCode = artifactTypeCode;
 		this.name = name;

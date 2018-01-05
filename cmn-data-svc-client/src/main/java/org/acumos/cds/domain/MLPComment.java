@@ -83,6 +83,8 @@ public class MLPComment extends MLPTimestampedEntity implements Serializable {
 	 *            Comment text
 	 */
 	public MLPComment(String threadId, String userId, String text) {
+		if (threadId == null || userId == null || text == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.threadId = threadId;
 		this.userId = userId;
 		this.text = text;

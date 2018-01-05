@@ -63,6 +63,14 @@ public class MLPSolTagMap implements MLPEntity, Serializable {
 			// no-arg constructor
 		}
 
+		/**
+		 * Convenience constructor
+		 * 
+		 * @param solutionId
+		 *            solution ID
+		 * @param tag
+		 *            Tag
+		 */
 		public SolTagMapPK(String solutionId, String tag) {
 			this.solutionId = solutionId;
 			this.tag = tag;
@@ -116,6 +124,8 @@ public class MLPSolTagMap implements MLPEntity, Serializable {
 	 *            Tag
 	 */
 	public MLPSolTagMap(String solutionId, String tag) {
+		if (solutionId == null || tag == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.solutionId = solutionId;
 		this.tag = tag;
 	}

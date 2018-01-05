@@ -130,6 +130,9 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	 */
 	public MLPPeer(String name, String subjectName, String apiUrl, String webUrl, boolean isActive, boolean isSelf,
 			String contact1, String contact2, int trustLevel) {
+		if (name == null || subjectName == null || apiUrl == null || webUrl == null || contact1 == null
+				|| contact2 == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.name = name;
 		this.subjectName = subjectName;
 		this.apiUrl = apiUrl;

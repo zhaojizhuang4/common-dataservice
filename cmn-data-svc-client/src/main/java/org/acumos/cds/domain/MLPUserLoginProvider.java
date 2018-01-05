@@ -61,6 +61,16 @@ public class MLPUserLoginProvider extends MLPTimestampedEntity implements Serial
 			// no-arg constructor
 		}
 
+		/**
+		 * Convenience constructor
+		 * 
+		 * @param userId
+		 *            user IDN
+		 * @param providerCode
+		 *            provider code
+		 * @param providerUserId
+		 *            provider user ID
+		 */
 		public UserLoginProviderPK(String userId, String providerCode, String providerUserId) {
 			this.userId = userId;
 			this.providerCode = providerCode;
@@ -161,6 +171,8 @@ public class MLPUserLoginProvider extends MLPTimestampedEntity implements Serial
 	 */
 	public MLPUserLoginProvider(String userId, String providerCode, String providerUserId, String accessToken,
 			int rank) {
+		if (userId == null || providerCode == null || providerUserId == null || accessToken == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.userId = userId;
 		this.providerCode = providerCode;
 		this.providerUserId = providerUserId;

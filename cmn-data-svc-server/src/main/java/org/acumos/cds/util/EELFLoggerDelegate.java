@@ -66,6 +66,12 @@ public class EELFLoggerDelegate extends SLF4jWrapper implements EELFLogger {
 	private String className;
 	private static ConcurrentMap<String, EELFLoggerDelegate> classMap = new ConcurrentHashMap<>();
 
+	/**
+	 * Builds an instance for the specified class.
+	 * 
+	 * @param className
+	 *            Class name
+	 */
 	public EELFLoggerDelegate(final String className) {
 		super(className);
 		this.className = className;

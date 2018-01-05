@@ -264,7 +264,7 @@ public class UserController extends AbstractController {
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createUser(@RequestBody MLPUser user, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "create: received object: {} ", user);
+		logger.debug(EELFLoggerDelegate.debugLogger, "createUser: received object: {} ", user);
 		Object result;
 		try {
 			String id = user.getUserId();
@@ -678,7 +678,7 @@ public class UserController extends AbstractController {
 	public Object createUserLoginProvider(@PathVariable("userId") String userId,
 			@PathVariable("providerCode") String providerCode, @PathVariable("providerUserId") String providerUserId,
 			@RequestBody MLPUserLoginProvider ulp, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "create: received object: {} ", ulp);
+		logger.debug(EELFLoggerDelegate.debugLogger, "createUserLoginProvider: received object: {} ", ulp);
 		// Validate args
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -828,7 +828,7 @@ public class UserController extends AbstractController {
 	@ResponseBody
 	public Object createSolutionFavorite(@PathVariable("solutionId") String solutionId,
 			@PathVariable("userId") String userId, @RequestBody MLPSolutionFavorite sfv, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "create: received object: {} ", sfv);
+		logger.debug(EELFLoggerDelegate.debugLogger, "createSolutionFavorite: received object: {} ", sfv);
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No solution for ID " + solutionId, null);

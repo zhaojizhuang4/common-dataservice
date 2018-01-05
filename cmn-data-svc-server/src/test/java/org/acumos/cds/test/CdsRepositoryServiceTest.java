@@ -20,7 +20,6 @@
 
 package org.acumos.cds.test;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -64,8 +63,6 @@ import org.acumos.cds.domain.MLPUserLoginProvider;
 import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPUserRoleMap;
 import org.acumos.cds.domain.MLPValidationStatus;
-import org.acumos.cds.query.SearchCriterion;
-import org.acumos.cds.query.SearchOperation;
 import org.acumos.cds.repository.AccessTypeRepository;
 import org.acumos.cds.repository.ArtifactRepository;
 import org.acumos.cds.repository.ArtifactTypeRepository;
@@ -99,8 +96,6 @@ import org.acumos.cds.service.PeerSearchService;
 import org.acumos.cds.service.RoleSearchService;
 import org.acumos.cds.service.SolutionSearchService;
 import org.acumos.cds.service.UserSearchService;
-import org.acumos.cds.specification.MLPSolutionSpecification;
-import org.acumos.cds.specification.MLPSolutionSpecificationBuilder;
 import org.acumos.cds.util.EELFLoggerDelegate;
 import org.junit.Assert;
 import org.junit.Test;
@@ -110,8 +105,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.TransactionSystemException;
 
@@ -403,36 +396,6 @@ public class CdsRepositoryServiceTest {
 			solParms.put("name", cs.getName());
 			List<MLPSolution> searchSols = solutionSearchService.getSolutions(solParms, false);
 			Assert.assertTrue(searchSols.size() == 1);
-
-			String[] nameArray = { solName };
-			MLPSolutionSpecification spec1 = new MLPSolutionSpecification(
-					new SearchCriterion("name", SearchOperation.IN, nameArray));
-			MLPSolutionSpecification spec2 = new MLPSolutionSpecification(
-					new SearchCriterion("ownerId", SearchOperation.EQUALS, cu.getUserId()));
-			Page<MLPSolution> specSearchResults = solutionRepository.findAll(Specifications.where(spec1).and(spec2),
-					new PageRequest(0, 5, null));
-			Assert.assertTrue(specSearchResults.getNumberOfElements() == 1);
-
-			Specification<MLPSolution> spec = new MLPSolutionSpecificationBuilder()
-					.with(new SearchCriterion("name", SearchOperation.EQUALS, solName))
-					.with(new SearchCriterion("ownerId", SearchOperation.EQUALS, cu.getUserId())).build();
-			Page<MLPSolution> specSearchResults2 = solutionRepository.findAll(spec, new PageRequest(0, 5, null));
-			Assert.assertTrue(specSearchResults2.getNumberOfElements() == 1);
-
-			List<SearchCriterion> criterionList = new ArrayList<>();
-			criterionList.add(new SearchCriterion("accessTypeCode", SearchOperation.EQUALS, AccessTypeCode.PB.name()));
-			criterionList.add(new SearchCriterion(true, "accessTypeCode", SearchOperation.NOT_EQUALS, "Y"));
-			criterionList.add(new SearchCriterion("accessTypeCode", SearchOperation.IN,
-					new String[] { AccessTypeCode.PB.name(), AccessTypeCode.PR.name() }));
-			criterionList.add(new SearchCriterion("accessTypeCode", SearchOperation.LIKE, "X"));
-			criterionList.add(new SearchCriterion("accessTypeCode", SearchOperation.LTE, "X"));
-			criterionList.add(new SearchCriterion("accessTypeCode", SearchOperation.GTE, "X"));
-			criterionList.add(new SearchCriterion("created", SearchOperation.EQUALS, new Date()));
-			criterionList.add(new SearchCriterion("created", SearchOperation.NULL, null));
-			MLPSolutionSpecificationBuilder specBuilder = new MLPSolutionSpecificationBuilder(criterionList);
-			Specification<MLPSolution> messySpec = specBuilder.build();
-			List<MLPSolution> messyResult = solutionRepository.findAll(messySpec);
-			Assert.assertNotNull(messyResult);
 
 			logger.info("Finding portal solutions");
 			String[] solKw = { solName };

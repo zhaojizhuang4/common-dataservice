@@ -91,6 +91,8 @@ public class MLPSolutionRevision extends MLPTimestampedEntity implements Seriali
 	 *            User ID
 	 */
 	public MLPSolutionRevision(String solutionId, String version, String ownerId) {
+		if (solutionId == null || version == null || ownerId == null)
+			throw new IllegalArgumentException("Null not permitted");
 		this.solutionId = solutionId;
 		this.version = version;
 		this.ownerId = ownerId;
