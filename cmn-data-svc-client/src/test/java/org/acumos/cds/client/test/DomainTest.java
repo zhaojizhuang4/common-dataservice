@@ -334,23 +334,25 @@ public class DomainTest extends AbstractModelTest {
 
 	@Test
 	public void testMLPPeerSubscription() {
-		MLPPeerSubscription m = new MLPPeerSubscription(s1);
+		MLPPeerSubscription m = new MLPPeerSubscription(s1, s2);
 		m = new MLPPeerSubscription();
 		m.setCreated(d1);
 		m.setMaxArtifactSize(l1);
 		m.setModified(d2);
 		m.setOptions(s1);
-		m.setPeerId(s2);
+		m.setOwnerId(s2);
+		m.setPeerId(s3);
 		m.setRefreshInterval(l2);
-		m.setSelector(s3);
+		m.setSelector(s4);
 		m.setSubId(l3);
 		Assert.assertEquals(d1, m.getCreated());
 		Assert.assertEquals(l1, m.getMaxArtifactSize());
 		Assert.assertEquals(d2, m.getModified());
 		Assert.assertEquals(s1, m.getOptions());
-		Assert.assertEquals(s2, m.getPeerId());
+		Assert.assertEquals(s2, m.getOwnerId());
+		Assert.assertEquals(s3, m.getPeerId());
 		Assert.assertEquals(l2, m.getRefreshInterval());
-		Assert.assertEquals(s3, m.getSelector());
+		Assert.assertEquals(s4, m.getSelector());
 		Assert.assertEquals(l3, m.getSubId());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
@@ -358,7 +360,7 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
 		try {
-			new MLPPeerSubscription(null);
+			new MLPPeerSubscription(null, null);
 			Assert.assertTrue("Unexpected success", false);
 		} catch (IllegalArgumentException iae) {
 			// null arg is rejected
@@ -541,10 +543,11 @@ public class DomainTest extends AbstractModelTest {
 		m.setModified(d2);
 		m.setName(s5);
 		m.setOwnerId(s6);
-		m.setProvider(s7);
-		m.setSolutionId(s8);
-		m.setToolkitTypeCode(s9);
-		m.setValidationStatusCode(s10);
+		m.setSourceId(s7);
+		m.setProvider(s8);
+		m.setSolutionId(s9);
+		m.setToolkitTypeCode(s10);
+		m.setValidationStatusCode(s11);
 		Assert.assertEquals(s1, m.getAccessTypeCode());
 		Assert.assertEquals(b1, m.isActive());
 		Assert.assertEquals(d1, m.getCreated());
@@ -554,10 +557,11 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertEquals(d2, m.getModified());
 		Assert.assertEquals(s5, m.getName());
 		Assert.assertEquals(s6, m.getOwnerId());
-		Assert.assertEquals(s7, m.getProvider());
-		Assert.assertEquals(s8, m.getSolutionId());
-		Assert.assertEquals(s9, m.getToolkitTypeCode());
-		Assert.assertEquals(s10, m.getValidationStatusCode());
+		Assert.assertEquals(s7, m.getSourceId());
+		Assert.assertEquals(s8, m.getProvider());
+		Assert.assertEquals(s9, m.getSolutionId());
+		Assert.assertEquals(s10, m.getToolkitTypeCode());
+		Assert.assertEquals(s11, m.getValidationStatusCode());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));

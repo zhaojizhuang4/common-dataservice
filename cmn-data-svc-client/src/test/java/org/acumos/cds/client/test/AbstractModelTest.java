@@ -23,7 +23,7 @@ package org.acumos.cds.client.test;
 import java.util.Date;
 
 public abstract class AbstractModelTest {
-	
+
 	// Values for properties
 	final long time = new Date().getTime();
 	final boolean b1 = true;
@@ -53,5 +53,6 @@ public abstract class AbstractModelTest {
 	final String s8 = "string8";
 	final String s9 = "string9";
 	final String s10 = "string10";
+	final String s11 = "string11";
 
 }

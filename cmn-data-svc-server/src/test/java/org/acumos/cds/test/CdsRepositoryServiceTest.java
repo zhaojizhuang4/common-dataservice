@@ -291,8 +291,7 @@ public class CdsRepositoryServiceTest {
 			List<MLPPeer> searchPeers = peerSearchService.getPeers(peerParms, false);
 			Assert.assertTrue(searchPeers.size() == 1);
 
-			MLPPeerSubscription ps = new MLPPeerSubscription();
-			ps.setPeerId(pr.getPeerId());
+			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId());
 			ps = peerSubscriptionRepository.save(ps);
 			logger.info("Peer subscription {}", ps);
 
@@ -682,8 +681,7 @@ public class CdsRepositoryServiceTest {
 			Assert.assertNotNull(pr.getPeerId());
 			Assert.assertNotNull(pr.getCreated());
 
-			MLPPeerSubscription ps = new MLPPeerSubscription();
-			ps.setPeerId(pr.getPeerId());
+			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId());
 			ps = peerSubscriptionRepository.save(ps);
 			Assert.assertNotNull(ps.getSubId());
 

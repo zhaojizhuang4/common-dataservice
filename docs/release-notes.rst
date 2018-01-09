@@ -5,6 +5,13 @@ Release Notes
 The client and server are released together.  The client is deployed as a jar file to a 
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.  
 
+Version 1.12.0, 9 January 2018
+------------------------------
+
+* Extend MLPPeerSubscription with required ownerId attribute with user ID
+* Extend MLPSolution with optional sourceId attribute with peer ID
+* Requires database schema version 1.12
+
 Version 1.11.0, 3 January 2018
 ------------------------------
 
