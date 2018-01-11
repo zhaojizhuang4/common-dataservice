@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.acumos.common-dataservice</groupId>
 	<artifactId>cmn-data-svc-server</artifactId>
-	<!-- This version number is used to tag the Docker image. No need for maven 
-		snapshot convention here, registry allows replace -->
+	<!-- This version number is used to tag the Docker image. Don't use maven-style 
+		SNAPSHOT in the version, the Nexus3 registry allows overwrite. -->
 	<version>1.12.0</version>
 	<name>Acumos Common Data Service Server</name>
 	<description>Micro service based on Spring-Boot</description>
@@ -25,8 +25,9 @@
 		<springfox.version>2.7.0</springfox.version>
 		<!-- Jenkins invokes mvn with argument -Dbuild.number=${BUILD_NUMBER} -->
 		<build.number>0</build.number>
-		<!-- LF Docker coordinates; pull is a proxy for external -->
+		<!-- Port 10001 is a proxy for external images -->
 		<docker.pull.registry>nexus3.acumos.org:10001</docker.pull.registry>
+		<!-- Port 10003 is the LF snapshot repository -->
 		<docker.push.registry>nexus3.acumos.org:10003</docker.push.registry>
 	</properties>
 	<!-- No repositories section. -->
@@ -153,7 +154,7 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<!-- Add the build number to the manifest. Spring-Boot uses a complex 
+			<!-- Add the build number to the jar manifest. Spring-Boot uses a complex 
 				packaging process that makes access to the original Manifest.MF very difficult. 
 				However, Java provides access to the implementation version for a package, 
 				so cram the build number into there. -->
@@ -197,7 +198,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.6.201602180812</version>
+				<version>0.7.9</version>
 				<executions>
 					<execution>
 						<id>default-prepare-agent</id>
@@ -214,6 +215,21 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<!-- <version>3.0.0</version> -->
+				<configuration>
+					<!-- Silence error javax.interceptor.InterceptorBinding not found -->
+					<additionalDependencies>
+						<additionalDependency>
+							<groupId>javax.interceptor</groupId>
+							<artifactId>javax.interceptor-api</artifactId>
+							<version>1.2</version>
+						</additionalDependency>
+					</additionalDependencies>
+				</configuration>
+			</plugin>
 			<!-- https://stackoverflow.com/questions/39126226/fabric8-springboot-full-example -->
 			<plugin>
 				<groupId>io.fabric8</groupId>
@@ -228,11 +244,12 @@
 					<!-- LF credentials are not supplied here -->
 					<images>
 						<image>
+							<!-- Specify a tag to avoid default tag "latest" -->
 							<name>common-dataservice:${project.version}</name>
 							<build>
 								<from>frolvlad/alpine-oraclejdk8:slim</from>
 								<tags>
-									<tag>${project.version}</tag>
+									<!-- Add tag with build number -->
 									<tag>${project.version}-b${build.number}</tag>
 								</tags>
 								<assembly>
@@ -255,21 +272,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<!-- <version>3.0.0</version> -->
-				<configuration>
-					<!-- Silence error javax.interceptor.InterceptorBinding not found -->
-					<additionalDependencies>
-						<additionalDependency>
-							<groupId>javax.interceptor</groupId>
-							<artifactId>javax.interceptor-api</artifactId>
-							<version>1.2</version>
-						</additionalDependency>
-					</additionalDependencies>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
