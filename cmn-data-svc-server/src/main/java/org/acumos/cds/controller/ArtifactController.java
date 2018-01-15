@@ -20,6 +20,7 @@
 
 package org.acumos.cds.controller;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -42,6 +43,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -117,27 +119,26 @@ public class ArtifactController extends AbstractController {
 	 *            HttpServletResponse
 	 * @return List of artifacts, for serialization as JSON
 	 */
-	@ApiOperation(value = "Gets a list of artifacts restricted by field name - field value pairs specified as query parameters.", response = MLPArtifact.class, responseContainer = "List")
+	@ApiOperation(value = "Searches for artifacts using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disunction).", response = MLPArtifact.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchArtifacts(@RequestParam Map<String, String> queryParameters, HttpServletResponse response) {
-		Object result;
+	public Object searchArtifacts(@RequestParam MultiValueMap<String, String> queryParameters,
+			HttpServletResponse response) {
+		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
+		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
+		if (queryParameters.size() == 0) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
+		}
 		try {
-			Map<String, Object> convertedQryParm = null;
-			boolean isOr = false;
-			if (queryParameters != null && queryParameters.size() > 0) {
-				String junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
-				isOr = junction != null && "o".equals(junction);
-				convertedQryParm = convertQueryParameters(MLPArtifact.class, queryParameters);
-			}
-			result = artifactService.getArtifacts(convertedQryParm, isOr);
+			Map<String, Object> convertedQryParm = convertQueryParameters(MLPArtifact.class, queryParameters);
+			return artifactService.findArtifacts(convertedQryParm, isOr);
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "searchArtifacts", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchArtifacts failed", ex);
 		}
-		return result;
 	}
 
 	/**

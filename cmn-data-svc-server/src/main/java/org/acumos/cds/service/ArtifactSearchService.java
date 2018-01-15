@@ -31,15 +31,16 @@ import org.acumos.cds.domain.MLPArtifact;
 public interface ArtifactSearchService {
 
 	/**
-	 * Gets all instances matching the specified query parameters.
+	 * Searches for instances matching all or one of the query parameters, depending
+	 * on the isOr parameter.
 	 * 
 	 * @param queryParameters
-	 *            field-name, field-value pairs; ignored if null or empty.
+	 *            field-name, field-value pairs.  Value may be scalar or array.
 	 * @param isOr
 	 *            If true, the query is a disjunction ("or"); otherwise the query is
 	 *            a conjunction ("and").
 	 * @return List of instances, which may be empty.
 	 */
-	List<MLPArtifact> getArtifacts(Map<String, ? extends Object> queryParameters, boolean isOr);
+	List<MLPArtifact> findArtifacts(Map<String, ? extends Object> queryParameters, boolean isOr);
 
 }

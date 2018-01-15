@@ -28,7 +28,7 @@ public abstract class CCDSConstants {
 	// Seems like this should available somewhere
 	public static final String APPLICATION_JSON = "application/json";
 
-	public static final String JUNCTION_QUERY_PARAM = "j";
+	public static final String JUNCTION_QUERY_PARAM = "_j";
 
 	// Metadata
 	public static final String HEALTHCHECK_PATH = "healthcheck";

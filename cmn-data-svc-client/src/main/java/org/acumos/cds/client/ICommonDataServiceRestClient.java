@@ -216,7 +216,8 @@ public interface ICommonDataServiceRestClient {
 	 * 
 	 * @param queryParameters
 	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Accepts Boolean, Date, Integer, Long, String.
+	 *            Accepts Boolean, Date, Integer, Long, String values; also Array of
+	 *            those types.
 	 * @param isOr
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
@@ -464,7 +465,8 @@ public interface ICommonDataServiceRestClient {
 	 * 
 	 * @param queryParameters
 	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Accepts Boolean, Date, Integer, Long, String.
+	 *            Accepts Boolean, Date, Integer, Long, String values; also Array of
+	 *            those types.
 	 * @param isOr
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
@@ -542,7 +544,8 @@ public interface ICommonDataServiceRestClient {
 	 * 
 	 * @param queryParameters
 	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Accepts Boolean, Date, Integer, Long, String.
+	 *            Accepts Boolean, Date, Integer, Long, String values; also Array of
+	 *            those types.
 	 * @param isOr
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
@@ -729,7 +732,8 @@ public interface ICommonDataServiceRestClient {
 	 * 
 	 * @param queryParameters
 	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Accepts Boolean, Date, Integer, Long, String.
+	 *            Accepts Boolean, Date, Integer, Long, String values; also Array of
+	 *            those types.
 	 * @param isOr
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
@@ -844,7 +848,8 @@ public interface ICommonDataServiceRestClient {
 	 * 
 	 * @param queryParameters
 	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Accepts Boolean, Date, Integer, Long, String.
+	 *            Accepts Boolean, Date, Integer, Long, String values; also Array of
+	 *            those types.
 	 * @param isOr
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs

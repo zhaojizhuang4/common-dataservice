@@ -10,8 +10,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<!-- Jenkins invokes mvn with argument -Dbuild.number=${BUILD_NUMBER} -->
-		<build.number>0</build.number>
+		<!-- Supplied by Jenkins -->
+		<build.number>${env.BUILD_NUMBER}</build.number>
 		<!-- For distributionManagement section -->
 		<acumos.nexus.url>https://nexus.acumos.org</acumos.nexus.url>
 		<!-- Begin versions set by spring-boot in POM spring-boot-dependencies -->

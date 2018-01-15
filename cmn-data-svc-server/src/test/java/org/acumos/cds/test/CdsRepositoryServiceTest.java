@@ -212,7 +212,7 @@ public class CdsRepositoryServiceTest {
 			HashMap<String, Object> restr = new HashMap<>();
 			restr.put("firstName", firstName);
 			restr.put("lastName", lastName);
-			List<MLPUser> userList = userService.getUsers(restr, true);
+			List<MLPUser> userList = userService.findUsers(restr, true);
 			Assert.assertTrue(userList.size() > 0);
 			MLPUser testUser = userList.get(0);
 			logger.info("testUser is " + testUser);
@@ -288,7 +288,7 @@ public class CdsRepositoryServiceTest {
 			// Fetch back
 			Map<String, String> peerParms = new HashMap<>();
 			peerParms.put("name", pr.getName());
-			List<MLPPeer> searchPeers = peerSearchService.getPeers(peerParms, false);
+			List<MLPPeer> searchPeers = peerSearchService.findPeers(peerParms, false);
 			Assert.assertTrue(searchPeers.size() == 1);
 
 			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId());
@@ -312,7 +312,7 @@ public class CdsRepositoryServiceTest {
 
 			Map<String, String> roleParms = new HashMap<>();
 			roleParms.put("name", cr2.getName());
-			List<MLPRole> searchRoles = roleSearchService.getRoles(roleParms, false);
+			List<MLPRole> searchRoles = roleSearchService.findRoles(roleParms, false);
 			Assert.assertTrue(searchRoles.size() == 1);
 
 			MLPRoleFunction crf = new MLPRoleFunction();
@@ -365,7 +365,7 @@ public class CdsRepositoryServiceTest {
 			// Fetch artifact back
 			Map<String, String> artParms = new HashMap<>();
 			artParms.put("name", ca.getName());
-			List<MLPArtifact> searchArts = artifactSearchService.getArtifacts(artParms, false);
+			List<MLPArtifact> searchArts = artifactSearchService.findArtifacts(artParms, false);
 			Assert.assertTrue(searchArts.size() > 0);
 
 			// This tag is existing
@@ -394,13 +394,13 @@ public class CdsRepositoryServiceTest {
 			// Search for a single value
 			Map<String, String> solParms = new HashMap<>();
 			solParms.put("name", cs.getName());
-			List<MLPSolution> searchSols = solutionSearchService.getSolutions(solParms, false);
+			List<MLPSolution> searchSols = solutionSearchService.findSolutions(solParms, false);
 			Assert.assertTrue(searchSols.size() == 1);
 
 			// Search for a list
 			Map<String, Object> solListParms = new HashMap<>();
 			solListParms.put("name", new String [] {cs.getName()});
-			List<MLPSolution> searchListSols = solutionSearchService.getSolutions(solListParms, false);
+			List<MLPSolution> searchListSols = solutionSearchService.findSolutions(solListParms, false);
 			Assert.assertTrue(searchListSols.size() == 1);
 			
 			logger.info("Finding portal solutions");
@@ -526,8 +526,15 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(sul != null && sul.iterator().hasNext());
 			logger.info("User list: {}", sul);
 
-			Iterable<MLPSolution> solbytag = solutionRepository.findByTag("Java", new PageRequest(0, 5, null));
-			logger.info("Solutions by tag: {}", solbytag);
+			Iterable<MLPSolution> solByTag = solutionRepository.findByTag("Java", new PageRequest(0, 5, null));
+			logger.info("Solutions by tag: {}", solByTag);
+			Assert.assertTrue(solByTag != null && solByTag.iterator().hasNext());
+
+			Date anHourAgo = new java.util.Date();
+			anHourAgo.setTime(new Date().getTime() - (1000L * 60 * 60));
+			Iterable<MLPSolution> solByDate = solutionRepository.findModifiedAfter(anHourAgo, new PageRequest(0, 5, null));
+			logger.info("Solutions by date: {}", solByDate);
+			Assert.assertTrue(solByDate != null && solByDate.iterator().hasNext());
 
 			MLPUser founduser = userRepository.findByLoginOrEmail("test_user7");
 			logger.info("Found user: {}", founduser);
@@ -657,7 +664,7 @@ public class CdsRepositoryServiceTest {
 			// restr.put("active", true);
 			restr.put("firstName", firstName);
 			restr.put("lastName", lastName);
-			List<MLPUser> userList = userService.getUsers(restr, false);
+			List<MLPUser> userList = userService.findUsers(restr, false);
 			Assert.assertTrue(userList.size() == 1);
 
 			// social login

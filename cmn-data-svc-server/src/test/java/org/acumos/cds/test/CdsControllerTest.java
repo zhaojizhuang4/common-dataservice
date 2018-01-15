@@ -541,7 +541,7 @@ public class CdsControllerTest {
 
 			logger.info("Querying for active PB solutions");
 			Map<String, Object> activePb = new HashMap<>();
-			activePb.put("accessTypeCode", AccessTypeCode.PB.name());
+			activePb.put("accessTypeCode", new String [] {AccessTypeCode.PB.name(), AccessTypeCode.OR.name()});
 			activePb.put("active", Boolean.TRUE);
 			List<MLPSolution> activePbList = client.searchSolutions(activePb, false);
 			Assert.assertTrue(activePbList != null && !activePbList.isEmpty());
@@ -557,6 +557,8 @@ public class CdsControllerTest {
 			logger.info("Querying for solutions with similar names");
 			RestPageResponse<MLPSolution> sl1 = client.findSolutionsBySearchTerm("solution", new RestPageRequest(0, 1));
 			Assert.assertTrue(sl1 != null && sl1.getNumberOfElements() > 0);
+
+			logger.info("Querying for solutions by tag");
 			RestPageResponse<MLPSolution> sl2 = client.findSolutionsByTag(tagName1, new RestPageRequest(0, 1));
 			Assert.assertTrue(sl2 != null && sl2.getNumberOfElements() > 0);
 
@@ -1482,6 +1484,13 @@ public class CdsControllerTest {
 
 		try {
 			Map<String, Object> queryParameters = new HashMap<>();
+			client.searchUsers(queryParameters, false);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Search users failed on empty query as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			Map<String, Object> queryParameters = new HashMap<>();
 			queryParameters.put("bogusFieldName", "bogusFieldFValue");
 			client.searchUsers(queryParameters, false);
 			throw new Exception("Unexpected success");
@@ -1713,6 +1722,13 @@ public class CdsControllerTest {
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create artifact failed on dupe as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			HashMap<String, Object> restr = new HashMap<>();
+			client.searchArtifacts(restr, false);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Search artifacts failed on empty as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
 			HashMap<String, Object> restr = new HashMap<>();
@@ -2185,6 +2201,13 @@ public class CdsControllerTest {
 
 		try {
 			HashMap<String, Object> peerRestr = new HashMap<>();
+			client.searchPeers(peerRestr, false);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Search peers failed on empty as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			HashMap<String, Object> peerRestr = new HashMap<>();
 			peerRestr.put("bogus", "name");
 			client.searchPeers(peerRestr, false);
 			throw new Exception("Unexpected success");
@@ -2217,6 +2240,13 @@ public class CdsControllerTest {
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Update missing role failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			HashMap<String, Object> roleRestr = new HashMap<>();
+			client.searchRoles(roleRestr, false);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Search role failed on empty as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
 			HashMap<String, Object> roleRestr = new HashMap<>();

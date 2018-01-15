@@ -20,6 +20,7 @@
 
 package org.acumos.cds.controller;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -41,6 +42,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -99,25 +101,25 @@ public class RoleController extends AbstractController {
 	 *            HttpServletResponse
 	 * @return List of roles, for serialization as JSON.
 	 */
-	@ApiOperation(value = "Gets roles that match the field name - field value pairs specified as query parameters.", response = MLPRole.class, responseContainer = "List")
+	@ApiOperation(value = "Searches for roles using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disunction).", response = MLPRole.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchRoles(@RequestParam Map<String, String> queryParameters, HttpServletResponse response) {
-		Object result;
+	public Object searchRoles(@RequestParam MultiValueMap<String, String> queryParameters, HttpServletResponse response) {
+		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
+		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
+		if (queryParameters.size() == 0) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
+		}
 		try {
-			boolean isOr = false;
-			if (queryParameters != null && queryParameters.size() > 0) {
-				String junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
-				isOr = junction != null && "o".equals(junction);
-			}
-			return roleSearchService.getRoles(queryParameters, isOr);
+			Map<String, Object> convertedQryParm = convertQueryParameters(MLPRole.class, queryParameters);
+			return roleSearchService.findRoles(convertedQryParm, isOr);
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "searchRoles failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchRoles failed", ex);
 		}
-		return result;
 	}
 
 	/**

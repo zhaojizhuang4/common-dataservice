@@ -23,10 +23,14 @@ package org.acumos.cds.controller;
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.acumos.cds.util.EELFLoggerDelegate;
+import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -57,54 +61,81 @@ public abstract class AbstractController {
 	 * @param modelClass
 	 *            Model class with fields named in the query parameters
 	 * @param queryParameters
-	 *            Maps field names to expected field values
+	 *            Maps field names to (list of) field values
 	 * @return Map of String to Object
 	 * @throws NoSuchFieldException
 	 *             If a field name is not found in the class
 	 */
-	protected Map<String, Object> convertQueryParameters(Class<?> modelClass, Map<String, String> queryParameters)
-			throws NoSuchFieldException {
+	protected Map<String, Object> convertQueryParameters(Class<?> modelClass,
+			MultiValueMap<String, String> queryParameters) throws NoSuchFieldException {
 		Class<?> clazz = modelClass;
 		HashMap<String, Object> convertedQryParm = new HashMap<>();
-		// Copy then remove as processed to detect missing items
-		HashMap<String, String> queryParamsCopy = new HashMap<>();
-		queryParamsCopy.putAll(queryParameters);
+		// Track the fields that were found and processed
+		Set<String> fieldNames = new HashSet<>();
+		fieldNames.addAll(queryParameters.keySet());
 		while (clazz != null) {
 			logger.trace(EELFLoggerDelegate.debugLogger, "convertQueryParameters: checking class {}", clazz.getName());
 			Field[] fields = clazz.getDeclaredFields();
-			Iterator<Map.Entry<String, String>> iter = queryParamsCopy.entrySet().iterator();
+			Iterator<Map.Entry<String, List<String>>> iter = queryParameters.entrySet().iterator();
 			while (iter.hasNext()) {
-				Map.Entry<String, String> queryParm = iter.next();
+				Map.Entry<String, List<String>> queryParm = iter.next();
 				Field f = null;
 				for (Field field : fields)
 					if (queryParm.getKey().equals(field.getName())) {
+						// Matched a field
 						f = field;
-						iter.remove();
+						fieldNames.remove(field.getName());
 						break;
 					}
 				if (f == null)
 					continue;
-				logger.trace(EELFLoggerDelegate.debugLogger, "convertQueryParameters: type is " + f.getType());
-				if (f.getType().equals(String.class))
-					convertedQryParm.put(queryParm.getKey(), queryParm.getValue());
-				else if (f.getType().equals(Boolean.class) || f.getType().equals(boolean.class))
-					convertedQryParm.put(queryParm.getKey(), Boolean.valueOf(queryParm.getValue()));
-				else if (f.getType().equals(Integer.class))
-					convertedQryParm.put(queryParm.getKey(), Integer.parseInt(queryParm.getValue()));
-				else if (f.getType().equals(Long.class))
-					convertedQryParm.put(queryParm.getKey(), Long.parseLong(queryParm.getValue()));
-				else if (f.getType().equals(Date.class))
-					convertedQryParm.put(queryParm.getKey(), new Date(Long.parseLong(queryParm.getValue())));
-				else
+				logger.trace(EELFLoggerDelegate.debugLogger, "convertQueryParameters: field {} type is {}", f.getName(),
+						f.getType());
+				if (f.getType().equals(String.class)) {
+					if (queryParm.getValue().size() == 1)
+						convertedQryParm.put(queryParm.getKey(), queryParm.getValue().get(0));
+					else
+						convertedQryParm.put(queryParm.getKey(), queryParm.getValue().toArray());
+				} else if (f.getType().equals(Boolean.class) || f.getType().equals(boolean.class)) {
+					// Array not useful for Boolean
+					convertedQryParm.put(queryParm.getKey(), Boolean.valueOf(queryParm.getValue().get(0)));
+				} else if (f.getType().equals(Integer.class)) {
+					if (queryParm.getValue().size() == 1) {
+						convertedQryParm.put(queryParm.getKey(), Integer.parseInt(queryParm.getValue().get(0)));
+					} else {
+						Integer[] array = new Integer[queryParm.getValue().size()];
+						for (int i = 0; i < array.length; ++i)
+							array[i] = Integer.parseInt(queryParm.getValue().get(i));
+						convertedQryParm.put(queryParm.getKey(), array);
+					}
+				} else if (f.getType().equals(Long.class)) {
+					if (queryParm.getValue().size() == 1) {
+						convertedQryParm.put(queryParm.getKey(), Long.parseLong(queryParm.getValue().get(0)));
+					} else {
+						Long[] array = new Long[queryParm.getValue().size()];
+						for (int i = 0; i < array.length; ++i)
+							array[i] = Long.parseLong(queryParm.getValue().get(i));
+						convertedQryParm.put(queryParm.getKey(), array);
+					}
+				} else if (f.getType().equals(Date.class)) {
+					if (queryParm.getValue().size() == 1) {
+						convertedQryParm.put(queryParm.getKey(), new Date(Long.parseLong(queryParm.getValue().get(0))));
+					} else {
+						Date[] array = new Date[queryParm.getValue().size()];
+						for (int i = 0; i < array.length; ++i)
+							array[i] = new Date(Long.parseLong(queryParm.getValue().get(i)));
+						convertedQryParm.put(queryParm.getKey(), array);
+					}
+				} else
 					throw new IllegalArgumentException("Unhandled type " + f.getType().toString() + " on field "
 							+ f.getName() + " in class " + clazz.getName());
 			}
 			// recurse up
 			clazz = clazz.getSuperclass();
 		}
-		// Check if any params were missed
-		if (queryParamsCopy.size() > 0) {
-			String fieldName = queryParamsCopy.keySet().iterator().next();
+		// Report names of any parameters (fields) that were not found in the classes
+		if (fieldNames.size() > 0) {
+			String fieldName = fieldNames.iterator().next();
 			throw new IllegalArgumentException("Failed to find field name " + fieldName);
 		}
 		return convertedQryParm;

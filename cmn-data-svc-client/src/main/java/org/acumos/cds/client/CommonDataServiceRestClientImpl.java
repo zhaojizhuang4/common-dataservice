@@ -124,7 +124,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	 * @param pass
 	 *            password; ignored if null
 	 */
-	public CommonDataServiceRestClientImpl(String webapiUrl, String user, String pass) {
+	public CommonDataServiceRestClientImpl(final String webapiUrl, final String user, final String pass) {
 		if (webapiUrl == null)
 			throw new IllegalArgumentException("Null URL not permitted");
 
@@ -157,7 +157,32 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	/**
-	 * Gets an instance to access a remote endpoint using the specified credentials.
+	 * Creates an instance to access the remote endpoint using the specified
+	 * template, which allows HTTP credentials, choice of route, etc.
+	 * 
+	 * Clients should use the static method
+	 * {@link #getInstance(String, RestTemplate)} instead of this constructor.
+	 * 
+	 * @param webapiUrl
+	 *            URL of the web endpoint
+	 * @param restTemplate
+	 *            REST template to use for connections
+	 */
+	public CommonDataServiceRestClientImpl(final String webapiUrl, final RestTemplate restTemplate) {
+		if (webapiUrl == null || restTemplate == null)
+			throw new IllegalArgumentException("Null not permitted");
+		URL url = null;
+		try {
+			url = new URL(webapiUrl);
+			baseUrl = url.toExternalForm();
+		} catch (MalformedURLException ex) {
+			throw new IllegalArgumentException("Failed to parse URL", ex);
+		}
+		this.restTemplate = restTemplate;
+	}
+
+	/**
+	 * Gets an instance to access a remote endpoint using the specified template.
 	 * This factory method is the preferred usage.
 	 * 
 	 * @param webapiUrl
@@ -173,6 +198,19 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	/**
+	 * Gets an instance to access a remote endpoint using the specified template.
+	 * 
+	 * @param webapiUrl
+	 *            URL of the web endpoint
+	 * @param restTemplate
+	 *            REST template
+	 * @return Instance of ICommonDataServiceRestClient
+	 */
+	public static ICommonDataServiceRestClient getInstance(String webapiUrl, RestTemplate restTemplate) {
+		return new CommonDataServiceRestClientImpl(webapiUrl, restTemplate);
+	}
+
+	/**
 	 * Privileged access for subclasses.
 	 * 
 	 * @return RestTemplate configured for access to remote CDS server.
@@ -183,13 +221,15 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	/**
 	 * Builds URI by adding specified path segments and query parameters to the base
-	 * URL.
+	 * URL. Converts an array of values to a series of parameters with the same
+	 * name; e.g., "find foo in list [a,b]" becomes request parameters
+	 * "foo=a&foo=b".
 	 * 
 	 * @param path
 	 *            Array of path segments
 	 * @param queryParams
 	 *            key-value pairs; ignored if null or empty. Gives special treatment
-	 *            to Date-type and Array values.
+	 *            to Date-type values, Array values, and null values inside arrays.
 	 * @param restPageRequest
 	 *            page, size and sort specification; ignored if null.
 	 * @return
@@ -200,26 +240,22 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 			builder.pathSegment(path[p]);
 		if (queryParams != null && queryParams.size() > 0) {
 			for (Map.Entry<String, ? extends Object> entry : queryParams.entrySet()) {
-				Object value;
-				// Server expects Date type as Long (not String)
 				if (entry.getValue() instanceof Date) {
-					value = ((Date) entry.getValue()).getTime();
+					// Server expects Date type as Long (not String)
+					builder.queryParam(entry.getKey(), ((Date) entry.getValue()).getTime());
 				} else if (entry.getValue().getClass().isArray()) {
 					Object[] array = (Object[]) entry.getValue();
-					StringBuilder sb = new StringBuilder();
-					for (int i = 0; i < array.length; ++i) {
-						if (i > 0)
-							sb.append(',');
-						if (array[i] == null)
-							sb.append("null");
+					for (Object o : array) {
+						if (o == null)
+							builder.queryParam(entry.getKey(), "null");
+						else if (o instanceof Date)
+							builder.queryParam(entry.getKey(), ((Date) o).getTime());
 						else
-							sb.append(array[i].toString());
+							builder.queryParam(entry.getKey(), o.toString());
 					}
-					value = sb.toString();
 				} else {
-					value = entry.getValue().toString();
+					builder.queryParam(entry.getKey(), entry.getValue().toString());
 				}
-				builder.queryParam(entry.getKey(), value);
 			}
 		}
 		if (pageRequest != null) {
@@ -419,7 +455,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	@Override
 	public List<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr) {
 		Map<String, Object> copy = new HashMap<>(queryParameters);
-		copy.put("j", isOr ? "o" : "a");
+		copy.put(CCDSConstants.JUNCTION_QUERY_PARAM, isOr ? "o" : "a");
 		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH }, copy, null);
 		logger.debug("searchSolutions: uri {}", uri);
 		ResponseEntity<List<MLPSolution>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
@@ -647,7 +683,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	@Override
 	public List<MLPArtifact> searchArtifacts(Map<String, Object> queryParameters, boolean isOr) {
 		Map<String, Object> copy = new HashMap<>(queryParameters);
-		copy.put("j", isOr ? "o" : "a");
+		copy.put(CCDSConstants.JUNCTION_QUERY_PARAM, isOr ? "o" : "a");
 		URI uri = buildUri(new String[] { CCDSConstants.ARTIFACT_PATH, CCDSConstants.SEARCH_PATH }, copy, null);
 		logger.debug("searchArtifacts: uri {}", uri);
 		ResponseEntity<List<MLPArtifact>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
@@ -722,7 +758,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	@Override
 	public List<MLPUser> searchUsers(Map<String, Object> queryParameters, boolean isOr) {
 		Map<String, Object> copy = new HashMap<>(queryParameters);
-		copy.put("j", isOr ? "o" : "a");
+		copy.put(CCDSConstants.JUNCTION_QUERY_PARAM, isOr ? "o" : "a");
 		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.SEARCH_PATH }, copy, null);
 		logger.debug("searchUsers: uri {}", uri);
 		ResponseEntity<List<MLPUser>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
@@ -853,7 +889,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	@Override
 	public List<MLPRole> searchRoles(Map<String, Object> queryParameters, boolean isOr) {
 		Map<String, Object> copy = new HashMap<>(queryParameters);
-		copy.put("j", isOr ? "o" : "a");
+		copy.put(CCDSConstants.JUNCTION_QUERY_PARAM, isOr ? "o" : "a");
 		URI uri = buildUri(new String[] { CCDSConstants.ROLE_PATH, CCDSConstants.SEARCH_PATH }, copy, null);
 		logger.debug("searchRoles: uri {}", uri);
 		ResponseEntity<List<MLPRole>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
@@ -1016,7 +1052,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	@Override
 	public List<MLPPeer> searchPeers(Map<String, Object> queryParameters, boolean isOr) {
 		Map<String, Object> copy = new HashMap<>(queryParameters);
-		copy.put("j", isOr ? "o" : "a");
+		copy.put(CCDSConstants.JUNCTION_QUERY_PARAM, isOr ? "o" : "a");
 		URI uri = buildUri(new String[] { CCDSConstants.PEER_PATH, CCDSConstants.SEARCH_PATH }, copy, null);
 		logger.debug("searchPeers: uri {}", uri);
 		ResponseEntity<List<MLPPeer>> response = restTemplate.exchange(uri, HttpMethod.GET, null,

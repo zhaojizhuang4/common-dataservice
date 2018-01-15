@@ -31,15 +31,16 @@ import org.acumos.cds.domain.MLPPeer;
 public interface PeerSearchService {
 
 	/**
-	 * Gets all instances matching the query parameters.
+	 * Searches for instances matching all or one of the query parameters, depending
+	 * on the isOr parameter.
 	 * 
 	 * @param queryParameters
-	 *            field-name, field-value pairs; ignored if null or empty.
+	 *            field-name, field-value pairs.  Value may be scalar or array.
 	 * @param isOr
 	 *            If true, the query is a disjunction ("or"); otherwise the query is
 	 *            a conjunction ("and").
 	 * @return List of instances, which may be empty.
 	 */
-	public List<MLPPeer> getPeers(Map<String, ? extends Object> queryParameters, boolean isOr);
+	public List<MLPPeer> findPeers(Map<String, ? extends Object> queryParameters, boolean isOr);
 
 }

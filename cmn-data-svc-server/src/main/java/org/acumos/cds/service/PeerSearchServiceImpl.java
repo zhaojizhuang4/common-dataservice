@@ -47,7 +47,7 @@ public class PeerSearchServiceImpl extends AbstractSearchServiceImpl implements 
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MLPPeer> getPeers(Map<String, ? extends Object> queryParameters, boolean isOr) {
+	public List<MLPPeer> findPeers(Map<String, ? extends Object> queryParameters, boolean isOr) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPPeer.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 		Transaction tx = sessionFactory.getCurrentSession().beginTransaction();

@@ -63,6 +63,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -195,39 +196,38 @@ public class UserController extends AbstractController {
 	/**
 	 * @param queryParameters
 	 *            Map of String (field name) to String (value) for restricting the
-	 *            query
+	 *            query.
 	 * @param response
 	 *            HttpServletResponse
 	 * @return List of users, for serialization as JSON.
 	 */
-	@ApiOperation(value = "Searches for users that exactly match the field name - field value pairs specified as query parameters.", response = MLPUser.class, responseContainer = "List")
+	@ApiOperation(value = "Searches for users using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disunction).", response = MLPUser.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchUsers(@RequestParam Map<String, String> queryParameters, HttpServletResponse response) {
-		Object result;
+	public Object searchUsers(@RequestParam MultiValueMap<String, String> queryParameters,
+			HttpServletResponse response) {
+		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
+		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
+		if (queryParameters.size() == 0) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
+		}
 		try {
-			Map<String, Object> convertedQryParm = null;
-			boolean isOr = false;
-			if (queryParameters != null && queryParameters.size() > 0) {
-				String junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
-				isOr = junction != null && "o".equals(junction);
-				convertedQryParm = convertQueryParameters(MLPUser.class, queryParameters);
-			}
-			List<MLPUser> userList = userSearchService.getUsers(convertedQryParm, isOr);
+			Map<String, Object> convertedQryParm = convertQueryParameters(MLPUser.class, queryParameters);
+			List<MLPUser> userList = userSearchService.findUsers(convertedQryParm, isOr);
 			logger.debug(EELFLoggerDelegate.debugLogger, "searchUsers: size is {} ", userList.size());
 			// Wipe login hash values
 			for (MLPUser user : userList) {
 				entityManager.detach(user);
 				user.setLoginHash(null);
 			}
-			result = userList;
+			return userList;
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "searchUsers failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchUsers failed", ex);
 		}
-		return result;
 	}
 
 	/**

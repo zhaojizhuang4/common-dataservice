@@ -20,6 +20,8 @@
 
 package org.acumos.cds.repository;
 
+import java.util.Date;
+
 import org.acumos.cds.domain.MLPSolution;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -53,9 +55,30 @@ public interface SolutionRepository extends JpaRepository<MLPSolution, String>, 
 	 *            Page and sort criteria
 	 * @return Page of MLPSolution
 	 */
-	@Query(value = "select s from MLPSolution s, MLPSolTagMap m " //
-			+ " where s.solutionId =  m.solutionId " //
-			+ " and m.tag = :tag")
+	@Query(value = "SELECT s FROM MLPSolution s, MLPSolTagMap m " //
+			+ " WHERE s.solutionId =  m.solutionId " //
+			+ "   AND m.tag = :tag")
 	Page<MLPSolution> findByTag(@Param("tag") String tag, Pageable pageRequest);
+
+	/**
+	 * Gets all solutions with any update after the specified date, including
+	 * the solution, revision and artifact entities.  Returns no results for
+	 * a solution with no revision(s) and/or no artifact(s).
+	 * 
+	 * @param thedate
+	 *            Date threshold
+	 * @param pageRequest
+	 *            Page and sort criteria
+	 * @return Page of MLPSolution
+	 */
+	@Query(value = "SELECT s FROM MLPSolution s, MLPSolutionRevision r, MLPSolRevArtMap m, MLPArtifact a "
+			+ " WHERE s.solutionId = r.solutionId " //
+			+ "   AND r.revisionId = m.revisionId " //
+			+ "   AND m.artifactId = a.artifactId " //
+			+ "   AND " //
+			+ "   ( s.modified >= :thedate " //
+			+ "  OR r.modified >= :thedate " //
+			+ "  OR a.modified >= :thedate ) ")
+	Page<MLPSolution> findModifiedAfter(@Param("thedate") Date thedate, Pageable pageRequest);
 
 }

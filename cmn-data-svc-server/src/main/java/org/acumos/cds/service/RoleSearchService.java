@@ -34,16 +34,16 @@ import org.acumos.cds.domain.MLPRole;
 public interface RoleSearchService {
 
 	/**
-	 * Gets all instances matching all query parameters; i.e., the conditions are
-	 * AND-ed together.
+	 * Searches for instances matching all or one of the query parameters, depending
+	 * on the isOr parameter.
 	 * 
 	 * @param queryParameters
-	 *            field-name, field-value pairs; ignored if null or empty.
+	 *            field-name, field-value pairs.  Value may be scalar or array.
 	 * @param isOr
 	 *            If true, the query is a disjunction ("or"); otherwise the query is
 	 *            a conjunction ("and").
 	 * @return List of instances, which may be empty.
 	 */
-	List<MLPRole> getRoles(Map<String, String> queryParameters, boolean isOr);
+	List<MLPRole> findRoles(Map<String, ? extends Object> queryParameters, boolean isOr);
 
 }

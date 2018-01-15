@@ -20,6 +20,7 @@
 
 package org.acumos.cds.controller;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,6 +41,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -88,27 +90,26 @@ public class PeerController extends AbstractController {
 	 *            HttpServletResponse
 	 * @return List of peers, for serialization as JSON.
 	 */
-	@ApiOperation(value = "Gets a list of peers matching the field name - field value pairs specified as query parameters.", response = MLPPeer.class, responseContainer = "List")
+	@ApiOperation(value = "Searches for peers using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disunction).", response = MLPPeer.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchPeers(@RequestParam Map<String, String> queryParameters, HttpServletResponse response) {
-		Object result;
+	public Object searchPeers(@RequestParam MultiValueMap<String, String> queryParameters,
+			HttpServletResponse response) {
+		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
+		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
+		if (queryParameters.size() == 0) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
+		}
 		try {
-			Map<String, Object> convertedQryParm = null;
-			boolean isOr = false;
-			if (queryParameters != null && queryParameters.size() > 0) {
-				String junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
-				isOr = junction != null && "o".equals(junction);
-				convertedQryParm = convertQueryParameters(MLPPeer.class, queryParameters);
-			}
-			return peerSearchService.getPeers(convertedQryParm, isOr);
+			Map<String, Object> convertedQryParm = convertQueryParameters(MLPPeer.class, queryParameters);
+			return peerSearchService.findPeers(convertedQryParm, isOr);
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "searchPeers failed", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchPeers failed", ex);
 		}
-		return result;
 	}
 
 	/**

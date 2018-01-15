@@ -57,7 +57,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MLPSolution> getSolutions(Map<String, ? extends Object> queryParameters, boolean isOr) {
+	public List<MLPSolution> findSolutions(Map<String, ? extends Object> queryParameters, boolean isOr) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 		List<MLPSolution> items = criteria.list();

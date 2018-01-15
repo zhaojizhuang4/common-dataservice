@@ -48,7 +48,7 @@ public class RoleSearchServiceImpl extends AbstractSearchServiceImpl implements 
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MLPRole> getRoles(Map<String, String> queryParameters, boolean isOr) {
+	public List<MLPRole> findRoles(Map<String, ? extends Object> queryParameters, boolean isOr) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPRole.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 		Transaction tx = sessionFactory.getCurrentSession().beginTransaction();

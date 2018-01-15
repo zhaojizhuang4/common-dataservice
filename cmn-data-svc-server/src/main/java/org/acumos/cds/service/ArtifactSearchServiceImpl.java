@@ -46,7 +46,7 @@ public class ArtifactSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MLPArtifact> getArtifacts(Map<String, ? extends Object> queryParameters, boolean isOr) {
+	public List<MLPArtifact> findArtifacts(Map<String, ? extends Object> queryParameters, boolean isOr) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPArtifact.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 		Transaction tx = sessionFactory.getCurrentSession().beginTransaction();

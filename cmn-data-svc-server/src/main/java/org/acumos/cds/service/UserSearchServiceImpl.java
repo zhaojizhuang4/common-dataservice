@@ -47,7 +47,7 @@ public class UserSearchServiceImpl extends AbstractSearchServiceImpl implements 
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MLPUser> getUsers(Map<String, ? extends Object> queryParameters, boolean isOr) {
+	public List<MLPUser> findUsers(Map<String, ? extends Object> queryParameters, boolean isOr) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPUser.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 		Transaction tx = sessionFactory.getCurrentSession().beginTransaction();

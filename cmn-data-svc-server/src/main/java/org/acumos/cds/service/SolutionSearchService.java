@@ -33,16 +33,17 @@ import org.springframework.data.domain.Pageable;
 public interface SolutionSearchService {
 
 	/**
-	 * Gets all instances matching all query parameters.
+	 * Searches for instances matching all or one of the query parameters, depending
+	 * on the isOr parameter.
 	 * 
 	 * @param queryParameters
-	 *            field-name, field-value pairs; ignored if null or empty.
+	 *            field-name, field-value pairs.  Value may be scalar or array.
 	 * @param isOr
 	 *            If true, the query is a disjunction ("or"); otherwise the query is
 	 *            a conjunction ("and").
 	 * @return List of instances, which may be empty.
 	 */
-	List<MLPSolution> getSolutions(Map<String, ? extends Object> queryParameters, boolean isOr);
+	List<MLPSolution> findSolutions(Map<String, ? extends Object> queryParameters, boolean isOr);
 
 	/**
 	 * Gets a page of instances matching all query parameters.
