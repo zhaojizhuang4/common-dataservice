@@ -20,7 +20,6 @@
 
 package org.acumos.cds.controller;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.acumos.cds.CCDSConstants;
@@ -87,111 +86,93 @@ public class CodeTableController extends AbstractController {
 
 	/**
 	 * @return List of MLPAccessType objects
-	 * @throws ServletException
-	 *             in case of unrecoverable failure
 	 */
 	@ApiOperation(value = "Gets the list of access types.", response = MLPAccessType.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.ACCESS_PATH + "/" + CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Iterable<MLPAccessType> getAccessTypeList() throws ServletException {
+	public Iterable<MLPAccessType> getAccessTypeList() {
 		return accessTypeRepository.findAll();
 	}
 
 	/**
 	 * @return List of MLPArtifactType objects
-	 * @throws ServletException
-	 *             in case of unrecoverable failure
 	 */
 	@ApiOperation(value = "Gets the list of artifact types.", response = MLPArtifactType.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.ARTIFACT_PATH + "/"
 			+ CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Iterable<MLPArtifactType> getArtifactTypeList() throws ServletException {
+	public Iterable<MLPArtifactType> getArtifactTypeList() {
 		return artifactTypeRepository.findAll();
 	}
 
 	/**
 	 * @return List of MLPLoginProvider objects
-	 * @throws ServletException
-	 *             in case of unrecoverable failure
 	 */
 	@ApiOperation(value = "Gets the list of login providers.", response = MLPLoginProvider.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.LOGIN_PROVIDER_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Iterable<MLPLoginProvider> getLoginProviderList() throws ServletException {
+	public Iterable<MLPLoginProvider> getLoginProviderList() {
 		return loginProviderRepository.findAll();
 	}
 
 	/**
 	 * @return List of MLPToolkitType objects
-	 * @throws ServletException
-	 *             in case of unrecoverable failure
 	 */
 	@ApiOperation(value = "Gets the list of model types.", response = MLPToolkitType.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.MODEL_PATH + "/" + CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Iterable<MLPModelType> getModelTypeList() throws ServletException {
+	public Iterable<MLPModelType> getModelTypeList() {
 		return modelTypeRepository.findAll();
 	}
 
 	/**
 	 * @return List of MLPToolkitType objects
-	 * @throws ServletException
-	 *             in case of unrecoverable failure
 	 */
 	@ApiOperation(value = "Gets the list of toolkit types.", response = MLPToolkitType.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.TOOLKIT_PATH + "/"
 			+ CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Iterable<MLPToolkitType> getToolkitTypeList() throws ServletException {
+	public Iterable<MLPToolkitType> getToolkitTypeList() {
 		return toolkitTypeRepository.findAll();
 	}
 
 	/**
 	 * @return List of MLPValidationStatus objects
-	 * @throws ServletException
-	 *             in case of unrecoverable failure
 	 */
 	@ApiOperation(value = "Gets the list of validation status codes.", response = MLPValidationStatus.class, responseContainer = "Iterable")
 	@RequestMapping(value = "/" + CCDSConstants.VAL_STAT_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Iterable<MLPValidationStatus> getValidationStatusList() throws ServletException {
+	public Iterable<MLPValidationStatus> getValidationStatusList() {
 		return validationStatusRepository.findAll();
 	}
 
 	/**
 	 * @return List of MLPValidationType objects
-	 * @throws ServletException
-	 *             in case of unrecoverable failure
 	 */
 	@ApiOperation(value = "Gets the list of validation type codes.", response = MLPValidationType.class, responseContainer = "Iterable")
 	@RequestMapping(value = "/" + CCDSConstants.VAL_TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Iterable<MLPValidationType> getValidationTypeList() throws ServletException {
+	public Iterable<MLPValidationType> getValidationTypeList() {
 		return validationTypeRepository.findAll();
 	}
 
 	/**
 	 * @return List of MLPDeploymentStatus objects
-	 * @throws ServletException
-	 *             in case of unrecoverable failure
 	 */
 	@ApiOperation(value = "Gets the list of deployment status codes.", response = MLPDeploymentStatus.class, responseContainer = "Iterable")
 	@RequestMapping(value = "/" + CCDSConstants.DEP_STAT_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Iterable<MLPDeploymentStatus> getDeploymentStatusList() throws ServletException {
+	public Iterable<MLPDeploymentStatus> getDeploymentStatusList() {
 		return deploymentStatusRepository.findAll();
 	}
 
 	/**
 	 * @return List of MLPSolValSeq objects
-	 * @throws ServletException
-	 *             in case of unrecoverable failure
 	 */
 	@ApiOperation(value = "Gets the list of validation sequence records.", response = MLPValidationSequence.class, responseContainer = "Iterable")
 	@RequestMapping(value = "/" + CCDSConstants.VAL_SEQ_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Iterable<MLPValidationSequence> getValidationSequenceList() throws ServletException {
+	public Iterable<MLPValidationSequence> getValidationSequenceList() {
 		return validationSequenceRepository.findAll();
 	}
 
@@ -244,7 +225,6 @@ public class CodeTableController extends AbstractController {
 			// Build a key for fetch
 			ValidationSequencePK pk = new ValidationSequencePK(sequence, valTypeCode);
 			validationSequenceRepository.delete(pk);
-			// Answer "OK"
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error

@@ -22,7 +22,6 @@ package org.acumos.cds.controller;
 
 import java.util.UUID;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.acumos.cds.CCDSConstants;
@@ -64,13 +63,11 @@ public class NotificationController extends AbstractController {
 
 	/**
 	 * @return SuccessTransport object
-	 * @throws ServletException
-	 *             in case of unrecoverable failure
 	 */
 	@ApiOperation(value = "Gets the count of notifications.", response = CountTransport.class)
 	@RequestMapping(value = "/" + CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public CountTransport getCount() throws ServletException {
+	public CountTransport getCount() {
 		Long count = notificationRepository.count();
 		logger.debug(EELFLoggerDelegate.debugLogger, "getNotificationCount: result is {} ", count);
 		return new CountTransport(count);
@@ -155,7 +152,6 @@ public class NotificationController extends AbstractController {
 			notif.setNotificationId(rowId);
 			// Update the existing row
 			notificationRepository.save(notif);
-			// Answer "OK"
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);

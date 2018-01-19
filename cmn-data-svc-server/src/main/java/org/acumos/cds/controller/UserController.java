@@ -110,6 +110,11 @@ public class UserController extends AbstractController {
 	@Autowired
 	private SolutionDeploymentRepository solutionDeploymentRepository;
 
+	// Silence Sonar complaints
+	private static final String NO_ROLE_WITH_ID = "No role with ID ";
+	private static final String NO_USER_WITH_ID = "No user with ID ";
+	private static final String NO_NOIF_WITH_ID = "No notification with ID ";
+
 	/**
 	 * @return Model that maps String to Object, for serialization as JSON
 	 */
@@ -333,9 +338,7 @@ public class UserController extends AbstractController {
 			} else {
 				user.setLoginHash(existingUser.getLoginHash());
 			}
-			// Update the existing row
 			userRepository.save(user);
-			// Answer "OK"
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
@@ -388,9 +391,7 @@ public class UserController extends AbstractController {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "The old password did not match", null);
 			}
-			// Update the existing row
 			userRepository.save(existingUser);
-			// Answer "OK"
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			logger.error(EELFLoggerDelegate.errorLogger, "updatePassword failed", ex);
@@ -478,10 +479,10 @@ public class UserController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "addUserRole: user {}, role {}", userId, roleId);
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		} else if (roleRepository.findOne(roleId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No role " + roleId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ROLE_WITH_ID + roleId, null);
 		} else {
 			userRoleMapRepository.save(new MLPUserRoleMap(userId, roleId));
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
@@ -506,12 +507,12 @@ public class UserController extends AbstractController {
 
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		}
 		for (String roleId : roleIds) {
 			if (roleRepository.findOne(roleId) == null) {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No role " + roleId, null);
+				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ROLE_WITH_ID + roleId, null);
 			}
 		}
 
@@ -543,10 +544,10 @@ public class UserController extends AbstractController {
 
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		} else if (roleRepository.findOne(roleId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No role " + roleId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ROLE_WITH_ID + roleId, null);
 		} else {
 			userRoleMapRepository.delete(new MLPUserRoleMap(userId, roleId));
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
@@ -571,7 +572,7 @@ public class UserController extends AbstractController {
 		// Validate entire request before making any change to avoid failing midway
 		if (roleRepository.findOne(roleId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No role " + roleId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ROLE_WITH_ID + roleId, null);
 		}
 		if (usersRoleRequest.getUserIds().isEmpty()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -580,7 +581,7 @@ public class UserController extends AbstractController {
 		for (String userId : usersRoleRequest.getUserIds()) {
 			if (userRepository.findOne(userId) == null) {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + userId, null);
+				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 			}
 		}
 		for (String userId : usersRoleRequest.getUserIds()) {
@@ -627,7 +628,7 @@ public class UserController extends AbstractController {
 			HttpServletResponse response) {
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		}
 		// Build a key for fetch
 		UserLoginProviderPK pk = new UserLoginProviderPK(userId, providerCode, providerUserId);
@@ -652,7 +653,7 @@ public class UserController extends AbstractController {
 	public Object getAllLoginProviders(@PathVariable("userId") String userId, HttpServletResponse response) {
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		}
 		// this might be an empty list, which is ok.
 		return userLoginProviderRepository.findByUser(userId);
@@ -682,7 +683,7 @@ public class UserController extends AbstractController {
 		// Validate args
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		}
 		Object result;
 		try {
@@ -729,7 +730,7 @@ public class UserController extends AbstractController {
 		// Validate args
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		}
 		// Get the existing one
 		// Build a key for fetch
@@ -746,7 +747,6 @@ public class UserController extends AbstractController {
 			ulp.setProviderCode(providerCode);
 			ulp.setProviderUserId(providerUserId);
 			userLoginProviderRepository.save(ulp);
-			// Answer "OK"
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
@@ -805,7 +805,7 @@ public class UserController extends AbstractController {
 			HttpServletResponse response) {
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user for ID " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		}
 		// this might be empty, which is ok.
 		return solutionFavoriteRepository.findByUserId(userId, pageRequest);
@@ -831,11 +831,11 @@ public class UserController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "createSolutionFavorite: received object: {} ", sfv);
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No solution for ID " + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No solution with ID " + solutionId, null);
 		}
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user for ID " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		}
 		Object result;
 		try {
@@ -921,10 +921,10 @@ public class UserController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "addUserNotification: user {}, notif {}", userId, notificationId);
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		} else if (notificationRepository.findOne(notificationId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No notification " + notificationId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_NOIF_WITH_ID + notificationId, null);
 		} else {
 			notifUserMap.setUserId(userId);
 			notifUserMap.setNotificationId(notificationId);
@@ -955,11 +955,11 @@ public class UserController extends AbstractController {
 				notificationId);
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		}
 		if (notificationRepository.findOne(notificationId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No notification " + notificationId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_NOIF_WITH_ID + notificationId, null);
 		}
 		Object result;
 		try {
@@ -994,10 +994,10 @@ public class UserController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "dropUserRecipient: user {}, notif{}", userId, notificationId);
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		} else if (notificationRepository.findOne(notificationId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No notification " + notificationId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_NOIF_WITH_ID + notificationId, null);
 		} else {
 			MLPNotifUserMap map = new MLPNotifUserMap(notificationId, userId);
 			notifUserMapRepository.delete(map);

@@ -49,7 +49,7 @@ public class HibernateConfiguration {
 		sessionFactory.setDataSource(dataSource);
 		// The package is maintained in the client library.
 		// This avoids hard-coding a package name as string
-		sessionFactory.setPackagesToScan(new String[] { MLPSolution.class.getPackage().getName() });
+		sessionFactory.setPackagesToScan(MLPSolution.class.getPackage().getName());
 		return sessionFactory;
 	}
 

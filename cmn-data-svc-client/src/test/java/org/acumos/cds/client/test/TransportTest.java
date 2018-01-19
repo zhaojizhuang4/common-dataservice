@@ -117,8 +117,8 @@ public class TransportTest extends AbstractModelTest {
 		Assert.assertEquals((int) i3, t.getSize());
 		Assert.assertEquals((long) l1, t.getTotalElements());
 		Assert.assertEquals((long) i4, t.getTotalPages());
-		Assert.assertEquals(t.isPreviousPage(), true);
-		Assert.assertEquals(t.isNextPage(), true);
+		Assert.assertEquals(true, t.isPreviousPage());
+		Assert.assertEquals(true, t.isNextPage());
 		Assert.assertNull(t.getSort());
 		Assert.assertFalse(t.equals(null));
 		Assert.assertFalse(t.equals(new RestPageResponse<>()));

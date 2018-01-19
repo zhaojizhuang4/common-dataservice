@@ -207,7 +207,6 @@ public class RoleController extends AbstractController {
 			role.setRoleId(rowId);
 			// Update the existing row
 			roleRepository.save(role);
-			// Answer "OK"
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
@@ -353,7 +352,6 @@ public class RoleController extends AbstractController {
 			roleFunction.setRoleId(roleId);
 			// Update
 			roleFunctionRepository.save(roleFunction);
-			// Answer "OK"
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);

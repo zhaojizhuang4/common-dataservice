@@ -186,9 +186,7 @@ public class ThreadController extends AbstractController {
 		try {
 			// Use the path-parameter id; don't trust the one in the object
 			thread.setThreadId(threadId);
-			// Update the existing row
 			threadRepository.save(thread);
-			// Answer "OK"
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
@@ -392,9 +390,7 @@ public class ThreadController extends AbstractController {
 		try {
 			// Use the path-parameter id; don't trust the one in the object
 			comment.setCommentId(commentId);
-			// Update the existing row
 			commentRepository.save(comment);
-			// Answer "OK"
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);

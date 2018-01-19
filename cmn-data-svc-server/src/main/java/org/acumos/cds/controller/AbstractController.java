@@ -63,6 +63,8 @@ public abstract class AbstractController {
 	 * @param queryParameters
 	 *            Maps field names to (list of) field values
 	 * @return Map of String to Object
+	 * @throws IllegalArgumentException
+	 *             If an unexpected data type is used
 	 * @throws NoSuchFieldException
 	 *             If a field name is not found in the class
 	 */
@@ -134,9 +136,9 @@ public abstract class AbstractController {
 			clazz = clazz.getSuperclass();
 		}
 		// Report names of any parameters (fields) that were not found in the classes
-		if (fieldNames.size() > 0) {
+		if (!fieldNames.isEmpty()) {
 			String fieldName = fieldNames.iterator().next();
-			throw new IllegalArgumentException("Failed to find field name " + fieldName);
+			throw new NoSuchFieldException("Failed to find field name " + fieldName);
 		}
 		return convertedQryParm;
 	}

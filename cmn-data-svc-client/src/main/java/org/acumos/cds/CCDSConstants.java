@@ -30,6 +30,9 @@ public abstract class CCDSConstants {
 
 	public static final String JUNCTION_QUERY_PARAM = "_j";
 
+	// For error page
+	public static final String ERROR_PATH = "/error";
+
 	// Metadata
 	public static final String HEALTHCHECK_PATH = "healthcheck";
 	public static final String VERSION_PATH = "version";

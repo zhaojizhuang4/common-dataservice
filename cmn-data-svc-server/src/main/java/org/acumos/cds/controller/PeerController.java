@@ -186,7 +186,7 @@ public class PeerController extends AbstractController {
 		// Get the existing one
 		if (peerRepository.findOne(peerId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + peerId,
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find peer with id " + peerId,
 					null);
 		}
 		MLPTransportModel result = null;
@@ -195,7 +195,6 @@ public class PeerController extends AbstractController {
 			peer.setPeerId(peerId);
 			// Update the existing row
 			peerRepository.save(peer);
-			// Answer "OK"
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
@@ -253,7 +252,7 @@ public class PeerController extends AbstractController {
 		// Get the existing one
 		if (peerRepository.findOne(peerId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + peerId,
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find peer with id " + peerId,
 					null);
 		}
 		return peerSubRepository.findByPeer(peerId);
@@ -293,7 +292,7 @@ public class PeerController extends AbstractController {
 		if (peerRepository.findOne(peerSub.getPeerId()) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
-					"Failed to find object with id " + peerSub.getPeerId(), null);
+					"Failed to find peer sub with id " + peerSub.getPeerId(), null);
 		}
 		Object result;
 		try {
@@ -333,7 +332,7 @@ public class PeerController extends AbstractController {
 		MLPPeerSubscription existingPeer = peerSubRepository.findOne(subId);
 		if (existingPeer == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + subId,
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find peer with id " + subId,
 					null);
 		}
 		MLPTransportModel result = null;
@@ -342,7 +341,6 @@ public class PeerController extends AbstractController {
 			peerSub.setSubId(subId);
 			// Update the existing row
 			peerSubRepository.save(peerSub);
-			// Answer "OK"
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);

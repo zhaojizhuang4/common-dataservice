@@ -116,7 +116,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		Criteria solCriteria = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class);
 
 		// Always check active status
-		solCriteria.add(Restrictions.eq("active", new Boolean(active)));
+		solCriteria.add(Restrictions.eq("active", active));
 
 		if (nameKeywords != null && nameKeywords.length > 0)
 			solCriteria.add(buildLikeListCriterion("name", nameKeywords));

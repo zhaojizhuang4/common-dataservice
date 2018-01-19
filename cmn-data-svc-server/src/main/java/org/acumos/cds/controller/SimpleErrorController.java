@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.acumos.cds.CCDSConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ErrorAttributes;
 import org.springframework.boot.autoconfigure.web.ErrorController;
@@ -37,9 +38,9 @@ import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * Returns JSON on error within the Spring-managed context. Does not fire for
- * anything else; e.g., resource not found outside the context. If requested
- * ("?trace=true") and available, adds stack trace information to the standard
- * JSON error response.
+ * anything else; e.g., resource not found outside the context. If trace is
+ * requested via request parameter ("?trace=true") and available, adds stack
+ * trace information to the standard JSON error response.
  * 
  * Excluded from Swagger API documentation.
  * 
@@ -49,7 +50,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 public class SimpleErrorController implements ErrorController {
 
-	public static final String ERROR_PATH = "/error";
 	private static final String TRACE = "trace";
 	private final ErrorAttributes errorAttributes;
 
@@ -67,7 +67,7 @@ public class SimpleErrorController implements ErrorController {
 
 	@Override
 	public String getErrorPath() {
-		return ERROR_PATH;
+		return CCDSConstants.ERROR_PATH;
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class SimpleErrorController implements ErrorController {
 	 *            HttpServletRequest
 	 * @return Map of String to Object
 	 */
-	@RequestMapping(ERROR_PATH)
+	@RequestMapping(CCDSConstants.ERROR_PATH)
 	public Map<String, Object> error(HttpServletRequest aRequest) {
 		Map<String, Object> body = getErrorAttributes(aRequest, getTraceParameter(aRequest));
 		body.put("decorated-by", SimpleErrorController.class.getName());

@@ -6,7 +6,7 @@
 	<artifactId>cmn-data-svc-parent</artifactId>
 	<version>0</version>
 	<packaging>pom</packaging>
-	<name>Acumos Common Data Service</name>
+	<name>Acumos Common Data Service Project</name>
 	<modules>
 		<!-- Child modules do NOT name this parent. -->
 		<module>cmn-data-svc-server</module>

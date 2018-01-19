@@ -136,9 +136,7 @@ public class SiteConfigController extends AbstractController {
 		try {
 			// Use the path-parameter id; don't trust the one in the object
 			sc.setConfigKey(configKey);
-			// Update the existing row
 			siteConfigRepository.save(sc);
-			// Answer "OK"
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
