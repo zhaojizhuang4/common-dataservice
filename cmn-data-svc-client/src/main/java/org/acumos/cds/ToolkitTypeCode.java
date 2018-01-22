@@ -21,10 +21,28 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP toolkit type codes for developer convenience only. The
+ * This enum provides MLP toolkit type codes for developer convenience. The
  * valid values are maintained in a database table modeled by the class
  * {@link org.acumos.cds.domain.MLPToolkitType}.
  */
 public enum ToolkitTypeCode {
-	DS, SK, RC, H2, TF, CP
+	CP("Composite Solution"), //
+	DS("Design Studio"), //
+	H2("H2O"), //
+	RC("R"), //
+	SK("Scikit-Learn"), //
+	TF("TensorFlow"), //
+	TC("Training Client"), //
+	BR("Data Broker"); //
+
+	private String typeName;
+
+	private ToolkitTypeCode(final String typeName) {
+		this.typeName = typeName;
+	}
+
+	public String getTypeName() {
+		return typeName;
+	}
+
 }

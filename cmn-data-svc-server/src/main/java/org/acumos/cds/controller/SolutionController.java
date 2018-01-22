@@ -121,8 +121,9 @@ public class SolutionController extends AbstractController {
 	private UserRepository userRepository;
 
 	// Silence Sonar complaints
-	private static final String NO_SOL_WITH_ID = "No solution with ID ";
 	private static final String NO_REV_WITH_ID = "No revision with ID ";
+	private static final String NO_SOL_WITH_ID = "No solution with ID ";
+	private static final String NO_TAG = "No tag ";
 	private static final String NO_USR_WITH_ID = "No user with ID ";
 
 	/**
@@ -225,7 +226,7 @@ public class SolutionController extends AbstractController {
 		MLPTag existing = solutionTagRepository.findOne(tag);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No tag " + tag, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_TAG + tag, null);
 		}
 		return solutionRepository.findByTag(tag, pageRequest);
 	}
@@ -757,7 +758,7 @@ public class SolutionController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "addTag: solution {}, tag {}", solutionId, tag);
 		if (solutionTagRepository.findOne(tag) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No tag " + tag, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_TAG + tag, null);
 		} else if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
@@ -784,7 +785,7 @@ public class SolutionController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "dropTag: solution {}, tag {}", solutionId, tag);
 		if (solutionTagRepository.findOne(tag) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No tag " + tag, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_TAG + tag, null);
 		} else if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);

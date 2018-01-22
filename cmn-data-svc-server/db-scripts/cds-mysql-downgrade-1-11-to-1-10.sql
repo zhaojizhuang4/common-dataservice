@@ -2,6 +2,8 @@
 -- FROM version 1.9.x TO version 1.8.x.
 -- No database is created or specified to allow flexible deployment!
 
+-- Undo: 9 Change type
+ALTER TABLE C_SOLUTION MODIFY PROVIDER CHAR(64) NULL;
 -- Undo: 8 Add a column
 ALTER TABLE C_PEER DROP COLUMN TRUST_LEVEL;
 -- Undo: 7 Add a row

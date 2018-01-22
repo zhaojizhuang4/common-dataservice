@@ -26,5 +26,20 @@ package org.acumos.cds;
  * class {@link org.acumos.cds.domain.MLPValidationStatus}.
  */
 public enum ValidationStatusCode {
-	NV, SB, IP, FA, PS;
+	FA("Failed"), //
+	IP("In Progress"), //
+	NV("Not Validated"), //
+	PS("Passed"), //
+	SB("Submitted");
+
+	private String statusName;
+
+	private ValidationStatusCode(final String statusName) {
+		this.statusName = statusName;
+	}
+
+	public String getStatusName() {
+		return statusName;
+	}
+
 }

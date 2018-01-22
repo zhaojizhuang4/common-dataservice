@@ -324,8 +324,7 @@ public class UserController extends AbstractController {
 		MLPUser existingUser = userRepository.findOne(userId);
 		if (existingUser == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + userId,
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		}
 		MLPTransportModel result = null;
 		try {
@@ -369,8 +368,7 @@ public class UserController extends AbstractController {
 		MLPUser existingUser = userRepository.findOne(userId);
 		if (existingUser == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + userId,
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
 		}
 		// Reject empty passwords
 		if (changeRequest.getNewLoginPass() == null || changeRequest.getNewLoginPass().length() == 0) {
@@ -738,7 +736,7 @@ public class UserController extends AbstractController {
 		MLPUserLoginProvider existing = userLoginProviderRepository.findOne(pk);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + pk, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + pk, null);
 		}
 		MLPTransportModel result = null;
 		try {

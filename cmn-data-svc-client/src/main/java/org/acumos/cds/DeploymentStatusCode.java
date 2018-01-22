@@ -21,17 +21,24 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP deployment status codes for developer convenience
- * only. The valid values are maintained in a database table modeled by the
- * class {@link org.acumos.cds.domain.MLPDeploymentStatus}.
+ * This enum provides MLP deployment status codes for developer convenience. The
+ * valid values are maintained in a database table modeled by the class
+ * {@link org.acumos.cds.domain.MLPDeploymentStatus}.
  */
 public enum DeploymentStatusCode {
-	/** started */
-	ST,
-	/** in progress */
-	IP,
-	/** failed */
-	FA,
-	/** deployed */
-	DP,
+	DP("Deployed"), //
+	FA("Failed"), //
+	IP("In Progress"), //
+	ST("Started");
+
+	private String statusName;
+
+	private DeploymentStatusCode(final String statusName) {
+		this.statusName = statusName;
+	}
+
+	public String getStatusName() {
+		return statusName;
+	}
+
 }

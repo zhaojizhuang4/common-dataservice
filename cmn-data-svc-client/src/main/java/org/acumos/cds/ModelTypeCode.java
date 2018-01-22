@@ -21,10 +21,25 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP model type codes for developer convenience only. The
- * valid values are maintained in a database table modeled by the class
+ * This enum provides MLP model type codes for developer convenience. The valid
+ * values are maintained in a database table modeled by the class
  * {@link org.acumos.cds.domain.MLPModelType}.
  */
 public enum ModelTypeCode {
-	CL, DS, DT, PR, RG;
+	CL("Classification"), //
+	DS("Data Sources"), //
+	DT("Data Transformer"), //
+	PR("Prediction"), //
+	RG("Regression");
+
+	private String typeName;
+
+	private ModelTypeCode(final String typeName) {
+		this.typeName = typeName;
+	}
+
+	public String getTypeName() {
+		return typeName;
+	}
+
 }

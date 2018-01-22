@@ -21,10 +21,36 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP artifact type codes for developer convenience only.
- * The valid values are maintained in a database table modeled by the class
+ * This enum provides MLP artifact type codes for developer convenience. It
+ * replicates the values maintained in a database table modeled by the class
  * {@link org.acumos.cds.domain.MLPArtifactType}.
  */
 public enum ArtifactTypeCode {
-	BP, CD, DS, TS, TT, TE, DI, MI, MD, MS, MR, MT, MH, PJ;
+
+	BP("BLUEPRINT FILE"), //
+	CD("CDUMP FILE"), //
+	DI("DOCKER IMAGE"), //
+	DS("DATA SOURCE"), //
+	MD("METADATA"), //
+	MH("MODEL-H2O"), //
+	MI("MODEL IMAGE"), //
+	MR("MODEL-R"), //
+	MS("MODEL-SCIKIT"), //
+	MT("MODEL-TENSORFLOW"), //
+	TE("TOSCA TEMPLATE"), //
+	TG("TOSCA Generator Input File"), //
+	TS("TOSCA SCHEMA"), //
+	TT("TOSCA TRANSLATE"), //
+	PJ("PROTOBUF FILE");
+
+	private String typeName;
+
+	private ArtifactTypeCode(final String typeName) {
+		this.typeName = typeName;
+	}
+
+	public String getTypeName() {
+		return typeName;
+	}
+
 }

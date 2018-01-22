@@ -26,5 +26,20 @@ package org.acumos.cds;
  * {@link org.acumos.cds.domain.MLPValidationType}.
  */
 public enum ValidationTypeCode {
-	LC, SS, OQ, TA;
+
+	SS("Security Scan"), //
+	LC("License Check"), //
+	OQ("OSS Quantification"), //
+	TA("Text Analysis");
+
+	private String typeName;
+
+	private ValidationTypeCode(final String typeName) {
+		this.typeName = typeName;
+	}
+
+	public String getTypeName() {
+		return typeName;
+	}
+
 }

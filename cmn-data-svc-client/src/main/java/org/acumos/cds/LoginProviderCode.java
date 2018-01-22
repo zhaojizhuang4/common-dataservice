@@ -21,10 +21,24 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP model type codes for developer convenience only. The
+ * This enum provides MLP login provider codes for developer convenience. The
  * valid values are maintained in a database table modeled by the class
  * {@link org.acumos.cds.domain.MLPLoginProvider}.
  */
 public enum LoginProviderCode {
-	FB, GH, HP, LI
+	FB("Facebook"), //
+	GH("GitHub"), //
+	GP("Google Plus"), //
+	LI("LinkedIn");
+
+	private String providerName;
+
+	private LoginProviderCode(final String providerName) {
+		this.providerName = providerName;
+	}
+
+	public String getProviderName() {
+		return providerName;
+	}
+
 }

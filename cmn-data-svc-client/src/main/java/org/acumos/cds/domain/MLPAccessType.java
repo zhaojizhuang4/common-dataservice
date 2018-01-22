@@ -21,66 +21,27 @@
 package org.acumos.cds.domain;
 
 import java.io.Serializable;
-import java.util.Objects;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
 
 /**
  * Model for access type, a code-name pair.
  */
 @Entity
 @Table(name = "C_ACCESS_TYPE")
-public class MLPAccessType implements MLPEntity, Serializable {
+public class MLPAccessType extends MLPTypeCodeEntity implements MLPEntity, Serializable {
 
 	private static final long serialVersionUID = -3836564419430582350L;
 
-	@Id
-	@Column(name = "TYPE_CD", updatable = false, nullable = false, columnDefinition = "CHAR(2)")
-	@Size(max = 2)
-	private String accessCode;
-
-	@Column(name = "TYPE_NAME", columnDefinition = "CHAR(100)")
-	@Size(max = 100)
-	private String accessName;
-
+	// Getters for backward compatibility
+	
 	public String getAccessCode() {
-		return accessCode;
-	}
-
-	public void setAccessCode(String typeCode) {
-		this.accessCode = typeCode;
+		return getTypeCode();
 	}
 
 	public String getAccessName() {
-		return accessName;
-	}
-
-	public void setAccessName(String accessName) {
-		this.accessName = accessName;
-	}
-
-	@Override
-	public boolean equals(Object that) {
-		if (that == null)
-			return false;
-		if (!(that instanceof MLPAccessType))
-			return false;
-		MLPAccessType thatObj = (MLPAccessType) that;
-		return Objects.equals(accessCode, thatObj.accessCode) && Objects.equals(accessName, thatObj.accessName);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(accessCode, accessName);
-	}
-
-	@Override
-	public String toString() {
-		return this.getClass().getName() + "[code=" + accessCode + ", name=" + accessName + "]";
+		return getTypeName();
 	}
 
 }

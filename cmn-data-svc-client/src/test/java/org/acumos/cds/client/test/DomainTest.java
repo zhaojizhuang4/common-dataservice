@@ -71,8 +71,8 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPAccessType() {
 		MLPAccessType m = new MLPAccessType();
-		m.setAccessCode(s1);
-		m.setAccessName(s2);
+		m.setTypeCode(s1);
+		m.setTypeName(s2);
 		Assert.assertEquals(s1, m.getAccessCode());
 		Assert.assertEquals(s2, m.getAccessName());
 		Assert.assertFalse(m.equals(null));

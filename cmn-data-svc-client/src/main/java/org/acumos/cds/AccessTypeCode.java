@@ -21,10 +21,23 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP access type codes for developer convenience only. The
- * valid values are maintained in a database table modeled by the class
+ * This enum provides MLP access type codes for developer convenience. It
+ * replicates the values maintained in a database table modeled by the class
  * {@link org.acumos.cds.domain.MLPAccessType}.
  */
 public enum AccessTypeCode {
-	PB, OR, PR;
+
+	OR("Organization"), //
+	PB("Public"), //
+	PR("Private");
+
+	private String typeName;
+
+	private AccessTypeCode(final String typeName) {
+		this.typeName = typeName;
+	}
+
+	public String getTypeName() {
+		return typeName;
+	}
 }

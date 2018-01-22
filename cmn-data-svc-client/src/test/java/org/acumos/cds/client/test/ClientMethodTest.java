@@ -61,7 +61,7 @@ import org.springframework.web.client.ResourceAccessException;
  */
 public class ClientMethodTest {
 
-	private static Logger logger = LoggerFactory.getLogger(DomainTest.class);
+	private static Logger logger = LoggerFactory.getLogger(ClientMethodTest.class);
 
 	static class TrivialRestClientImplSubclass extends CommonDataServiceRestClientImpl {
 		public TrivialRestClientImplSubclass(String webapiUrl, String user, String pass) {
