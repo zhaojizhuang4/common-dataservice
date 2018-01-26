@@ -232,7 +232,7 @@ public class SolutionController extends AbstractController {
 	}
 
 	/**
-	 * Fetches the value, splits on comma, and converts the four-letter sequence
+	 * Fetches the value, and converts the four-letter sequence
 	 * "null" to the null value.
 	 * 
 	 * @param parmName
@@ -241,11 +241,12 @@ public class SolutionController extends AbstractController {
 	 *            Map of parameters
 	 * @return String array; empty if key is not present
 	 */
-	private String[] getOptCsvParameter(String parmName, Map<String, String> queryParameters) {
-		String val = queryParameters.get(parmName);
+	private String[] getOptStringArray(String parmName, MultiValueMap<String, String> queryParameters) {
+		List<String> val = queryParameters.get(parmName);
 		if (val == null)
 			return new String[0];
-		String[] vals = val.split(",");
+		String[] vals = new String[val.size()];
+		vals = val.toArray(vals);
 		for (int i = 0; i < vals.length; ++i)
 			if ("null".equals(vals[i]))
 				vals[i] = null;
@@ -298,19 +299,19 @@ public class SolutionController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH + "/"
 			+ CCDSConstants.PORTAL_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object findPortalSolutions(@RequestParam Map<String, String> queryParameters, Pageable pageRequest,
+	public Object findPortalSolutions(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
 			HttpServletResponse response) {
 		try {
 			// This parameter is required
-			Boolean active = new Boolean(queryParameters.get(CCDSConstants.SEARCH_ACTIVE));
+			Boolean active = new Boolean(queryParameters.getFirst(CCDSConstants.SEARCH_ACTIVE));
 			// All remaining parameters are optional
-			String[] nameKws = getOptCsvParameter(CCDSConstants.SEARCH_NAME, queryParameters);
-			String[] descKws = getOptCsvParameter(CCDSConstants.SEARCH_DESC, queryParameters);
-			String[] ownerIds = getOptCsvParameter(CCDSConstants.SEARCH_OWNERS, queryParameters);
-			String[] accessTypeCodes = getOptCsvParameter(CCDSConstants.SEARCH_ACCESS_TYPES, queryParameters);
-			String[] modelTypeCodes = getOptCsvParameter(CCDSConstants.SEARCH_MODEL_TYPES, queryParameters);
-			String[] valStatusCodes = getOptCsvParameter(CCDSConstants.SEARCH_VAL_STATUSES, queryParameters);
-			String[] tags = getOptCsvParameter(CCDSConstants.SEARCH_TAGS, queryParameters);
+			String[] nameKws = getOptStringArray(CCDSConstants.SEARCH_NAME, queryParameters);
+			String[] descKws = getOptStringArray(CCDSConstants.SEARCH_DESC, queryParameters);
+			String[] ownerIds = getOptStringArray(CCDSConstants.SEARCH_OWNERS, queryParameters);
+			String[] accessTypeCodes = getOptStringArray(CCDSConstants.SEARCH_ACCESS_TYPES, queryParameters);
+			String[] modelTypeCodes = getOptStringArray(CCDSConstants.SEARCH_MODEL_TYPES, queryParameters);
+			String[] valStatusCodes = getOptStringArray(CCDSConstants.SEARCH_VAL_STATUSES, queryParameters);
+			String[] tags = getOptStringArray(CCDSConstants.SEARCH_TAGS, queryParameters);
 			return solutionSearchService.findPortalSolutions(nameKws, descKws, active, ownerIds, accessTypeCodes,
 					modelTypeCodes, valStatusCodes, tags, pageRequest);
 		} catch (Exception ex) {

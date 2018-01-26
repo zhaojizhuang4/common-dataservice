@@ -5,6 +5,12 @@ Release Notes
 The client and server are released together.  The client is deployed as a jar file to a 
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.  
 
+Version 1.12.1, 26 January 2018
+-------------------------------
+
+* Repair findPortalSolutions endpoint to process multiple values correctly
+* Requires database schema version 1.12
+
 Version 1.12.0, 23 January 2018
 -------------------------------
 

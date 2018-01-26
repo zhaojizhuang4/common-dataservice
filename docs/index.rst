@@ -1,10 +1,8 @@
-.. Acumos Common Data Service documentation master file, created by
-   sphinx-quickstart on Wed Nov  8 08:11:26 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. Acumos Common Data Service documentation master
 
-Welcome to the Acumos Common Data Service Documentation!
-========================================================
+========================================
+Acumos Common Data Service Documentation
+========================================
 
 
 .. toctree::

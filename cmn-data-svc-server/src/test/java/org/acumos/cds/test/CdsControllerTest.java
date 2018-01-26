@@ -474,6 +474,7 @@ public class CdsControllerTest {
 			RestPageResponse<MLPTag> tags = client.getTags(new RestPageRequest(0, 100));
 			Assert.assertTrue(tags.getNumberOfElements() > 0);
 
+			// public solution
 			MLPSolution cs = new MLPSolution();
 			cs.setName("solution name");
 			cs.setOwnerId(cu.getUserId());
@@ -487,7 +488,21 @@ public class CdsControllerTest {
 			cs = client.createSolution(cs);
 			Assert.assertNotNull(cs.getSolutionId());
 			Assert.assertFalse(cs.getTags().isEmpty());
-			logger.info("Created solution {}", cs);
+			logger.info("Created public solution {}", cs);
+
+			// private to organization
+			MLPSolution csOrg = new MLPSolution();
+			csOrg.setName("solution organization");
+			csOrg.setOwnerId(cu.getUserId());
+			csOrg.setValidationStatusCode(ValidationStatusCode.IP.name());
+			csOrg.setProvider("Internal Org");
+			csOrg.setAccessTypeCode(AccessTypeCode.OR.name());
+			csOrg.setModelTypeCode(ModelTypeCode.DS.name());
+			csOrg.setToolkitTypeCode(ToolkitTypeCode.SK.name());
+			csOrg.setActive(true);
+			csOrg = client.createSolution(csOrg);
+			Assert.assertNotNull(csOrg.getSolutionId());
+			logger.info("Created org solution {}", cs);
 
 			MLPSolution inactive = new MLPSolution();
 			inactive.setName("inactive solution name");
@@ -580,13 +595,14 @@ public class CdsControllerTest {
 			String [] nameKw = null;
 			String [] descKw = null;
 			String [] owners = { cu.getUserId() };
-			String [] accessTypeCodes = { AccessTypeCode.PB.name() };
+			String [] accessTypeCodes = { AccessTypeCode.PB.name(), AccessTypeCode.OR.name() };
 			String [] modelTypeCodes = null;
 			String [] valStatusCodes = { ValidationStatusCode.IP.name(), "null" };
 			searchTags = null;
+			// find active solutions
 			RestPageResponse<MLPSolution> portalActiveMatches = client.findPortalSolutions(nameKw, descKw, true, owners, accessTypeCodes, modelTypeCodes, valStatusCodes, searchTags, 
-					new RestPageRequest(0, 1));
-			Assert.assertTrue(portalActiveMatches != null && portalActiveMatches.getNumberOfElements() > 0);
+					new RestPageRequest(0, 9));
+			Assert.assertTrue(portalActiveMatches != null && portalActiveMatches.getNumberOfElements() > 1);
 
 			// Add user access
 			client.addSolutionUserAccess(cs.getSolutionId(), cu.getUserId());
