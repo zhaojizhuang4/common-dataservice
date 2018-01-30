@@ -46,6 +46,7 @@ import org.acumos.cds.domain.MLPSolutionRating;
 import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionValidation;
 import org.acumos.cds.domain.MLPSolutionWeb;
+import org.acumos.cds.domain.MLPStepResult;
 import org.acumos.cds.domain.MLPTag;
 import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
@@ -803,6 +804,41 @@ public class DomainTest extends AbstractModelTest {
 	}
 
 	@Test
+	public void testMLPStepResult() {
+		MLPStepResult m = new MLPStepResult(s1, s2, s3, d1);
+		m = new MLPStepResult();
+		m.setArtifactId(s1);
+		m.setEndDate(d1);
+		m.setName(s2);
+		m.setResult(s3);
+		m.setRevisionId(s4);
+		m.setSolutionId(s5);
+		m.setStartDate(d2);
+		m.setStatusCode(s6);
+		m.setStepCode(s7);
+		Assert.assertEquals(s1, m.getArtifactId());
+		Assert.assertEquals(d1, m.getEndDate());
+		Assert.assertEquals(s2, m.getName());
+		Assert.assertEquals(s3, m.getResult());
+		Assert.assertEquals(s4, m.getRevisionId());
+		Assert.assertEquals(s5, m.getSolutionId());
+		Assert.assertEquals(d2, m.getStartDate());
+		Assert.assertEquals(s6, m.getStatusCode());
+		Assert.assertEquals(s7, m.getStepCode());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		logger.info(m.toString());
+		try {
+			new MLPStepResult(null, null, null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
+	}
+
+	@Test
 	public void testMLPTag() {
 		MLPTag m = new MLPTag(s1);
 		m = new MLPTag();
@@ -937,7 +973,7 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
-		logger.info(m.toString());	
+		logger.info(m.toString());
 		try {
 			new MLPUserLoginProvider(null, null, null, null, 0);
 			Assert.assertTrue("Unexpected success", false);

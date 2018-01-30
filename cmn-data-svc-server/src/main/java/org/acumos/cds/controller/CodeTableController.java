@@ -28,6 +28,8 @@ import org.acumos.cds.domain.MLPArtifactType;
 import org.acumos.cds.domain.MLPDeploymentStatus;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPModelType;
+import org.acumos.cds.domain.MLPStepStatus;
+import org.acumos.cds.domain.MLPStepType;
 import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationSequence.ValidationSequencePK;
@@ -38,6 +40,8 @@ import org.acumos.cds.repository.ArtifactTypeRepository;
 import org.acumos.cds.repository.DeploymentStatusRepository;
 import org.acumos.cds.repository.LoginProviderRepository;
 import org.acumos.cds.repository.ModelTypeRepository;
+import org.acumos.cds.repository.StepStatusRepository;
+import org.acumos.cds.repository.StepTypeRepository;
 import org.acumos.cds.repository.ToolkitTypeRepository;
 import org.acumos.cds.repository.ValidationSequenceRepository;
 import org.acumos.cds.repository.ValidationStatusRepository;
@@ -83,6 +87,10 @@ public class CodeTableController extends AbstractController {
 	private ValidationSequenceRepository validationSequenceRepository;
 	@Autowired
 	private DeploymentStatusRepository deploymentStatusRepository;
+	@Autowired
+	private StepStatusRepository stepStatusRepository;
+	@Autowired
+	private StepTypeRepository stepTypeRepository;
 
 	/**
 	 * @return List of MLPAccessType objects
@@ -174,6 +182,26 @@ public class CodeTableController extends AbstractController {
 	@ResponseBody
 	public Iterable<MLPValidationSequence> getValidationSequenceList() {
 		return validationSequenceRepository.findAll();
+	}
+
+	/**
+	 * @return List of MLPStepStatus objects
+	 */
+	@ApiOperation(value = "Gets the list of step statuses.", response = MLPStepStatus.class, responseContainer = "Iterable")
+	@RequestMapping(value = "/" + CCDSConstants.STEP_STAT_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public Iterable<MLPStepStatus> getStepStatusList() {
+		return stepStatusRepository.findAll();
+	}
+
+	/**
+	 * @return List of MLPStepType objects
+	 */
+	@ApiOperation(value = "Gets the list of step types.", response = MLPStepType.class, responseContainer = "List")
+	@RequestMapping(value = "/" + CCDSConstants.STEP_TYPE_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public Iterable<MLPStepType> getStepTypeList() {
+		return stepTypeRepository.findAll();
 	}
 
 	/**

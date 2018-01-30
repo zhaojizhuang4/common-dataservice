@@ -61,9 +61,9 @@ public interface SolutionRepository extends JpaRepository<MLPSolution, String>, 
 	Page<MLPSolution> findByTag(@Param("tag") String tag, Pageable pageRequest);
 
 	/**
-	 * Gets all solutions with any update after the specified date, including
-	 * the solution, revision and artifact entities.  Returns no results for
-	 * a solution with no revision(s) and/or no artifact(s).
+	 * Gets all solutions with any update after the specified date, including the
+	 * solution, revision and artifact entities. Returns no results for a solution
+	 * with no revision(s) and/or no artifact(s).
 	 * 
 	 * @param thedate
 	 *            Date threshold

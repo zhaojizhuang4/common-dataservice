@@ -93,7 +93,7 @@ public class BasicSequenceDemo {
 			client.deleteSolutionRevision(cs.getSolutionId(), cr.getRevisionId());
 			client.deleteSolution(cs.getSolutionId());
 			client.deleteUser(cu.getUserId());
-			
+
 		} catch (HttpStatusCodeException ex) {
 			logger.error("basicSequenceDemo failed, server reports: {}", ex.getResponseBodyAsString());
 			throw ex;

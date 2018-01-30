@@ -68,6 +68,9 @@ public abstract class CCDSConstants {
 	public static final String CONFIG_PATH = "config";
 	public static final String THREAD_PATH = "thread";
 	public static final String COMMENT_PATH = "comment";
+	public static final String STEP_RESULT_PATH = "stepresult";
+	public static final String STEP_STAT_PATH = "stepstat";
+	public static final String STEP_TYPE_PATH = "steptype";
 
 	// Actions on entities
 	public static final String LIKE_PATH = "like";

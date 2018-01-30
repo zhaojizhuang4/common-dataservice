@@ -35,7 +35,7 @@ public interface PeerSearchService {
 	 * on the isOr parameter.
 	 * 
 	 * @param queryParameters
-	 *            field-name, field-value pairs.  Value may be scalar or array.
+	 *            field-name, field-value pairs. Value may be scalar or array.
 	 * @param isOr
 	 *            If true, the query is a disjunction ("or"); otherwise the query is
 	 *            a conjunction ("and").

@@ -265,7 +265,8 @@ public class ThreadController extends AbstractController {
 	 *            Revision ID
 	 * @param pageable
 	 *            Sort and page criteria
-	 * @return Page of comments for specified solution and revision, which may include multiple threads
+	 * @return Page of comments for specified solution and revision, which may
+	 *         include multiple threads
 	 */
 	@ApiOperation(value = "Gets a page of comments for the solution and revision IDs, optionally sorted.", response = MLPThread.class, responseContainer = "Page")
 	@RequestMapping(value = CCDSConstants.SOLUTION_PATH + "/{solutionId}/" + CCDSConstants.REVISION_PATH

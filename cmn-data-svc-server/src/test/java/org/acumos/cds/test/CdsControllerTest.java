@@ -33,6 +33,8 @@ import org.acumos.cds.ArtifactTypeCode;
 import org.acumos.cds.DeploymentStatusCode;
 import org.acumos.cds.LoginProviderCode;
 import org.acumos.cds.ModelTypeCode;
+import org.acumos.cds.StepStatusCode;
+import org.acumos.cds.StepTypeCode;
 import org.acumos.cds.ToolkitTypeCode;
 import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.ValidationTypeCode;
@@ -60,6 +62,9 @@ import org.acumos.cds.domain.MLPSolutionRating;
 import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionValidation;
 import org.acumos.cds.domain.MLPSolutionWeb;
+import org.acumos.cds.domain.MLPStepResult;
+import org.acumos.cds.domain.MLPStepStatus;
+import org.acumos.cds.domain.MLPStepType;
 import org.acumos.cds.domain.MLPTag;
 import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
@@ -158,7 +163,7 @@ public class CdsControllerTest {
 
 			cs.setDescription("some description");
 			client.updateSolution(cs);
-			
+
 			MLPSolution fetched = client.getSolution(cs.getSolutionId());
 			Assert.assertTrue(fetched != null && fetched.getTags() != null && fetched.getWebStats() != null);
 
@@ -249,6 +254,16 @@ public class CdsControllerTest {
 		Assert.assertTrue(tt.size() > 0);
 		for (MLPValidationType m : vt)
 			logger.info("Validation type {}", m);
+
+		List<MLPStepStatus> ss = client.getStepStatuses();
+		Assert.assertTrue(ss.size() > 0);
+		for (MLPStepStatus s : ss)
+			logger.info("Step Status {}", s);
+
+		List<MLPStepType> st = client.getStepTypes();
+		Assert.assertTrue(st.size() > 0);
+		for (MLPStepType s : st)
+			logger.info("Step Type {}", s);
 	}
 
 	@Test
@@ -317,7 +332,7 @@ public class CdsControllerTest {
 
 			RestPageResponse<MLPUser> users = client.getUsers(rp);
 			Assert.assertTrue(users.getNumberOfElements() > 0);
-			for (MLPUser u : users.getContent()) 
+			for (MLPUser u : users.getContent())
 				logger.info("Fetched user: " + u);
 
 			// Login
@@ -474,7 +489,6 @@ public class CdsControllerTest {
 			RestPageResponse<MLPTag> tags = client.getTags(new RestPageRequest(0, 100));
 			Assert.assertTrue(tags.getNumberOfElements() > 0);
 
-			// public solution
 			MLPSolution cs = new MLPSolution();
 			cs.setName("solution name");
 			cs.setOwnerId(cu.getUserId());
@@ -552,11 +566,12 @@ public class CdsControllerTest {
 			client.updateSolution(cs);
 			logger.info("Fetching back updated solution");
 			MLPSolution updated = client.getSolution(cs.getSolutionId());
-			Assert.assertTrue(updated != null && !updated.getTags().isEmpty() && updated.getWebStats() != null && updated.getWebStats().getViewCount() > 0);
+			Assert.assertTrue(updated != null && !updated.getTags().isEmpty() && updated.getWebStats() != null
+					&& updated.getWebStats().getViewCount() > 0);
 
 			logger.info("Querying for active PB solutions");
 			Map<String, Object> activePb = new HashMap<>();
-			activePb.put("accessTypeCode", new String [] {AccessTypeCode.PB.name(), AccessTypeCode.OR.name()});
+			activePb.put("accessTypeCode", new String[] { AccessTypeCode.PB.name(), AccessTypeCode.OR.name() });
 			activePb.put("active", Boolean.TRUE);
 			List<MLPSolution> activePbList = client.searchSolutions(activePb, false);
 			Assert.assertTrue(activePbList != null && !activePbList.isEmpty());
@@ -578,31 +593,30 @@ public class CdsControllerTest {
 			Assert.assertTrue(sl2 != null && sl2.getNumberOfElements() > 0);
 
 			// Portal dynamic search
-			String [] searchTags = new String [] { tagName1 };
-			RestPageResponse<MLPSolution> portalTagMatches = client.findPortalSolutions(null, null, true, null, null, null, null, searchTags, 
-					new RestPageRequest(0, 1));
+			String[] searchTags = new String[] { tagName1 };
+			RestPageResponse<MLPSolution> portalTagMatches = client.findPortalSolutions(null, null, true, null, null,
+					null, null, searchTags, new RestPageRequest(0, 1));
 			Assert.assertTrue(portalTagMatches != null && portalTagMatches.getNumberOfElements() > 0);
-	
-			String [] bogusTags = new String [] { "bogus" };
-			RestPageResponse<MLPSolution> portalTagNoMatches = client.findPortalSolutions(null, null, true, null, null, null, null, bogusTags, 
-					new RestPageRequest(0, 1));
+
+			String[] bogusTags = new String[] { "bogus" };
+			RestPageResponse<MLPSolution> portalTagNoMatches = client.findPortalSolutions(null, null, true, null, null,
+					null, null, bogusTags, new RestPageRequest(0, 1));
 			Assert.assertTrue(portalTagNoMatches != null && portalTagNoMatches.getNumberOfElements() == 0);
 
-			RestPageResponse<MLPSolution> portalInactiveMatches = client.findPortalSolutions(null, null, false, null, null, null, null, null, 
-					new RestPageRequest(0, 1));
+			RestPageResponse<MLPSolution> portalInactiveMatches = client.findPortalSolutions(null, null, false, null,
+					null, null, null, null, new RestPageRequest(0, 1));
 			Assert.assertTrue(portalInactiveMatches != null && portalInactiveMatches.getNumberOfElements() > 0);
 
-			String [] nameKw = null;
-			String [] descKw = null;
-			String [] owners = { cu.getUserId() };
-			String [] accessTypeCodes = { AccessTypeCode.PB.name(), AccessTypeCode.OR.name() };
-			String [] modelTypeCodes = null;
-			String [] valStatusCodes = { ValidationStatusCode.IP.name(), "null" };
+			String[] nameKw = null;
+			String[] descKw = null;
+			String[] owners = { cu.getUserId() };
+			String[] accessTypeCodes = { AccessTypeCode.PB.name() };
+			String[] modelTypeCodes = null;
+			String[] valStatusCodes = { ValidationStatusCode.IP.name(), "null" };
 			searchTags = null;
-			// find active solutions
-			RestPageResponse<MLPSolution> portalActiveMatches = client.findPortalSolutions(nameKw, descKw, true, owners, accessTypeCodes, modelTypeCodes, valStatusCodes, searchTags, 
-					new RestPageRequest(0, 9));
-			Assert.assertTrue(portalActiveMatches != null && portalActiveMatches.getNumberOfElements() > 1);
+			RestPageResponse<MLPSolution> portalActiveMatches = client.findPortalSolutions(nameKw, descKw, true, owners,
+					accessTypeCodes, modelTypeCodes, valStatusCodes, searchTags, new RestPageRequest(0, 1));
+			Assert.assertTrue(portalActiveMatches != null && portalActiveMatches.getNumberOfElements() > 0);
 
 			// Add user access
 			client.addSolutionUserAccess(cs.getSolutionId(), cu.getUserId());
@@ -985,6 +999,41 @@ public class CdsControllerTest {
 	}
 
 	@Test
+	public void testStepResult() throws Exception {
+		try {
+
+			MLPStepResult sr = new MLPStepResult();
+			sr.setStepCode(StepTypeCode.OB.name());
+
+			sr.setName("Solution ID creation");
+
+			sr.setStatusCode(String.valueOf(StepStatusCode.SU));
+
+			Date now = new Date();
+			sr.setStartDate(new Date(now.getTime() - 60 * 1000));
+
+			sr = client.createStepResult(sr);
+			Assert.assertNotNull(sr.getStepResultId());
+
+			sr.setResult("New stack trace");
+			client.updateStepResult(sr);
+
+			RestPageResponse<MLPStepResult> stepResults = client.getStepResults(new RestPageRequest(0, 100));
+
+			Assert.assertTrue(stepResults.iterator().hasNext());
+			logger.info("First step result {}", stepResults.iterator().next());
+
+			client.deleteStepResult(sr.getStepResultId());
+
+		} catch (HttpStatusCodeException ex) {
+			logger.error("testStepResults got response {}", ex.getResponseBodyAsString());
+			logger.error("testStepResults failed", ex);
+			throw ex;
+		}
+
+	}
+
+	@Test
 	public void testSiteConfig() throws Exception {
 		final String s64 = "12345678901234567890123456789012345678901234567890123456789012345";
 		MLPUser cu = new MLPUser("loginId", true);
@@ -1063,7 +1112,7 @@ public class CdsControllerTest {
 		MLPSolutionRevision cr = new MLPSolutionRevision(cs.getSolutionId(), "1.0", cu.getUserId());
 		cr = client.createSolutionRevision(cr);
 		Assert.assertNotNull(cr.getRevisionId());
-			
+
 		MLPThread thread = client.createThread(new MLPThread(cs.getSolutionId(), cr.getRevisionId()));
 		Assert.assertTrue(thread != null && thread.getThreadId() != null);
 		RestPageResponse<MLPThread> threads = client.getThreads(new RestPageRequest(0, 1));
@@ -1071,8 +1120,9 @@ public class CdsControllerTest {
 
 		MLPThread retrieved = client.getThread(thread.getThreadId());
 		Assert.assertNotNull(retrieved);
-		
-		RestPageResponse<MLPThread> threadsById = client.getSolutionRevisionThreads(cs.getSolutionId(), cr.getRevisionId(), new RestPageRequest(0, 1));
+
+		RestPageResponse<MLPThread> threadsById = client.getSolutionRevisionThreads(cs.getSolutionId(),
+				cr.getRevisionId(), new RestPageRequest(0, 1));
 		Assert.assertTrue(threadsById != null && threadsById.getNumberOfElements() > 0);
 
 		long threadCount = client.getThreadCount();
@@ -1153,7 +1203,8 @@ public class CdsControllerTest {
 				new RestPageRequest(0, 1));
 		Assert.assertTrue(threadComments != null && threadComments.hasContent());
 
-		RestPageResponse<MLPComment> commentsById = client.getSolutionRevisionComments(cs.getSolutionId(), cr.getRevisionId(), new RestPageRequest(0, 1));
+		RestPageResponse<MLPComment> commentsById = client.getSolutionRevisionComments(cs.getSolutionId(),
+				cr.getRevisionId(), new RestPageRequest(0, 1));
 		Assert.assertTrue(commentsById != null && commentsById.getNumberOfElements() > 0);
 
 		try {
@@ -1182,7 +1233,7 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Failed to create comment bad user as expected {}", ex.getResponseBodyAsString());
 		}
-		char [] longCommentChars = new char[8193];
+		char[] longCommentChars = new char[8193];
 		for (int i = 0; i < longCommentChars.length; ++i)
 			longCommentChars[i] = 'x';
 		String longCommentString = new String(longCommentChars);
@@ -1860,8 +1911,8 @@ public class CdsControllerTest {
 			logger.info("Find sols by tag failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			String [] searchTags = new String [] { "%" };
-			client.findPortalSolutions(null, null, true, null, null, null, null, searchTags, new RestPageRequest(0,1)); 
+			String[] searchTags = new String[] { "%" };
+			client.findPortalSolutions(null, null, true, null, null, null, null, searchTags, new RestPageRequest(0, 1));
 			// I have not been able to make findPortalSolutions fail.
 			// all arguments are optional; there is no illegal value; etc.
 			// TODO: throw new Exception("Unexpected success");

@@ -5,6 +5,12 @@ Release Notes
 The client and server are released together.  The client is deployed as a jar file to a 
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.  
 
+Version 1.13.0, 5 February 2018
+-------------------------------
+
+* Support workflow step results
+* Requires database schema version 1.13
+
 Version 1.12.1, 26 January 2018
 -------------------------------
 

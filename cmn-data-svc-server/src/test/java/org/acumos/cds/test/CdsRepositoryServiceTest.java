@@ -31,6 +31,8 @@ import javax.validation.ConstraintViolationException;
 import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.ArtifactTypeCode;
 import org.acumos.cds.ModelTypeCode;
+import org.acumos.cds.StepStatusCode;
+import org.acumos.cds.StepTypeCode;
 import org.acumos.cds.ToolkitTypeCode;
 import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.domain.MLPAccessType;
@@ -55,6 +57,7 @@ import org.acumos.cds.domain.MLPSolutionRating;
 import org.acumos.cds.domain.MLPSolutionRating.SolutionRatingPK;
 import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionWeb;
+import org.acumos.cds.domain.MLPStepResult;
 import org.acumos.cds.domain.MLPTag;
 import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
@@ -84,6 +87,7 @@ import org.acumos.cds.repository.SolutionRatingRepository;
 import org.acumos.cds.repository.SolutionRepository;
 import org.acumos.cds.repository.SolutionRevisionRepository;
 import org.acumos.cds.repository.SolutionWebRepository;
+import org.acumos.cds.repository.StepResultRepository;
 import org.acumos.cds.repository.TagRepository;
 import org.acumos.cds.repository.ThreadRepository;
 import org.acumos.cds.repository.ToolkitTypeRepository;
@@ -184,6 +188,8 @@ public class CdsRepositoryServiceTest {
 	private SolutionSearchService solutionSearchService;
 	@Autowired
 	private UserSearchService userService;
+	@Autowired
+	private StepResultRepository stepResultRepository;
 
 	@Test
 	public void testingRepositories() throws Exception {
@@ -399,10 +405,10 @@ public class CdsRepositoryServiceTest {
 
 			// Search for a list
 			Map<String, Object> solListParms = new HashMap<>();
-			solListParms.put("name", new String [] {cs.getName()});
+			solListParms.put("name", new String[] { cs.getName() });
 			List<MLPSolution> searchListSols = solutionSearchService.findSolutions(solListParms, false);
 			Assert.assertTrue(searchListSols.size() == 1);
-			
+
 			logger.info("Finding portal solutions");
 			String[] solKw = { solName };
 			String[] descKw = { solDesc };
@@ -532,7 +538,8 @@ public class CdsRepositoryServiceTest {
 
 			Date anHourAgo = new java.util.Date();
 			anHourAgo.setTime(new Date().getTime() - (1000L * 60 * 60));
-			Iterable<MLPSolution> solByDate = solutionRepository.findModifiedAfter(anHourAgo, new PageRequest(0, 5, null));
+			Iterable<MLPSolution> solByDate = solutionRepository.findModifiedAfter(anHourAgo,
+					new PageRequest(0, 5, null));
 			logger.info("Solutions by date: {}", solByDate);
 			Assert.assertTrue(solByDate != null && solByDate.iterator().hasNext());
 
@@ -572,7 +579,8 @@ public class CdsRepositoryServiceTest {
 				logger.info("Removing newly added entities");
 				// Dropping the revision above; don't need delete here
 				// solRevArtMapRepository.delete(new
-				// MLPSolRevArtMap.SolRevArtMapPK(cr.getRevisionId(), ca.getArtifactId()));
+				// MLPSolRevArtMap.SolRevArtMapPK(cr.getRevisionId(),
+				// ca.getArtifactId()));
 				revisionRepository.delete(cr);
 				solutionRatingRepository.delete(solrate);
 				MLPSolTagMap.SolTagMapPK solTagMapKey = new MLPSolTagMap.SolTagMapPK(cs.getSolutionId(), tag1.getTag());
@@ -1040,6 +1048,38 @@ public class CdsRepositoryServiceTest {
 			notifUserMapRepository.delete(nm);
 			notificationRepository.delete(no);
 			userRepository.delete(cu);
+		} catch (Exception ex) {
+			logger.error("Failed", ex);
+			throw ex;
+		}
+
+	}
+
+	@Test
+	public void testStepResults() throws Exception {
+		try {
+			MLPStepResult sr = new MLPStepResult();
+
+			sr.setStepCode(String.valueOf(StepTypeCode.OB));
+			sr.setName("Solution ID creation");
+			sr.setStatusCode(StepStatusCode.FA.name());
+
+			Date now = new Date();
+			sr.setStartDate(new Date(now.getTime() - 60 * 1000));
+
+			sr = stepResultRepository.save(sr);
+			Assert.assertNotNull(sr.getStepResultId());
+
+			long srCountTrans = stepResultRepository.count();
+			Assert.assertTrue(srCountTrans > 0);
+			Assert.assertNotNull(stepResultRepository.findOne(sr.getStepResultId()));
+			logger.info("First step result {}", stepResultRepository.findOne(sr.getStepResultId()));
+
+			sr.setResult("New stack trace");
+			stepResultRepository.save(sr);
+
+			Assert.assertNotNull(stepResultRepository.findOne(sr.getStepResultId()).getResult());
+			stepResultRepository.delete(sr.getStepResultId());
 		} catch (Exception ex) {
 			logger.error("Failed", ex);
 			throw ex;

@@ -17,20 +17,22 @@
  * limitations under the License.
  * ===============LICENSE_END=========================================================
  */
+package org.acumos.cds.repository;
 
-package org.acumos.cds.domain;
+import org.acumos.cds.domain.MLPStepResult;
+import org.acumos.cds.domain.MLPTag;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
-import java.io.Serializable;
+public interface StepResultRepository extends PagingAndSortingRepository<MLPStepResult, Long> {
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+	/**
+	 * Finds step results for the specified tracking ID.
+	 * 
+	 * @param trackingId
+	 *            tracking ID
+	 * @return Iterable of MLPStepResult
+	 */
+	Iterable<MLPTag> findByTrackingId(@Param("trackingId") String trackingId);
 
-/**
- * Model for deployment status, a code-name pair.
- */
-@Entity
-@Table(name = "C_DEPLOYMENT_STATUS")
-public class MLPDeploymentStatus extends MLPStatusCodeEntity implements Serializable {
-
-	private static final long serialVersionUID = 4071413895054694395L;
 }

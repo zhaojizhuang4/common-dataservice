@@ -29,6 +29,8 @@ import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.DeploymentStatusCode;
 import org.acumos.cds.LoginProviderCode;
 import org.acumos.cds.ModelTypeCode;
+import org.acumos.cds.StepStatusCode;
+import org.acumos.cds.StepTypeCode;
 import org.acumos.cds.ToolkitTypeCode;
 import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.ValidationTypeCode;
@@ -54,6 +56,9 @@ import org.acumos.cds.domain.MLPSolutionRating;
 import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionValidation;
 import org.acumos.cds.domain.MLPSolutionWeb;
+import org.acumos.cds.domain.MLPStepResult;
+import org.acumos.cds.domain.MLPStepStatus;
+import org.acumos.cds.domain.MLPStepType;
 import org.acumos.cds.domain.MLPTag;
 import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
@@ -123,7 +128,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private List<MLPRole> searchRoles;
 	private RestPageResponse<MLPRole> roles;
 	private MLPRole roleById = new MLPRole();
-	private MLPRole role  = new MLPRole();
+	private MLPRole role = new MLPRole();
 	private List<MLPRoleFunction> roleFunctions;
 	private MLPRoleFunction roleFunctionById = new MLPRoleFunction();
 	private MLPRoleFunction roleFunction = new MLPRoleFunction();
@@ -144,6 +149,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private RestPageResponse<MLPNotification> notifications;
 	private MLPNotification notification;
 	private RestPageResponse<MLPUserNotification> userNotifications;
+	private MLPStepResult stepResult;
 	private MLPSolutionWeb solutionWeb = new MLPSolutionWeb();
 	private List<MLPUser> solutionAccessUsers;
 	private RestPageResponse<MLPSolution> userAccessSolutions;
@@ -170,6 +176,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private List<MLPSolution> searchSolutions;
 	private RestPageResponse<MLPThread> solutionRevisionThreads;
 	private RestPageResponse<MLPComment> solutionRevisionComments;
+	private RestPageResponse<MLPStepResult> stepResults;
 
 	/**
 	 * No-argument constructor.
@@ -328,6 +335,32 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 			MLPDeploymentStatus b = new MLPDeploymentStatus();
 			b.setStatusCode(a.name());
 			b.setStatusName(a.getStatusName());
+			list.add(b);
+		}
+		return list;
+	}
+
+	@Override
+	public List<MLPStepStatus> getStepStatuses() {
+		List<MLPStepStatus> list = new ArrayList<>();
+		for (StepStatusCode a : StepStatusCode.values()) {
+			MLPStepStatus b = new MLPStepStatus();
+			b.setStatusCode(a.name());
+			b.setStatusName(a.getStatusName());
+			// b.setTypeCode(String.valueOf(a.name()));
+			// b.setTypeName(a.getStatusName());
+			list.add(b);
+		}
+		return list;
+	}
+
+	@Override
+	public List<MLPStepType> getStepTypes() {
+		List<MLPStepType> list = new ArrayList<>();
+		for (StepTypeCode a : StepTypeCode.values()) {
+			MLPStepType b = new MLPStepType();
+			b.setTypeCode(a.name());
+			b.setTypeName(a.getStepName());
 			list.add(b);
 		}
 		return list;
@@ -1353,6 +1386,35 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	public RestPageResponse<MLPComment> getSolutionRevisionComments(String solutionId, String revisionId,
 			RestPageRequest pageRequest) {
 		return this.solutionRevisionComments;
+	}
+
+	public void setStepResults(RestPageResponse<MLPStepResult> results) {
+		this.stepResults = results;
+	}
+
+	@Override
+	public RestPageResponse<MLPStepResult> getStepResults(RestPageRequest pageRequest) {
+		return stepResults;
+	}
+
+	public void setStepResult(MLPStepResult result) {
+		this.stepResult = result;
+	}
+
+	@Override
+	public MLPStepResult createStepResult(MLPStepResult stepResult) {
+		// TODO Auto-generated method stub
+		return this.stepResult;
+	}
+
+	@Override
+	public void updateStepResult(MLPStepResult stepResult) {
+		this.stepResult = stepResult;
+	}
+
+	@Override
+	public void deleteStepResult(Long stepResultId) {
+		// How to mock?
 	}
 
 }

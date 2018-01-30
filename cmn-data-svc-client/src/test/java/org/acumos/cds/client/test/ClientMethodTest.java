@@ -160,7 +160,8 @@ public class ClientMethodTest {
 		}
 		try {
 			String[] array = new String[] { "I'm a string" };
-			client.findPortalSolutions(array, array, true, array, array, array, array, array, new RestPageRequest(0, 1));
+			client.findPortalSolutions(array, array, true, array, array, array, array, array,
+					new RestPageRequest(0, 1));
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}

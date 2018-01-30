@@ -232,8 +232,8 @@ public class SolutionController extends AbstractController {
 	}
 
 	/**
-	 * Fetches the value, and converts the four-letter sequence
-	 * "null" to the null value.
+	 * Fetches the value, and converts the four-letter sequence "null" to the null
+	 * value.
 	 * 
 	 * @param parmName
 	 *            Map key

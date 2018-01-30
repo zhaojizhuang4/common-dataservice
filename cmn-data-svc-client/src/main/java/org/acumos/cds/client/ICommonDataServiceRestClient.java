@@ -45,6 +45,9 @@ import org.acumos.cds.domain.MLPSolutionRating;
 import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionValidation;
 import org.acumos.cds.domain.MLPSolutionWeb;
+import org.acumos.cds.domain.MLPStepResult;
+import org.acumos.cds.domain.MLPStepStatus;
+import org.acumos.cds.domain.MLPStepType;
 import org.acumos.cds.domain.MLPTag;
 import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
@@ -1490,5 +1493,53 @@ public interface ICommonDataServiceRestClient {
 	 *            comment ID
 	 */
 	void deleteComment(String threadId, String commentId);
+
+	/**
+	 * Gets a page of step results.
+	 * 
+	 * @param pageRequest
+	 *            Page index, page size, sort information; ignored if null.
+	 * @return Page of step result objects.
+	 */
+	RestPageResponse<MLPStepResult> getStepResults(RestPageRequest pageRequest);
+
+	/**
+	 * Creates a step result.
+	 * 
+	 * @param stepResult
+	 *            result Step Result data.
+	 * @return Complete object, with generated information such as ID
+	 */
+	MLPStepResult createStepResult(MLPStepResult stepResult);
+
+	/**
+	 * Updates a step result.
+	 * 
+	 * @param stepResult
+	 *            Step Result data
+	 */
+	void updateStepResult(MLPStepResult stepResult);
+
+	/**
+	 * Deletes a step result.
+	 * 
+	 * @param stepResultId
+	 *            stepResult ID
+	 */
+	void deleteStepResult(Long stepResultId);
+
+	/**
+	 * Gets all step statuses.
+	 * 
+	 * @return List of step status objects.
+	 */
+	List<MLPStepStatus> getStepStatuses();
+
+	/**
+	 * Gets all step types.
+	 * 
+	 * @return List of step type objects.
+	 */
+	List<MLPStepType> getStepTypes();
 
 }

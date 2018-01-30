@@ -18,19 +18,20 @@
  * ===============LICENSE_END=========================================================
  */
 
-package org.acumos.cds.domain;
+package org.acumos.cds;
 
-import java.io.Serializable;
+public enum StepTypeCode {
+	OB("Onboarding"), //
+	VL("Validation");
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+	private String stepName;
 
-/**
- * Model for deployment status, a code-name pair.
- */
-@Entity
-@Table(name = "C_DEPLOYMENT_STATUS")
-public class MLPDeploymentStatus extends MLPStatusCodeEntity implements Serializable {
+	private StepTypeCode(final String stepName) {
+		this.stepName = stepName;
+	}
 
-	private static final long serialVersionUID = 4071413895054694395L;
+	public String getStepName() {
+		return stepName;
+	}
+
 }

@@ -104,7 +104,8 @@ public class RoleController extends AbstractController {
 	@ApiOperation(value = "Searches for roles using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disunction).", response = MLPRole.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchRoles(@RequestParam MultiValueMap<String, String> queryParameters, HttpServletResponse response) {
+	public Object searchRoles(@RequestParam MultiValueMap<String, String> queryParameters,
+			HttpServletResponse response) {
 		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
 		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
 		if (queryParameters.size() == 0) {

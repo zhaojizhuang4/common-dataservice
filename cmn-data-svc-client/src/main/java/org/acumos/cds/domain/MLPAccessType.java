@@ -35,7 +35,7 @@ public class MLPAccessType extends MLPTypeCodeEntity implements MLPEntity, Seria
 	private static final long serialVersionUID = -3836564419430582350L;
 
 	// Getters for backward compatibility
-	
+
 	public String getAccessCode() {
 		return getTypeCode();
 	}
