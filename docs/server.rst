@@ -44,9 +44,12 @@ Using an external database
 
 The server can be configured to use an external database as follows:
 
-    1. Check that a configuration file "application.properties" is in the current working directory with suitable server coordinates
-    2. Ensure the database server is reachable at the expected port
-    3. Check that the database tables have been created and populated
+    1. Copy the local application.properties file to a new file "application-mydb.properties" 
+    2. Revise the new "mydb" properties file to have suitable server coordinates and credentials
+    3. Ensure the newly configured database server is reachable at the expected port
+    4. Check that the database tables have been created and populated
+    5. Launch the test as usual, adding this extra argument to use the alternate properties file:
+          -Dspring.config.name=application-mydb
 
 Launching
 ~~~~~~~~~
@@ -168,7 +171,6 @@ The same "password" parameter used to encrypt the passwords must be supplied at 
 2. Alternately, the password can be supplied on the command line with a JVM argument "-Djasypt.encryptor.password"::
 
     java -jar cmn-data-svc-server-N.N.jar -Djasypt.encryptor.password=EncryptionKey
-
 
 Launch Instructions
 ~~~~~~~~~~~~~~~~~~~
