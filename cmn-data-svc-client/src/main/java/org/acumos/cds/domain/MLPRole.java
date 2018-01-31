@@ -101,6 +101,14 @@ public class MLPRole extends MLPTimestampedEntity implements Serializable {
 		this.name = name;
 	}
 
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
 	@Override
 	public boolean equals(Object that) {
 		if (that == null)

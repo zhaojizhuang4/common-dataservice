@@ -20,18 +20,32 @@
 
 package org.acumos.cds.repository;
 
-import org.acumos.cds.domain.MLPUserNotifPref;
-import org.springframework.data.repository.CrudRepository;
+import java.util.List;
+
+import org.acumos.cds.domain.MLPPeer;
+import org.acumos.cds.domain.MLPPeerPeerAccMap;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface UserNotificationPreferenceRepository extends CrudRepository<MLPUserNotifPref, Long> {
+public interface PeerPeerAccMapRepository extends PagingAndSortingRepository<MLPPeerPeerAccMap, MLPPeerPeerAccMap.PeerPeerAccMapPK> {
+
 	/**
-	 * Finds all entries for the specified userId.
+	 * Gets the list of peers accessible to the specified peer.
 	 * 
-	 * @param userId
-	 *            User ID
-	 * @return Iterable of user notification preference objects
+	 * There must be a better way than this nested query.
+	 * 
+	 * @param peerId
+	 *            Peer ID
+	 * @return List of accessible peers
 	 */
-	Iterable<MLPUserNotifPref> findByUserId(@Param("userId") String userId);
+	@Query("SELECT p FROM MLPPeer p WHERE p.peerId IN  "//
+			+ " ( SELECT pg.peerId FROM MLPPeerGrpMemMap pg WHERE pg.groupId IN " //
+			+ "    ( SELECT pp.resourcePeerGroupId FROM MLPPeerPeerAccMap pp WHERE pp.principalPeerGroupId IN "
+			+ "       ( SELECT pg2.groupId FROM MLPPeerGrpMemMap pg2 WHERE pg2.peerId = :peerId ) "
+			+ "    ) "
+			+ " ) "
+			)
+	List<MLPPeer> findAccessPeers(@Param("peerId") String peerId);
 
 }

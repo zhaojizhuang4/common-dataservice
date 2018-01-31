@@ -20,10 +20,10 @@
 
 package org.acumos.cds.test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -45,17 +45,22 @@ import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPNotifUserMap;
 import org.acumos.cds.domain.MLPNotification;
-import org.acumos.cds.domain.MLPNotificationDeliveryMechanismType;
 import org.acumos.cds.domain.MLPPeer;
+import org.acumos.cds.domain.MLPPeerGroup;
+import org.acumos.cds.domain.MLPPeerGrpMemMap;
+import org.acumos.cds.domain.MLPPeerPeerAccMap;
+import org.acumos.cds.domain.MLPPeerSolAccMap;
 import org.acumos.cds.domain.MLPPeerSubscription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
 import org.acumos.cds.domain.MLPSiteConfig;
+import org.acumos.cds.domain.MLPSolGrpMemMap;
 import org.acumos.cds.domain.MLPSolRevArtMap;
 import org.acumos.cds.domain.MLPSolTagMap;
 import org.acumos.cds.domain.MLPSolUserAccMap;
 import org.acumos.cds.domain.MLPSolution;
 import org.acumos.cds.domain.MLPSolutionDownload;
+import org.acumos.cds.domain.MLPSolutionGroup;
 import org.acumos.cds.domain.MLPSolutionRating;
 import org.acumos.cds.domain.MLPSolutionRating.SolutionRatingPK;
 import org.acumos.cds.domain.MLPSolutionRevision;
@@ -65,22 +70,28 @@ import org.acumos.cds.domain.MLPTag;
 import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
-import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPUserNotifPref;
+import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPUserRoleMap;
 import org.acumos.cds.repository.ArtifactRepository;
 import org.acumos.cds.repository.CommentRepository;
 import org.acumos.cds.repository.NotifUserMapRepository;
 import org.acumos.cds.repository.NotificationRepository;
+import org.acumos.cds.repository.PeerGroupRepository;
+import org.acumos.cds.repository.PeerGrpMemMapRepository;
+import org.acumos.cds.repository.PeerPeerAccMapRepository;
 import org.acumos.cds.repository.PeerRepository;
+import org.acumos.cds.repository.PeerSolAccMapRepository;
 import org.acumos.cds.repository.PeerSubscriptionRepository;
 import org.acumos.cds.repository.RoleFunctionRepository;
 import org.acumos.cds.repository.RoleRepository;
 import org.acumos.cds.repository.SiteConfigRepository;
+import org.acumos.cds.repository.SolGrpMemMapRepository;
 import org.acumos.cds.repository.SolRevArtMapRepository;
 import org.acumos.cds.repository.SolTagMapRepository;
 import org.acumos.cds.repository.SolUserAccMapRepository;
 import org.acumos.cds.repository.SolutionDownloadRepository;
+import org.acumos.cds.repository.SolutionGroupRepository;
 import org.acumos.cds.repository.SolutionRatingRepository;
 import org.acumos.cds.repository.SolutionRepository;
 import org.acumos.cds.repository.SolutionRevisionRepository;
@@ -109,7 +120,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.TransactionSystemException;
-import org.springframework.web.client.HttpStatusCodeException;
 
 /**
  * Tests the repository and service classes that provide access to the database.
@@ -181,6 +191,18 @@ public class CdsRepositoryServiceTest {
 	private StepResultSearchService stepResultSearchService;
 	@Autowired
 	private UserNotificationPreferenceRepository usrNotifPrefRepository;
+	@Autowired
+	private PeerGroupRepository peerGroupRepository;
+	@Autowired
+	private SolutionGroupRepository solutionGroupRepository;
+	@Autowired
+	private PeerGrpMemMapRepository peerGroupMemMapRepository;
+	@Autowired
+	private SolGrpMemMapRepository solGroupMemMapRepository;
+	@Autowired
+	private PeerSolAccMapRepository peerSolAccMapRepository;
+	@Autowired
+	private PeerPeerAccMapRepository peerPeerAccMapRepository;
 
 	@Test
 	public void testingRepositories() throws Exception {
@@ -1024,7 +1046,6 @@ public class CdsRepositoryServiceTest {
 			logger.error("Failed", ex);
 			throw ex;
 		}
-
 	}
 
 	@Test
@@ -1064,7 +1085,7 @@ public class CdsRepositoryServiceTest {
 			usrNotifPrefRepository.save(new MLPUserNotifPref());
 			throw new Exception("Unexpected success");
 		} catch (ConstraintViolationException ex) {
-			logger.info("create user notification preference failed as expected: {}", ex.getStackTrace());
+			logger.info("create user notification preference failed as expected: " + ex.toString());
 		}
 		try {
 			MLPUserNotifPref usrNotifPrefFld = new MLPUserNotifPref();
@@ -1072,7 +1093,7 @@ public class CdsRepositoryServiceTest {
 			usrNotifPrefRepository.save(usrNotifPrefFld);
 			throw new Exception("Unexpected success");
 		} catch (ConstraintViolationException ex) {
-			logger.info("update user notification preference failed as expected: {}", ex.getStackTrace());
+			logger.info("update user notification preference failed as expected:" + ex.toString());
 		}
 	}
 
@@ -1110,7 +1131,117 @@ public class CdsRepositoryServiceTest {
 			logger.error("Failed", ex);
 			throw ex;
 		}
+	}
 
+	@Test
+	public void testPeerSolutionGroups() {
+		// Need a user to create a solution
+		MLPUser cu = null;
+		cu = new MLPUser();
+		cu.setActive(true);
+		final String loginName = "test_user_" + Long.toString(new Date().getTime());
+		cu.setLoginName(loginName);
+		cu = userRepository.save(cu);
+		Assert.assertNotNull("User ID", cu.getUserId());
+		logger.info("Created user " + cu);
+
+		MLPSolution cs1 = new MLPSolution("solutionName", cu.getUserId(), false);
+		cs1 = solutionRepository.save(cs1);
+		Assert.assertNotNull("Solution ID", cs1.getSolutionId());
+		logger.info("Created solution " + cs1);
+
+		MLPSolution cs2 = new MLPSolution("solutionName2", cu.getUserId(), false);
+		cs2 = solutionRepository.save(cs2);
+		Assert.assertNotNull("Solution ID", cs2.getSolutionId());
+		logger.info("Created solution " + cs2);
+
+		final String peerName = "Peer-" + Long.toString(new Date().getTime());
+		MLPPeer pr = new MLPPeer(peerName, "x.509", "http://peer-api", true, false, "contact", PeerStatusCode.AC.name(),
+				ValidationStatusCode.FA.name());
+		pr = peerRepository.save(pr);
+		logger.info("Created peer " + pr);
+
+		final String peerName2 = "Peer-" + Long.toString(new Date().getTime());
+		MLPPeer pr2 = new MLPPeer(peerName2, "x.509", "http://peer-api", true, false, "contact", PeerStatusCode.AC.name(),
+				ValidationStatusCode.FA.name());
+		pr2 = peerRepository.save(pr2);
+		logger.info("Created second peer " + pr2);
+
+		MLPPeerGroup pg1 = new MLPPeerGroup("peer group 1");
+		pg1 = peerGroupRepository.save(pg1);
+		Assert.assertNotNull(pg1.getGroupId());
+		logger.info("Created peer group " + pg1);
+
+		MLPPeerGroup pg2 = new MLPPeerGroup("peer group 2");
+		pg2 = peerGroupRepository.save(pg2);
+		Assert.assertNotNull(pg2.getGroupId());
+		logger.info("Created peer group " + pg2);
+
+		MLPSolutionGroup sg = new MLPSolutionGroup("solution group");
+		sg = solutionGroupRepository.save(sg);
+		Assert.assertNotNull(sg.getGroupId());
+		logger.info("Created solution group " + sg);
+
+		PageRequest pageable = new PageRequest(0, 3);
+
+		MLPPeerGrpMemMap pgm1 = new MLPPeerGrpMemMap(pg1.getGroupId(), pr.getPeerId());
+		pgm1 = peerGroupMemMapRepository.save(pgm1);
+		logger.info("Created peer group map " + pgm1);
+		Page<MLPPeer> peers1 = peerGroupMemMapRepository.findPeersByGroupId(pg1.getGroupId(), pageable);
+		Assert.assertTrue(peers1 != null && peers1.getNumberOfElements() > 0);
+
+		MLPPeerGrpMemMap pgm2 = new MLPPeerGrpMemMap(pg2.getGroupId(), pr2.getPeerId());
+		pgm2 = peerGroupMemMapRepository.save(pgm2);
+		logger.info("Created peer group map " + pgm2);
+		Page<MLPPeer> peers2 = peerGroupMemMapRepository.findPeersByGroupId(pg2.getGroupId(), pageable);
+		Assert.assertTrue(peers2 != null && peers2.getNumberOfElements() > 0);
+
+		MLPSolGrpMemMap gsm = new MLPSolGrpMemMap(sg.getGroupId(), cs1.getSolutionId());
+		gsm = solGroupMemMapRepository.save(gsm);
+		logger.info("Created solution group map " + gsm);
+		Page<MLPSolution> sols = solGroupMemMapRepository.findSolutionsByGroupId(pg1.getGroupId(), pageable);
+		Assert.assertTrue(sols != null && sols.getNumberOfElements() > 0);
+
+		MLPPeerSolAccMap gpsm = new MLPPeerSolAccMap(pg1.getGroupId(), sg.getGroupId(), true);
+		gpsm = peerSolAccMapRepository.save(gpsm);
+		logger.info("Created peer group - sol group map " + gpsm);
+		MLPPeerSolAccMap.PeerSolAccMapPK pk = new MLPPeerSolAccMap.PeerSolAccMapPK(pg1.getGroupId(), sg.getGroupId());
+		MLPPeerSolAccMap map = peerSolAccMapRepository.findOne(pk);
+		Assert.assertNotNull(map);
+		
+		MLPPeerPeerAccMap gppm = new MLPPeerPeerAccMap(pg1.getGroupId(), pg2.getGroupId());
+		gppm = peerPeerAccMapRepository.save(gppm);
+		logger.info("Created peer group - peer group map " + gppm);
+		MLPPeerPeerAccMap.PeerPeerAccMapPK ppKey = new MLPPeerPeerAccMap.PeerPeerAccMapPK(pg1.getGroupId(),
+				pg2.getGroupId());
+		MLPPeerPeerAccMap ppMap = peerPeerAccMapRepository.findOne(ppKey);
+		Assert.assertNotNull(ppMap);
+		
+		List<MLPPeer> accessPeers = peerPeerAccMapRepository.findAccessPeers(pr.getPeerId());
+		Assert.assertTrue(accessPeers != null && !accessPeers.isEmpty());
+
+		List<MLPPeer> accessPeers2 = peerPeerAccMapRepository.findAccessPeers(pr2.getPeerId());
+		Assert.assertTrue(accessPeers2 != null && accessPeers2.isEmpty());
+
+		long yesAccess = peerSolAccMapRepository.checkPeerSolutionAccess(pr.getPeerId(), cs1.getSolutionId());
+		Assert.assertTrue(yesAccess > 0);
+		logger.info("Access count: " + yesAccess);
+		long noAccess = peerSolAccMapRepository.checkPeerSolutionAccess(pr.getPeerId(), cs2.getSolutionId());
+		Assert.assertTrue(noAccess <= 0);
+		logger.info("No access count: " + noAccess);
+
+		peerPeerAccMapRepository.delete(gppm);
+		peerSolAccMapRepository.delete(gpsm);
+		solGroupMemMapRepository.delete(gsm);
+		peerGroupMemMapRepository.delete(pgm2);
+		peerGroupMemMapRepository.delete(pgm1);
+		solutionGroupRepository.delete(sg);
+		peerGroupRepository.delete(pg1);
+		peerRepository.delete(pr2);
+		peerRepository.delete(pr);
+		solutionRepository.delete(cs2);
+		solutionRepository.delete(cs1);
+		userRepository.delete(cu);
 	}
 
 	@Test

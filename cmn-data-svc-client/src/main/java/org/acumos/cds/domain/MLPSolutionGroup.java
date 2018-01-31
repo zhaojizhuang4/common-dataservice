@@ -18,20 +18,40 @@
  * ===============LICENSE_END=========================================================
  */
 
-package org.acumos.cds.repository;
+package org.acumos.cds.domain;
 
-import org.acumos.cds.domain.MLPUserNotifPref;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
+import java.io.Serializable;
 
-public interface UserNotificationPreferenceRepository extends CrudRepository<MLPUserNotifPref, Long> {
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+/**
+ * Model for a solution group to support access control. The group definition is
+ * an ID-name pair. The ID is used in another table to map solution(s) to
+ * group(s).
+ */
+@Entity
+@Table(name = "C_SOLUTION_GROUP")
+public class MLPSolutionGroup extends MLPAbstractGroup implements Serializable {
+
+	private static final long serialVersionUID = -327686386522809395L;
+
 	/**
-	 * Finds all entries for the specified userId.
-	 * 
-	 * @param userId
-	 *            User ID
-	 * @return Iterable of user notification preference objects
+	 * No-arg constructor.
 	 */
-	Iterable<MLPUserNotifPref> findByUserId(@Param("userId") String userId);
+	public MLPSolutionGroup() {
+		// no-arg constructor
+	}
+
+	/**
+	 * This constructor accepts the required fields; i.e., the minimum that the user
+	 * must supply to create a valid instance.
+	 * 
+	 * @param name
+	 *            Group name
+	 */
+	public MLPSolutionGroup(String name) {
+		super(name);
+	}
 
 }

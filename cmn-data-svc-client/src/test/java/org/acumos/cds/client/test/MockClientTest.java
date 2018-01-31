@@ -31,6 +31,8 @@ import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPNotification;
 import org.acumos.cds.domain.MLPPasswordChangeRequest;
 import org.acumos.cds.domain.MLPPeer;
+import org.acumos.cds.domain.MLPPeerGroup;
+import org.acumos.cds.domain.MLPPeerSolAccMap;
 import org.acumos.cds.domain.MLPPeerSubscription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
@@ -39,6 +41,7 @@ import org.acumos.cds.domain.MLPSolution;
 import org.acumos.cds.domain.MLPSolutionDeployment;
 import org.acumos.cds.domain.MLPSolutionDownload;
 import org.acumos.cds.domain.MLPSolutionFavorite;
+import org.acumos.cds.domain.MLPSolutionGroup;
 import org.acumos.cds.domain.MLPSolutionRating;
 import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionValidation;
@@ -449,5 +452,53 @@ public class MockClientTest {
 		Assert.assertTrue(stepResult == client.createStepResult(stepResult));
 		client.updateStepResult(stepResult);
 		client.deleteStepResult(0L);
+		
+		RestPageResponse<MLPPeerGroup> peerGroups = new RestPageResponse<>();
+		client.setPeerGroups(peerGroups);
+		Assert.assertTrue(peerGroups == client.getPeerGroups(new RestPageRequest()));
+		MLPPeerGroup peerGroup = new MLPPeerGroup();
+		client.setPeerGroup(peerGroup);
+		Assert.assertTrue(peerGroup == client.createPeerGroup(peerGroup));
+		client.updatePeerGroup(peerGroup);
+		client.deletePeerGroup(0L);
+
+		RestPageResponse<MLPSolutionGroup> solGroups = new RestPageResponse<>();
+		client.setSolutionGroups(solGroups);
+		Assert.assertTrue(solGroups == client.getSolutionGroups(new RestPageRequest()));
+		MLPSolutionGroup solGroup = new MLPSolutionGroup();
+		client.setSolutionGroup(solGroup);
+		Assert.assertTrue(solGroup == client.createSolutionGroup(solGroup));
+		client.updateSolutionGroup(solGroup);
+		client.deleteSolutionGroup(0L);
+	
+		RestPageResponse<MLPPeer> peersInGroup = new RestPageResponse<>();
+		client. setPeersInGroup(peersInGroup);
+		Assert.assertTrue(peersInGroup == client.getPeersInGroup(0L, new RestPageRequest()));
+		client.addPeerToGroup("peerId", 0L);
+		client.dropPeerFromGroup("peerId", 0L);
+		
+		RestPageResponse<MLPSolution> solsInGroup = new RestPageResponse<>();
+		client. setSolutionsInGroup(solsInGroup);
+		Assert.assertTrue(solsInGroup == client.getSolutionsInGroup(0L, new RestPageRequest()));
+		client.addSolutionToGroup("peerId", 0L);
+		client.dropSolutionFromGroup("peerId", 0L);
+
+		RestPageResponse<MLPPeerSolAccMap> peerSolutionGroupMaps = new RestPageResponse<>();
+		client.setPeerSolutionGroupMaps(peerSolutionGroupMaps);
+		Assert.assertTrue(peerSolutionGroupMaps == client.getPeerSolutionGroupMaps(new RestPageRequest()));
+		client.mapPeerSolutionGroups(0L, 1L);
+		client.unmapPeerSolutionGroups(0L, 1L);
+		client.mapPeerPeerGroups(0L, 1L);
+		client.unmapPeerPeerGroups(0L, 1L);
+
+		long peerSolutionAccess = 1;
+		client.setPeerSolutionAccess(peerSolutionAccess);
+		Assert.assertTrue(peerSolutionAccess == client.checkPeerSolutionAccess("peerId", "solutionId"));
+		
+		List<MLPPeer> peerAccessList = new ArrayList<>();
+		client.setPeerAccess(peerAccessList);
+		Assert.assertTrue(peerAccessList == client.getPeerAccess("peerId"));
+
 	}
+	
 }

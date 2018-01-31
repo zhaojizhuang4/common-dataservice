@@ -20,18 +20,8 @@
 
 package org.acumos.cds.repository;
 
-import org.acumos.cds.domain.MLPUserNotifPref;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
+import org.acumos.cds.domain.MLPSolutionGroup;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface UserNotificationPreferenceRepository extends CrudRepository<MLPUserNotifPref, Long> {
-	/**
-	 * Finds all entries for the specified userId.
-	 * 
-	 * @param userId
-	 *            User ID
-	 * @return Iterable of user notification preference objects
-	 */
-	Iterable<MLPUserNotifPref> findByUserId(@Param("userId") String userId);
-
+public interface SolutionGroupRepository extends PagingAndSortingRepository<MLPSolutionGroup, Long> {
 }

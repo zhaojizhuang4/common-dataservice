@@ -1,7 +1,19 @@
 -- Script to downgrade database used by the Common Data Service
 -- FROM version 1.14.x TO version 1.13.x.
--- No database is created or specified to allow flexible deployment!
+-- No database is specified to allow flexible deployment!
 
+-- 36
+DROP TABLE C_PEER_PEER_ACC_MAP;
+-- 35
+DROP TABLE C_PEER_SOL_ACC_MAP;
+-- 34
+DROP TABLE C_SOL_GRP_MEM_MAP;
+-- 33
+DROP TABLE C_PEER_GRP_MEM_MAP;
+-- 32
+DROP TABLE C_SOLUTION_GROUP;
+-- 31
+DROP TABLE C_PEER_GROUP;
 -- 30  
 DROP TABLE C_NOTIF_USER_PREF;  
 -- 29

@@ -2,9 +2,6 @@ package org.acumos.cds.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 /**
  * Model for an message severity type, a code-name pair.
  */

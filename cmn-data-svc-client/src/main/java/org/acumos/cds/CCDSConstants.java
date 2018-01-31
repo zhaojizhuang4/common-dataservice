@@ -74,6 +74,7 @@ public abstract class CCDSConstants {
 	public static final String STEP_RESULT_PATH = "stepresult";
 	public static final String STEP_STAT_PATH = "stepstat";
 	public static final String STEP_TYPE_PATH = "steptype";
+	public static final String GROUP_PATH = "group";
 
 	// Actions on entities
 	public static final String LIKE_PATH = "like";

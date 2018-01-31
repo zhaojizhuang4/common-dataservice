@@ -25,6 +25,10 @@ import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
+import org.acumos.cds.domain.MLPPeerGrpMemMap;
+import org.acumos.cds.domain.MLPPeerPeerAccMap;
+import org.acumos.cds.domain.MLPPeerSolAccMap;
+import org.acumos.cds.domain.MLPSolGrpMemMap;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPMessageSeverityType;
 import org.acumos.cds.domain.MLPModelType;
@@ -34,6 +38,7 @@ import org.acumos.cds.domain.MLPNotificationDeliveryMechanismType;
 import org.acumos.cds.domain.MLPPasswordChangeRequest;
 import org.acumos.cds.domain.MLPPeer;
 import org.acumos.cds.domain.MLPPeerStatus;
+import org.acumos.cds.domain.MLPPeerGroup;
 import org.acumos.cds.domain.MLPPeerSubscription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
@@ -45,6 +50,7 @@ import org.acumos.cds.domain.MLPSolution;
 import org.acumos.cds.domain.MLPSolutionDeployment;
 import org.acumos.cds.domain.MLPSolutionDownload;
 import org.acumos.cds.domain.MLPSolutionFavorite;
+import org.acumos.cds.domain.MLPSolutionGroup;
 import org.acumos.cds.domain.MLPSolutionRating;
 import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionValidation;
@@ -215,10 +221,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPMessageSeverityType() {
 		MLPMessageSeverityType m = new MLPMessageSeverityType();
-		m.setTypeCode(s1);
-		m.setTypeName(s2);
-		Assert.assertEquals(s1, m.getTypeCode());
-		Assert.assertEquals(s2, m.getTypeName());
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -229,10 +235,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPNotifDelvMechType() {
 		MLPNotificationDeliveryMechanismType m = new MLPNotificationDeliveryMechanismType();
-		m.setTypeCode(s1);
-		m.setTypeName(s2);
-		Assert.assertEquals(s1, m.getTypeCode());
-		Assert.assertEquals(s2, m.getTypeName());
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -392,6 +398,21 @@ public class DomainTest extends AbstractModelTest {
 	}
 
 	@Test
+	public void testMLPPeerGroup() {
+		MLPPeerGroup m = new MLPPeerGroup(s1);
+		m = new MLPPeerGroup();
+		m.setName(s1);
+		Assert.assertEquals(s1, m.getName());
+		logger.info(m.toString());
+		try {
+			new MLPPeerGroup(null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
+	}
+
+	@Test
 	public void testMLPPeerStatus() {
 		MLPPeerStatus m = new MLPPeerStatus();
 		m.setCode(s1);
@@ -446,6 +467,90 @@ public class DomainTest extends AbstractModelTest {
 		}
 	}
 
+	@Test
+	public void testMLPPeerGrpMemMap() {
+		MLPPeerGrpMemMap m = new MLPPeerGrpMemMap(l1, s1);
+		m = new MLPPeerGrpMemMap();
+		m.setGroupId(l1);
+		m.setPeerId(s1);
+		Assert.assertEquals(l1, m.getGroupId());
+		Assert.assertEquals(s1, m.getPeerId());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		try {
+			new MLPPeerGrpMemMap(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
+		logger.info(m.toString());
+		MLPPeerGrpMemMap.PeerGrpMemMapPK pk = new MLPPeerGrpMemMap.PeerGrpMemMapPK();
+		pk = new MLPPeerGrpMemMap.PeerGrpMemMapPK(l1, s1);
+		Assert.assertFalse(pk.equals(null));
+		Assert.assertFalse(pk.equals(new Object()));
+		Assert.assertTrue(pk.equals(pk));
+		Assert.assertFalse(pk.hashCode() == 0);
+		logger.info(pk.toString());
+	}
+
+	@Test
+	public void testMLPPeerPeerAccMap() {
+		MLPPeerPeerAccMap m = new MLPPeerPeerAccMap(l1, l2);
+		m = new MLPPeerPeerAccMap();
+		m.setPrincipalPeerGroupId(l1);
+		m.setResourcePeerGroupId(l2);
+		Assert.assertEquals(l1, m.getPrincipalPeerGroupId());
+		Assert.assertEquals(l2, m.getResourcePeerGroupId());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		try {
+			new MLPPeerPeerAccMap(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
+		logger.info(m.toString());
+		MLPPeerPeerAccMap.PeerPeerAccMapPK pk = new MLPPeerPeerAccMap.PeerPeerAccMapPK();
+		pk = new MLPPeerPeerAccMap.PeerPeerAccMapPK(l1, l2);
+		Assert.assertFalse(pk.equals(null));
+		Assert.assertFalse(pk.equals(new Object()));
+		Assert.assertTrue(pk.equals(pk));
+		Assert.assertFalse(pk.hashCode() == 0);
+		logger.info(pk.toString());
+	}
+
+	@Test
+	public void testMLPPeerSolAccMap() {
+		MLPPeerSolAccMap m = new MLPPeerSolAccMap(l1, l2, true);
+		m = new MLPPeerSolAccMap();
+		m.setPeerGroupId(l1);
+		m.setSolutionGroupId(l2);
+		Assert.assertEquals(l1, m.getPeerGroupId());
+		Assert.assertEquals(l2, m.getSolutionGroupId());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		try {
+			new MLPPeerSolAccMap(null, null, false);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
+		logger.info(m.toString());
+		MLPPeerSolAccMap.PeerSolAccMapPK pk = new MLPPeerSolAccMap.PeerSolAccMapPK();
+		pk = new MLPPeerSolAccMap.PeerSolAccMapPK(l1, l2);
+		Assert.assertFalse(pk.equals(null));
+		Assert.assertFalse(pk.equals(new Object()));
+		Assert.assertTrue(pk.equals(pk));
+		Assert.assertFalse(pk.hashCode() == 0);
+		logger.info(pk.toString());
+	}
+	
 	@Test
 	public void testMLPRole() {
 		MLPRole m = new MLPRole(s1, b1);
@@ -574,6 +679,34 @@ public class DomainTest extends AbstractModelTest {
 		logger.info(m.toString());
 		MLPSolTagMap.SolTagMapPK pk = new MLPSolTagMap.SolTagMapPK();
 		pk = new MLPSolTagMap.SolTagMapPK(s1, s2);
+		Assert.assertFalse(pk.equals(null));
+		Assert.assertFalse(pk.equals(new Object()));
+		Assert.assertTrue(pk.equals(pk));
+		Assert.assertFalse(pk.hashCode() == 0);
+		logger.info(pk.toString());
+	}
+
+	@Test
+	public void testMLPSolGrpMemMap() {
+		MLPSolGrpMemMap m = new MLPSolGrpMemMap(l1, s1);
+		m = new MLPSolGrpMemMap();
+		m.setGroupId(l1);
+		m.setSolutionId(s1);
+		Assert.assertEquals(l1, m.getGroupId());
+		Assert.assertEquals(s1, m.getSolutionId());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		try {
+			new MLPSolGrpMemMap(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
+		logger.info(m.toString());
+		MLPSolGrpMemMap.SolGrpMemMapPK pk = new MLPSolGrpMemMap.SolGrpMemMapPK();
+		pk = new MLPSolGrpMemMap.SolGrpMemMapPK(l1, s1);
 		Assert.assertFalse(pk.equals(null));
 		Assert.assertFalse(pk.equals(new Object()));
 		Assert.assertTrue(pk.equals(pk));
@@ -743,6 +876,24 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(pk.equals(pk));
 		Assert.assertFalse(pk.hashCode() == 0);
 		logger.info(pk.toString());
+	}
+
+	@Test
+	public void testMLPSolutionGroup() {
+		MLPSolutionGroup m = new MLPSolutionGroup(s1);
+		m = new MLPSolutionGroup();
+		m.setName(s1);
+		Assert.assertEquals(s1, m.getName());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		logger.info(m.toString());
+		try {
+			new MLPSolutionGroup(null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
