@@ -495,7 +495,7 @@ public class CdsControllerTest {
 			csOrg.setName("solution organization");
 			csOrg.setOwnerId(cu.getUserId());
 			csOrg.setValidationStatusCode(ValidationStatusCode.IP.name());
-			csOrg.setProvider("Internal Org");
+			csOrg.setProvider("Sol Org");
 			csOrg.setAccessTypeCode(AccessTypeCode.OR.name());
 			csOrg.setModelTypeCode(ModelTypeCode.DS.name());
 			csOrg.setToolkitTypeCode(ToolkitTypeCode.SK.name());
@@ -765,6 +765,8 @@ public class CdsControllerTest {
 				client.deleteSolutionFavorite(sf1);
 				// delete-solution should cascade to sol-rev-art
 				client.deleteSolution(cs.getSolutionId());
+				client.deleteSolution(csOrg.getSolutionId());
+				client.deleteSolution(inactive.getSolutionId());
 				client.deleteArtifact(ca.getArtifactId());
 				client.deletePeerSubscription(ps.getSubId());
 				client.deletePeer(pr.getPeerId());
@@ -897,11 +899,19 @@ public class CdsControllerTest {
 			Assert.assertTrue(revisedUserRoles != null && revisedUserRoles.size() == 2);
 			logger.info("User role count is back at 2");
 
+			client.dropUserRole(cu.getUserId(), cr.getRoleId());
+			client.dropUserRole(cu.getUserId(), cr2.getRoleId());
+			revisedUserRoles = client.getUserRoles(cu.getUserId());
+			Assert.assertTrue(revisedUserRoles != null && revisedUserRoles.size() == 0);
+			logger.info("User role count is back to zero");
+
 			logger.info("Deleting role function");
 			client.deleteRoleFunction(cr.getRoleId(), crf.getRoleFunctionId());
 
 			logger.info("Deleting role 1");
 			client.deleteRole(cr.getRoleId());
+			logger.info("Deleting role 2");
+			client.deleteRole(cr2.getRoleId());
 		} catch (HttpClientErrorException ex) {
 			logger.error("Client reported error; body is {}", ex.getResponseBodyAsString());
 			throw ex;
@@ -1244,8 +1254,8 @@ public class CdsControllerTest {
 			logger.info("Failed to delete missing as expected {}", ex.getResponseBodyAsString());
 		}
 
-		client.deleteComment(thread.getThreadId(), parent.getCommentId());
 		client.deleteComment(thread.getThreadId(), reply.getCommentId());
+		client.deleteComment(thread.getThreadId(), parent.getCommentId());
 		client.deleteThread(thread.getThreadId());
 		client.deleteSolutionRevision(cs.getSolutionId(), cr.getRevisionId());
 		client.deleteSolution(cs.getSolutionId());
