@@ -891,10 +891,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPToolkitType() {
 		MLPToolkitType m = new MLPToolkitType();
-		m.setToolkitCode(s1);
-		Assert.assertEquals(s1, m.getToolkitCode());
-		m.setToolkitName(s2);
-		Assert.assertEquals(s2, m.getToolkitName());
+		m.setTypeCode(s1);
+		m.setTypeName(s2);
+		Assert.assertEquals(s1, m.getTypeCode());
+		Assert.assertEquals(s2, m.getTypeName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));

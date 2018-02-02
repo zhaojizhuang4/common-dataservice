@@ -25,6 +25,9 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * Model for step result type, a code-name pair.
+ */
 @Entity
 @Table(name = "C_STEP_TYPE")
 public class MLPStepType extends MLPTypeCodeEntity implements Serializable {
