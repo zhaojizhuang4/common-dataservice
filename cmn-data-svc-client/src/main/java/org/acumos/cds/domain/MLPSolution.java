@@ -118,12 +118,20 @@ public class MLPSolution extends MLPTimestampedEntity implements Serializable {
 	private String validationStatusCode;
 
 	/**
-	 * ID of the peer that supplied the solution; null indicates local.
+	 * ID of the peer where this was onboarded; null indicates local.
+	 * Supports federation.
 	 */
 	@Column(name = "SOURCE_ID", columnDefinition = "CHAR(36)")
 	@Size(max = 36)
 	private String sourceId;
 
+	/**
+	 * URI of the peer that provided this object. Supports federation.
+	 */
+	@Column(name = "ORIGIN", columnDefinition = "VARCHAR(512)")
+	@Size(max = 512)
+	private String origin;
+	 
 	/**
 	 * Tags assigned to the solution via a join table. Tags can be reused by many
 	 * solutions, so this is a many-many (not one-many) relationship.
@@ -300,6 +308,14 @@ public class MLPSolution extends MLPTimestampedEntity implements Serializable {
 
 	public void setSourceId(String sourceId) {
 		this.sourceId = sourceId;
+	}
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
 	}
 
 	/**

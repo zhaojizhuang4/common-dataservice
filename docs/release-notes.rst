@@ -8,7 +8,8 @@ Maven Nexus repository. The server is deployed as a Docker image to a Docker reg
 Version 1.13.0, 5 February 2018
 -------------------------------
 
-* Support workflow step results
+* Add origin attribute to solution and revision entities (ACUMOS-59)
+* Support workflow step results (ACUMOS-56)
 * Requires database schema version 1.13
 
 Version 1.12.1, 26 January 2018

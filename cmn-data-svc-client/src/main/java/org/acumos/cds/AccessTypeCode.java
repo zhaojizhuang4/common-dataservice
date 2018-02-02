@@ -29,7 +29,8 @@ public enum AccessTypeCode {
 
 	OR("Organization"), //
 	PB("Public"), //
-	PR("Private");
+	PR("Private"), //
+	RS("Restricted"); // for federation peer-solution groups
 
 	private String typeName;
 

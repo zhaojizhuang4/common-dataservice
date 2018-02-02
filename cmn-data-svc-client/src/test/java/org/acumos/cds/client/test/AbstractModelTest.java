@@ -54,5 +54,6 @@ public abstract class AbstractModelTest {
 	final String s9 = "string9";
 	final String s10 = "string10";
 	final String s11 = "string11";
+	final String s12 = "string12";
 
 }
