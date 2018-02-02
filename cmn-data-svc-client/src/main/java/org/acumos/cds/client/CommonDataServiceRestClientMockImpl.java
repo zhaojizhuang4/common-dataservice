@@ -297,8 +297,8 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		List<MLPToolkitType> list = new ArrayList<>();
 		for (ToolkitTypeCode a : ToolkitTypeCode.values()) {
 			MLPToolkitType b = new MLPToolkitType();
-			b.setToolkitCode(a.name());
-			b.setToolkitName(a.getTypeName());
+			b.setTypeCode(a.name());
+			b.setTypeName(a.getTypeName());
 			list.add(b);
 		}
 		return list;
