@@ -25,13 +25,10 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-/**
- * Model for step status, a code-name pair.
- */
 @Entity
-@Table(name = "C_STEP_STATUS")
-public class MLPStepStatus extends MLPStatusCodeEntity implements Serializable {
+@Table(name = "C_PEER_STATUS")
+public class MLPPeerStatus extends MLPStatusCodeEntity implements Serializable {
 
-	private static final long serialVersionUID = -8342728048884890038L;
+	private static final long serialVersionUID = 5341647455351536720L;
 
 }

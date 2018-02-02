@@ -28,8 +28,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -66,17 +64,13 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	@Size(max = 512)
 	private String description;
 
-	@Column(name = "API_URL", columnDefinition = "VARCHAR(512)")
+	@Column(name = "API_URL", nullable = false, columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
 	private String apiUrl;
 
 	@Column(name = "WEB_URL", columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
 	private String webUrl;
-
-	@Column(name = "IS_ACTIVE", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y'")
-	@Type(type = "yes_no")
-	private boolean isActive;
 
 	@Column(name = "IS_SELF", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'N'")
 	@Type(type = "yes_no")
@@ -87,16 +81,23 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	@Size(max = 100)
 	private String contact1;
 
-	@Column(name = "CONTACT2", nullable = false, columnDefinition = "VARCHAR(100)")
-	@NotNull(message = "contact2 cannot be null")
-	@Size(max = 100)
-	private String contact2;
+	/**
+	 * Peer status. This exposes the database code for simplicity. Alternately this
+	 * column could be mapped using @ManyToOne and @JoinColumn as an MLPPeerStatus
+	 * object.
+	 */
+	@Column(name = "STATUS_CD", nullable = false, columnDefinition = "CHAR(2)")
+	@Size(max = 2)
+	private String statusCode;
 
-	@Column(name = "TRUST_LEVEL", nullable = false, columnDefinition = "SMALLINT DEFAULT 0")
-	@NotNull(message = "TrustLevel cannot be null")
-	@Min(value = 0)
-	@Max(value = 10)
-	private Integer trustLevel = 0;
+	/**
+	 * Validation status. This exposes the database code for simplicity. Alternately
+	 * this column could be mapped using @ManyToOne and @JoinColumn as an
+	 * MLPValidationStatus object.
+	 */
+	@Column(name = "VALIDATION_STATUS_CD", nullable = false, columnDefinition = "CHAR(2)")
+	@Size(max = 2)
+	private String validationStatusCode;
 
 	/**
 	 * No-arg constructor.
@@ -115,33 +116,27 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	 *            X.509 subject name
 	 * @param apiUrl
 	 *            API URL
-	 * @param webUrl
-	 *            Web URL
-	 * @param isActive
-	 *            Is the entry active
 	 * @param isSelf
 	 *            Is the entry this site
 	 * @param contact1
 	 *            Primary contact details
-	 * @param contact2
-	 *            Alternate contact details
-	 * @param trustLevel
-	 *            Value in range [0..10]
+	 * @param statusCode
+	 *            Peer status code
+	 * @param validationStatusCode
+	 *            Peer validation code
 	 */
-	public MLPPeer(String name, String subjectName, String apiUrl, String webUrl, boolean isActive, boolean isSelf,
-			String contact1, String contact2, int trustLevel) {
-		if (name == null || subjectName == null || apiUrl == null || webUrl == null || contact1 == null
-				|| contact2 == null)
+	public MLPPeer(String name, String subjectName, String apiUrl, boolean isSelf, String contact1, String statusCode,
+			String validationStatusCode) {
+		if (name == null || subjectName == null || apiUrl == null || contact1 == null || statusCode == null
+				|| validationStatusCode == null)
 			throw new IllegalArgumentException("Null not permitted");
 		this.name = name;
 		this.subjectName = subjectName;
 		this.apiUrl = apiUrl;
-		this.webUrl = webUrl;
-		this.isActive = isActive;
 		this.isSelf = isSelf;
 		this.contact1 = contact1;
-		this.contact2 = contact2;
-		this.trustLevel = trustLevel;
+		this.statusCode = statusCode;
+		this.validationStatusCode = validationStatusCode;
 	}
 
 	/**
@@ -235,21 +230,6 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	}
 
 	/**
-	 * @return the isActive
-	 */
-	public boolean isActive() {
-		return isActive;
-	}
-
-	/**
-	 * @param isActive
-	 *            the isActive to set
-	 */
-	public void setActive(boolean isActive) {
-		this.isActive = isActive;
-	}
-
-	/**
 	 * @return the isSelf
 	 */
 	public boolean isSelf() {
@@ -279,27 +259,30 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 		this.contact1 = contact1;
 	}
 
-	/**
-	 * @return the contact2
-	 */
-	public String getContact2() {
-		return contact2;
+	public String getStatusCode() {
+		return statusCode;
 	}
 
 	/**
-	 * @param contact2
-	 *            the contact2 to set
+	 * @param statusCode
+	 *            A value obtained by calling
+	 *            {@link org.acumos.cds.PeerStatusCode#toString()}.
 	 */
-	public void setContact2(String contact2) {
-		this.contact2 = contact2;
+	public void setStatusCode(String statusCode) {
+		this.statusCode = statusCode;
 	}
 
-	public Integer getTrustLevel() {
-		return trustLevel;
+	public String getValidationStatusCode() {
+		return validationStatusCode;
 	}
 
-	public void setTrustLevel(Integer trustLevel) {
-		this.trustLevel = trustLevel;
+	/**
+	 * @param validationStatusCode
+	 *            A value obtained by calling
+	 *            {@link org.acumos.cds.ValidationStatusCode#toString()}.
+	 */
+	public void setValidationStatusCode(String validationStatusCode) {
+		this.validationStatusCode = validationStatusCode;
 	}
 
 	@Override
@@ -314,12 +297,12 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(peerId, name, subjectName, webUrl, trustLevel);
+		return Objects.hash(peerId, name, subjectName, webUrl);
 	}
 
 	@Override
 	public String toString() {
 		return this.getClass().getName() + "[peerId=" + peerId + ", name=" + name + ", subjectName=" + subjectName
-				+ "webUrl=" + webUrl + ", trustLevel=" + trustLevel + "]";
+				+ "webUrl=" + webUrl + "]";
 	}
 }

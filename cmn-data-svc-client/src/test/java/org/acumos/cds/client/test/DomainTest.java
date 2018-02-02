@@ -31,6 +31,7 @@ import org.acumos.cds.domain.MLPNotifUserMap;
 import org.acumos.cds.domain.MLPNotification;
 import org.acumos.cds.domain.MLPPasswordChangeRequest;
 import org.acumos.cds.domain.MLPPeer;
+import org.acumos.cds.domain.MLPPeerStatus;
 import org.acumos.cds.domain.MLPPeerSubscription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
@@ -47,6 +48,8 @@ import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionValidation;
 import org.acumos.cds.domain.MLPSolutionWeb;
 import org.acumos.cds.domain.MLPStepResult;
+import org.acumos.cds.domain.MLPStepStatus;
+import org.acumos.cds.domain.MLPStepType;
 import org.acumos.cds.domain.MLPTag;
 import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
@@ -292,41 +295,39 @@ public class DomainTest extends AbstractModelTest {
 
 	@Test
 	public void testMLPPeer() {
-		MLPPeer m = new MLPPeer(s1, s1, s1, s1, b1, b1, s1, s1, i1);
+		MLPPeer m = new MLPPeer(s1, s1, s1, b1, s1, s1, s1);
 		m = new MLPPeer();
-		m.setActive(b1);
 		m.setApiUrl(s1);
 		m.setContact1(s2);
-		m.setContact2(s3);
 		m.setCreated(d1);
 		m.setDescription(s4);
 		m.setModified(d2);
 		m.setName(s5);
 		m.setPeerId(s6);
 		m.setSelf(b2);
-		m.setSubjectName(s7);
-		m.setWebUrl(s8);
-		m.setTrustLevel(i1);
-		Assert.assertEquals(b1, m.isActive());
+		m.setStatusCode(s7);
+		m.setSubjectName(s8);
+		m.setValidationStatusCode(s9);
+		m.setWebUrl(s10);
 		Assert.assertEquals(s1, m.getApiUrl());
 		Assert.assertEquals(s2, m.getContact1());
-		Assert.assertEquals(s3, m.getContact2());
 		Assert.assertEquals(d1, m.getCreated());
 		Assert.assertEquals(s4, m.getDescription());
 		Assert.assertEquals(d2, m.getModified());
 		Assert.assertEquals(s5, m.getName());
 		Assert.assertEquals(s6, m.getPeerId());
 		Assert.assertEquals(b2, m.isSelf());
-		Assert.assertEquals(s7, m.getSubjectName());
-		Assert.assertEquals(s8, m.getWebUrl());
-		Assert.assertEquals(i1, m.getTrustLevel());
+		Assert.assertEquals(s7, m.getStatusCode());
+		Assert.assertEquals(s8, m.getSubjectName());
+		Assert.assertEquals(s9, m.getValidationStatusCode());
+		Assert.assertEquals(s10, m.getWebUrl());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
 		try {
-			new MLPPeer(null, null, null, null, b1, b1, null, null, i1);
+			new MLPPeer(null, null, null, b1, null, null, null);
 			Assert.assertTrue("Unexpected success", false);
 		} catch (IllegalArgumentException iae) {
 			// null arg is rejected
@@ -334,8 +335,22 @@ public class DomainTest extends AbstractModelTest {
 	}
 
 	@Test
+	public void testMLPPeerStatus() {
+		MLPPeerStatus m = new MLPPeerStatus();
+		m.setStatusCode(s1);
+		m.setStatusName(s2);
+		Assert.assertEquals(s1, m.getStatusCode());
+		Assert.assertEquals(s2, m.getStatusName());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		logger.info(m.toString());
+	}
+
+	@Test
 	public void testMLPPeerSubscription() {
-		MLPPeerSubscription m = new MLPPeerSubscription(s1, s2);
+		MLPPeerSubscription m = new MLPPeerSubscription(s1, s2, s3);
 		m = new MLPPeerSubscription();
 		m.setCreated(d1);
 		m.setMaxArtifactSize(l1);
@@ -343,8 +358,10 @@ public class DomainTest extends AbstractModelTest {
 		m.setOptions(s1);
 		m.setOwnerId(s2);
 		m.setPeerId(s3);
+		m.setProcessed(d3);
 		m.setRefreshInterval(l2);
-		m.setSelector(s4);
+		m.setScopeCode(s4);
+		m.setSelector(s5);
 		m.setSubId(l3);
 		Assert.assertEquals(d1, m.getCreated());
 		Assert.assertEquals(l1, m.getMaxArtifactSize());
@@ -352,8 +369,10 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertEquals(s1, m.getOptions());
 		Assert.assertEquals(s2, m.getOwnerId());
 		Assert.assertEquals(s3, m.getPeerId());
+		Assert.assertEquals(d3, m.getProcessed());
 		Assert.assertEquals(l2, m.getRefreshInterval());
-		Assert.assertEquals(s4, m.getSelector());
+		Assert.assertEquals(s4, m.getScopeType());
+		Assert.assertEquals(s5, m.getSelector());
 		Assert.assertEquals(l3, m.getSubId());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
@@ -361,7 +380,7 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
 		try {
-			new MLPPeerSubscription(null, null);
+			new MLPPeerSubscription(null, null, null);
 			Assert.assertTrue("Unexpected success", false);
 		} catch (IllegalArgumentException iae) {
 			// null arg is rejected
@@ -842,6 +861,34 @@ public class DomainTest extends AbstractModelTest {
 		} catch (IllegalArgumentException iae) {
 			// null arg is rejected
 		}
+	}
+
+	@Test
+	public void testMLPStepStatus() {
+		MLPStepStatus m = new MLPStepStatus();
+		m.setStatusCode(s1);
+		m.setStatusName(s2);
+		Assert.assertEquals(s1, m.getStatusCode());
+		Assert.assertEquals(s2, m.getStatusName());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		logger.info(m.toString());
+	}
+
+	@Test
+	public void testMLPStepType() {
+		MLPStepType m = new MLPStepType();
+		m.setTypeCode(s1);
+		m.setTypeName(s2);
+		Assert.assertEquals(s1, m.getTypeCode());
+		Assert.assertEquals(s2, m.getTypeName());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		logger.info(m.toString());
 	}
 
 	@Test

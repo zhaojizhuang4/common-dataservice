@@ -18,20 +18,26 @@
  * ===============LICENSE_END=========================================================
  */
 
-package org.acumos.cds.domain;
-
-import java.io.Serializable;
-
-import javax.persistence.Entity;
-import javax.persistence.Table;
+package org.acumos.cds;
 
 /**
- * Model for step status, a code-name pair.
+ * This enum provides MLP validation type codes for developer convenience only.
+ * The valid values are maintained in a database table modeled by the class
+ * {@link org.acumos.cds.domain.MLPValidationType}.
  */
-@Entity
-@Table(name = "C_STEP_STATUS")
-public class MLPStepStatus extends MLPStatusCodeEntity implements Serializable {
+public enum SubscriptionScopeTypeCode {
 
-	private static final long serialVersionUID = -8342728048884890038L;
+	RF("Reference"), //
+	FL("Full");
+
+	private String scopeName;
+
+	private SubscriptionScopeTypeCode(final String scopeName) {
+		this.scopeName = scopeName;
+	}
+
+	public String getScopeName() {
+		return scopeName;
+	}
 
 }

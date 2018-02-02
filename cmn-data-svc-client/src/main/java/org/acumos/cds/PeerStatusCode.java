@@ -18,20 +18,28 @@
  * ===============LICENSE_END=========================================================
  */
 
-package org.acumos.cds.domain;
-
-import java.io.Serializable;
-
-import javax.persistence.Entity;
-import javax.persistence.Table;
+package org.acumos.cds;
 
 /**
- * Model for step status, a code-name pair.
+ * This enum provides MLP peer status codes for developer convenience only. The
+ * valid values are maintained in a database table modeled by the class
+ * {@link org.acumos.cds.domain.MLPPeerStatus}.
  */
-@Entity
-@Table(name = "C_STEP_STATUS")
-public class MLPStepStatus extends MLPStatusCodeEntity implements Serializable {
+public enum PeerStatusCode {
+	AC("Active"), //
+	IN("Inactive"), //
+	PA("Pending Active"), //
+	RM("Removed"), //
+	PR("Pending Remove");
 
-	private static final long serialVersionUID = -8342728048884890038L;
+	private String statusName;
+
+	private PeerStatusCode(final String statusName) {
+		this.statusName = statusName;
+	}
+
+	public String getStatusName() {
+		return statusName;
+	}
 
 }

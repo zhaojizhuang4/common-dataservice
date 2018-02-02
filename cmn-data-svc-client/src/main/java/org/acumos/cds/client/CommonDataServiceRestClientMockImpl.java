@@ -184,10 +184,8 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	public CommonDataServiceRestClientMockImpl() {
 
 		MLPPeer mlpPeer = new MLPPeer();
-		mlpPeer.setActive(true);
 		mlpPeer.setApiUrl("http://peer-api");
 		mlpPeer.setContact1("Contact1");
-		mlpPeer.setContact2("Contact2");
 		Date created = new Date();
 		mlpPeer.setCreated(created);
 		mlpPeer.setDescription("Peer description");

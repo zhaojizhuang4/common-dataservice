@@ -33,8 +33,10 @@ import org.acumos.cds.ArtifactTypeCode;
 import org.acumos.cds.DeploymentStatusCode;
 import org.acumos.cds.LoginProviderCode;
 import org.acumos.cds.ModelTypeCode;
+import org.acumos.cds.PeerStatusCode;
 import org.acumos.cds.StepStatusCode;
 import org.acumos.cds.StepTypeCode;
+import org.acumos.cds.SubscriptionScopeTypeCode;
 import org.acumos.cds.ToolkitTypeCode;
 import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.ValidationTypeCode;
@@ -383,10 +385,9 @@ public class CdsControllerTest {
 			pr.setName(peerName);
 			pr.setSubjectName("subject name");
 			pr.setApiUrl("http://peer-api");
-			pr.setWebUrl("https://web-url");
 			pr.setContact1("Katherine Globe");
-			pr.setContact2("Aemon Targaryen");
-			pr.setTrustLevel(1);
+			pr.setStatusCode(PeerStatusCode.AC.name());
+			pr.setValidationStatusCode(ValidationStatusCode.FA.name());
 			pr = client.createPeer(pr);
 			logger.info("Created peer with ID {}", pr.getPeerId());
 
@@ -404,7 +405,8 @@ public class CdsControllerTest {
 			MLPPeer pr2 = client.getPeer(pr.getPeerId());
 			Assert.assertEquals(pr.getPeerId(), pr2.getPeerId());
 
-			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId());
+			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId(),
+					SubscriptionScopeTypeCode.FL.name());
 			ps = client.createPeerSubscription(ps);
 			logger.info("Created peer subscription {}", ps);
 
@@ -2195,10 +2197,8 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Update peer failed as expected: {}", ex.getResponseBodyAsString());
 		}
-		cp.setActive(true);
 		cp.setSelf(false);
 		cp.setContact1("me");
-		cp.setContact2("you");
 		try {
 			cp.setName(s64);
 			cp = client.createPeer(cp);
@@ -2207,8 +2207,8 @@ public class CdsControllerTest {
 			logger.info("Create peer failed on constraint as expected: {}", ex.getResponseBodyAsString());
 		}
 		// This one is supposed to work
-		cp = client.createPeer(
-				new MLPPeer("peer name", "subj name", "api url", "web url", true, false, "contact 1", "contact 2", 1));
+		cp = client.createPeer(new MLPPeer("peer name", "subj name", "api url", false, "contact 1",
+				PeerStatusCode.AC.name(), ValidationStatusCode.FA.name()));
 
 		try {
 			cp = client.createPeer(cp);
@@ -2237,13 +2237,13 @@ public class CdsControllerTest {
 			logger.info("Get peer sub failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.createPeerSubscription(new MLPPeerSubscription("peerId", "userId"));
+			client.createPeerSubscription(new MLPPeerSubscription("peerId", "userId", "scope"));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create peer sub failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			MLPPeerSubscription ps = new MLPPeerSubscription(cp.getPeerId(), cu.getUserId());
+			MLPPeerSubscription ps = new MLPPeerSubscription(cp.getPeerId(), cu.getUserId(), "scope");
 			ps.setSelector(
 					s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64);
 			client.createPeerSubscription(ps);
@@ -2252,7 +2252,8 @@ public class CdsControllerTest {
 			logger.info("Create peer sub failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		// Supposed to work
-		MLPPeerSubscription ps = new MLPPeerSubscription(cp.getPeerId(), cu.getUserId());
+		MLPPeerSubscription ps = new MLPPeerSubscription(cp.getPeerId(), cu.getUserId(),
+				SubscriptionScopeTypeCode.FL.name());
 		ps = client.createPeerSubscription(ps);
 		try {
 			ps.setSelector(

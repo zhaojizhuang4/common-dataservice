@@ -21,6 +21,7 @@
 package org.acumos.cds.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -56,6 +57,14 @@ public class MLPPeerSubscription extends MLPTimestampedEntity implements Seriali
 	@Size(max = 36)
 	private String ownerId;
 
+	/**
+	 * This exposes the database code for simplicity. Alternately this column could
+	 * be mapped using @ManyToOne and @JoinColumn as an MLPSubscriptionScopeType object.
+	 */
+	@Column(name = "SCOPE_TYPE", nullable = false, columnDefinition = "CHAR(2)")
+	@Size(max = 2)
+	private String scopeType;
+
 	// JSON
 	@Column(name = "SELECTOR", columnDefinition = "VARCHAR(1024)")
 	@Size(max = 1024)
@@ -72,6 +81,9 @@ public class MLPPeerSubscription extends MLPTimestampedEntity implements Seriali
 	@Column(name = "MAX_ARTIFACT_SIZE", columnDefinition = "INT")
 	private Long maxArtifactSize;
 
+	@Column(name = "PROCESSED_DATE", columnDefinition = "TIMESTAMP")
+	private Date processed;
+	
 	/**
 	 * No-arg constructor
 	 */
@@ -87,12 +99,15 @@ public class MLPPeerSubscription extends MLPTimestampedEntity implements Seriali
 	 *            Peer ID
 	 * @param ownerId
 	 *            User ID, the operator
+	 * @param scopeType
+	 *            Peer subscription scope type
 	 */
-	public MLPPeerSubscription(String peerId, String ownerId) {
-		if (peerId == null || ownerId == null)
+	public MLPPeerSubscription(String peerId, String ownerId, String scopeType) {
+		if (peerId == null || ownerId == null || scopeType == null)
 			throw new IllegalArgumentException("Null not permitted");
 		this.peerId = peerId;
 		this.ownerId = ownerId;
+		this.scopeType = scopeType;
 	}
 
 	public Long getSubId() {
@@ -163,6 +178,27 @@ public class MLPPeerSubscription extends MLPTimestampedEntity implements Seriali
 	 */
 	public void setMaxArtifactSize(Long maxArtifactSize) {
 		this.maxArtifactSize = maxArtifactSize;
+	}
+
+	public String getScopeType() {
+		return scopeType;
+	}
+
+	/**
+	 * @param scopeType
+	 *            A value obtained by calling
+	 *            {@link org.acumos.cds.SubscriptionScopeTypeCode#toString()}.
+	 */
+	public void setScopeCode(String scopeType) {
+		this.scopeType = scopeType;
+	}
+
+	public Date getProcessed() {
+		return processed;
+	}
+
+	public void setProcessed(Date created) {
+		this.processed = created;
 	}
 
 	@Override

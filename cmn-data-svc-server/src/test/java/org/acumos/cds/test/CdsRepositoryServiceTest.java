@@ -31,8 +31,10 @@ import javax.validation.ConstraintViolationException;
 import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.ArtifactTypeCode;
 import org.acumos.cds.ModelTypeCode;
+import org.acumos.cds.PeerStatusCode;
 import org.acumos.cds.StepStatusCode;
 import org.acumos.cds.StepTypeCode;
+import org.acumos.cds.SubscriptionScopeTypeCode;
 import org.acumos.cds.ToolkitTypeCode;
 import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.domain.MLPAccessType;
@@ -283,10 +285,9 @@ public class CdsRepositoryServiceTest {
 			pr.setName("Peer-" + Long.toString(new Date().getTime()));
 			pr.setSubjectName("x.509");
 			pr.setApiUrl("http://peer-api");
-			pr.setWebUrl("https://web-url");
 			pr.setContact1("Tyrion Lannister");
-			pr.setContact2("House of Targaryen");
-			pr.setTrustLevel(0);
+			pr.setStatusCode(PeerStatusCode.AC.name());
+			pr.setValidationStatusCode(ValidationStatusCode.FA.name());
 			pr = peerRepository.save(pr);
 			Assert.assertNotNull(pr.getPeerId());
 			Assert.assertNotNull(pr.getCreated());
@@ -297,7 +298,8 @@ public class CdsRepositoryServiceTest {
 			List<MLPPeer> searchPeers = peerSearchService.findPeers(peerParms, false);
 			Assert.assertTrue(searchPeers.size() == 1);
 
-			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId());
+			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId(),
+					SubscriptionScopeTypeCode.FL.name());
 			ps = peerSubscriptionRepository.save(ps);
 			logger.info("Peer subscription {}", ps);
 
@@ -691,12 +693,14 @@ public class CdsRepositoryServiceTest {
 
 			// Create Peer
 			final String peerName = "Peer-" + Long.toString(new Date().getTime());
-			MLPPeer pr = new MLPPeer(peerName, "x.509", "http://peer-api", "http://web-url", true, true, "", "", 1);
+			MLPPeer pr = new MLPPeer(peerName, "x.509", "http://peer-api", true, "", PeerStatusCode.AC.name(),
+					ValidationStatusCode.IP.name());
 			pr = peerRepository.save(pr);
 			Assert.assertNotNull(pr.getPeerId());
 			Assert.assertNotNull(pr.getCreated());
 
-			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId());
+			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId(),
+					SubscriptionScopeTypeCode.FL.name());
 			ps = peerSubscriptionRepository.save(ps);
 			Assert.assertNotNull(ps.getSubId());
 

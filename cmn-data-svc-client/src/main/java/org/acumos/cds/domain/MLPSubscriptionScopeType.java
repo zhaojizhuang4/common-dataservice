@@ -26,12 +26,12 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * Model for step status, a code-name pair.
+ * Model for subscription scope type, a code-name pair.
  */
 @Entity
-@Table(name = "C_STEP_STATUS")
-public class MLPStepStatus extends MLPStatusCodeEntity implements Serializable {
+@Table(name = "C_SUB_SCOPE_TYPE")
+public class MLPSubscriptionScopeType extends MLPTypeCodeEntity implements Serializable {
 
-	private static final long serialVersionUID = -8342728048884890038L;
+	private static final long serialVersionUID = 3181398731734798726L;
 
 }

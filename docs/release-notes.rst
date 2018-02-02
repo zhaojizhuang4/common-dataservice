@@ -2,14 +2,15 @@
 Release Notes
 =============
 
-The client and server are released together.  The client is deployed as a jar file to a 
-Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.  
+The client and server are released together.  The client is deployed as a jar file to a
+Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
 Version 1.13.0, 5 February 2018
 -------------------------------
 
+* Add features for workflow step results (ACUMOS-56)
 * Add origin attribute to solution and revision entities (ACUMOS-59)
-* Support workflow step results (ACUMOS-56)
+* Revise peer attributes (ACUMOS-60)
 * Requires database schema version 1.13
 
 Version 1.12.1, 26 January 2018
@@ -38,13 +39,13 @@ Version 1.11.0, 3 January 2018
 * Revise MLPThread to add solutionId and revisionId; drop url
 * Revise MLPComment to drop url
 * Revise MLPPeer to add trustLevel
-* Add methods to query for threads and comments using solution and revision IDs 
+* Add methods to query for threads and comments using solution and revision IDs
 * Requires database schema version 1.11
 
 Version 1.10.2, 20 December 2017
 --------------------------------
 
-* Extend MLPSolution with tags and solution web statistics via unidirectional annotations 
+* Extend MLPSolution with tags and solution web statistics via unidirectional annotations
 * Extend the find-solutions method for Portal/Marketplace dynamic search
 * Requires database schema version 1.10
 
@@ -164,7 +165,7 @@ Version 1.4.0, 23 August 2017
 * Add statistics for solutions: view count
 * Add simple user access control list for solutions
 * Fix CD-765, count methods always return zero
-* Cache solution download and rating statistics 
+* Cache solution download and rating statistics
 * Requires database schema version 1.4
 
 Version 1.3.1 update, 15 August 2017
