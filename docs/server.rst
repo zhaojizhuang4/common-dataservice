@@ -2,15 +2,15 @@
 Acumos Common Data Service Server
 =================================
 
-This micro service provides common data services to components in the Acumos machine-learning platform. It is built using the Spring-Boot platform.
+This microservice provides common data services to components in the Acumos machine-learning platform. It is built using the Spring-Boot platform.
 
 Supported Methods and Objects
 -----------------------------
 
-The micro service endpoints and objects are documented using Swagger. A running server documents itself at a URL like the following, but
+The microservice endpoints and objects are documented using Swagger. A running server documents itself at a URL like the following, but
 consult the server's configuration for the exact port number (e.g., "8080") and context root (e.g., "ccds") to use::
 
-	http://localhost:8080/ccds/swagger-ui.html
+    http://localhost:8080/ccds/swagger-ui.html
 
 
 Building and Packaging
@@ -27,24 +27,24 @@ The build machine needs the following:
 
 Use maven to build and package the service into a single "fat" jar using this command::
 
-	mvn package
+    mvn package
 
 Development and Local Testing
 -----------------------------
 
 This section provides information for developing and testing the server locally; e.g., on a personal machine.
 
-Using an in-memory database 
+Using an in-memory database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration for the server uses an in-memory Derby database, which is created at launch time. 
+The default configuration for the server uses an in-memory Derby database, which is created at launch time.
 
 Using an external database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The server can be configured to use an external database as follows:
 
-    1. Copy the local application.properties file to a new file "application-mydb.properties" 
+    1. Copy the local application.properties file to a new file "application-mydb.properties"
     2. Revise the new "mydb" properties file to have suitable server coordinates and credentials
     3. Ensure the newly configured database server is reachable at the expected port
     4. Check that the database tables have been created and populated
@@ -56,7 +56,7 @@ Launching
 
 Start the microservice for development and testing like this::
 
-	mvn clean spring-boot:run
+     mvn clean spring-boot:run
 
 Alternately, launch the service from Eclipse by starting this class::
 
@@ -65,15 +65,15 @@ Alternately, launch the service from Eclipse by starting this class::
 Production Deployment
 ---------------------
 
-This section provides information for running the server in a production environment, 
+This section provides information for running the server in a production environment,
 assuming that the application is packaged into a docker container for deployment.
 
 Prerequisites
 ~~~~~~~~~~~~~
 
 1. Java version 1.8 in the runtime environment (e.g., docker container)
-2. A Mariadb or Mysql database with the required tables, instructions are shown below 
-3. The username/password combination to access the database 
+2. A Mariadb or Mysql database with the required tables, instructions are shown below
+3. The username/password combination to access the database
 4. A valid configuration with database coordinates.
 
 Configuring the system
@@ -89,7 +89,7 @@ First the database must be created and configured using scripts in the
 - cmn-data-svc-ddl-cml-mysql-N-N.sql: This has the data-definition and
   data-modeling language statements that create the tables and
   populate them.
-    
+
 Next, configuration parameters must be specified.  A template with
 default values can be found in the top level of this project named
 application.properties.template, and can be copied a file named
@@ -112,8 +112,8 @@ REST endpoint. The default entries for the server are shown here::
     security.user.password=(encrypted)
 
 At runtime in production deployments, instead of using a configuration file,
-all configuration properties should be supplied using a block of JSON in an 
-environment variable called SPRING\_APPLICATION\_JSON. This can easily be done 
+all configuration properties should be supplied using a block of JSON in an
+environment variable called SPRING\_APPLICATION\_JSON. This can easily be done
 in a docker-compose configuration file.  For example::
 
       SPRING_APPLICATION_JSON: '{
@@ -185,13 +185,13 @@ Troubleshooting
 
 Spring-Boot throws a confusing exception if the database connection fails, something like this::
 
-    Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: 
-    Error creating bean with name 'artifactController': Unsatisfied dependency expressed through field 'artifactService'; nested exception is 
-    org.springframework.beans.factory.UnsatisfiedDependencyException: 
-    Error creating bean with name 'artifactService': Unsatisfied dependency expressed through field 'sessionFactory'; nested exception is 
-    org.springframework.beans.factory.BeanCreationException: 
-    Error creating bean with name 'sessionFactory' defined in class path resource [.../ccds/hibernate/HibernateConfiguration.class : Invocation of init method failed; 
-    nested exception is org.hibernate.service.spi.ServiceException: 
-    Unable to create requested service [org.hibernate.engine.jdbc.env.spi.JdbcEnvironment]    
+    Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException:
+    Error creating bean with name 'artifactController': Unsatisfied dependency expressed through field 'artifactService'; nested exception is
+    org.springframework.beans.factory.UnsatisfiedDependencyException:
+    Error creating bean with name 'artifactService': Unsatisfied dependency expressed through field 'sessionFactory'; nested exception is
+    org.springframework.beans.factory.BeanCreationException:
+    Error creating bean with name 'sessionFactory' defined in class path resource [.../ccds/hibernate/HibernateConfiguration.class : Invocation of init method failed;
+    nested exception is org.hibernate.service.spi.ServiceException:
+    Unable to create requested service [org.hibernate.engine.jdbc.env.spi.JdbcEnvironment]
 
-If you see this exception, first check the database configuration carefully. 
+If you see this exception, first check the database configuration carefully.

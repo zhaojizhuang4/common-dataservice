@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-# Acumos Common Data Service documentation build configuration file, created by
-# sphinx-quickstart on Wed Nov  8 08:11:26 2017.
-#
 # This file is execfile()d with the current directory set to its
 # containing dir.
 #
@@ -46,7 +43,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Acumos Common Data Service'
-copyright = u'2017, Acumos'
+copyright = u'2018, Acumos'
 author = u'Acumos'
 
 # The version info for the project you're documenting, acts as replacement for

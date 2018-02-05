@@ -10,6 +10,7 @@ Acumos Common Data Service Documentation
    :caption: Contents:
 
    overview.rst
+   requirements.rst
    client.rst
    server.rst
    release-notes.rst
