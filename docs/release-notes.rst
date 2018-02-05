@@ -5,12 +5,13 @@ Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
-Version 1.13.0, 5 February 2018
+Version 1.13.0, 9 February 2018
 -------------------------------
 
 * Add features for workflow step results (ACUMOS-56)
 * Add origin attribute to solution and revision entities (ACUMOS-59)
 * Revise peer attributes (ACUMOS-60)
+* Add toolkit type PB - Probe
 * Requires database schema version 1.13
 
 Version 1.12.1, 26 January 2018

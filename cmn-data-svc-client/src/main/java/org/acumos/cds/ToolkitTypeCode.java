@@ -29,6 +29,7 @@ public enum ToolkitTypeCode {
 	CP("Composite Solution"), //
 	DS("Design Studio"), //
 	H2("H2O"), //
+	PB("Probe"), //
 	RC("R"), //
 	SK("Scikit-Learn"), //
 	TF("TensorFlow"), //
