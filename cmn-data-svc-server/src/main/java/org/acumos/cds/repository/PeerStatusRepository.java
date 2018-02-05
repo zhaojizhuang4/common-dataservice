@@ -17,17 +17,22 @@
  * limitations under the License.
  * ===============LICENSE_END=========================================================
  */
+
 package org.acumos.cds.repository;
 
-import org.acumos.cds.domain.MLPStepType;
+import org.acumos.cds.domain.MLPPeerStatus;
 import org.springframework.data.repository.Repository;
 
-public interface StepTypeRepository extends Repository<MLPStepType, String> {
+/**
+ * Only exposes the single get-all method.
+ */
+public interface PeerStatusRepository extends Repository<MLPPeerStatus, String> {
+	
 	/**
 	 * Returns all instances of the type.
 	 * 
 	 * @return all entities
 	 */
-	Iterable<MLPStepType> findAll();
+	Iterable<MLPPeerStatus> findAll();
 
 }

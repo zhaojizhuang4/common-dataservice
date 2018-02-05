@@ -19,15 +19,14 @@
  */
 package org.acumos.cds.repository;
 
-import org.acumos.cds.domain.MLPStepType;
+import org.acumos.cds.domain.MLPSubscriptionScopeType;
 import org.springframework.data.repository.Repository;
 
-public interface StepTypeRepository extends Repository<MLPStepType, String> {
+public interface SubscriptionScopeRepository extends Repository<MLPSubscriptionScopeType, String> {
 	/**
 	 * Returns all instances of the type.
 	 * 
 	 * @return all entities
 	 */
-	Iterable<MLPStepType> findAll();
-
+	Iterable<MLPSubscriptionScopeType> findAll();
 }
