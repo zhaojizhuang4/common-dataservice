@@ -109,13 +109,13 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private long artifactCount = 0;
 	private RestPageResponse<MLPArtifact> artifacts;
 	private RestPageResponse<MLPArtifact> artifactsBySearchTerm;
-	private List<MLPArtifact> searchArtifacts;
+	private RestPageResponse<MLPArtifact> searchArtifacts;
 	private MLPArtifact artifactById = new MLPArtifact();
 	private MLPArtifact artifact = new MLPArtifact();
 	private long userCount = 0;
 	private RestPageResponse<MLPUser> users;
 	private RestPageResponse<MLPUser> usersBySearchTerm;
-	private List<MLPUser> searchUsers;
+	private RestPageResponse<MLPUser> searchUsers;
 	private MLPUser loginUser = new MLPUser();
 	private MLPUser userById = new MLPUser();
 	private MLPUser user = new MLPUser();
@@ -125,7 +125,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private List<MLPUserLoginProvider> userLoginProviders;
 	private MLPUserLoginProvider userLoginProvider = new MLPUserLoginProvider();
 	private long roleCount = 0;
-	private List<MLPRole> searchRoles;
+	private RestPageResponse<MLPRole> searchRoles;
 	private RestPageResponse<MLPRole> roles;
 	private MLPRole roleById = new MLPRole();
 	private MLPRole role = new MLPRole();
@@ -133,7 +133,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private MLPRoleFunction roleFunctionById = new MLPRoleFunction();
 	private MLPRoleFunction roleFunction = new MLPRoleFunction();
 	private RestPageResponse<MLPPeer> peers;
-	private List<MLPPeer> searchPeers;
+	private RestPageResponse<MLPPeer> searchPeers;
 	private MLPPeer peerById = new MLPPeer();
 	private MLPPeer peer = new MLPPeer();
 	private List<MLPPeerSubscription> peerSubscriptions;
@@ -173,10 +173,11 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private MLPComment comment = new MLPComment();
 	private MLPComment commentById = new MLPComment();
 	private RestPageResponse<MLPSolution> portalSolutions;
-	private List<MLPSolution> searchSolutions;
+	private RestPageResponse<MLPSolution> searchSolutions;
 	private RestPageResponse<MLPThread> solutionRevisionThreads;
 	private RestPageResponse<MLPComment> solutionRevisionComments;
 	private RestPageResponse<MLPStepResult> stepResults;
+	private RestPageResponse<MLPStepResult> searchStepResults;
 
 	/**
 	 * No-argument constructor.
@@ -576,12 +577,12 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return artifactsBySearchTerm;
 	}
 
-	public void setSearchArtifacts(List<MLPArtifact> artifacts) {
+	public void setSearchArtifacts(RestPageResponse<MLPArtifact> artifacts) {
 		this.searchArtifacts = artifacts;
 	}
 
 	@Override
-	public List<MLPArtifact> searchArtifacts(Map<String, Object> queryParameters, boolean isOr) {
+	public RestPageResponse<MLPArtifact> searchArtifacts(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest) {
 		return searchArtifacts;
 	}
 
@@ -640,12 +641,12 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return usersBySearchTerm;
 	}
 
-	public void setSearchUsers(List<MLPUser> users) {
+	public void setSearchUsers(RestPageResponse<MLPUser> users) {
 		this.searchUsers = users;
 	}
 
 	@Override
-	public List<MLPUser> searchUsers(Map<String, Object> queryParameters, boolean isOr) {
+	public RestPageResponse<MLPUser> searchUsers(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest) {
 		return searchUsers;
 	}
 
@@ -775,12 +776,12 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return roleCount;
 	}
 
-	public void setSearchRoles(List<MLPRole> roles) {
+	public void setSearchRoles(RestPageResponse<MLPRole> roles) {
 		this.searchRoles = roles;
 	}
 
 	@Override
-	public List<MLPRole> searchRoles(Map<String, Object> queryParameters, boolean isOr) {
+	public RestPageResponse<MLPRole> searchRoles(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest) {
 		return searchRoles;
 	}
 
@@ -867,12 +868,12 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return peers;
 	}
 
-	public void setSearchPeers(List<MLPPeer> peers) {
+	public void setSearchPeers(RestPageResponse<MLPPeer> peers) {
 		this.searchPeers = peers;
 	}
 
 	@Override
-	public List<MLPPeer> searchPeers(Map<String, Object> queryParameters, boolean isOr) {
+	public RestPageResponse<MLPPeer> searchPeers(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest) {
 		return searchPeers;
 	}
 
@@ -1357,12 +1358,12 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return this.portalSolutions;
 	}
 
-	public void setSearchSolutions(List<MLPSolution> solutions) {
+	public void setSearchSolutions(RestPageResponse<MLPSolution> solutions) {
 		this.searchSolutions = solutions;
 	}
 
 	@Override
-	public List<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr) {
+	public RestPageResponse<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest) {
 		return this.searchSolutions;
 	}
 
@@ -1393,6 +1394,15 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	@Override
 	public RestPageResponse<MLPStepResult> getStepResults(RestPageRequest pageRequest) {
 		return stepResults;
+	}
+
+	public void setSearchStepResults(RestPageResponse<MLPStepResult> results) {
+		this.searchStepResults = results;
+	}
+
+	@Override
+	public RestPageResponse<MLPStepResult> searchStepResults(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest) {
+		return this.searchStepResults;
 	}
 
 	public void setStepResult(MLPStepResult result) {

@@ -20,10 +20,11 @@
 
 package org.acumos.cds.service;
 
-import java.util.List;
 import java.util.Map;
 
 import org.acumos.cds.domain.MLPUser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Defines methods to manipulate user information.
@@ -39,8 +40,10 @@ public interface UserSearchService {
 	 * @param isOr
 	 *            If true, the query is a disjunction ("or"); otherwise the query is
 	 *            a conjunction ("and").
-	 * @return List of instances, which may be empty.
+	 * @param pageable
+	 *            Page and sort criteria
+	 * @return Page of instances, which may be empty.
 	 */
-	List<MLPUser> findUsers(Map<String, ? extends Object> queryParameters, boolean isOr);
+	Page<MLPUser> findUsers(Map<String, ? extends Object> queryParameters, boolean isOr, Pageable pageable);
 
 }

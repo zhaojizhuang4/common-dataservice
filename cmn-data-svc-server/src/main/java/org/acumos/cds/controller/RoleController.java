@@ -97,15 +97,18 @@ public class RoleController extends AbstractController {
 	 * @param queryParameters
 	 *            Map of String (field name) to String (value) for restricting the
 	 *            query
+	 * @param pageRequest
+	 *            Sort and page criteria
 	 * @param response
 	 *            HttpServletResponse
 	 * @return List of roles, for serialization as JSON.
 	 */
-	@ApiOperation(value = "Searches for roles using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disunction).", response = MLPRole.class, responseContainer = "List")
+	@ApiOperation(value = "Searches for roles using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disjunction).", response = MLPRole.class, responseContainer = "Page")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchRoles(@RequestParam MultiValueMap<String, String> queryParameters,
+	public Object searchRoles(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
 			HttpServletResponse response) {
+		cleanPageableParameters(queryParameters);
 		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
 		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
 		if (queryParameters.size() == 0) {
@@ -114,7 +117,7 @@ public class RoleController extends AbstractController {
 		}
 		try {
 			Map<String, Object> convertedQryParm = convertQueryParameters(MLPRole.class, queryParameters);
-			return roleSearchService.findRoles(convertedQryParm, isOr);
+			return roleSearchService.findRoles(convertedQryParm, isOr, pageRequest);
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "searchRoles failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

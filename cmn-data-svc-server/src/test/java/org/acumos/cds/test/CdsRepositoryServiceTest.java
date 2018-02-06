@@ -24,7 +24,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.validation.ConstraintViolationException;
@@ -117,6 +116,7 @@ import org.acumos.cds.service.ArtifactSearchService;
 import org.acumos.cds.service.PeerSearchService;
 import org.acumos.cds.service.RoleSearchService;
 import org.acumos.cds.service.SolutionSearchService;
+import org.acumos.cds.service.StepResultSearchService;
 import org.acumos.cds.service.UserSearchService;
 import org.acumos.cds.util.EELFLoggerDelegate;
 import org.junit.Assert;
@@ -216,6 +216,8 @@ public class CdsRepositoryServiceTest {
 	private UserSearchService userService;
 	@Autowired
 	private StepResultRepository stepResultRepository;
+	@Autowired
+	private StepResultSearchService stepResultSearchService;
 	@Autowired
 	private ValidationStatusRepository validationStatusRepository;
 	@Autowired
@@ -399,9 +401,9 @@ public class CdsRepositoryServiceTest {
 			HashMap<String, Object> restr = new HashMap<>();
 			restr.put("firstName", firstName);
 			restr.put("lastName", lastName);
-			List<MLPUser> userList = userService.findUsers(restr, true);
-			Assert.assertTrue(userList.size() > 0);
-			MLPUser testUser = userList.get(0);
+			Page<MLPUser> userPage = userService.findUsers(restr, true, new PageRequest(0,5,null));
+			Assert.assertTrue(userPage.getNumberOfElements() > 0);
+			MLPUser testUser = userPage.iterator().next();
 			logger.info("testUser is " + testUser);
 			logger.info("cu.getUserID is " + cu.getUserId());
 
@@ -460,8 +462,8 @@ public class CdsRepositoryServiceTest {
 			// Fetch back
 			Map<String, String> peerParms = new HashMap<>();
 			peerParms.put("name", pr.getName());
-			List<MLPPeer> searchPeers = peerSearchService.findPeers(peerParms, false);
-			Assert.assertTrue(searchPeers.size() == 1);
+			Page<MLPPeer> searchPeers = peerSearchService.findPeers(peerParms, false, new PageRequest(0,5,null));
+			Assert.assertTrue(searchPeers.getNumberOfElements() == 1);
 
 			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId(),
 					SubscriptionScopeTypeCode.FL.name());
@@ -485,8 +487,8 @@ public class CdsRepositoryServiceTest {
 
 			Map<String, String> roleParms = new HashMap<>();
 			roleParms.put("name", cr2.getName());
-			List<MLPRole> searchRoles = roleSearchService.findRoles(roleParms, false);
-			Assert.assertTrue(searchRoles.size() == 1);
+			Page<MLPRole> searchRoles = roleSearchService.findRoles(roleParms, false, new PageRequest(0,5,null));
+			Assert.assertTrue(searchRoles.getNumberOfElements() == 1);
 
 			MLPRoleFunction crf = new MLPRoleFunction();
 			final String roleFuncName = "My test role function";
@@ -538,8 +540,8 @@ public class CdsRepositoryServiceTest {
 			// Fetch artifact back
 			Map<String, String> artParms = new HashMap<>();
 			artParms.put("name", ca.getName());
-			List<MLPArtifact> searchArts = artifactSearchService.findArtifacts(artParms, false);
-			Assert.assertTrue(searchArts.size() > 0);
+			Page<MLPArtifact> searchArts = artifactSearchService.findArtifacts(artParms, false, new PageRequest(0,5,null));
+			Assert.assertTrue(searchArts.getNumberOfElements() > 0);
 
 			// This tag is existing
 			MLPTag solTag1 = new MLPTag("soltag1");
@@ -567,14 +569,14 @@ public class CdsRepositoryServiceTest {
 			// Search for a single value
 			Map<String, String> solParms = new HashMap<>();
 			solParms.put("name", cs.getName());
-			List<MLPSolution> searchSols = solutionSearchService.findSolutions(solParms, false);
-			Assert.assertTrue(searchSols.size() == 1);
+			Page<MLPSolution> searchSols = solutionSearchService.findSolutions(solParms, false, new PageRequest(0, 5, null));
+			Assert.assertTrue(searchSols.getNumberOfElements() == 1);
 
 			// Search for a list
 			Map<String, Object> solListParms = new HashMap<>();
 			solListParms.put("name", new String[] { cs.getName() });
-			List<MLPSolution> searchListSols = solutionSearchService.findSolutions(solListParms, false);
-			Assert.assertTrue(searchListSols.size() == 1);
+			Page<MLPSolution> searchPageSols = solutionSearchService.findSolutions(solListParms, false, new PageRequest(0,5,null));
+			Assert.assertTrue(searchPageSols.getNumberOfElements() == 1);
 
 			logger.info("Finding portal solutions");
 			String[] solKw = { solName };
@@ -839,8 +841,8 @@ public class CdsRepositoryServiceTest {
 			// restr.put("active", true);
 			restr.put("firstName", firstName);
 			restr.put("lastName", lastName);
-			List<MLPUser> userList = userService.findUsers(restr, false);
-			Assert.assertTrue(userList.size() == 1);
+			Page<MLPUser> userPage = userService.findUsers(restr, false, new PageRequest(0,5));
+			Assert.assertTrue(userPage.getNumberOfElements() == 1);
 
 			// social login
 			Iterable<MLPLoginProvider> provs = loginProviderRepository.findAll();
@@ -1216,21 +1218,25 @@ public class CdsRepositoryServiceTest {
 	public void testStepResults() throws Exception {
 		try {
 			MLPStepResult sr = new MLPStepResult();
-
 			sr.setStepCode(String.valueOf(StepTypeCode.OB));
 			sr.setName("Solution ID creation");
 			sr.setStatusCode(StepStatusCode.FA.name());
-
 			Date now = new Date();
 			sr.setStartDate(new Date(now.getTime() - 60 * 1000));
-
 			sr = stepResultRepository.save(sr);
 			Assert.assertNotNull(sr.getStepResultId());
 
 			long srCountTrans = stepResultRepository.count();
 			Assert.assertTrue(srCountTrans > 0);
-			Assert.assertNotNull(stepResultRepository.findOne(sr.getStepResultId()));
-			logger.info("First step result {}", stepResultRepository.findOne(sr.getStepResultId()));
+		
+			MLPStepResult result = stepResultRepository.findOne(sr.getStepResultId()); 
+			Assert.assertNotNull(result);
+			logger.info("First step result {}", result);
+			
+			HashMap<String,Object> queryParameters = new HashMap<>();
+			queryParameters.put("statusCode", StepStatusCode.FA.toString());
+			Page<MLPStepResult> page = stepResultSearchService.findStepResults(queryParameters, false, new PageRequest(0, 5, null));
+			Assert.assertTrue(page.getNumberOfElements() > 0);
 
 			sr.setResult("New stack trace");
 			stepResultRepository.save(sr);

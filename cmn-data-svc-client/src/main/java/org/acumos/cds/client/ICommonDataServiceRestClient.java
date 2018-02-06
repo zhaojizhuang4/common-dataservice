@@ -225,9 +225,11 @@ public interface ICommonDataServiceRestClient {
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
 	 *            (conditions are AND-ed together).
-	 * @return List of solution objects.
+	 * @param pageRequest
+	 *            Page index, page size, sort information; ignored if null.
+	 * @return Page of solution objects
 	 */
-	List<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr);
+	RestPageResponse<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest);
 
 	/**
 	 * Gets the solution with the specified ID.
@@ -474,9 +476,11 @@ public interface ICommonDataServiceRestClient {
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
 	 *            (conditions are AND-ed together).
-	 * @return List of artifact objects.
+	 * @param pageRequest
+	 *            Page index, page size, sort information; ignored if null.
+	 * @return Page of artifact objects.
 	 */
-	List<MLPArtifact> searchArtifacts(Map<String, Object> queryParameters, boolean isOr);
+	RestPageResponse<MLPArtifact> searchArtifacts(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest);
 
 	/**
 	 * Gets the artifact with the specified ID.
@@ -553,9 +557,11 @@ public interface ICommonDataServiceRestClient {
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
 	 *            (conditions are AND-ed together).
-	 * @return List of user objects
+	 * @param pageRequest
+	 *            Page index, page size, sort information; ignored if null.
+	 * @return Page of user objects
 	 */
-	List<MLPUser> searchUsers(Map<String, Object> queryParameters, boolean isOr);
+	RestPageResponse<MLPUser> searchUsers(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest);
 
 	/**
 	 * Searches for user with the specified credentials.
@@ -741,9 +747,11 @@ public interface ICommonDataServiceRestClient {
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
 	 *            (conditions are AND-ed together).
-	 * @return List of instances, which may be empty.
+	 * @param pageRequest
+	 *            Page index, page size, sort information; ignored if null.
+	 * @return Page of role objects
 	 */
-	List<MLPRole> searchRoles(Map<String, Object> queryParameters, boolean isOr);
+	RestPageResponse<MLPRole> searchRoles(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest);
 
 	/**
 	 * Gets the roles.
@@ -857,9 +865,11 @@ public interface ICommonDataServiceRestClient {
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
 	 *            (conditions are AND-ed together).
-	 * @return List of peer objects
+	 * @param pageRequest
+	 *            Page index, page size, sort information; ignored if null.
+	 * @return Page of peer objects
 	 */
-	List<MLPPeer> searchPeers(Map<String, Object> queryParameters, boolean isOr);
+	RestPageResponse<MLPPeer> searchPeers(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest);
 
 	/**
 	 * Gets the peer with the specified ID.
@@ -1502,6 +1512,23 @@ public interface ICommonDataServiceRestClient {
 	 * @return Page of step result objects.
 	 */
 	RestPageResponse<MLPStepResult> getStepResults(RestPageRequest pageRequest);
+
+	/**
+	 * Searches step results.
+	 * 
+	 * @param queryParameters
+	 *            Map of field-name, field-value pairs to use as query criteria.
+	 *            Accepts Boolean, Date, Integer, Long, String values; also Array of
+	 *            those types.
+	 * @param isOr
+	 *            If true, finds matches on any field-value pair (conditions are
+	 *            OR-ed together); otherwise finds matches on all field-value pairs
+	 *            (conditions are AND-ed together).
+	 * @param pageRequest
+	 *            Page index, page size, sort information; ignored if null.
+	 * @return Page of step result objects
+	 */
+	RestPageResponse<MLPStepResult> searchStepResults(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest);
 
 	/**
 	 * Creates a step result.

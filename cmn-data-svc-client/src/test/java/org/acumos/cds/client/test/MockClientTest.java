@@ -170,8 +170,9 @@ public class MockClientTest {
 		client.setArtifactsBySearchTerm(artifacts);
 		Assert.assertTrue(artifacts == client.findArtifactsBySearchTerm("search", pageRequest));
 
-		client.setSearchArtifacts(artList);
-		Assert.assertTrue(artList == client.searchArtifacts(queryParameters, isOr));
+		RestPageResponse<MLPArtifact> artPage = new RestPageResponse<>();
+		client.setSearchArtifacts(artPage);
+		Assert.assertTrue(artPage == client.searchArtifacts(queryParameters, isOr, pageRequest));
 
 		MLPArtifact artifact = new MLPArtifact();
 		client.setArtifactById(artifact);
@@ -190,9 +191,9 @@ public class MockClientTest {
 		client.setUsersBySearchTerm(users);
 		Assert.assertTrue(users == client.findUsersBySearchTerm("term", pageRequest));
 
-		List<MLPUser> userList = new ArrayList<>();
-		client.setSearchUsers(userList);
-		Assert.assertTrue(userList == client.searchUsers(queryParameters, isOr));
+		RestPageResponse<MLPUser> userPage = new RestPageResponse<>();
+		client.setSearchUsers(userPage);
+		Assert.assertTrue(userPage == client.searchUsers(queryParameters, isOr, pageRequest));
 
 		MLPUser user = new MLPUser();
 		client.setLoginUser(user);
@@ -233,8 +234,9 @@ public class MockClientTest {
 		client.setRoleCount(count);
 		Assert.assertTrue(count == client.getRoleCount());
 
-		client.setSearchRoles(roleList);
-		Assert.assertTrue(roleList == client.searchRoles(queryParameters, isOr));
+		RestPageResponse<MLPRole> rolePage = new RestPageResponse<>();
+		client.setSearchRoles(rolePage);
+		Assert.assertTrue(rolePage == client.searchRoles(queryParameters, isOr, pageRequest));
 
 		RestPageResponse<MLPRole> roles = new RestPageResponse<>();
 		client.setRoles(roles);
@@ -264,9 +266,9 @@ public class MockClientTest {
 		client.setPeers(peers);
 		Assert.assertTrue(peers == client.getPeers(pageRequest));
 
-		List<MLPPeer> peerList = new ArrayList<>();
-		client.setSearchPeers(peerList);
-		Assert.assertTrue(peerList == client.searchPeers(queryParameters, isOr));
+		RestPageResponse<MLPPeer> peerPage = new RestPageResponse<>();
+		client.setSearchPeers(peerPage);
+		Assert.assertTrue(peerPage == client.searchPeers(queryParameters, isOr, pageRequest));
 
 		MLPPeer peer = new MLPPeer();
 		client.setPeerById(peer);
@@ -342,6 +344,7 @@ public class MockClientTest {
 		client.setSolutionWebMetadata(web);
 		Assert.assertTrue(web == client.getSolutionWebMetadata("id"));
 
+		List<MLPUser> userList = new ArrayList<>();
 		client.setSolutionAccessUsers(userList);
 		Assert.assertTrue(userList == client.getSolutionAccessUsers("id"));
 
@@ -427,9 +430,9 @@ public class MockClientTest {
 		Assert.assertTrue(
 				solutions == client.findPortalSolutions(null, null, true, null, null, null, null, null, pageRequest));
 
-		List<MLPSolution> solutionList = new ArrayList<>();
-		client.setSearchSolutions(solutionList);
-		Assert.assertTrue(solutionList == client.searchSolutions(queryParameters, isOr));
+		RestPageResponse<MLPSolution> solutionResponse = new RestPageResponse<>();
+		client.setSearchSolutions(solutionResponse);
+		Assert.assertTrue(solutionResponse == client.searchSolutions(queryParameters, isOr, new RestPageRequest()));
 
 		client.setSolutionRevisionThreads(threads);
 		Assert.assertTrue(threads == client.getSolutionRevisionThreads("id", "id", pageRequest));

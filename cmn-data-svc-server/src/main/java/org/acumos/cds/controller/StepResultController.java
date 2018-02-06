@@ -1,10 +1,14 @@
 package org.acumos.cds.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.acumos.cds.CCDSConstants;
 import org.acumos.cds.domain.MLPStepResult;
 import org.acumos.cds.repository.StepResultRepository;
+import org.acumos.cds.service.StepResultSearchService;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
@@ -14,10 +18,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +36,8 @@ public class StepResultController extends AbstractController {
 
 	@Autowired
 	private StepResultRepository stepResultRepository;
+	@Autowired
+	private StepResultSearchService stepResultSearchService;
 
 	/**
 	 * 
@@ -42,6 +50,39 @@ public class StepResultController extends AbstractController {
 	@ResponseBody
 	public Page<MLPStepResult> getPage(Pageable pageRequest) {
 		return stepResultRepository.findAll(pageRequest);
+	}
+
+	/**
+	 * @param queryParameters
+	 *            Map of String (field name) to String (value) for restricting the
+	 *            query
+	 * @param pageRequest
+	 *            Page and sort criteria
+	 * @param response
+	 *            HttpServletResponse
+	 * @return List of solutions
+	 */
+	@ApiOperation(value = "Searches for step results using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disjunction).", response = MLPStepResult.class, responseContainer = "Page")
+	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public Object searchStepResults(@RequestParam MultiValueMap<String, String> queryParameters,
+			HttpServletResponse response, Pageable pageRequest) {
+		cleanPageableParameters(queryParameters);
+		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
+		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
+		if (queryParameters.size() == 0) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
+		}
+		try {
+			Map<String, Object> convertedQryParm = convertQueryParameters(MLPStepResult.class, queryParameters);
+			return stepResultSearchService.findStepResults(convertedQryParm, isOr, pageRequest);
+		} catch (Exception ex) {
+			logger.warn(EELFLoggerDelegate.errorLogger, "searchStepResults failed", ex);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+					ex.getCause() != null ? ex.getCause().getMessage() : "searchStepResults failed", ex);
+		}
 	}
 
 	/**

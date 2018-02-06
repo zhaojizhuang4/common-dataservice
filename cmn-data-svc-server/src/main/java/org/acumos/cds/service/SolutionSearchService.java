@@ -20,7 +20,6 @@
 
 package org.acumos.cds.service;
 
-import java.util.List;
 import java.util.Map;
 
 import org.acumos.cds.domain.MLPSolution;
@@ -41,9 +40,11 @@ public interface SolutionSearchService {
 	 * @param isOr
 	 *            If true, the query is a disjunction ("or"); otherwise the query is
 	 *            a conjunction ("and").
-	 * @return List of instances, which may be empty.
+	 * @param pageable
+	 *            Page and sort criteria
+	 * @return Page of instances, which may be empty.
 	 */
-	List<MLPSolution> findSolutions(Map<String, ? extends Object> queryParameters, boolean isOr);
+	Page<MLPSolution> findSolutions(Map<String, ? extends Object> queryParameters, boolean isOr, Pageable pageable);
 
 	/**
 	 * Gets a page of instances matching all query parameters.
@@ -74,7 +75,8 @@ public interface SolutionSearchService {
 	 *            including null (not the 4-character sequence "null"); ignored if
 	 *            null or empty
 	 * @param tags
-	 *            Not implemented
+	 *            Limits match to solutions with one of the specified tags; ignored
+	 *            if null or empty
 	 * @param pageable
 	 *            Page and sort info
 	 * @return Page of matches

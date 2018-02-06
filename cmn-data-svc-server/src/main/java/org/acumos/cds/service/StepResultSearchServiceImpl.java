@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.acumos.cds.domain.MLPArtifact;
+import javax.transaction.Transactional;
+
+import org.acumos.cds.domain.MLPStepResult;
 import org.acumos.cds.transport.RestPageResponse;
 import org.acumos.cds.util.EELFLoggerDelegate;
 import org.hibernate.Criteria;
@@ -34,31 +36,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Hibernate-assisted methods to search Artifact information.
+ * Hibernate-assisted methods to search step result information.
  */
-@Service("artifactSearchService")
-@Transactional(readOnly = true)
-public class ArtifactSearchServiceImpl extends AbstractSearchServiceImpl implements ArtifactSearchService {
+@Service("stepResultSearchService")
+@Transactional
+public class StepResultSearchServiceImpl extends AbstractSearchServiceImpl implements StepResultSearchService {
 
-	private final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(ArtifactSearchServiceImpl.class);
+	private final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(StepResultSearchServiceImpl.class);
 
 	@Autowired
 	private SessionFactory sessionFactory;
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Page<MLPArtifact> findArtifacts(Map<String, ? extends Object> queryParameters, boolean isOr, Pageable pageable) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPArtifact.class);
+	public Page<MLPStepResult> findStepResults(Map<String, Object> queryParameters, boolean isOr, Pageable pageable) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPStepResult.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 
 		// Count the total rows
 		criteria.setProjection(Projections.rowCount());
 		Long count = (Long) criteria.uniqueResult();
 		if (count == 0)
-			return new RestPageResponse<>(new ArrayList<MLPArtifact>(), pageable, count);
+			return new RestPageResponse<>(new ArrayList<MLPStepResult>(), pageable, count);
 
 		// Reset the count criteria; add pagination and sort
 		criteria.setProjection(null);
@@ -66,9 +67,9 @@ public class ArtifactSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		super.applyPageableCriteria(criteria, pageable);
 
 		// Get a page of results and send it back with the total available
-		List<MLPArtifact> items = criteria.list();
-		logger.debug(EELFLoggerDelegate.debugLogger, "getArtifacts: result size={}", items.size());
+		List<MLPStepResult> items = criteria.list();
+		logger.debug(EELFLoggerDelegate.debugLogger, "findStepResults: result size={}", items.size());
 		return new RestPageResponse<>(items, pageable, count);
 	}
-
+	
 }

@@ -20,17 +20,21 @@
 
 package org.acumos.cds.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.transaction.Transactional;
 
 import org.acumos.cds.domain.MLPPeer;
+import org.acumos.cds.transport.RestPageResponse;
 import org.acumos.cds.util.EELFLoggerDelegate;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.criterion.Projections;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -47,13 +51,24 @@ public class PeerSearchServiceImpl extends AbstractSearchServiceImpl implements 
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MLPPeer> findPeers(Map<String, ? extends Object> queryParameters, boolean isOr) {
+	public Page<MLPPeer> findPeers(Map<String, ? extends Object> queryParameters, boolean isOr, Pageable pageable) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPPeer.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
-		Transaction tx = sessionFactory.getCurrentSession().beginTransaction();
+
+		// Count the total rows
+		criteria.setProjection(Projections.rowCount());
+		Long count = (Long) criteria.uniqueResult();
+		if (count == 0)
+			return new RestPageResponse<>(new ArrayList<MLPPeer>(), pageable, count);
+
+		// Reset the count criteria; add pagination and sort
+		criteria.setProjection(null);
+		criteria.setResultTransformer(Criteria.ROOT_ENTITY);
+		super.applyPageableCriteria(criteria, pageable);
+
+		// Get a page of results and send it back with the total available
 		List<MLPPeer> items = criteria.list();
-		tx.commit();
 		logger.debug(EELFLoggerDelegate.debugLogger, "getPeers: result size={}", items.size());
-		return items;
+		return new RestPageResponse<>(items, pageable, count);		
 	}
 }

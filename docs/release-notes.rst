@@ -12,6 +12,7 @@ Version 1.13.0, 9 February 2018
 * Add origin attribute to solution and revision entities (ACUMOS-59)
 * Revise peer attributes (ACUMOS-60)
 * Add toolkit type PB - Probe
+* Revise search methods to return a page of results
 * Requires database schema version 1.13
 
 Version 1.12.1, 26 January 2018

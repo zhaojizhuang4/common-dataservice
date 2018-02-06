@@ -81,7 +81,7 @@ public class PeerController extends AbstractController {
 	@ApiOperation(value = "Gets a page of peers, optionally sorted on fields.", response = MLPPeer.class, responseContainer = "Page")
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	public Page<MLPPeer> getPage(Pageable pageable) {
+	public Page<MLPPeer> getPageOfPeers(Pageable pageable) {
 		return peerRepository.findAll(pageable);
 	}
 
@@ -89,15 +89,18 @@ public class PeerController extends AbstractController {
 	 * @param queryParameters
 	 *            Map of String (field name) to String (value) for restricting the
 	 *            query
+	 * @param pageable
+	 *            Sort and page criteria
 	 * @param response
 	 *            HttpServletResponse
-	 * @return List of peers, for serialization as JSON.
+	 * @return Page of peers, for serialization as JSON.
 	 */
-	@ApiOperation(value = "Searches for peers using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disunction).", response = MLPPeer.class, responseContainer = "List")
+	@ApiOperation(value = "Searches for peers using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disjunction).", response = MLPPeer.class, responseContainer = "Page")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchPeers(@RequestParam MultiValueMap<String, String> queryParameters,
+	public Object searchPeers(@RequestParam MultiValueMap<String, String> queryParameters,Pageable pageable,
 			HttpServletResponse response) {
+		cleanPageableParameters(queryParameters);
 		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
 		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
 		if (queryParameters.size() == 0) {
@@ -106,7 +109,7 @@ public class PeerController extends AbstractController {
 		}
 		try {
 			Map<String, Object> convertedQryParm = convertQueryParameters(MLPPeer.class, queryParameters);
-			return peerSearchService.findPeers(convertedQryParm, isOr);
+			return peerSearchService.findPeers(convertedQryParm, isOr, pageable);
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "searchPeers failed", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

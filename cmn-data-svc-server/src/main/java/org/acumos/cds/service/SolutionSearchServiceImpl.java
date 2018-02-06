@@ -21,7 +21,6 @@
 package org.acumos.cds.service;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,15 +31,11 @@ import org.acumos.cds.transport.RestPageResponse;
 import org.acumos.cds.util.EELFLoggerDelegate;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Junction;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 /**
@@ -57,56 +52,35 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MLPSolution> findSolutions(Map<String, ? extends Object> queryParameters, boolean isOr) {
+	public Page<MLPSolution> findSolutions(Map<String, ? extends Object> queryParameters, boolean isOr, Pageable pageable) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
+
+		// Count the total rows
+		criteria.setProjection(Projections.rowCount());
+		Long count = (Long) criteria.uniqueResult();
+		if (count == 0)
+			return new RestPageResponse<>(new ArrayList<MLPSolution>(), pageable, count);
+
+		// Reset the count criteria; add pagination and sort
+		criteria.setProjection(null);
+		criteria.setResultTransformer(Criteria.ROOT_ENTITY);
+		super.applyPageableCriteria(criteria, pageable);
+
+		// Get a page of results and send it back with the total available
 		List<MLPSolution> items = criteria.list();
-		logger.debug(EELFLoggerDelegate.debugLogger, "getSolutions: result size={}", items.size());
-		return items;
+		logger.debug(EELFLoggerDelegate.debugLogger, "findSolutions: result size={}", items.size());
+		return new RestPageResponse<>(items, pageable, count);
 	}
 
 	/**
-	 * Builds a disjunction ("OR") criterion to check exact match of any value in
-	 * the list, with special handling for null.
-	 * 
-	 * @param fieldName
-	 *            POJO field name
-	 * @param values
-	 *            String values; null is permitted
-	 * @return Criterion
+	 * This implementation is awkward for several reasons:
+	 * <UL>
+	 * <LI>the need to use LIKE queries on certain fields
+	 * <LI>the need to search tags, which are not attributes on the entity itself
+	 * but instead are implemented via a mapping table</LI>
+	 * </UL>
 	 */
-	private Criterion buildEqualsListCriterion(String fieldName, String[] values) {
-		Junction junction = Restrictions.disjunction();
-		for (String v : values) {
-			if (v == null)
-				junction.add(Restrictions.isNull(fieldName));
-			else
-				junction.add(Restrictions.eq(fieldName, v));
-		}
-		return junction;
-	}
-
-	/**
-	 * Builds a disjunction ("OR") criterion to check approximate match of any value
-	 * in the list; null is not permitted.
-	 * 
-	 * @param fieldName
-	 *            POJO field name
-	 * @param values
-	 *            String values; null is forbidden
-	 * @return Criterion
-	 */
-	private Criterion buildLikeListCriterion(String fieldName, String[] values) {
-		Junction junction = Restrictions.disjunction();
-		for (String v : values) {
-			if (v == null)
-				throw new IllegalArgumentException("Null not permitted in value list");
-			else
-				junction.add(Restrictions.like(fieldName, '%' + v + '%'));
-		}
-		return junction;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public Page<MLPSolution> findPortalSolutions(String[] nameKeywords, String[] descKeywords, boolean active,
@@ -143,26 +117,13 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		if (count == 0)
 			return new RestPageResponse<>(new ArrayList<MLPSolution>(), pageable, count);
 
-		// Reset the criteria, add pagination and sort
+		// Reset the count criteria; add pagination and sort
 		solCriteria.setProjection(null);
 		solCriteria.setResultTransformer(Criteria.ROOT_ENTITY);
-		solCriteria.setFirstResult(pageable.getOffset());
-		solCriteria.setMaxResults(pageable.getPageSize());
-		if (pageable.getSort() != null) {
-			Iterator<Sort.Order> orderIter = pageable.getSort().iterator();
-			while (orderIter.hasNext()) {
-				Sort.Order sortOrder = orderIter.next();
-				Order order;
-				if (sortOrder.isAscending())
-					order = Order.asc(sortOrder.getProperty());
-				else
-					order = Order.desc(sortOrder.getProperty());
-				solCriteria.addOrder(order);
-			}
-		}
+		super.applyPageableCriteria(solCriteria, pageable);
+
 		// Get a page of results
 		List<MLPSolution> items = solCriteria.list();
-
 		logger.debug(EELFLoggerDelegate.debugLogger, "findPortalSolutions: result size={}", items.size());
 		return new RestPageResponse<>(items, pageable, count);
 	}

@@ -476,13 +476,14 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public List<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr) {
+	public RestPageResponse<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
 		Map<String, Object> copy = new HashMap<>(queryParameters);
 		copy.put(CCDSConstants.JUNCTION_QUERY_PARAM, isOr ? "o" : "a");
-		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH }, copy, null);
+		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH }, copy, pageRequest);
 		logger.debug("searchSolutions: uri {}", uri);
-		ResponseEntity<List<MLPSolution>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<MLPSolution>>() {
+		ResponseEntity<RestPageResponse<MLPSolution>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPSolution>>() {
 				});
 		return response.getBody();
 	}
@@ -704,13 +705,14 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public List<MLPArtifact> searchArtifacts(Map<String, Object> queryParameters, boolean isOr) {
+	public RestPageResponse<MLPArtifact> searchArtifacts(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
 		Map<String, Object> copy = new HashMap<>(queryParameters);
 		copy.put(CCDSConstants.JUNCTION_QUERY_PARAM, isOr ? "o" : "a");
-		URI uri = buildUri(new String[] { CCDSConstants.ARTIFACT_PATH, CCDSConstants.SEARCH_PATH }, copy, null);
+		URI uri = buildUri(new String[] { CCDSConstants.ARTIFACT_PATH, CCDSConstants.SEARCH_PATH }, copy, pageRequest);
 		logger.debug("searchArtifacts: uri {}", uri);
-		ResponseEntity<List<MLPArtifact>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<MLPArtifact>>() {
+		ResponseEntity<RestPageResponse<MLPArtifact>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPArtifact>>() {
 				});
 		return response.getBody();
 	}
@@ -779,13 +781,14 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public List<MLPUser> searchUsers(Map<String, Object> queryParameters, boolean isOr) {
+	public RestPageResponse<MLPUser> searchUsers(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
 		Map<String, Object> copy = new HashMap<>(queryParameters);
 		copy.put(CCDSConstants.JUNCTION_QUERY_PARAM, isOr ? "o" : "a");
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.SEARCH_PATH }, copy, null);
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.SEARCH_PATH }, copy, pageRequest);
 		logger.debug("searchUsers: uri {}", uri);
-		ResponseEntity<List<MLPUser>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<MLPUser>>() {
+		ResponseEntity<RestPageResponse<MLPUser>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPUser>>() {
 				});
 		return response.getBody();
 	}
@@ -910,13 +913,14 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public List<MLPRole> searchRoles(Map<String, Object> queryParameters, boolean isOr) {
+	public RestPageResponse<MLPRole> searchRoles(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
 		Map<String, Object> copy = new HashMap<>(queryParameters);
 		copy.put(CCDSConstants.JUNCTION_QUERY_PARAM, isOr ? "o" : "a");
-		URI uri = buildUri(new String[] { CCDSConstants.ROLE_PATH, CCDSConstants.SEARCH_PATH }, copy, null);
+		URI uri = buildUri(new String[] { CCDSConstants.ROLE_PATH, CCDSConstants.SEARCH_PATH }, copy, pageRequest);
 		logger.debug("searchRoles: uri {}", uri);
-		ResponseEntity<List<MLPRole>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<MLPRole>>() {
+		ResponseEntity<RestPageResponse<MLPRole>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPRole>>() {
 				});
 		return response.getBody();
 	}
@@ -1073,13 +1077,14 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public List<MLPPeer> searchPeers(Map<String, Object> queryParameters, boolean isOr) {
+	public RestPageResponse<MLPPeer> searchPeers(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
 		Map<String, Object> copy = new HashMap<>(queryParameters);
 		copy.put(CCDSConstants.JUNCTION_QUERY_PARAM, isOr ? "o" : "a");
-		URI uri = buildUri(new String[] { CCDSConstants.PEER_PATH, CCDSConstants.SEARCH_PATH }, copy, null);
+		URI uri = buildUri(new String[] { CCDSConstants.PEER_PATH, CCDSConstants.SEARCH_PATH }, copy, pageRequest);
 		logger.debug("searchPeers: uri {}", uri);
-		ResponseEntity<List<MLPPeer>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<MLPPeer>>() {
+		ResponseEntity<RestPageResponse<MLPPeer>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPPeer>>() {
 				});
 		return response.getBody();
 	}
@@ -1692,6 +1697,20 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	public RestPageResponse<MLPStepResult> getStepResults(RestPageRequest pageRequest) {
 		URI uri = buildUri(new String[] { CCDSConstants.STEP_RESULT_PATH }, null, pageRequest);
 		logger.debug("getStepResults: uri {}", uri);
+		ResponseEntity<RestPageResponse<MLPStepResult>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPStepResult>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public RestPageResponse<MLPStepResult> searchStepResults(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
+		Map<String, Object> copy = new HashMap<>(queryParameters);
+		copy.put(CCDSConstants.JUNCTION_QUERY_PARAM, isOr ? "o" : "a");
+		URI uri = buildUri(new String[] { CCDSConstants.STEP_RESULT_PATH, CCDSConstants.SEARCH_PATH }, copy,
+				pageRequest);
+		logger.debug("searchStepResults: uri {}", uri);
 		ResponseEntity<RestPageResponse<MLPStepResult>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<RestPageResponse<MLPStepResult>>() {
 				});

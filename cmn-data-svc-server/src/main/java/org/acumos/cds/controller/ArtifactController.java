@@ -112,15 +112,18 @@ public class ArtifactController extends AbstractController {
 	 * @param queryParameters
 	 *            Map of String (field name) to String (value) for restricting the
 	 *            query
+	 * @param pageRequest
+	 *            Page and sort criteria
 	 * @param response
 	 *            HttpServletResponse
-	 * @return List of artifacts, for serialization as JSON
+	 * @return Page of artifacts, for serialization as JSON
 	 */
-	@ApiOperation(value = "Searches for artifacts using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disunction).", response = MLPArtifact.class, responseContainer = "List")
+	@ApiOperation(value = "Searches for artifacts using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disjunction).", response = MLPArtifact.class, responseContainer = "Page")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchArtifacts(@RequestParam MultiValueMap<String, String> queryParameters,
+	public Object searchArtifacts(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
 			HttpServletResponse response) {
+		cleanPageableParameters(queryParameters);
 		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
 		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
 		if (queryParameters.size() == 0) {
@@ -129,7 +132,7 @@ public class ArtifactController extends AbstractController {
 		}
 		try {
 			Map<String, Object> convertedQryParm = convertQueryParameters(MLPArtifact.class, queryParameters);
-			return artifactService.findArtifacts(convertedQryParm, isOr);
+			return artifactService.findArtifacts(convertedQryParm, isOr, pageRequest);
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "searchArtifacts", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

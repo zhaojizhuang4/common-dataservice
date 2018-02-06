@@ -22,14 +22,14 @@ package org.acumos.cds.service;
 
 import java.util.Map;
 
-import org.acumos.cds.domain.MLPPeer;
+import org.acumos.cds.domain.MLPStepResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 /**
- * Defines methods to manipulate peer information.
+ * Defines methods to query step result information.
  */
-public interface PeerSearchService {
+public interface StepResultSearchService {
 
 	/**
 	 * Searches for instances matching all or one of the query parameters, depending
@@ -42,8 +42,8 @@ public interface PeerSearchService {
 	 *            a conjunction ("and").
 	 * @param pageable
 	 *            Page and sort criteria
-	 * @return Page of instances, which may be empty.
+	 * @return List of instances, which may be empty.
 	 */
-	public Page<MLPPeer> findPeers(Map<String, ? extends Object> queryParameters, boolean isOr, Pageable pageable);
+	Page<MLPStepResult> findStepResults(Map<String, Object> queryParameters, boolean isOr, Pageable pageable);
 
 }

@@ -256,16 +256,19 @@ public class SolutionController extends AbstractController {
 	/**
 	 * @param queryParameters
 	 *            Map of String (field name) to String (value) for restricting the
-	 *            query
+	 *            query	
+	 * @param pageRequest
+	 *            Page and sort criteria
 	 * @param response
 	 *            HttpServletResponse
-	 * @return List of solutions
+	 * @return Page of solutions
 	 */
-	@ApiOperation(value = "Searches for solutions using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disunction).", response = MLPSolution.class, responseContainer = "List")
+	@ApiOperation(value = "Searches for solutions using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disjunction).", response = MLPSolution.class, responseContainer = "Page")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchSolutions(@RequestParam MultiValueMap<String, String> queryParameters,
+	public Object searchSolutions(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
 			HttpServletResponse response) {
+		cleanPageableParameters(queryParameters);
 		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
 		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
 		if (queryParameters.size() == 0) {
@@ -274,7 +277,7 @@ public class SolutionController extends AbstractController {
 		}
 		try {
 			Map<String, Object> convertedQryParm = convertQueryParameters(MLPSolution.class, queryParameters);
-			return solutionSearchService.findSolutions(convertedQryParm, isOr);
+			return solutionSearchService.findSolutions(convertedQryParm, isOr, pageRequest);
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "searchSolutions failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

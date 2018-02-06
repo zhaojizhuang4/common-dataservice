@@ -348,9 +348,9 @@ public class CdsControllerTest {
 			userRestr.put("active", "true");
 			userRestr.put("firstName", firstName);
 			userRestr.put("lastName", lastName);
-			List<MLPUser> userList = client.searchUsers(userRestr, false);
-			Assert.assertTrue(userList.size() == 1);
-			MLPUser testUser = userList.get(0);
+			RestPageResponse<MLPUser> userPage = client.searchUsers(userRestr, false, new RestPageRequest());
+			Assert.assertTrue(userPage.getNumberOfElements() == 1);
+			MLPUser testUser = userPage.iterator().next();
 			// Password must not come back as JSON
 			Assert.assertNull(testUser.getLoginHash());
 
@@ -399,8 +399,9 @@ public class CdsControllerTest {
 
 			HashMap<String, Object> peerRestr = new HashMap<>();
 			peerRestr.put("name", peerName);
-			List<MLPPeer> peerSearchResult = client.searchPeers(peerRestr, false);
-			Assert.assertTrue(peerSearchResult.size() > 0);
+			RestPageResponse<MLPPeer> peerSearchResult = client.searchPeers(peerRestr, false,
+					new RestPageRequest(0, 1));
+			Assert.assertTrue(peerSearchResult.getNumberOfElements() > 0);
 
 			MLPPeer pr2 = client.getPeer(pr.getPeerId());
 			Assert.assertEquals(pr.getPeerId(), pr2.getPeerId());
@@ -470,15 +471,15 @@ public class CdsControllerTest {
 			// Search exactly
 			HashMap<String, Object> restr = new HashMap<>();
 			restr.put("version", version);
-			List<MLPArtifact> filtered = client.searchArtifacts(restr, true);
-			Assert.assertTrue(filtered.size() > 0);
+			RestPageResponse<MLPArtifact> filtered = client.searchArtifacts(restr, true, new RestPageRequest(0, 10));
+			Assert.assertTrue(filtered.getNumberOfElements() > 0);
 
 			// This will get no results but will cover some clauses
 			restr.clear();
 			restr.put("created", new Date());
 			restr.put("size", 0);
-			filtered = client.searchArtifacts(restr, true);
-			Assert.assertTrue(filtered.isEmpty());
+			filtered = client.searchArtifacts(restr, true, new RestPageRequest(0, 10));
+			Assert.assertTrue(filtered.getNumberOfElements() == 0);
 
 			final String tagName1 = "tag1-" + Long.toString(new Date().getTime());
 			final String tagName2 = "tag-2" + Long.toString(new Date().getTime());
@@ -575,16 +576,18 @@ public class CdsControllerTest {
 			Map<String, Object> activePb = new HashMap<>();
 			activePb.put("accessTypeCode", new String[] { AccessTypeCode.PB.name(), AccessTypeCode.OR.name() });
 			activePb.put("active", Boolean.TRUE);
-			List<MLPSolution> activePbList = client.searchSolutions(activePb, false);
-			Assert.assertTrue(activePbList != null && !activePbList.isEmpty());
-			logger.info("Active PB solution count {}", activePbList.size());
+			RestPageResponse<MLPSolution> activePbList = client.searchSolutions(activePb, false,
+					new RestPageRequest(0, 1, "name"));
+			Assert.assertTrue(activePbList != null && activePbList.getNumberOfElements() > 0);
+			logger.info("Active PB solution count {}", activePbList.getNumberOfElements());
 
 			logger.info("Querying for inactive solutions");
 			Map<String, Object> inactiveSols = new HashMap<>();
 			inactiveSols.put("active", Boolean.TRUE);
-			List<MLPSolution> inactiveSolList = client.searchSolutions(inactiveSols, false);
-			Assert.assertTrue(inactiveSolList != null && !inactiveSolList.isEmpty());
-			logger.info("Inactive PB solution count {}", inactiveSolList.size());
+			RestPageResponse<MLPSolution> inactiveSolList = client.searchSolutions(inactiveSols, false,
+					new RestPageRequest());
+			Assert.assertTrue(inactiveSolList != null && inactiveSolList.getNumberOfElements() > 0);
+			logger.info("Inactive PB solution count {}", inactiveSolList.getNumberOfElements());
 
 			logger.info("Querying for solutions with similar names");
 			RestPageResponse<MLPSolution> sl1 = client.findSolutionsBySearchTerm("solution", new RestPageRequest(0, 1));
@@ -847,13 +850,13 @@ public class CdsControllerTest {
 			long roleCount = client.getRoleCount();
 			Assert.assertTrue(roleCount > 0);
 
-			RestPageResponse<MLPRole> roles = client.getRoles(new RestPageRequest(0, 1));
+			RestPageResponse<MLPRole> roles = client.getRoles(new RestPageRequest());
 			Assert.assertTrue(roles.getNumberOfElements() > 0);
 
 			HashMap<String, Object> roleRestr = new HashMap<>();
 			roleRestr.put("name", roleName);
-			List<MLPRole> roleResult = client.searchRoles(roleRestr, false);
-			Assert.assertTrue(roleResult.size() > 0);
+			RestPageResponse<MLPRole> roleResult = client.searchRoles(roleRestr, false, new RestPageRequest());
+			Assert.assertTrue(roleResult.getNumberOfElements() > 0);
 
 			MLPRoleFunction crf = new MLPRoleFunction();
 			final String roleFuncName = "My test role function";
@@ -1563,7 +1566,7 @@ public class CdsControllerTest {
 
 		try {
 			Map<String, Object> queryParameters = new HashMap<>();
-			client.searchUsers(queryParameters, false);
+			client.searchUsers(queryParameters, false, new RestPageRequest());
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search users failed on empty query as expected: {}", ex.getResponseBodyAsString());
@@ -1571,7 +1574,7 @@ public class CdsControllerTest {
 		try {
 			Map<String, Object> queryParameters = new HashMap<>();
 			queryParameters.put("bogusFieldName", "bogusFieldFValue");
-			client.searchUsers(queryParameters, false);
+			client.searchUsers(queryParameters, false, new RestPageRequest());
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search users failed on bad field as expected: {}", ex.getResponseBodyAsString());
@@ -1579,7 +1582,7 @@ public class CdsControllerTest {
 		try {
 			Map<String, Object> queryParameters = new HashMap<>();
 			queryParameters.put("picture", new MLPUser());
-			client.searchUsers(queryParameters, false);
+			client.searchUsers(queryParameters, false, new RestPageRequest());
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search users failed on bad type as expected: {}", ex.getResponseBodyAsString());
@@ -1639,7 +1642,7 @@ public class CdsControllerTest {
 		try {
 			Map<String, Object> queryParameters = new HashMap<>();
 			queryParameters.put("bogusFieldName", "bogusFieldFValue");
-			client.searchSolutions(queryParameters, false);
+			client.searchSolutions(queryParameters, false, new RestPageRequest());
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search solution failed as expected: {}", ex.getResponseBodyAsString());
@@ -1804,7 +1807,7 @@ public class CdsControllerTest {
 		}
 		try {
 			HashMap<String, Object> restr = new HashMap<>();
-			client.searchArtifacts(restr, false);
+			client.searchArtifacts(restr, false, new RestPageRequest(0, 1));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search artifacts failed on empty as expected: {}", ex.getResponseBodyAsString());
@@ -1812,7 +1815,7 @@ public class CdsControllerTest {
 		try {
 			HashMap<String, Object> restr = new HashMap<>();
 			restr.put("bogus", "value");
-			client.searchArtifacts(restr, false);
+			client.searchArtifacts(restr, false, new RestPageRequest(0, 1));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search artifacts failed as expected: {}", ex.getResponseBodyAsString());
@@ -2279,7 +2282,7 @@ public class CdsControllerTest {
 
 		try {
 			HashMap<String, Object> peerRestr = new HashMap<>();
-			client.searchPeers(peerRestr, false);
+			client.searchPeers(peerRestr, false, new RestPageRequest(0, 1));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search peers failed on empty as expected: {}", ex.getResponseBodyAsString());
@@ -2287,7 +2290,7 @@ public class CdsControllerTest {
 		try {
 			HashMap<String, Object> peerRestr = new HashMap<>();
 			peerRestr.put("bogus", "name");
-			client.searchPeers(peerRestr, false);
+			client.searchPeers(peerRestr, false, new RestPageRequest(0, 1));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search peers failed on bad field as expected: {}", ex.getResponseBodyAsString());
@@ -2321,7 +2324,7 @@ public class CdsControllerTest {
 		}
 		try {
 			HashMap<String, Object> roleRestr = new HashMap<>();
-			client.searchRoles(roleRestr, false);
+			client.searchRoles(roleRestr, false, new RestPageRequest(0, 1));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search role failed on empty as expected: {}", ex.getResponseBodyAsString());
@@ -2329,7 +2332,7 @@ public class CdsControllerTest {
 		try {
 			HashMap<String, Object> roleRestr = new HashMap<>();
 			roleRestr.put("bogus", "value");
-			client.searchRoles(roleRestr, false);
+			client.searchRoles(roleRestr, false, new RestPageRequest(0, 1));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search role failed as expected: {}", ex.getResponseBodyAsString());

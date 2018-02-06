@@ -54,9 +54,24 @@ public abstract class AbstractController {
 	}
 
 	/**
-	 * Creates query parameters with appropriate types. Uses reflection to discover
-	 * field types and converts the values appropriately. Any field may be declared
-	 * on a superclass.
+	 * This is a brutal hack: remove the Pageable query parameters that Spring
+	 * mistakenly (?) adds to the multi value map supplied to the controller.
+	 * 
+	 * @param queryParameters
+	 *            Map of query parameters
+	 */
+	protected void cleanPageableParameters(MultiValueMap<String, String> queryParameters) {
+		final String[] pageable = { "page", "size", "sort" };
+		for (String p : pageable)
+			if (queryParameters.containsKey(p))
+				queryParameters.remove(p);
+	}
+
+	/**
+	 * Creates query parameters with appropriate types. Uses reflection to check
+	 * field names and discover field types; converts the values appropriately.
+	 * Handles single/multiple values appropriately. Any field may be declared on a
+	 * superclass.
 	 * 
 	 * @param modelClass
 	 *            Model class with fields named in the query parameters
@@ -70,6 +85,7 @@ public abstract class AbstractController {
 	 */
 	protected Map<String, Object> convertQueryParameters(Class<?> modelClass,
 			MultiValueMap<String, String> queryParameters) throws NoSuchFieldException {
+
 		Class<?> clazz = modelClass;
 		HashMap<String, Object> convertedQryParm = new HashMap<>();
 		// Track the fields that were found and processed
@@ -138,7 +154,7 @@ public abstract class AbstractController {
 		// Report names of any parameters (fields) that were not found in the classes
 		if (!fieldNames.isEmpty()) {
 			String fieldName = fieldNames.iterator().next();
-			throw new NoSuchFieldException("Failed to find field name " + fieldName);
+			throw new NoSuchFieldException("Failed to find field " + fieldName);
 		}
 		return convertedQryParm;
 	}

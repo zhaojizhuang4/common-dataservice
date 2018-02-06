@@ -20,6 +20,7 @@
 
 package org.acumos.cds.controller;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -202,15 +203,18 @@ public class UserController extends AbstractController {
 	 * @param queryParameters
 	 *            Map of String (field name) to String (value) for restricting the
 	 *            query.
+	 * @param pageable
+	 *            Sort and page criteria
 	 * @param response
 	 *            HttpServletResponse
-	 * @return List of users, for serialization as JSON.
+	 * @return Page of users, for serialization as JSON.
 	 */
-	@ApiOperation(value = "Searches for users using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disunction).", response = MLPUser.class, responseContainer = "List")
+	@ApiOperation(value = "Searches for users using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disjunction).", response = MLPUser.class, responseContainer = "Page")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchUsers(@RequestParam MultiValueMap<String, String> queryParameters,
+	public Object searchUsers(@RequestParam MultiValueMap<String, String> queryParameters,  Pageable pageable,
 			HttpServletResponse response) {
+		cleanPageableParameters(queryParameters);
 		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
 		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
 		if (queryParameters.size() == 0) {
@@ -219,14 +223,16 @@ public class UserController extends AbstractController {
 		}
 		try {
 			Map<String, Object> convertedQryParm = convertQueryParameters(MLPUser.class, queryParameters);
-			List<MLPUser> userList = userSearchService.findUsers(convertedQryParm, isOr);
-			logger.debug(EELFLoggerDelegate.debugLogger, "searchUsers: size is {} ", userList.size());
+			Page<MLPUser> userPage = userSearchService.findUsers(convertedQryParm, isOr, pageable);
+			logger.debug(EELFLoggerDelegate.debugLogger, "searchUsers: size is {} ", userPage.getNumberOfElements());
 			// Wipe login hash values
-			for (MLPUser user : userList) {
+			Iterator<MLPUser> userIter = userPage.iterator();
+			while (userIter.hasNext()) {
+				MLPUser user = userIter.next();
 				entityManager.detach(user);
 				user.setLoginHash(null);
 			}
-			return userList;
+			return userPage;
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "searchUsers failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
