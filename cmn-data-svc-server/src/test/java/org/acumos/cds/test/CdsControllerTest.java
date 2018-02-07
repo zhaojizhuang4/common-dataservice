@@ -1041,37 +1041,34 @@ public class CdsControllerTest {
 	@Test
 	public void testSiteConfig() throws Exception {
 		final String s64 = "12345678901234567890123456789012345678901234567890123456789012345";
-		MLPUser cu = new MLPUser("loginId", true);
-		cu = client.createUser(cu);
-		Assert.assertNotNull(cu.getUserId());
 		try {
 			client.getSiteConfig("bogus");
-			throw new Exception("Unexpected success");
+			throw new Exception("Unexpected success on key=bogus");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Failed to get missing config as expected {}", ex.getResponseBodyAsString());
 		}
-		final String key = "myKey";
 		try {
-			MLPSiteConfig sc = new MLPSiteConfig(key, "{ 'some' : 'json' }");
+			MLPSiteConfig sc = new MLPSiteConfig("bogus", "{ 'some' : 'json' }");
 			sc.setUserId("bogus");
 			client.createSiteConfig(sc);
-			throw new Exception("Unexpected success");
+			throw new Exception("Unexpected succes on invalid user ID");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Failed to create config with bad user as expected {}", ex.getResponseBodyAsString());
 		}
 		try {
 			client.createSiteConfig(new MLPSiteConfig(s64, "{ 'some' : 'json' }"));
-			throw new Exception("Unexpected success");
+			throw new Exception("Unexpected success on long key");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Failed to create config with long key as expected {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.updateSiteConfig(new MLPSiteConfig(key, "{ 'some' : 'json' }"));
-			throw new Exception("Unexpected success");
+			client.updateSiteConfig(new MLPSiteConfig("bogus", "{ 'some' : 'json' }"));
+			throw new Exception("Unexpected success of bogus update");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("Failed to update config as expected {}", ex.getResponseBodyAsString());
+			logger.info("Failed to update non-existent config as expected {}", ex.getResponseBodyAsString());
 		}
 		// this should work
+		final String key = "myKey";
 		MLPSiteConfig config = new MLPSiteConfig(key, "{ 'some' : 'json' }");
 		config = client.createSiteConfig(config);
 		Assert.assertNotNull(config.getCreated());
@@ -1081,7 +1078,7 @@ public class CdsControllerTest {
 
 		try {
 			client.createSiteConfig(config);
-			throw new Exception("Unexpected success");
+			throw new Exception("Unexpected success on dupe");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Failed to create dupe config as expected {}", ex.getResponseBodyAsString());
 		}
@@ -1090,18 +1087,17 @@ public class CdsControllerTest {
 		try {
 			config.setConfigValue(null);
 			client.updateSiteConfig(config);
-			throw new Exception("Unexpected success");
+			throw new Exception("Unexpected success of bad config");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Failed to update bad config as expected {}", ex.getResponseBodyAsString());
 		}
 		client.deleteSiteConfig(config.getConfigKey());
 		try {
 			client.deleteSiteConfig(config.getConfigKey());
-			throw new Exception("Unexpected success");
+			throw new Exception("Unexpected success of delete");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Failed to delete fake config as expected {}", ex.getResponseBodyAsString());
 		}
-		client.deleteUser(cu.getUserId());
 	}
 
 	@Test

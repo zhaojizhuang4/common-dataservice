@@ -723,7 +723,8 @@ public class CdsRepositoryServiceTest {
 			cc = siteConfigRepository.save(cc);
 			Assert.assertNotNull(cc);
 			logger.info("Created site config {}", cc);
-
+			siteConfigRepository.delete(cc);
+			
 			MLPThread thread = threadRepository.save(new MLPThread(cs.getSolutionId(), cr.getRevisionId()));
 			Assert.assertTrue(thread.getThreadId() != null);
 			logger.info("Created thread {}", thread);
