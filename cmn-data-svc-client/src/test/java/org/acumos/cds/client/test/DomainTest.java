@@ -295,12 +295,13 @@ public class DomainTest extends AbstractModelTest {
 
 	@Test
 	public void testMLPPeer() {
-		MLPPeer m = new MLPPeer(s1, s1, s1, b1, s1, s1, s1);
+		MLPPeer m = new MLPPeer(s1, s1, s1, b1, b1, s1, s1, s1);
 		m = new MLPPeer();
 		m.setApiUrl(s1);
 		m.setContact1(s2);
 		m.setCreated(d1);
 		m.setDescription(s4);
+		m.setLocal(b1);
 		m.setModified(d2);
 		m.setName(s5);
 		m.setPeerId(s6);
@@ -313,6 +314,7 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertEquals(s2, m.getContact1());
 		Assert.assertEquals(d1, m.getCreated());
 		Assert.assertEquals(s4, m.getDescription());
+		Assert.assertEquals(b1, m.isLocal());
 		Assert.assertEquals(d2, m.getModified());
 		Assert.assertEquals(s5, m.getName());
 		Assert.assertEquals(s6, m.getPeerId());
@@ -327,7 +329,7 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
 		try {
-			new MLPPeer(null, null, null, b1, null, null, null);
+			new MLPPeer(null, null, null, b1, b1, null, null, null);
 			Assert.assertTrue("Unexpected success", false);
 		} catch (IllegalArgumentException iae) {
 			// null arg is rejected
@@ -350,29 +352,31 @@ public class DomainTest extends AbstractModelTest {
 
 	@Test
 	public void testMLPPeerSubscription() {
-		MLPPeerSubscription m = new MLPPeerSubscription(s1, s2, s3);
+		MLPPeerSubscription m = new MLPPeerSubscription(s1, s2, s3, s4);
 		m = new MLPPeerSubscription();
+		m.setAccessType(s1);
 		m.setCreated(d1);
 		m.setMaxArtifactSize(l1);
 		m.setModified(d2);
-		m.setOptions(s1);
-		m.setOwnerId(s2);
-		m.setPeerId(s3);
+		m.setOptions(s2);
+		m.setOwnerId(s3);
+		m.setPeerId(s4);
 		m.setProcessed(d3);
 		m.setRefreshInterval(l2);
-		m.setScopeCode(s4);
-		m.setSelector(s5);
+		m.setScopeType(s5);
+		m.setSelector(s6);
 		m.setSubId(l3);
+		Assert.assertEquals(s1, m.getAccessType());
 		Assert.assertEquals(d1, m.getCreated());
 		Assert.assertEquals(l1, m.getMaxArtifactSize());
 		Assert.assertEquals(d2, m.getModified());
-		Assert.assertEquals(s1, m.getOptions());
-		Assert.assertEquals(s2, m.getOwnerId());
-		Assert.assertEquals(s3, m.getPeerId());
+		Assert.assertEquals(s2, m.getOptions());
+		Assert.assertEquals(s3, m.getOwnerId());
+		Assert.assertEquals(s4, m.getPeerId());
 		Assert.assertEquals(d3, m.getProcessed());
 		Assert.assertEquals(l2, m.getRefreshInterval());
-		Assert.assertEquals(s4, m.getScopeType());
-		Assert.assertEquals(s5, m.getSelector());
+		Assert.assertEquals(s5, m.getScopeType());
+		Assert.assertEquals(s6, m.getSelector());
 		Assert.assertEquals(l3, m.getSubId());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
@@ -380,7 +384,7 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
 		try {
-			new MLPPeerSubscription(null, null, null);
+			new MLPPeerSubscription(null, null, null, null);
 			Assert.assertTrue("Unexpected success", false);
 		} catch (IllegalArgumentException iae) {
 			// null arg is rejected

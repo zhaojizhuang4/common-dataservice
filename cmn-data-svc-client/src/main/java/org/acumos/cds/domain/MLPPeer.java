@@ -76,6 +76,10 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	@Type(type = "yes_no")
 	private boolean isSelf;
 
+	@Column(name = "IS_LOCAL", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'N'")
+	@Type(type = "yes_no")
+	private boolean isLocal;
+
 	@Column(name = "CONTACT1", nullable = false, columnDefinition = "VARCHAR(100)")
 	@NotNull(message = "contact1 cannot be null")
 	@Size(max = 100)
@@ -118,6 +122,8 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	 *            API URL
 	 * @param isSelf
 	 *            Is the entry this site
+	 * @param isLocal
+	 *            Is the entry local
 	 * @param contact1
 	 *            Primary contact details
 	 * @param statusCode
@@ -125,8 +131,8 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	 * @param validationStatusCode
 	 *            Peer validation code
 	 */
-	public MLPPeer(String name, String subjectName, String apiUrl, boolean isSelf, String contact1, String statusCode,
-			String validationStatusCode) {
+	public MLPPeer(String name, String subjectName, String apiUrl, boolean isSelf, boolean isLocal, String contact1,
+			String statusCode, String validationStatusCode) {
 		if (name == null || subjectName == null || apiUrl == null || contact1 == null || statusCode == null
 				|| validationStatusCode == null)
 			throw new IllegalArgumentException("Null not permitted");
@@ -134,6 +140,7 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 		this.subjectName = subjectName;
 		this.apiUrl = apiUrl;
 		this.isSelf = isSelf;
+		this.isLocal = isLocal;
 		this.contact1 = contact1;
 		this.statusCode = statusCode;
 		this.validationStatusCode = validationStatusCode;
@@ -242,6 +249,21 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	 */
 	public void setSelf(boolean isSelf) {
 		this.isSelf = isSelf;
+	}
+
+	/**
+	 * @return the isLocal
+	 */
+	public boolean isLocal() {
+		return isLocal;
+	}
+
+	/**
+	 * @param isLocal
+	 *            the isLocal to set
+	 */
+	public void setLocal(boolean isLocal) {
+		this.isLocal = isLocal;
 	}
 
 	/**

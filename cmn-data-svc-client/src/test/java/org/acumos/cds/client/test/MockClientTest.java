@@ -443,10 +443,10 @@ public class MockClientTest {
 		RestPageResponse<MLPStepResult> stepResults = new RestPageResponse<>();
 		client.setStepResults(stepResults);
 		Assert.assertTrue(stepResults == client.getStepResults(pageRequest));
-		
+
 		MLPStepResult stepResult = new MLPStepResult();
 		client.setStepResult(stepResult);
-		Assert.assertTrue(stepResult == client.createStepResult(stepResult));		
+		Assert.assertTrue(stepResult == client.createStepResult(stepResult));
 		client.updateStepResult(stepResult);
 		client.deleteStepResult(0L);
 	}

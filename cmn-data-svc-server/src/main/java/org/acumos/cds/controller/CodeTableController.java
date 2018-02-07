@@ -155,7 +155,8 @@ public class CodeTableController extends AbstractController {
 	 * @return List of MLPPeerStatus objects
 	 */
 	@ApiOperation(value = "Gets the list of peer statuses.", response = MLPPeerStatus.class, responseContainer = "Iterable")
-	@RequestMapping(value = "/" + CCDSConstants.PEER_PATH + "/" + CCDSConstants.PEER_STAT_PATH, method = RequestMethod.GET)
+	@RequestMapping(value = "/" + CCDSConstants.PEER_PATH + "/"
+			+ CCDSConstants.PEER_STAT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPPeerStatus> getPeerStatusList() {
 		return peerStatusRepository.findAll();
@@ -225,7 +226,7 @@ public class CodeTableController extends AbstractController {
 	////////////////////////////////////////////////////////////////////////
 	// Validation sequence is configurable at runtime, not a fixed value set
 	////////////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * @return List of MLPValidationSequence objects
 	 */

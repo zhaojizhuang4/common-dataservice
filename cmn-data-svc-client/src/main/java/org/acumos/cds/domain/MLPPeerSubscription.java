@@ -59,11 +59,20 @@ public class MLPPeerSubscription extends MLPTimestampedEntity implements Seriali
 
 	/**
 	 * This exposes the database code for simplicity. Alternately this column could
-	 * be mapped using @ManyToOne and @JoinColumn as an MLPSubscriptionScopeType object.
+	 * be mapped using @ManyToOne and @JoinColumn as an MLPSubscriptionScopeType
+	 * object.
 	 */
 	@Column(name = "SCOPE_TYPE", nullable = false, columnDefinition = "CHAR(2)")
 	@Size(max = 2)
 	private String scopeType;
+
+	/**
+	 * This exposes the database code for simplicity. Alternately this column could
+	 * be mapped using @ManyToOne and @JoinColumn as an MLPAccessType object.
+	 */
+	@Column(name = "ACCESS_TYPE", nullable = false, columnDefinition = "CHAR(2)")
+	@Size(max = 2)
+	private String accessType;
 
 	// JSON
 	@Column(name = "SELECTOR", columnDefinition = "VARCHAR(1024)")
@@ -83,7 +92,7 @@ public class MLPPeerSubscription extends MLPTimestampedEntity implements Seriali
 
 	@Column(name = "PROCESSED_DATE", columnDefinition = "TIMESTAMP")
 	private Date processed;
-	
+
 	/**
 	 * No-arg constructor
 	 */
@@ -101,13 +110,16 @@ public class MLPPeerSubscription extends MLPTimestampedEntity implements Seriali
 	 *            User ID, the operator
 	 * @param scopeType
 	 *            Peer subscription scope type
+	 * @param accessType
+	 *            Peer subscription access type
 	 */
-	public MLPPeerSubscription(String peerId, String ownerId, String scopeType) {
-		if (peerId == null || ownerId == null || scopeType == null)
+	public MLPPeerSubscription(String peerId, String ownerId, String scopeType, String accessType) {
+		if (peerId == null || ownerId == null || scopeType == null || accessType == null)
 			throw new IllegalArgumentException("Null not permitted");
 		this.peerId = peerId;
 		this.ownerId = ownerId;
 		this.scopeType = scopeType;
+		this.accessType = accessType;
 	}
 
 	public Long getSubId() {
@@ -189,8 +201,21 @@ public class MLPPeerSubscription extends MLPTimestampedEntity implements Seriali
 	 *            A value obtained by calling
 	 *            {@link org.acumos.cds.SubscriptionScopeTypeCode#toString()}.
 	 */
-	public void setScopeCode(String scopeType) {
+	public void setScopeType(String scopeType) {
 		this.scopeType = scopeType;
+	}
+
+	public String getAccessType() {
+		return accessType;
+	}
+
+	/**
+	 * @param accessType
+	 *            A value obtained by calling
+	 *            {@link org.acumos.cds.AccessTypeCode#toString()}.
+	 */
+	public void setAccessType(String accessType) {
+		this.accessType = accessType;
 	}
 
 	public Date getProcessed() {

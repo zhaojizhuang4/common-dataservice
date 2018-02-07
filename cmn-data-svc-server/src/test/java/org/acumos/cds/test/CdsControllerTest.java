@@ -407,7 +407,7 @@ public class CdsControllerTest {
 			Assert.assertEquals(pr.getPeerId(), pr2.getPeerId());
 
 			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId(),
-					SubscriptionScopeTypeCode.FL.name());
+					SubscriptionScopeTypeCode.FL.name(), AccessTypeCode.PB.toString());
 			ps = client.createPeerSubscription(ps);
 			logger.info("Created peer subscription {}", ps);
 
@@ -1920,7 +1920,7 @@ public class CdsControllerTest {
 			client.findPortalSolutions(null, null, true, null, null, null, null, searchTags, new RestPageRequest(0, 1));
 			// I have not been able to make findPortalSolutions fail.
 			// all arguments are optional; there is no illegal value; etc.
-			// TODO: throw new Exception("Unexpected success");
+			// so can't throw new Exception("Unexpected success") here.
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Find portal solutions failed as expected: {}", ex.getResponseBodyAsString());
 		}
@@ -2210,7 +2210,7 @@ public class CdsControllerTest {
 			logger.info("Create peer failed on constraint as expected: {}", ex.getResponseBodyAsString());
 		}
 		// This one is supposed to work
-		cp = client.createPeer(new MLPPeer("peer name", "subj name", "api url", false, "contact 1",
+		cp = client.createPeer(new MLPPeer("peer name", "subj name", "api url", false, false, "contact 1",
 				PeerStatusCode.AC.name(), ValidationStatusCode.FA.name()));
 
 		try {
@@ -2240,13 +2240,13 @@ public class CdsControllerTest {
 			logger.info("Get peer sub failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.createPeerSubscription(new MLPPeerSubscription("peerId", "userId", "scope"));
+			client.createPeerSubscription(new MLPPeerSubscription("peerId", "userId", "scope", "access"));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create peer sub failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			MLPPeerSubscription ps = new MLPPeerSubscription(cp.getPeerId(), cu.getUserId(), "scope");
+			MLPPeerSubscription ps = new MLPPeerSubscription(cp.getPeerId(), cu.getUserId(), "scope", "access");
 			ps.setSelector(
 					s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64);
 			client.createPeerSubscription(ps);
@@ -2256,7 +2256,7 @@ public class CdsControllerTest {
 		}
 		// Supposed to work
 		MLPPeerSubscription ps = new MLPPeerSubscription(cp.getPeerId(), cu.getUserId(),
-				SubscriptionScopeTypeCode.FL.name());
+				SubscriptionScopeTypeCode.FL.toString(), AccessTypeCode.PB.toString());
 		ps = client.createPeerSubscription(ps);
 		try {
 			ps.setSelector(

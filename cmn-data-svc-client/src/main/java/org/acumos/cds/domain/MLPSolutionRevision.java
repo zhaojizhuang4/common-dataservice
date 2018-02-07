@@ -73,8 +73,8 @@ public class MLPSolutionRevision extends MLPTimestampedEntity implements Seriali
 	private String metadata;
 
 	/**
-	 * ID of the peer where this was onboarded; null indicates local.
-	 * Supports federation.
+	 * ID of the peer where this was onboarded; null indicates local. Supports
+	 * federation.
 	 */
 	@Column(name = "SOURCE_ID", columnDefinition = "CHAR(36)")
 	@Size(max = 36)

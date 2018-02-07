@@ -27,7 +27,7 @@ import org.springframework.data.repository.Repository;
  * Only exposes the single get-all method.
  */
 public interface PeerStatusRepository extends Repository<MLPPeerStatus, String> {
-	
+
 	/**
 	 * Returns all instances of the type.
 	 * 
