@@ -25,13 +25,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.acumos.cds.domain.MLPArtifact;
-import org.acumos.cds.transport.RestPageResponse;
 import org.acumos.cds.util.EELFLoggerDelegate;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +50,8 @@ public class ArtifactSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Page<MLPArtifact> findArtifacts(Map<String, ? extends Object> queryParameters, boolean isOr, Pageable pageable) {
+	public Page<MLPArtifact> findArtifacts(Map<String, ? extends Object> queryParameters, boolean isOr,
+			Pageable pageable) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPArtifact.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 
@@ -58,7 +59,7 @@ public class ArtifactSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		criteria.setProjection(Projections.rowCount());
 		Long count = (Long) criteria.uniqueResult();
 		if (count == 0)
-			return new RestPageResponse<>(new ArrayList<MLPArtifact>(), pageable, count);
+			return new PageImpl<>(new ArrayList<>(), pageable, count);
 
 		// Reset the count criteria; add pagination and sort
 		criteria.setProjection(null);
@@ -68,7 +69,7 @@ public class ArtifactSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		// Get a page of results and send it back with the total available
 		List<MLPArtifact> items = criteria.list();
 		logger.debug(EELFLoggerDelegate.debugLogger, "getArtifacts: result size={}", items.size());
-		return new RestPageResponse<>(items, pageable, count);
+		return new PageImpl<>(items, pageable, count);
 	}
 
 }

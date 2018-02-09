@@ -562,8 +562,8 @@ public class CdsControllerTest {
 			logger.info("Found tag on solution {}", solTags.get(0));
 
 			logger.info("Getting all solutions");
-			RestPageResponse<MLPSolution> page = client.getSolutions(new RestPageRequest(0, 2));
-			Assert.assertTrue(page != null && page.getNumberOfElements() > 0);
+			RestPageResponse<MLPSolution> page = client.getSolutions(new RestPageRequest(0, 2, "name"));
+			Assert.assertTrue(page != null && page.getTotalElements() > 0);
 
 			cs.setDescription("some description");
 			client.updateSolution(cs);
@@ -576,10 +576,10 @@ public class CdsControllerTest {
 			Map<String, Object> activePb = new HashMap<>();
 			activePb.put("accessTypeCode", new String[] { AccessTypeCode.PB.name(), AccessTypeCode.OR.name() });
 			activePb.put("active", Boolean.TRUE);
-			RestPageResponse<MLPSolution> activePbList = client.searchSolutions(activePb, false,
-					new RestPageRequest(0, 1, "name"));
-			Assert.assertTrue(activePbList != null && activePbList.getNumberOfElements() > 0);
-			logger.info("Active PB solution count {}", activePbList.getNumberOfElements());
+			RestPageResponse<MLPSolution> activePbPage = client.searchSolutions(activePb, false,
+					new RestPageRequest(0, 10, "name"));
+			Assert.assertTrue(activePbPage != null && !activePbPage.getContent().isEmpty());
+			logger.info("Active PB solution page count {}", activePbPage.getContent().size());
 
 			logger.info("Querying for inactive solutions");
 			Map<String, Object> inactiveSols = new HashMap<>();

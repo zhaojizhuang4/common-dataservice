@@ -27,7 +27,6 @@ import java.util.Map;
 import javax.transaction.Transactional;
 
 import org.acumos.cds.domain.MLPSolution;
-import org.acumos.cds.transport.RestPageResponse;
 import org.acumos.cds.util.EELFLoggerDelegate;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
@@ -35,6 +34,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +52,8 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Page<MLPSolution> findSolutions(Map<String, ? extends Object> queryParameters, boolean isOr, Pageable pageable) {
+	public Page<MLPSolution> findSolutions(Map<String, ? extends Object> queryParameters, boolean isOr,
+			Pageable pageable) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 
@@ -60,7 +61,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		criteria.setProjection(Projections.rowCount());
 		Long count = (Long) criteria.uniqueResult();
 		if (count == 0)
-			return new RestPageResponse<>(new ArrayList<MLPSolution>(), pageable, count);
+			return new PageImpl<>(new ArrayList<>(), pageable, count);
 
 		// Reset the count criteria; add pagination and sort
 		criteria.setProjection(null);
@@ -70,7 +71,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		// Get a page of results and send it back with the total available
 		List<MLPSolution> items = criteria.list();
 		logger.debug(EELFLoggerDelegate.debugLogger, "findSolutions: result size={}", items.size());
-		return new RestPageResponse<>(items, pageable, count);
+		return new PageImpl<>(items, pageable, count);
 	}
 
 	/**
@@ -115,7 +116,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		solCriteria.setProjection(Projections.rowCount());
 		Long count = (Long) solCriteria.uniqueResult();
 		if (count == 0)
-			return new RestPageResponse<>(new ArrayList<MLPSolution>(), pageable, count);
+			return new PageImpl<>(new ArrayList<>(), pageable, count);
 
 		// Reset the count criteria; add pagination and sort
 		solCriteria.setProjection(null);
@@ -125,7 +126,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		// Get a page of results
 		List<MLPSolution> items = solCriteria.list();
 		logger.debug(EELFLoggerDelegate.debugLogger, "findPortalSolutions: result size={}", items.size());
-		return new RestPageResponse<>(items, pageable, count);
+		return new PageImpl<>(items, pageable, count);
 	}
 
 }

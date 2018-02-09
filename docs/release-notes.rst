@@ -5,6 +5,13 @@ Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
+Version 1.13.1, 9 February 2018
+-------------------------------
+
+* Limit memory use in server JVM to max 512MB
+* Correct search method usage of response page wrapper class
+* Requires database schema version 1.13
+
 Version 1.13.0, 7 February 2018
 -------------------------------
 

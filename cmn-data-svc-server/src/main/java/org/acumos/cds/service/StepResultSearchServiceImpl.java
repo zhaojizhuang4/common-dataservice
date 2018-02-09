@@ -27,13 +27,13 @@ import java.util.Map;
 import javax.transaction.Transactional;
 
 import org.acumos.cds.domain.MLPStepResult;
-import org.acumos.cds.transport.RestPageResponse;
 import org.acumos.cds.util.EELFLoggerDelegate;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -59,7 +59,7 @@ public class StepResultSearchServiceImpl extends AbstractSearchServiceImpl imple
 		criteria.setProjection(Projections.rowCount());
 		Long count = (Long) criteria.uniqueResult();
 		if (count == 0)
-			return new RestPageResponse<>(new ArrayList<MLPStepResult>(), pageable, count);
+			return new PageImpl<>(new ArrayList<>(), pageable, count);
 
 		// Reset the count criteria; add pagination and sort
 		criteria.setProjection(null);
@@ -69,7 +69,7 @@ public class StepResultSearchServiceImpl extends AbstractSearchServiceImpl imple
 		// Get a page of results and send it back with the total available
 		List<MLPStepResult> items = criteria.list();
 		logger.debug(EELFLoggerDelegate.debugLogger, "findStepResults: result size={}", items.size());
-		return new RestPageResponse<>(items, pageable, count);
+		return new PageImpl<>(items, pageable, count);
 	}
-	
+
 }

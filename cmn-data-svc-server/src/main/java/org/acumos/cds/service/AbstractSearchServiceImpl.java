@@ -146,14 +146,14 @@ public abstract class AbstractSearchServiceImpl {
 		}
 		return criteria.list();
 	}
-	
+
 	/**
-	 * Adds page-request criteria to the criteria.  
-	 *  
+	 * Adds page-request criteria to the criteria.
+	 * 
 	 * @param criteria
-	 * Criteria
+	 *            Criteria
 	 * @param pageable
-	 * Pageable
+	 *            Pageable
 	 */
 	protected void applyPageableCriteria(Criteria criteria, Pageable pageable) {
 		criteria.setFirstResult(pageable.getOffset());
