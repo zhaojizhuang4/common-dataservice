@@ -21,6 +21,8 @@
 package org.acumos.cds.client.test;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.ArtifactTypeCode;
@@ -33,6 +35,8 @@ import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPSolution;
 import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPUser;
+import org.acumos.cds.transport.RestPageRequest;
+import org.acumos.cds.transport.RestPageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -87,6 +91,12 @@ public class BasicSequenceDemo {
 			logger.info("Adding artifact to revision");
 			client.addSolutionRevisionArtifact(cs.getSolutionId(), cr.getRevisionId(), ca.getArtifactId());
 
+			logger.info("Searching for active solutions");
+			Map<String,Object> queryParams = new HashMap<>();
+			queryParams.put("active", Boolean.TRUE);
+			RestPageResponse<MLPSolution> activeSolutions = client.searchSolutions(queryParams, false, new RestPageRequest(0,10));
+			logger.info("Active solution count: " + activeSolutions.getTotalElements());
+			
 			logger.info("Deleting objects");
 			client.dropSolutionRevisionArtifact(cs.getSolutionId(), cr.getRevisionId(), ca.getArtifactId());
 			client.deleteArtifact(ca.getArtifactId());
