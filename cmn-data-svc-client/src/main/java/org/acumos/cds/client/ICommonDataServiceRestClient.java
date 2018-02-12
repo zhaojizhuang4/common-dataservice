@@ -54,6 +54,7 @@ import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
 import org.acumos.cds.domain.MLPUserNotification;
+import org.acumos.cds.domain.MLPUserNotifPref;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
 import org.acumos.cds.domain.MLPValidationType;
@@ -89,57 +90,73 @@ public interface ICommonDataServiceRestClient {
 
 	/**
 	 * Gets all access types.
+	 * 
 	 * @return List of access type objects.
-	 * @deprecated Java clients should use {@link org.acumos.cds.AccessTypeCode#values()}
+	 * @deprecated Java clients should use
+	 *             {@link org.acumos.cds.AccessTypeCode#values()}
 	 */
 	List<MLPAccessType> getAccessTypes();
 
 	/**
 	 * Gets all artifact types.
+	 * 
 	 * @return List of artifact type objects.
-	 * @deprecated Java clients should use {@link org.acumos.cds.ArtifactTypeCode#values()}
+	 * @deprecated Java clients should use
+	 *             {@link org.acumos.cds.ArtifactTypeCode#values()}
 	 */
 	List<MLPArtifactType> getArtifactTypes();
 
 	/**
 	 * Gets all deployment status codes
+	 * 
 	 * @return List of deployment status objects.
-	 * @deprecated Java clients should use {@link org.acumos.cds.DeploymentStatusCode#values()}
+	 * @deprecated Java clients should use
+	 *             {@link org.acumos.cds.DeploymentStatusCode#values()}
 	 */
 	List<MLPDeploymentStatus> getDeploymentStatuses();
 
 	/**
 	 * Gets all login providers.
+	 * 
 	 * @return List of login provider objects.
-	 * @deprecated Java clients should use {@link org.acumos.cds.LoginProviderCode#values()}
+	 * @deprecated Java clients should use
+	 *             {@link org.acumos.cds.LoginProviderCode#values()}
 	 */
 	List<MLPLoginProvider> getLoginProviders();
 
 	/**
 	 * Gets all model types.
+	 * 
 	 * @return List of model type objects.
-	 * @deprecated Java clients should use {@link org.acumos.cds.ModelTypeCode#values()}
+	 * @deprecated Java clients should use
+	 *             {@link org.acumos.cds.ModelTypeCode#values()}
 	 */
 	List<MLPModelType> getModelTypes();
 
 	/**
 	 * Gets all toolkit types.
+	 * 
 	 * @return List of tookit type objects.
-	 * @deprecated Java clients should use {@link org.acumos.cds.ToolkitTypeCode#values()}
+	 * @deprecated Java clients should use
+	 *             {@link org.acumos.cds.ToolkitTypeCode#values()}
 	 */
 	List<MLPToolkitType> getToolkitTypes();
 
 	/**
 	 * Gets all validation status codes
+	 * 
 	 * @return List of validation status objects.
-	 * @deprecated Java clients should use {@link org.acumos.cds.ValidationStatusCode#values()}
+	 * @deprecated Java clients should use
+	 *             {@link org.acumos.cds.ValidationStatusCode#values()}
 	 */
 	List<MLPValidationStatus> getValidationStatuses();
 
 	/**
 	 * Gets all validation type codes.
+	 * 
 	 * @return List of validation type objects.
-	 * @deprecated Java clients should use {@link org.acumos.cds.ValidationTypeCode#values()}
+	 * @deprecated Java clients should use
+	 *             {@link org.acumos.cds.ValidationTypeCode#values()}
 	 */
 	List<MLPValidationType> getValidationTypes();
 
@@ -229,7 +246,8 @@ public interface ICommonDataServiceRestClient {
 	 *            Page index, page size, sort information; ignored if null.
 	 * @return Page of solution objects
 	 */
-	RestPageResponse<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest);
+	RestPageResponse<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest);
 
 	/**
 	 * Gets the solution with the specified ID.
@@ -480,7 +498,8 @@ public interface ICommonDataServiceRestClient {
 	 *            Page index, page size, sort information; ignored if null.
 	 * @return Page of artifact objects.
 	 */
-	RestPageResponse<MLPArtifact> searchArtifacts(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest);
+	RestPageResponse<MLPArtifact> searchArtifacts(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest);
 
 	/**
 	 * Gets the artifact with the specified ID.
@@ -561,7 +580,8 @@ public interface ICommonDataServiceRestClient {
 	 *            Page index, page size, sort information; ignored if null.
 	 * @return Page of user objects
 	 */
-	RestPageResponse<MLPUser> searchUsers(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest);
+	RestPageResponse<MLPUser> searchUsers(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest);
 
 	/**
 	 * Searches for user with the specified credentials.
@@ -751,7 +771,8 @@ public interface ICommonDataServiceRestClient {
 	 *            Page index, page size, sort information; ignored if null.
 	 * @return Page of role objects
 	 */
-	RestPageResponse<MLPRole> searchRoles(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest);
+	RestPageResponse<MLPRole> searchRoles(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest);
 
 	/**
 	 * Gets the roles.
@@ -869,7 +890,8 @@ public interface ICommonDataServiceRestClient {
 	 *            Page index, page size, sort information; ignored if null.
 	 * @return Page of peer objects
 	 */
-	RestPageResponse<MLPPeer> searchPeers(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest);
+	RestPageResponse<MLPPeer> searchPeers(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest);
 
 	/**
 	 * Gets the peer with the specified ID.
@@ -1528,7 +1550,8 @@ public interface ICommonDataServiceRestClient {
 	 *            Page index, page size, sort information; ignored if null.
 	 * @return Page of step result objects
 	 */
-	RestPageResponse<MLPStepResult> searchStepResults(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest);
+	RestPageResponse<MLPStepResult> searchStepResults(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest);
 
 	/**
 	 * Creates a step result.
@@ -1568,5 +1591,48 @@ public interface ICommonDataServiceRestClient {
 	 * @return List of step type objects.
 	 */
 	List<MLPStepType> getStepTypes();
+
+	/**
+	 * Creates a user notification preference.
+	 * 
+	 * @param usrNotifPref
+	 *            user notification preference data
+	 * @return Complete object, with generated information such as ID
+	 */
+	MLPUserNotifPref createUserNotificationPreference(MLPUserNotifPref usrNotifPref);
+
+	/**
+	 * Updates a user notification preference.
+	 * 
+	 * @param usrNotifPref
+	 *            user notification preference data
+	 */
+	void updateUserNotificationPreference(MLPUserNotifPref usrNotifPref);
+
+	/**
+	 * Deletes a user notification preference.
+	 * 
+	 * @param userNotifPrefId
+	 *            user notification preference ID
+	 */
+	void deleteUserNotificationPreference(Long userNotifPrefId);
+
+	/**
+	 * Gets a list of user notification preferences for the specified user.
+	 * 
+	 * @param userId
+	 *            User ID
+	 * @return List of user notification preferences for the specified solution.
+	 */
+	List<MLPUserNotifPref> getUserNotificationPreferences(String userId);
+
+	/**
+	 * Gets the user notification preference with the specified ID.
+	 * 
+	 * @param usrNotifPrefId
+	 *            user notification preference ID
+	 * @return User Notification Preference object
+	 */
+	MLPUserNotifPref getUserNotificationPreference(Long usrNotifPrefId);
 
 }

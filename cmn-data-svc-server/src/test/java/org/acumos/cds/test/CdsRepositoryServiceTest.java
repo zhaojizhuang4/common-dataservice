@@ -20,17 +20,21 @@
 
 package org.acumos.cds.test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import javax.validation.ConstraintViolationException;
 
 import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.ArtifactTypeCode;
 import org.acumos.cds.LoginProviderCode;
+import org.acumos.cds.MessageSeverityTypeCode;
 import org.acumos.cds.ModelTypeCode;
+import org.acumos.cds.NotificationDeliveryMechanismTypeCode;
 import org.acumos.cds.PeerStatusCode;
 import org.acumos.cds.StepStatusCode;
 import org.acumos.cds.StepTypeCode;
@@ -41,6 +45,7 @@ import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPNotifUserMap;
 import org.acumos.cds.domain.MLPNotification;
+import org.acumos.cds.domain.MLPNotificationDeliveryMechanismType;
 import org.acumos.cds.domain.MLPPeer;
 import org.acumos.cds.domain.MLPPeerSubscription;
 import org.acumos.cds.domain.MLPRole;
@@ -61,6 +66,7 @@ import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
 import org.acumos.cds.domain.MLPUserNotification;
+import org.acumos.cds.domain.MLPUserNotifPref;
 import org.acumos.cds.domain.MLPUserRoleMap;
 import org.acumos.cds.repository.ArtifactRepository;
 import org.acumos.cds.repository.CommentRepository;
@@ -83,6 +89,7 @@ import org.acumos.cds.repository.StepResultRepository;
 import org.acumos.cds.repository.TagRepository;
 import org.acumos.cds.repository.ThreadRepository;
 import org.acumos.cds.repository.UserLoginProviderRepository;
+import org.acumos.cds.repository.UserNotificationPreferenceRepository;
 import org.acumos.cds.repository.UserRepository;
 import org.acumos.cds.repository.UserRoleMapRepository;
 import org.acumos.cds.service.ArtifactSearchService;
@@ -102,6 +109,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.TransactionSystemException;
+import org.springframework.web.client.HttpStatusCodeException;
 
 /**
  * Tests the repository and service classes that provide access to the database.
@@ -171,6 +179,8 @@ public class CdsRepositoryServiceTest {
 	private StepResultRepository stepResultRepository;
 	@Autowired
 	private StepResultSearchService stepResultSearchService;
+	@Autowired
+	private UserNotificationPreferenceRepository usrNotifPrefRepository;
 
 	@Test
 	public void testingRepositories() throws Exception {
@@ -180,9 +190,10 @@ public class CdsRepositoryServiceTest {
 			MLPUser cu = null;
 			cu = new MLPUser();
 			cu.setActive(true);
-			final String firstName = "First_" + Long.toString(new Date().getTime());
+			Random rand = new Random();
+			final String firstName = "First_" + String.valueOf(rand.nextInt());
 			final String lastName = "TestLast";
-			final String loginName = "test_user3";
+			final String loginName = "test_user" + Long.toString(new Date().getTime());
 			final String loginPass = "test_pass3";
 			cu.setFirstName(firstName);
 			cu.setLastName(lastName);
@@ -199,7 +210,7 @@ public class CdsRepositoryServiceTest {
 			HashMap<String, Object> restr = new HashMap<>();
 			restr.put("firstName", firstName);
 			restr.put("lastName", lastName);
-			Page<MLPUser> userPage = userService.findUsers(restr, true, new PageRequest(0,5,null));
+			Page<MLPUser> userPage = userService.findUsers(restr, true, new PageRequest(0, 5, null));
 			Assert.assertTrue(userPage.getNumberOfElements() > 0);
 			MLPUser testUser = userPage.iterator().next();
 			logger.info("testUser is " + testUser);
@@ -211,6 +222,7 @@ public class CdsRepositoryServiceTest {
 			notif.setMessage("Notification message");
 			notif.setUrl("http://www.yahoo.com");
 			notif.setStart(new Date());
+			notif.setMsgSeverityCode(String.valueOf(MessageSeverityTypeCode.LO));
 			Calendar c = Calendar.getInstance();
 			c.setTime(new Date()); // Now use today date.
 			c.add(Calendar.DATE, 5); // Adding 5 days
@@ -260,7 +272,7 @@ public class CdsRepositoryServiceTest {
 			// Fetch back
 			Map<String, String> peerParms = new HashMap<>();
 			peerParms.put("name", pr.getName());
-			Page<MLPPeer> searchPeers = peerSearchService.findPeers(peerParms, false, new PageRequest(0,5,null));
+			Page<MLPPeer> searchPeers = peerSearchService.findPeers(peerParms, false, new PageRequest(0, 5, null));
 			Assert.assertTrue(searchPeers.getNumberOfElements() == 1);
 
 			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId(),
@@ -285,7 +297,7 @@ public class CdsRepositoryServiceTest {
 
 			Map<String, String> roleParms = new HashMap<>();
 			roleParms.put("name", cr2.getName());
-			Page<MLPRole> searchRoles = roleSearchService.findRoles(roleParms, false, new PageRequest(0,5,null));
+			Page<MLPRole> searchRoles = roleSearchService.findRoles(roleParms, false, new PageRequest(0, 5, null));
 			Assert.assertTrue(searchRoles.getNumberOfElements() == 1);
 
 			MLPRoleFunction crf = new MLPRoleFunction();
@@ -338,7 +350,8 @@ public class CdsRepositoryServiceTest {
 			// Fetch artifact back
 			Map<String, String> artParms = new HashMap<>();
 			artParms.put("name", ca.getName());
-			Page<MLPArtifact> searchArts = artifactSearchService.findArtifacts(artParms, false, new PageRequest(0,5,null));
+			Page<MLPArtifact> searchArts = artifactSearchService.findArtifacts(artParms, false,
+					new PageRequest(0, 5, null));
 			Assert.assertTrue(searchArts.getNumberOfElements() > 0);
 
 			// This tag is existing
@@ -367,13 +380,15 @@ public class CdsRepositoryServiceTest {
 			// Search for a single value
 			Map<String, String> solParms = new HashMap<>();
 			solParms.put("name", cs.getName());
-			Page<MLPSolution> searchSols = solutionSearchService.findSolutions(solParms, false, new PageRequest(0, 5, null));
+			Page<MLPSolution> searchSols = solutionSearchService.findSolutions(solParms, false,
+					new PageRequest(0, 5, null));
 			Assert.assertTrue(searchSols.getNumberOfElements() == 1);
 
 			// Search for a list
 			Map<String, Object> solListParms = new HashMap<>();
 			solListParms.put("name", new String[] { cs.getName() });
-			Page<MLPSolution> searchPageSols = solutionSearchService.findSolutions(solListParms, false, new PageRequest(0,5,null));
+			Page<MLPSolution> searchPageSols = solutionSearchService.findSolutions(solListParms, false,
+					new PageRequest(0, 5, null));
 			Assert.assertTrue(searchPageSols.getNumberOfElements() == 1);
 
 			logger.info("Finding portal solutions");
@@ -522,7 +537,7 @@ public class CdsRepositoryServiceTest {
 			Assert.assertNotNull(cc);
 			logger.info("Created site config {}", cc);
 			siteConfigRepository.delete(cc);
-			
+
 			MLPThread thread = threadRepository.save(new MLPThread(cs.getSolutionId(), cr.getRevisionId()));
 			Assert.assertTrue(thread.getThreadId() != null);
 			logger.info("Created thread {}", thread);
@@ -563,6 +578,7 @@ public class CdsRepositoryServiceTest {
 				peerRepository.delete(pr);
 				notifUserMapRepository.delete(notifMap);
 				notificationRepository.delete(notif);
+				siteConfigRepository.delete(cc);
 				userLoginProviderRepository.delete(ulp);
 				userRepository.delete(cu.getUserId());
 
@@ -643,7 +659,7 @@ public class CdsRepositoryServiceTest {
 			// restr.put("active", true);
 			restr.put("firstName", firstName);
 			restr.put("lastName", lastName);
-			Page<MLPUser> userPage = userService.findUsers(restr, false, new PageRequest(0,5));
+			Page<MLPUser> userPage = userService.findUsers(restr, false, new PageRequest(0, 5));
 			Assert.assertTrue(userPage.getNumberOfElements() == 1);
 
 			MLPUserLoginProvider ulp = new MLPUserLoginProvider();
@@ -978,6 +994,7 @@ public class CdsRepositoryServiceTest {
 			no.setTitle("notif title");
 			no.setMessage("notif msg");
 			no.setUrl("http://notify.me");
+			no.setMsgSeverityCode(String.valueOf(MessageSeverityTypeCode.HI));
 			Date now = new Date();
 			no.setStart(new Date(now.getTime() - 1000));
 			no.setEnd(new Date(now.getTime() + 60 * 60 * 1000));
@@ -1011,6 +1028,55 @@ public class CdsRepositoryServiceTest {
 	}
 
 	@Test
+	public void testUserNotificationPreferences() throws Exception {
+		try {
+			MLPUser cu = new MLPUser();
+			final String loginName = "notif_" + Long.toString(new Date().getTime());
+			cu.setLoginName(loginName);
+			cu = userRepository.save(cu);
+			Assert.assertNotNull(cu.getUserId());
+
+			MLPUserNotifPref usrNotifPref = new MLPUserNotifPref();
+			usrNotifPref.setUserId(cu.getUserId());
+			usrNotifPref.setNotfDelvMechCode(String.valueOf(NotificationDeliveryMechanismTypeCode.TX));
+			usrNotifPref.setMsgSeverityCode(String.valueOf(MessageSeverityTypeCode.HI));
+
+			usrNotifPref = usrNotifPrefRepository.save(usrNotifPref);
+			Assert.assertNotNull(usrNotifPref.getUserNotifPrefId());
+
+			Iterable<MLPUserNotifPref> usrNotifPrefs = usrNotifPrefRepository.findByUserId(cu.getUserId());
+			Assert.assertTrue(usrNotifPrefs.iterator().hasNext());
+
+			usrNotifPref.setNotfDelvMechCode(String.valueOf(NotificationDeliveryMechanismTypeCode.EM));
+			usrNotifPref = usrNotifPrefRepository.save(usrNotifPref);
+			Assert.assertTrue(usrNotifPrefRepository.findOne(usrNotifPref.getUserNotifPrefId()).getNotfDelvMechCode()
+					.equals("EM"));
+
+			usrNotifPrefRepository.delete(usrNotifPref);
+			userRepository.delete(cu);
+		} catch (Exception ex) {
+			logger.error("Failed", ex);
+			throw ex;
+		}
+
+		// invalid tests
+		try {
+			usrNotifPrefRepository.save(new MLPUserNotifPref());
+			throw new Exception("Unexpected success");
+		} catch (ConstraintViolationException ex) {
+			logger.info("create user notification preference failed as expected: {}", ex.getStackTrace());
+		}
+		try {
+			MLPUserNotifPref usrNotifPrefFld = new MLPUserNotifPref();
+			usrNotifPrefFld.setUserNotifPrefId(999L);
+			usrNotifPrefRepository.save(usrNotifPrefFld);
+			throw new Exception("Unexpected success");
+		} catch (ConstraintViolationException ex) {
+			logger.info("update user notification preference failed as expected: {}", ex.getStackTrace());
+		}
+	}
+
+	@Test
 	public void testStepResults() throws Exception {
 		try {
 			MLPStepResult sr = new MLPStepResult();
@@ -1024,14 +1090,15 @@ public class CdsRepositoryServiceTest {
 
 			long srCountTrans = stepResultRepository.count();
 			Assert.assertTrue(srCountTrans > 0);
-		
-			MLPStepResult result = stepResultRepository.findOne(sr.getStepResultId()); 
+
+			MLPStepResult result = stepResultRepository.findOne(sr.getStepResultId());
 			Assert.assertNotNull(result);
 			logger.info("First step result {}", result);
-			
-			HashMap<String,Object> queryParameters = new HashMap<>();
+
+			HashMap<String, Object> queryParameters = new HashMap<>();
 			queryParameters.put("statusCode", StepStatusCode.FA.toString());
-			Page<MLPStepResult> page = stepResultSearchService.findStepResults(queryParameters, false, new PageRequest(0, 5, null));
+			Page<MLPStepResult> page = stepResultSearchService.findStepResults(queryParameters, false,
+					new PageRequest(0, 5, null));
 			Assert.assertTrue(page.getNumberOfElements() > 0);
 
 			sr.setResult("New stack trace");

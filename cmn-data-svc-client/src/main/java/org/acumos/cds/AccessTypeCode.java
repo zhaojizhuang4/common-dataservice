@@ -21,7 +21,7 @@
 package org.acumos.cds;
 
 /**
- * This enum defines Acumos access type codes. 
+ * This enum defines Acumos access type codes.
  */
 public enum AccessTypeCode {
 

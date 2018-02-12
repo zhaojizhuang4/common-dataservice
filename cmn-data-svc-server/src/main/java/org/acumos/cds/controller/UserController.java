@@ -30,6 +30,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.acumos.cds.CCDSConstants;
 import org.acumos.cds.LoginProviderCode;
+import org.acumos.cds.MessageSeverityTypeCode;
+import org.acumos.cds.NotificationDeliveryMechanismTypeCode;
+import org.acumos.cds.StepStatusCode;
+import org.acumos.cds.StepTypeCode;
 import org.acumos.cds.domain.MLPNotifUserMap;
 import org.acumos.cds.domain.MLPPasswordChangeRequest;
 import org.acumos.cds.domain.MLPRole;
@@ -41,6 +45,7 @@ import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
 import org.acumos.cds.domain.MLPUserLoginProvider.UserLoginProviderPK;
 import org.acumos.cds.domain.MLPUserNotification;
+import org.acumos.cds.domain.MLPUserNotifPref;
 import org.acumos.cds.domain.MLPUserRoleMap;
 import org.acumos.cds.repository.NotifUserMapRepository;
 import org.acumos.cds.repository.NotificationRepository;
@@ -49,6 +54,7 @@ import org.acumos.cds.repository.SolutionDeploymentRepository;
 import org.acumos.cds.repository.SolutionFavoriteRepository;
 import org.acumos.cds.repository.SolutionRepository;
 import org.acumos.cds.repository.UserLoginProviderRepository;
+import org.acumos.cds.repository.UserNotificationPreferenceRepository;
 import org.acumos.cds.repository.UserRepository;
 import org.acumos.cds.repository.UserRoleMapRepository;
 import org.acumos.cds.service.UserSearchService;
@@ -81,7 +87,8 @@ import io.swagger.annotations.ApiOperation;
  * Data at rest is hashed; data in flight is not. So an inbound JSON request has
  * a clear-text password.
  * 
- * https://stackoverflow.com/questions/942951/rest-api-error-return-good-practices
+ * https://stackoverflow.com/questions/942951/rest-api-error-return-good-
+ * practices
  */
 @Controller
 @RequestMapping("/" + CCDSConstants.USER_PATH)
@@ -105,6 +112,8 @@ public class UserController extends AbstractController {
 	private NotificationRepository notificationRepository;
 	@Autowired
 	private NotifUserMapRepository notifUserMapRepository;
+	@Autowired
+	private UserNotificationPreferenceRepository notificationPreferenceRepository;
 	@Autowired
 	private SolutionFavoriteRepository solutionFavoriteRepository;
 	@Autowired
@@ -213,7 +222,7 @@ public class UserController extends AbstractController {
 	@ApiOperation(value = "Searches for users using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disjunction).", response = MLPUser.class, responseContainer = "Page")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchUsers(@RequestParam MultiValueMap<String, String> queryParameters,  Pageable pageable,
+	public Object searchUsers(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageable,
 			HttpServletResponse response) {
 		cleanPageableParameters(queryParameters);
 		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
@@ -288,7 +297,8 @@ public class UserController extends AbstractController {
 					return result;
 				}
 			}
-			// Password arrives in the clear in the hash field, so hash if present
+			// Password arrives in the clear in the hash field, so hash if
+			// present
 			if (user.getLoginHash() != null) {
 				String pwHash = BCrypt.hashpw(user.getLoginHash(), BCrypt.gensalt());
 				user.setLoginHash(pwHash);
@@ -434,7 +444,8 @@ public class UserController extends AbstractController {
 			userRepository.delete(userId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
-			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			// e.g., EmptyResultDataAccessException is NOT an internal server
+			// error
 			logger.warn(EELFLoggerDelegate.errorLogger, "deleteUser failed", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteUser failed", ex);
@@ -574,7 +585,8 @@ public class UserController extends AbstractController {
 	public Object addOrDropUsersInRole(@PathVariable("roleId") String roleId,
 			@RequestBody UsersRoleRequest usersRoleRequest, HttpServletResponse response) {
 		logger.debug(EELFLoggerDelegate.debugLogger, "addOrDropUsersInRole: role {}", roleId);
-		// Validate entire request before making any change to avoid failing midway
+		// Validate entire request before making any change to avoid failing
+		// midway
 		if (roleRepository.findOne(roleId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ROLE_WITH_ID + roleId, null);
@@ -790,7 +802,8 @@ public class UserController extends AbstractController {
 			userLoginProviderRepository.delete(pk);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
-			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			// e.g., EmptyResultDataAccessException is NOT an internal server
+			// error
 			logger.warn(EELFLoggerDelegate.errorLogger, "deleteLoginProvider failed", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteLoginProvider failed", ex);
@@ -886,7 +899,8 @@ public class UserController extends AbstractController {
 			solutionFavoriteRepository.delete(pk);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
-			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			// e.g., EmptyResultDataAccessException is NOT an internal server
+			// error
 			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionFavorite failed", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteSolutionFavorite failed", ex);
@@ -1011,6 +1025,142 @@ public class UserController extends AbstractController {
 			MLPNotifUserMap map = new MLPNotifUserMap(notificationId, userId);
 			notifUserMapRepository.delete(map);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
+		}
+	}
+
+	/**
+	 * @param userNotifPrefId
+	 *            Path parameter with row ID
+	 * @param response
+	 *            HttpServletResponse
+	 * @return a user notification preference if found, an error otherwise.
+	 */
+	@ApiOperation(value = "Gets the user notification preference for the specified ID.", response = MLPUserNotifPref.class)
+	@RequestMapping(value = CCDSConstants.NOTIFICATION_PREF_PATH + "/{userNotifPrefId}/", method = RequestMethod.GET)
+	@ResponseBody
+	public Object getUserNotificationPreference(@PathVariable("userNotifPrefId") Long userNotifPrefId,
+			HttpServletResponse response) {
+		MLPUserNotifPref usrnp = notificationPreferenceRepository.findOne(userNotifPrefId);
+		if (usrnp == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for ID " + userNotifPrefId, null);
+		}
+		return usrnp;
+	}
+
+	/**
+	 * @param userId
+	 *            User ID
+	 * @return List of notification preferences for the specified user
+	 */
+	@ApiOperation(value = "Gets notification preferences for the specified user ID.", response = MLPUserNotifPref.class, responseContainer = "List")
+	@RequestMapping(value = "/{userId}/" + CCDSConstants.NOTIFICATION_PREF_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public Iterable<MLPUserNotifPref> getNotificationPreferencesForUser(@PathVariable("userId") String userId) {
+		return notificationPreferenceRepository.findByUserId(userId);
+	}
+
+	/**
+	 * @param usrNotifPref
+	 *            user notification preference to save. A new one will be generated;
+	 * @param response
+	 *            HttpServletResponse
+	 * @return Entity on success; error on failure.
+	 */
+	@ApiOperation(value = "Creates a new user notification preference", response = MLPUserNotifPref.class)
+	@RequestMapping(value = CCDSConstants.NOTIFICATION_PREF_PATH, method = RequestMethod.POST)
+	@ResponseBody
+	public Object createUserNotificationPreference(@RequestBody MLPUserNotifPref usrNotifPref,
+			HttpServletResponse response) {
+		logger.debug(EELFLoggerDelegate.debugLogger, "createUserNotificationPreference: received {} ", usrNotifPref);
+		Object result;
+		try {
+			// Validate enum codes
+			MessageSeverityTypeCode.valueOf(usrNotifPref.getMsgSeverityCode());
+			NotificationDeliveryMechanismTypeCode.valueOf(usrNotifPref.getNotfDelvMechCode());
+			// Create a new row
+			result = notificationPreferenceRepository.save(usrNotifPref);
+			response.setStatus(HttpServletResponse.SC_CREATED);
+			// This is a hack to create the location path.
+			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.USER_PATH + CCDSConstants.NOTIFICATION_PREF_PATH);
+		} catch (Exception ex) {
+			Exception cve = findConstraintViolationException(ex);
+			logger.warn(EELFLoggerDelegate.errorLogger, "createUserNotificationPreference", cve.toString());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createUserNotificationPreference failed",
+					cve);
+		}
+		return result;
+	}
+
+	/**
+	 * @param userNotifPrefId
+	 *            Path parameter with the row ID
+	 * @param usrNotifPref
+	 *            stepResult data to be updated
+	 * @param response
+	 *            HttpServletResponse
+	 * @return user notification preference that maps String to Object, for
+	 *         serialization as JSON
+	 */
+	@ApiOperation(value = "Updates a user notification preference.", response = SuccessTransport.class)
+	@RequestMapping(value = CCDSConstants.NOTIFICATION_PREF_PATH + "/{userNotifPrefId}", method = RequestMethod.PUT)
+	@ResponseBody
+	public Object updateUserNotificationPreference(@PathVariable("userNotifPrefId") Long userNotifPrefId,
+			@RequestBody MLPUserNotifPref usrNotifPref, HttpServletResponse response) {
+		logger.debug(EELFLoggerDelegate.debugLogger, "updateUserNotificationPreference: received {} ", usrNotifPref);
+		// Get the existing one
+		MLPUserNotifPref existing = notificationPreferenceRepository.findOne(userNotifPrefId);
+		if (existing == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+					"Failed to find object with id " + userNotifPrefId, null);
+		}
+		MLPTransportModel result = null;
+		try {
+			// Validate enum codes
+			MessageSeverityTypeCode.valueOf(usrNotifPref.getMsgSeverityCode());
+			NotificationDeliveryMechanismTypeCode.valueOf(usrNotifPref.getNotfDelvMechCode());
+			// Use the path-parameter id; don't trust the one in the object
+			usrNotifPref.setUserNotifPrefId(userNotifPrefId);
+			// Update the existing row
+			notificationPreferenceRepository.save(usrNotifPref);
+			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+		} catch (Exception ex) {
+			Exception cve = findConstraintViolationException(ex);
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateUserNotificationPreference", cve.toString());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateUserNotificationPreference failed",
+					cve);
+		}
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param userNotifPrefId
+	 *            Path parameter that identifies the instance
+	 * @param response
+	 *            HttpServletResponse
+	 * @return Transport model with success or failure
+	 */
+	@ApiOperation(value = "Deletes the user notification preference with the specified ID.", response = SuccessTransport.class)
+	@RequestMapping(value = CCDSConstants.NOTIFICATION_PREF_PATH + "/{userNotifPrefId}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public MLPTransportModel deleteUserNotificationPreference(@PathVariable("userNotifPrefId") Long userNotifPrefId,
+			HttpServletResponse response) {
+		logger.debug(EELFLoggerDelegate.debugLogger, "deleteUserNotificationPreference: received {} ", userNotifPrefId);
+		// Get the existing one
+		try {
+			notificationPreferenceRepository.delete(userNotifPrefId);
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
+		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server
+			// error
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteUserNotificationPreference", ex.toString());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteUserNotificationPreference failed",
+					ex);
 		}
 	}
 

@@ -17,13 +17,26 @@
  * limitations under the License.
  * ===============LICENSE_END=========================================================
  */
-package org.acumos.cds.repository;
 
-import org.acumos.cds.domain.MLPStepResult;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+package org.acumos.cds;
 
-public interface StepResultRepository
-		extends JpaRepository<MLPStepResult, Long>, JpaSpecificationExecutor<MLPStepResult> {
+/**
+ * This enum defines Acumos message severity type codes.
+ */
+public enum MessageSeverityTypeCode {
+
+	HI("High"), //
+	ME("Medium"), //
+	LO("Low");
+
+	private String typeName;
+
+	private MessageSeverityTypeCode(final String typeName) {
+		this.typeName = typeName;
+	}
+
+	public String getTypeName() {
+		return typeName;
+	}
 
 }

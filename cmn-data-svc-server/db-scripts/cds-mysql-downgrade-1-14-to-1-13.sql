@@ -2,6 +2,10 @@
 -- FROM version 1.14.x TO version 1.13.x.
 -- No database is created or specified to allow flexible deployment!
 
+-- 30  
+DROP TABLE C_NOTIF_USER_PREF;  
+-- 29
+ALTER TABLE C_NOTIFICATION DROP COLUMN MSG_SEVERITY_CD;
 -- 28
 CREATE TABLE C_LOGIN_PROVIDER (
   PROVIDER_CD CHAR(2) NOT NULL PRIMARY KEY,

@@ -71,7 +71,6 @@ public class ClientMethodTest {
 		}
 	}
 
-
 	@SuppressWarnings("deprecation")
 	@Test
 	public void coverClientEnumMethods() {
@@ -120,7 +119,7 @@ public class ClientMethodTest {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
 	}
-	
+
 	@Test
 	public void coverClientMethods() {
 
@@ -886,6 +885,6 @@ public class ClientMethodTest {
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
-	
+
 	}
 }

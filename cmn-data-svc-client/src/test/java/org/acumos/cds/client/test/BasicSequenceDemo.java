@@ -92,11 +92,12 @@ public class BasicSequenceDemo {
 			client.addSolutionRevisionArtifact(cs.getSolutionId(), cr.getRevisionId(), ca.getArtifactId());
 
 			logger.info("Searching for active solutions");
-			Map<String,Object> queryParams = new HashMap<>();
+			Map<String, Object> queryParams = new HashMap<>();
 			queryParams.put("active", Boolean.TRUE);
-			RestPageResponse<MLPSolution> activeSolutions = client.searchSolutions(queryParams, false, new RestPageRequest(0,10));
+			RestPageResponse<MLPSolution> activeSolutions = client.searchSolutions(queryParams, false,
+					new RestPageRequest(0, 10));
 			logger.info("Active solution count: " + activeSolutions.getTotalElements());
-			
+
 			logger.info("Deleting objects");
 			client.dropSolutionRevisionArtifact(cs.getSolutionId(), cr.getRevisionId(), ca.getArtifactId());
 			client.deleteArtifact(ca.getArtifactId());

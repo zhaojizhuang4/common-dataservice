@@ -102,7 +102,7 @@ public class PeerController extends AbstractController {
 	@ApiOperation(value = "Searches for peers using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disjunction).", response = MLPPeer.class, responseContainer = "Page")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchPeers(@RequestParam MultiValueMap<String, String> queryParameters,Pageable pageable,
+	public Object searchPeers(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageable,
 			HttpServletResponse response) {
 		cleanPageableParameters(queryParameters);
 		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);

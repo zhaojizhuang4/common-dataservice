@@ -62,6 +62,7 @@ import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
 import org.acumos.cds.domain.MLPUserNotification;
+import org.acumos.cds.domain.MLPUserNotifPref;
 import org.acumos.cds.domain.MLPUserRoleMap;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
@@ -1736,6 +1737,51 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	public void deleteStepResult(Long stepResultId) {
 		URI uri = buildUri(new String[] { CCDSConstants.STEP_RESULT_PATH, Long.toString(stepResultId) }, null, null);
 		logger.debug("deleteStepResult: url {}", uri);
+		restTemplate.delete(uri);
+	}
+
+	@Override
+	public List<MLPUserNotifPref> getUserNotificationPreferences(String userId) {
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.NOTIFICATION_PREF_PATH }, null,
+				null);
+		logger.debug("getUserNotificationPreferences: url {}", uri);
+		ResponseEntity<List<MLPUserNotifPref>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<MLPUserNotifPref>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public MLPUserNotifPref getUserNotificationPreference(Long usrNotifPrefId) {
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.NOTIFICATION_PREF_PATH,
+				String.valueOf(usrNotifPrefId) }, null, null);
+		logger.debug("getUserNotificationPreference: url {}", uri);
+		ResponseEntity<MLPUserNotifPref> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<MLPUserNotifPref>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public MLPUserNotifPref createUserNotificationPreference(MLPUserNotifPref usrNotifPref) {
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.NOTIFICATION_PREF_PATH }, null, null);
+		logger.debug("createUserNotificationPreference: uri {}", uri);
+		return restTemplate.postForObject(uri, usrNotifPref, MLPUserNotifPref.class);
+	}
+
+	@Override
+	public void updateUserNotificationPreference(MLPUserNotifPref usrNotifPref) {
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.NOTIFICATION_PREF_PATH,
+				Long.toString(usrNotifPref.getUserNotifPrefId()) }, null, null);
+		logger.debug("updateUserNotificationPreference: url {}", uri);
+		restTemplate.put(uri, usrNotifPref);
+	}
+
+	@Override
+	public void deleteUserNotificationPreference(Long userNotifPrefId) {
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.NOTIFICATION_PREF_PATH,
+				Long.toString(userNotifPrefId) }, null, null);
+		logger.debug("deleteUserNotificationPreference: url {}", uri);
 		restTemplate.delete(uri);
 	}
 

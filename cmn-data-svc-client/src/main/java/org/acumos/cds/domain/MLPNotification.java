@@ -61,6 +61,11 @@ public class MLPNotification extends MLPTimestampedEntity implements Serializabl
 	@Size(max = 2048)
 	private String message;
 
+	@Column(name = "MSG_SEVERITY_CD", nullable = false, columnDefinition = "CHAR(2)")
+	@NotNull(message = "Message Severity Code cannot be null")
+	@Size(max = 2)
+	private String msgSeverityCode;
+
 	@Column(name = "URL", columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
 	private String url;
@@ -86,15 +91,18 @@ public class MLPNotification extends MLPTimestampedEntity implements Serializabl
 	 * 
 	 * @param title
 	 *            Like the subject of an email
+	 * @param msgSeverityCode
+	 *            severity of the notification like high, medium or low
 	 * @param startDate
 	 *            Earliest date of the active period
 	 * @param endDate
 	 *            Latest date of the active period
 	 */
-	public MLPNotification(String title, Date startDate, Date endDate) {
-		if (title == null || startDate == null || endDate == null)
+	public MLPNotification(String title, String msgSeverityCode, Date startDate, Date endDate) {
+		if (title == null || msgSeverityCode == null || startDate == null || endDate == null)
 			throw new IllegalArgumentException("Null not permitted");
 		this.title = title;
+		this.msgSeverityCode = msgSeverityCode;
 		this.start = startDate;
 		this.end = endDate;
 	}
@@ -121,6 +129,14 @@ public class MLPNotification extends MLPTimestampedEntity implements Serializabl
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public String getMsgSeverityCode() {
+		return msgSeverityCode;
+	}
+
+	public void setMsgSeverityCode(String msgSeverityCode) {
+		this.msgSeverityCode = msgSeverityCode;
 	}
 
 	public String getUrl() {

@@ -262,7 +262,7 @@ public class SolutionController extends AbstractController {
 	/**
 	 * @param queryParameters
 	 *            Map of String (field name) to String (value) for restricting the
-	 *            query	
+	 *            query
 	 * @param pageRequest
 	 *            Page and sort criteria
 	 * @param response

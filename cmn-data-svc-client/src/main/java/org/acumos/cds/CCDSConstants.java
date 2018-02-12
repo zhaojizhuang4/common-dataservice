@@ -62,6 +62,7 @@ public abstract class CCDSConstants {
 	public static final String LOGIN_PROVIDER_PATH = "logprov";
 	public static final String TAG_PATH = "tag";
 	public static final String NOTIFICATION_PATH = "notif";
+	public static final String NOTIFICATION_PREF_PATH = "notifpref";
 	public static final String VIEW_PATH = "view";
 	public static final String WEB_PATH = "web";
 	public static final String DEPLOYMENT_PATH = "deploy";

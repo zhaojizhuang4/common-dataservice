@@ -8,6 +8,7 @@ Maven Nexus repository. The server is deployed as a Docker image to a Docker reg
 Version 1.14.0, ? February 2018
 -------------------------------
 
+* Add feature for User notification preference and user notification (ACUMOS-166) 
 * Refactor to drop code-name database tables (ACUMOS-144)
 * Requires database schema version 1.14
 

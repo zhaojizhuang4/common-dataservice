@@ -66,6 +66,7 @@ import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
 import org.acumos.cds.domain.MLPUserNotification;
+import org.acumos.cds.domain.MLPUserNotifPref;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
 import org.acumos.cds.domain.MLPValidationType;
@@ -150,6 +151,8 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private RestPageResponse<MLPNotification> notifications;
 	private MLPNotification notification;
 	private RestPageResponse<MLPUserNotification> userNotifications;
+	private MLPUserNotifPref usrNotifPref;
+	private List<MLPUserNotifPref> userNotifPreferences;
 	private MLPStepResult stepResult;
 	private MLPSolutionWeb solutionWeb = new MLPSolutionWeb();
 	private List<MLPUser> solutionAccessUsers;
@@ -179,6 +182,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private RestPageResponse<MLPComment> solutionRevisionComments;
 	private RestPageResponse<MLPStepResult> stepResults;
 	private RestPageResponse<MLPStepResult> searchStepResults;
+	private MLPUserNotifPref usrNotifPrefById = null;
 
 	/**
 	 * No-argument constructor.
@@ -1046,6 +1050,40 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 
 	@Override
 	public void setUserViewedNotification(String notificationId, String userId) {
+		// How to mock?
+	}
+
+	@Override
+	public MLPUserNotifPref createUserNotificationPreference(MLPUserNotifPref usrNotifPref) {
+		this.usrNotifPref = usrNotifPref;
+		return usrNotifPref;
+	}
+
+	public void setUserNotificationPreferences(List<MLPUserNotifPref> usrNotifPref) {
+		this.userNotifPreferences = usrNotifPref;
+	}
+
+	@Override
+	public List<MLPUserNotifPref> getUserNotificationPreferences(String userId) {
+		return this.userNotifPreferences;
+	}
+
+	@Override
+	public MLPUserNotifPref getUserNotificationPreference(Long userNotifPrefID) {
+		return this.usrNotifPrefById;
+	}
+
+	public void setUserNotificationPreference(MLPUserNotifPref usrNotifPref) {
+		this.usrNotifPrefById = usrNotifPref;
+	}
+
+	@Override
+	public void deleteUserNotificationPreference(Long usrNotifprefId) {
+		// How to mock?
+	}
+
+	@Override
+	public void updateUserNotificationPreference(MLPUserNotifPref usrNotifpref) {
 		// How to mock?
 	}
 

@@ -26,9 +26,11 @@ import org.acumos.cds.domain.MLPArtifactType;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
 import org.acumos.cds.domain.MLPLoginProvider;
+import org.acumos.cds.domain.MLPMessageSeverityType;
 import org.acumos.cds.domain.MLPModelType;
 import org.acumos.cds.domain.MLPNotifUserMap;
 import org.acumos.cds.domain.MLPNotification;
+import org.acumos.cds.domain.MLPNotificationDeliveryMechanismType;
 import org.acumos.cds.domain.MLPPasswordChangeRequest;
 import org.acumos.cds.domain.MLPPeer;
 import org.acumos.cds.domain.MLPPeerStatus;
@@ -56,6 +58,7 @@ import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
 import org.acumos.cds.domain.MLPUserNotification;
+import org.acumos.cds.domain.MLPUserNotifPref;
 import org.acumos.cds.domain.MLPUserRoleMap;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
@@ -210,8 +213,36 @@ public class DomainTest extends AbstractModelTest {
 	}
 
 	@Test
+	public void testMLPMessageSeverityType() {
+		MLPMessageSeverityType m = new MLPMessageSeverityType();
+		m.setTypeCode(s1);
+		m.setTypeName(s2);
+		Assert.assertEquals(s1, m.getTypeCode());
+		Assert.assertEquals(s2, m.getTypeName());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		logger.info(m.toString());
+	}
+
+	@Test
+	public void testMLPNotifDelvMechType() {
+		MLPNotificationDeliveryMechanismType m = new MLPNotificationDeliveryMechanismType();
+		m.setTypeCode(s1);
+		m.setTypeName(s2);
+		Assert.assertEquals(s1, m.getTypeCode());
+		Assert.assertEquals(s2, m.getTypeName());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		logger.info(m.toString());
+	}
+
+	@Test
 	public void testMLPNotification() {
-		MLPNotification m = new MLPNotification(s1, d1, d1);
+		MLPNotification m = new MLPNotification(s1, s6, d1, d1);
 		m = new MLPNotification();
 		m.setCreated(d1);
 		m.setEnd(d2);
@@ -221,6 +252,7 @@ public class DomainTest extends AbstractModelTest {
 		m.setStart(d4);
 		m.setTitle(s3);
 		m.setUrl(s4);
+		m.setMsgSeverityCode(s6);
 		Assert.assertEquals(d1, m.getCreated());
 		Assert.assertEquals(d2, m.getEnd());
 		Assert.assertEquals(s1, m.getMessage());
@@ -229,13 +261,14 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertEquals(d4, m.getStart());
 		Assert.assertEquals(s3, m.getTitle());
 		Assert.assertEquals(s4, m.getUrl());
+		Assert.assertEquals(s6, m.getMsgSeverityCode());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
 		try {
-			new MLPNotification(null, null, null);
+			new MLPNotification(null, null, null, null);
 			Assert.assertTrue("Unexpected success", false);
 		} catch (IllegalArgumentException iae) {
 			// null arg is rejected
@@ -266,6 +299,28 @@ public class DomainTest extends AbstractModelTest {
 		logger.info(pk.toString());
 		try {
 			new MLPNotifUserMap(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
+	}
+
+	@Test
+	public void testMLPUserNotifPreference() {
+		MLPUserNotifPref m = new MLPUserNotifPref();
+		m.setUserNotifPrefId(l1);
+		m.setMsgSeverityCode(s1);
+		m.setNotfDelvMechCode(s2);
+		m.setUserId(s3);
+
+		Assert.assertEquals(l1, m.getUserNotifPrefId());
+		Assert.assertEquals(s1, m.getMsgSeverityCode());
+		Assert.assertEquals(s2, m.getNotfDelvMechCode());
+		Assert.assertEquals(s3, m.getUserId());
+
+		logger.info(m.toString());
+		try {
+			new MLPUserNotifPref(null, null, null);
 			Assert.assertTrue("Unexpected success", false);
 		} catch (IllegalArgumentException iae) {
 			// null arg is rejected

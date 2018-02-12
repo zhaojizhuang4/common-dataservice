@@ -17,13 +17,24 @@
  * limitations under the License.
  * ===============LICENSE_END=========================================================
  */
-package org.acumos.cds.repository;
 
-import org.acumos.cds.domain.MLPStepResult;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+package org.acumos.cds;
 
-public interface StepResultRepository
-		extends JpaRepository<MLPStepResult, Long>, JpaSpecificationExecutor<MLPStepResult> {
+/**
+ * This enum defines Acumos notification delivery mechanism type codes.
+ */
+public enum NotificationDeliveryMechanismTypeCode {
+	EM("Email"), //
+	TX("Text"); //
+
+	private String typeName;
+
+	private NotificationDeliveryMechanismTypeCode(final String typeName) {
+		this.typeName = typeName;
+	}
+
+	public String getTypeName() {
+		return typeName;
+	}
 
 }

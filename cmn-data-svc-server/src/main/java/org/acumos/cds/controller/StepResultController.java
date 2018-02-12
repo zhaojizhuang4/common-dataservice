@@ -185,7 +185,7 @@ public class StepResultController extends AbstractController {
 	 *            Path parameter that identifies the instance
 	 * @param response
 	 *            HttpServletResponse
-	 * @return stepResult that maps String to Object, for serialization as JSON
+	 * @return Transport model with success or failure
 	 */
 	@ApiOperation(value = "Deletes the stepResult with the specified ID.", response = SuccessTransport.class)
 	@RequestMapping(value = "/{stepResultId}", method = RequestMethod.DELETE)

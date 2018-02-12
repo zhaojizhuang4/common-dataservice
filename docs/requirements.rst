@@ -90,6 +90,8 @@ Entity Overview
 
   - Details for administration of the system, initially for the Portal/Marketplace web site
 
+* User Notification Preference
+  - What delivery preference and message priority a user will choose for receiving a notification  
 
 Entity Relationship Overview
 ----------------------------
@@ -264,6 +266,13 @@ Validation Type
 | LC "License Check"
 | OQ "OSS Quantification"
 | TA "Text Analysis"
+
+Message Severity
+^^^^^^^^^^^^^^^^
+
+| HG "High"
+| MD "Medium"
+| LW "Low"
 
 Entities
 --------
@@ -616,6 +625,7 @@ Attributes:
 *    Notification ID
 *    Title (like an email subject)
 *    Message (like an email body)
+*    Severity (high/medium/low)
 *    URL (a link)
 *    Start (earliest date/time when the notification is active)
 *    End (latest date/time when the notification is active)
@@ -635,6 +645,18 @@ Attributes:
 *    User ID, the last person who updated the entry; optional to allow creation of initial row without a user ID
 *    Created date
 *    Modified date
+
+
+User Notification Preference
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This stores the delivery mechanism and message priority preferences by the user for receiving notifications
+
+Attributes: 
+
+*    User ID (notification recipient) 
+*    Notification type (email/text/web)
+*    Message Severity (low/medium/high)  
 
 
 Comment
