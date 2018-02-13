@@ -945,3 +945,169 @@ Attributes:
 *   Solution Group ID
 *   Peer Group ID
 *   Create timestamp
+
+
+Required Operations
+-------------------
+
+This section lists the required operations that shall be supported by the Common Data Micro Service. The list serves as a requirements document for both the client and server, in support of the entities and attributes identified above.
+
+Metadata operations
+^^^^^^^^^^^^^^^^^^^
+
+These read-only actions provide access to value sets that may change over time:
+
+*  Get access types
+*  Get artifact types
+*  Get login providers
+*  Get model types
+*  Get toolkit types
+*  Get validation status values
+
+CRUD operations
+^^^^^^^^^^^^^^^
+
+To keep the rest of this document brief, the standard "CRUD" operation definitions are repeated here:
+
+*    (C)reate an entity; a REST POST operation that requires new content. If the entity ID field is not supplied, this operation generates a unique ID; otherwise the supplied ID is used.
+*    (R)etrieve an enity; a REST GET operation that requires the entity ID
+*    (U)pdate an entity; a REST PUT operation that requires the entity ID and the new content
+*    (D)elete an entity; a REST DELETE operation that requires the entity ID
+
+Operations on artifacts
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations plus the following:
+
+*    Get a page of artifacts from the complete set, optionally sorted on one or more attributes
+*    Get a page of artifacts using partial ("like") value match on the name and description attributes, optionally sorted on one or more attributes
+*    Search for artifacts using exact value match on one or more attributes, either all (conjunction-and) or one (disjunction-or)
+*    Get all the artifacts for a particular solution revision
+*    Add an artifact to a solution revision
+*    Delete an artifact from a solution revision.
+
+Operations on solutions
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations plus the following:
+
+* Get a page of solutions from the complete set, optionally sorted on one or more attributes
+* Get a page of solutions using partial ("like") value match on the name and description attributes, optionally sorted on one or more attributes
+* Search for solutions using exact value match on one or more attributes, either all (conjunction-and) or one (disjunction-or)
+* Get a page of solutions that use a specified toolkit type
+* Tags
+
+  - Get all tags assigned to a solution
+  - Add a tag to a solution
+  - Drop a tag from a solution
+  - Get a page of solutions that have a specified tag
+
+*  Authorized users
+
+   - Get all authorized users assigned to a solution
+   - Add a user to a solution
+   - Drop a user from a solution
+
+Operations on solution revisions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations plus the following:
+
+* Get all revisions for a specific solution
+* Get all revisions for multiple solutions
+* Get a solution revision for a particular solution id and revision id.
+* Get all the solution revisions for a particular artifact.
+
+(Also see operations on artifacts, which are associated with solution revisions)
+
+Operations on solution downloads
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Standard CRUD operations plus the following:
+* Get all downloads for a specific solution
+* Get the count of downloads for a specific solution
+
+Operations on solution ratings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations plus the following:
+
+*  Get all ratings for a specific solution
+*  Get the average rating for a specific solution
+
+Operations on tags
+^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations apply.
+
+Operations on users
+^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations plus the following:
+
+* Get a page of users from the complete set, optionally sorted on one or more attributes
+* Get a page of users using partial ("like") value match on the first, middle, last or login name attributes, optionally sorted on one or more attributes
+* Search for users using exact value match on one or more attributes, either all (conjunction-and) or one (disjunction-or)
+* Check user credentials - the login operation. Match login name/email address as user, password as password. Returns user object if found; signals bad request if no match is found.
+
+Operations on user login providers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations plus the following:
+
+* Get all login providers for the specified user
+
+Operations on roles
+^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations plus the following:
+
+* Get all roles for the specified user
+* Search for roles using exact value match on one or more attributes
+
+Operations on role functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations plus the following:
+
+* Get all role functions for the specified role
+
+Operations on peers
+^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations plus the following:
+
+* Get a page of peers from the complete set, optionally sorted on one or more attributes
+* Search for peers using exact value match on one or more attributes
+
+Operations on peer subscriptions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations plus the following:
+
+* Get a page of peer subscriptions from the complete set, optionally sorted on one or more attributes
+
+Operations on notifications
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations plus the following:
+
+* Add a user as a notification recipient
+* Update that a user has viewed a notification
+* Drop a user as a notification recipient
+* Get all notifications for a user
+
+Operations on workflow step result
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations apply.
+
+Operations on workflow step type
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations apply.
+
+Operations on workflow step status
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Standard CRUD operations apply.
