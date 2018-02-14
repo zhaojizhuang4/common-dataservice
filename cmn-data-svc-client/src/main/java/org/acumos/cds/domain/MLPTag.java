@@ -39,8 +39,8 @@ import javax.validation.constraints.Size;
 @Table(name = "C_SOLUTION_TAG")
 public class MLPTag implements MLPEntity, Serializable {
 
-	private static final long serialVersionUID = -8342728048884890037L;
-
+	private static final long serialVersionUID = -288462280366502647L;
+	
 	@Id
 	@Column(name = "TAG", updatable = false, nullable = false, columnDefinition = "VARCHAR(32)")
 	@Size(max = 32)

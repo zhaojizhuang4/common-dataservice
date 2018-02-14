@@ -71,36 +71,13 @@ public class ClientMethodTest {
 		}
 	}
 
+
+	@SuppressWarnings("deprecation")
 	@Test
-	public void coverClientMethods() {
-
-		// Exercise getRestTemplate, also no-credentials path
-		new TrivialRestClientImplSubclass("http://localhost:12345", null, null);
-
-		try {
-			CommonDataServiceRestClientImpl.getInstance(null, null, null);
-		} catch (IllegalArgumentException ex) {
-			logger.info("Ctor failed as expected: {}", ex.toString());
-		}
-		try {
-			CommonDataServiceRestClientImpl.getInstance("bogus url", null, null);
-		} catch (IllegalArgumentException ex) {
-			logger.info("Ctor failed as expected: {}", ex.toString());
-		}
-
+	public void coverClientEnumMethods() {
 		ICommonDataServiceRestClient client = CommonDataServiceRestClientImpl.getInstance("http://invalidhost:51243",
 				"user", "pass");
 
-		try {
-			client.getHealth();
-		} catch (ResourceAccessException ex) {
-			logger.info("Client failed as expected: {}", ex.toString());
-		}
-		try {
-			client.getVersion();
-		} catch (ResourceAccessException ex) {
-			logger.info("Client failed as expected: {}", ex.toString());
-		}
 		try {
 			client.getAccessTypes();
 		} catch (ResourceAccessException ex) {
@@ -142,6 +119,39 @@ public class ClientMethodTest {
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
+	}
+	
+	@Test
+	public void coverClientMethods() {
+
+		// Exercise getRestTemplate, also no-credentials path
+		new TrivialRestClientImplSubclass("http://localhost:12345", null, null);
+
+		try {
+			CommonDataServiceRestClientImpl.getInstance(null, null, null);
+		} catch (IllegalArgumentException ex) {
+			logger.info("Ctor failed as expected: {}", ex.toString());
+		}
+		try {
+			CommonDataServiceRestClientImpl.getInstance("bogus url", null, null);
+		} catch (IllegalArgumentException ex) {
+			logger.info("Ctor failed as expected: {}", ex.toString());
+		}
+
+		ICommonDataServiceRestClient client = CommonDataServiceRestClientImpl.getInstance("http://invalidhost:51243",
+				"user", "pass");
+
+		try {
+			client.getHealth();
+		} catch (ResourceAccessException ex) {
+			logger.info("Client failed as expected: {}", ex.toString());
+		}
+		try {
+			client.getVersion();
+		} catch (ResourceAccessException ex) {
+			logger.info("Client failed as expected: {}", ex.toString());
+		}
+
 		try {
 			client.getSolutionCount();
 		} catch (ResourceAccessException ex) {

@@ -29,6 +29,7 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
 
 import org.acumos.cds.CCDSConstants;
+import org.acumos.cds.LoginProviderCode;
 import org.acumos.cds.domain.MLPNotifUserMap;
 import org.acumos.cds.domain.MLPPasswordChangeRequest;
 import org.acumos.cds.domain.MLPRole;
@@ -691,6 +692,8 @@ public class UserController extends AbstractController {
 		}
 		Object result;
 		try {
+			// Validate enum codes
+			LoginProviderCode.valueOf(ulp.getProviderCode());
 			// Use path IDs
 			ulp.setUserId(userId);
 			ulp.setProviderCode(providerCode);
@@ -746,6 +749,8 @@ public class UserController extends AbstractController {
 		}
 		MLPTransportModel result = null;
 		try {
+			// Validate enum codes
+			LoginProviderCode.valueOf(ulp.getProviderCode());
 			// Use path IDs
 			ulp.setUserId(userId);
 			ulp.setProviderCode(providerCode);

@@ -21,9 +21,7 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP login provider codes for developer convenience. The
- * valid values are maintained in a database table modeled by the class
- * {@link org.acumos.cds.domain.MLPLoginProvider}.
+ * This enum defines Acumos login provider codes.
  */
 public enum LoginProviderCode {
 	FB("Facebook"), //

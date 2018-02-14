@@ -22,13 +22,15 @@ package org.acumos.cds.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-@Entity
-@Table(name = "C_PEER_STATUS")
-public class MLPPeerStatus extends MLPStatusCodeEntity implements Serializable {
+public class MLPPeerStatus extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = 5341647455351536720L;
 
+	public MLPPeerStatus() {
+		super();
+	}
+
+	public MLPPeerStatus(String code, String name) {
+		super(code, name);
+	}
 }

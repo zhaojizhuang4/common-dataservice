@@ -57,7 +57,7 @@ public class MLPStepResult implements MLPEntity, Serializable {
 	private String trackingId;
 
 	@Column(name = "STEP_CD", nullable = false, columnDefinition = "CHAR(2)")
-	@NotNull(message = "StepCode cannot be null")
+	@NotNull(message = "Step code cannot be null")
 	@Size(max = 2)
 	private String stepCode;
 
@@ -83,7 +83,7 @@ public class MLPStepResult implements MLPEntity, Serializable {
 	private String name;
 
 	@Column(name = "STATUS_CD", nullable = false, columnDefinition = "CHAR(2)")
-	@NotNull(message = "StatusCode cannot be null")
+	@NotNull(message = "Status code cannot be null")
 	@Size(max = 2)
 	private String statusCode;
 

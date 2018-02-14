@@ -20,9 +20,24 @@
 
 package org.acumos.cds.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletResponse;
 
+import org.acumos.cds.AccessTypeCode;
+import org.acumos.cds.ArtifactTypeCode;
 import org.acumos.cds.CCDSConstants;
+import org.acumos.cds.DeploymentStatusCode;
+import org.acumos.cds.LoginProviderCode;
+import org.acumos.cds.ModelTypeCode;
+import org.acumos.cds.PeerStatusCode;
+import org.acumos.cds.StepStatusCode;
+import org.acumos.cds.StepTypeCode;
+import org.acumos.cds.SubscriptionScopeTypeCode;
+import org.acumos.cds.ToolkitTypeCode;
+import org.acumos.cds.ValidationStatusCode;
+import org.acumos.cds.ValidationTypeCode;
 import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifactType;
 import org.acumos.cds.domain.MLPDeploymentStatus;
@@ -37,19 +52,7 @@ import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationSequence.ValidationSequencePK;
 import org.acumos.cds.domain.MLPValidationStatus;
 import org.acumos.cds.domain.MLPValidationType;
-import org.acumos.cds.repository.AccessTypeRepository;
-import org.acumos.cds.repository.ArtifactTypeRepository;
-import org.acumos.cds.repository.DeploymentStatusRepository;
-import org.acumos.cds.repository.LoginProviderRepository;
-import org.acumos.cds.repository.ModelTypeRepository;
-import org.acumos.cds.repository.PeerStatusRepository;
-import org.acumos.cds.repository.StepStatusRepository;
-import org.acumos.cds.repository.StepTypeRepository;
-import org.acumos.cds.repository.SubscriptionScopeRepository;
-import org.acumos.cds.repository.ToolkitTypeRepository;
 import org.acumos.cds.repository.ValidationSequenceRepository;
-import org.acumos.cds.repository.ValidationStatusRepository;
-import org.acumos.cds.repository.ValidationTypeRepository;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
@@ -74,31 +77,7 @@ public class CodeTableController extends AbstractController {
 	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(CodeTableController.class);
 
 	@Autowired
-	private AccessTypeRepository accessTypeRepository;
-	@Autowired
-	private ArtifactTypeRepository artifactTypeRepository;
-	@Autowired
-	private DeploymentStatusRepository deploymentStatusRepository;
-	@Autowired
-	private LoginProviderRepository loginProviderRepository;
-	@Autowired
-	private ModelTypeRepository modelTypeRepository;
-	@Autowired
-	private PeerStatusRepository peerStatusRepository;
-	@Autowired
-	private StepStatusRepository stepStatusRepository;
-	@Autowired
-	private SubscriptionScopeRepository subscriptionScopeRepository;
-	@Autowired
-	private ToolkitTypeRepository toolkitTypeRepository;
-	@Autowired
-	private ValidationStatusRepository validationStatusRepository;
-	@Autowired
-	private ValidationTypeRepository validationTypeRepository;
-	@Autowired
 	private ValidationSequenceRepository validationSequenceRepository;
-	@Autowired
-	private StepTypeRepository stepTypeRepository;
 
 	/**
 	 * @return List of MLPAccessType objects
@@ -107,7 +86,10 @@ public class CodeTableController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.ACCESS_PATH + "/" + CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPAccessType> getAccessTypeList() {
-		return accessTypeRepository.findAll();
+		List<MLPAccessType> list = new ArrayList<>();
+		for (AccessTypeCode cn : AccessTypeCode.values())
+			list.add(new MLPAccessType(cn.name(), cn.getTypeName()));
+		return list;
 	}
 
 	/**
@@ -118,7 +100,10 @@ public class CodeTableController extends AbstractController {
 			+ CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPArtifactType> getArtifactTypeList() {
-		return artifactTypeRepository.findAll();
+		List<MLPArtifactType> list = new ArrayList<>();
+		for (ArtifactTypeCode cn : ArtifactTypeCode.values())
+			list.add(new MLPArtifactType(cn.name(), cn.getTypeName()));
+		return list;
 	}
 
 	/**
@@ -128,7 +113,10 @@ public class CodeTableController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.DEP_STAT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPDeploymentStatus> getDeploymentStatusList() {
-		return deploymentStatusRepository.findAll();
+		List<MLPDeploymentStatus> list = new ArrayList<>();
+		for (DeploymentStatusCode cn : DeploymentStatusCode.values())
+			list.add(new MLPDeploymentStatus(cn.name(), cn.getStatusName()));
+		return list;
 	}
 
 	/**
@@ -138,7 +126,10 @@ public class CodeTableController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.LOGIN_PROVIDER_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPLoginProvider> getLoginProviderList() {
-		return loginProviderRepository.findAll();
+		List<MLPLoginProvider> list = new ArrayList<>();
+		for (LoginProviderCode cn : LoginProviderCode.values())
+			list.add(new MLPLoginProvider(cn.name(), cn.getProviderName()));
+		return list;
 	}
 
 	/**
@@ -148,7 +139,10 @@ public class CodeTableController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.MODEL_PATH + "/" + CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPModelType> getModelTypeList() {
-		return modelTypeRepository.findAll();
+		List<MLPModelType> list = new ArrayList<>();
+		for (ModelTypeCode cn : ModelTypeCode.values())
+			list.add(new MLPModelType(cn.name(), cn.getTypeName()));
+		return list;
 	}
 
 	/**
@@ -159,7 +153,10 @@ public class CodeTableController extends AbstractController {
 			+ CCDSConstants.PEER_STAT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPPeerStatus> getPeerStatusList() {
-		return peerStatusRepository.findAll();
+		List<MLPPeerStatus> list = new ArrayList<>();
+		for (PeerStatusCode cn : PeerStatusCode.values())
+			list.add(new MLPPeerStatus(cn.name(), cn.getStatusName()));
+		return list;
 	}
 
 	/**
@@ -169,7 +166,10 @@ public class CodeTableController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.STEP_STAT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPStepStatus> getStepStatusList() {
-		return stepStatusRepository.findAll();
+		List<MLPStepStatus> list = new ArrayList<>();
+		for (StepStatusCode cn : StepStatusCode.values())
+			list.add(new MLPStepStatus(cn.name(), cn.getStatusName()));
+		return list;
 	}
 
 	/**
@@ -179,17 +179,23 @@ public class CodeTableController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.STEP_TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPStepType> getStepTypeList() {
-		return stepTypeRepository.findAll();
+		List<MLPStepType> list = new ArrayList<>();
+		for (StepTypeCode cn : StepTypeCode.values())
+			list.add(new MLPStepType(cn.name(), cn.getStepName()));
+		return list;
 	}
 
 	/**
 	 * @return List of MLPSubscriptionScopeType objects
 	 */
-	@ApiOperation(value = "Gets the list of subscription scopes.", response = MLPSubscriptionScopeType.class, responseContainer = "Iterable")
+	@ApiOperation(value = "Gets the list of subscription scope types.", response = MLPSubscriptionScopeType.class, responseContainer = "Iterable")
 	@RequestMapping(value = "/" + CCDSConstants.SUB_SCOPE_TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPSubscriptionScopeType> getSubscriptionScopes() {
-		return subscriptionScopeRepository.findAll();
+		List<MLPSubscriptionScopeType> list = new ArrayList<>();
+		for (SubscriptionScopeTypeCode cn : SubscriptionScopeTypeCode.values())
+			list.add(new MLPSubscriptionScopeType(cn.name(), cn.getScopeName()));
+		return list;
 	}
 
 	/**
@@ -200,7 +206,10 @@ public class CodeTableController extends AbstractController {
 			+ CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPToolkitType> getToolkitTypeList() {
-		return toolkitTypeRepository.findAll();
+		List<MLPToolkitType> list = new ArrayList<>();
+		for (ToolkitTypeCode cn : ToolkitTypeCode.values())
+			list.add(new MLPToolkitType(cn.name(), cn.getTypeName()));
+		return list;
 	}
 
 	/**
@@ -210,7 +219,10 @@ public class CodeTableController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.VAL_STAT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPValidationStatus> getValidationStatusList() {
-		return validationStatusRepository.findAll();
+		List<MLPValidationStatus> list = new ArrayList<>();
+		for (ValidationStatusCode cn : ValidationStatusCode.values())
+			list.add(new MLPValidationStatus(cn.name(), cn.getStatusName()));
+		return list;
 	}
 
 	/**
@@ -220,7 +232,10 @@ public class CodeTableController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.VAL_TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPValidationType> getValidationTypeList() {
-		return validationTypeRepository.findAll();
+		List<MLPValidationType> list = new ArrayList<>();
+		for (ValidationTypeCode cn : ValidationTypeCode.values())
+			list.add(new MLPValidationType(cn.name(), cn.getTypeName()));
+		return list;
 	}
 
 	////////////////////////////////////////////////////////////////////////
@@ -253,6 +268,8 @@ public class CodeTableController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "createValidationSequence: received object: {} ", sequence);
 		Object result;
 		try {
+			// Validate enum codes
+			ValidationTypeCode.valueOf(sequence.getValTypeCode());
 			// Create a new row
 			result = validationSequenceRepository.save(sequence);
 			response.setStatus(HttpServletResponse.SC_CREATED);

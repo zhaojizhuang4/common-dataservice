@@ -21,9 +21,7 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP toolkit type codes for developer convenience. The
- * valid values are maintained in a database table modeled by the class
- * {@link org.acumos.cds.domain.MLPToolkitType}.
+ * This enum defines Acumos toolkit type codes.
  */
 public enum ToolkitTypeCode {
 	CP("Composite Solution"), //

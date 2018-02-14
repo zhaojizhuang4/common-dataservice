@@ -21,9 +21,7 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP deployment status codes for developer convenience. The
- * valid values are maintained in a database table modeled by the class
- * {@link org.acumos.cds.domain.MLPDeploymentStatus}.
+ * This enum defines Acumos deployment status codes.
  */
 public enum DeploymentStatusCode {
 	DP("Deployed"), //

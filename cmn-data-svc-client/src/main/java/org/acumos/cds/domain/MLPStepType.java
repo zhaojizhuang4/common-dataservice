@@ -22,16 +22,19 @@ package org.acumos.cds.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 /**
  * Model for step result type, a code-name pair.
  */
-@Entity
-@Table(name = "C_STEP_TYPE")
-public class MLPStepType extends MLPTypeCodeEntity implements Serializable {
+public class MLPStepType extends MLPCodeNamePair implements Serializable {
 
-	private static final long serialVersionUID = -8342728048884890037L;
+	private static final long serialVersionUID = 759594960888845210L;
+
+	public MLPStepType() {
+		super();
+	}
+
+	public MLPStepType(String code, String name) {
+		super(code, name);
+	}
 
 }

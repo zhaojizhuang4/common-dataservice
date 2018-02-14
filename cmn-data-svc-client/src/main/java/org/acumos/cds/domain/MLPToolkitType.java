@@ -22,16 +22,19 @@ package org.acumos.cds.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 /**
  * Model for toolkit type, a code-name pair.
  */
-@Entity
-@Table(name = "C_TOOLKIT_TYPE")
-public class MLPToolkitType extends MLPTypeCodeEntity implements Serializable {
+public class MLPToolkitType extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = 5460589849770121899L;
+
+	public MLPToolkitType() {
+		super();
+	}
+
+	public MLPToolkitType(String code, String name) {
+		super(code, name);
+	}
 
 }

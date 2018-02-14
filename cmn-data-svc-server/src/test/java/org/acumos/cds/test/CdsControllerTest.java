@@ -215,6 +215,7 @@ public class CdsControllerTest {
 		logger.info("Server version: {}", version.getData());
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void getCodeValueConstants() throws Exception {
 		List<MLPAccessType> act = client.getAccessTypes();
@@ -366,11 +367,7 @@ public class CdsControllerTest {
 			long userCountTrans = client.getUserCount();
 			Assert.assertTrue(userCountTrans > 0);
 
-			List<MLPLoginProvider> provs = client.getLoginProviders();
-			Assert.assertTrue(provs != null && provs.size() > 0);
-			logger.info("Count of login provider {}", provs.size());
-
-			MLPUserLoginProvider clp = new MLPUserLoginProvider(cu.getUserId(), provs.get(0).getProviderCode(),
+			MLPUserLoginProvider clp = new MLPUserLoginProvider(cu.getUserId(), LoginProviderCode.GH.name(),
 					"something", "access token", 0);
 			clp = client.createUserLoginProvider(clp);
 			logger.info("Created user login provider {}", clp);

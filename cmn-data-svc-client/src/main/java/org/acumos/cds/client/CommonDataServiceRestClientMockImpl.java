@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.acumos.cds.AccessTypeCode;
+import org.acumos.cds.ArtifactTypeCode;
 import org.acumos.cds.DeploymentStatusCode;
 import org.acumos.cds.LoginProviderCode;
 import org.acumos.cds.ModelTypeCode;
@@ -246,122 +247,80 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	@Override
 	public List<MLPAccessType> getAccessTypes() {
 		List<MLPAccessType> list = new ArrayList<>();
-		for (AccessTypeCode a : AccessTypeCode.values()) {
-			MLPAccessType b = new MLPAccessType();
-			b.setTypeCode(a.name());
-			b.setTypeName(a.getTypeName());
-			list.add(b);
-		}
+		for (AccessTypeCode a : AccessTypeCode.values())
+			list.add(new MLPAccessType(a.name(), a.getTypeName()));
 		return list;
 	}
 
 	@Override
 	public List<MLPArtifactType> getArtifactTypes() {
 		List<MLPArtifactType> list = new ArrayList<>();
-		for (AccessTypeCode a : AccessTypeCode.values()) {
-			MLPArtifactType b = new MLPArtifactType();
-			b.setTypeCode(a.name());
-			b.setTypeName(a.getTypeName());
-			list.add(b);
-		}
+		for (ArtifactTypeCode a : ArtifactTypeCode.values())
+			list.add(new MLPArtifactType(a.name(), a.getTypeName()));
 		return list;
 	}
 
 	@Override
 	public List<MLPLoginProvider> getLoginProviders() {
 		List<MLPLoginProvider> list = new ArrayList<>();
-		for (LoginProviderCode a : LoginProviderCode.values()) {
-			MLPLoginProvider b = new MLPLoginProvider();
-			b.setProviderCode(a.name());
-			b.setProviderName(a.getProviderName());
-			list.add(b);
-		}
+		for (LoginProviderCode a : LoginProviderCode.values())
+			list.add(new MLPLoginProvider(a.name(), a.getProviderName()));
 		return list;
 	}
 
 	@Override
 	public List<MLPModelType> getModelTypes() {
 		List<MLPModelType> list = new ArrayList<>();
-		for (ModelTypeCode a : ModelTypeCode.values()) {
-			MLPModelType b = new MLPModelType();
-			b.setTypeCode(a.name());
-			b.setTypeName(a.getTypeName());
-			list.add(b);
-		}
+		for (ModelTypeCode a : ModelTypeCode.values())
+			list.add(new MLPModelType(a.name(), a.getTypeName()));
 		return list;
 	}
 
 	@Override
 	public List<MLPToolkitType> getToolkitTypes() {
 		List<MLPToolkitType> list = new ArrayList<>();
-		for (ToolkitTypeCode a : ToolkitTypeCode.values()) {
-			MLPToolkitType b = new MLPToolkitType();
-			b.setTypeCode(a.name());
-			b.setTypeName(a.getTypeName());
-			list.add(b);
-		}
+		for (ToolkitTypeCode a : ToolkitTypeCode.values())
+			list.add(new MLPToolkitType(a.name(), a.getTypeName()));
 		return list;
 	}
 
 	@Override
 	public List<MLPValidationStatus> getValidationStatuses() {
 		List<MLPValidationStatus> list = new ArrayList<>();
-		for (ValidationStatusCode a : ValidationStatusCode.values()) {
-			MLPValidationStatus b = new MLPValidationStatus();
-			b.setStatusCode(a.name());
-			b.setStatusName(a.getStatusName());
-			list.add(b);
-		}
+		for (ValidationStatusCode a : ValidationStatusCode.values())
+			list.add(new MLPValidationStatus(a.name(), a.getStatusName()));
 		return list;
 	}
 
 	@Override
 	public List<MLPValidationType> getValidationTypes() {
 		List<MLPValidationType> list = new ArrayList<>();
-		for (ValidationTypeCode a : ValidationTypeCode.values()) {
-			MLPValidationType b = new MLPValidationType();
-			b.setTypeCode(a.name());
-			b.setTypeName(a.getTypeName());
-			list.add(b);
-		}
+		for (ValidationTypeCode a : ValidationTypeCode.values())
+			list.add(new MLPValidationType(a.name(), a.getTypeName()));
 		return list;
 	}
 
 	@Override
 	public List<MLPDeploymentStatus> getDeploymentStatuses() {
 		List<MLPDeploymentStatus> list = new ArrayList<>();
-		for (DeploymentStatusCode a : DeploymentStatusCode.values()) {
-			MLPDeploymentStatus b = new MLPDeploymentStatus();
-			b.setStatusCode(a.name());
-			b.setStatusName(a.getStatusName());
-			list.add(b);
-		}
+		for (DeploymentStatusCode a : DeploymentStatusCode.values())
+			list.add(new MLPDeploymentStatus(a.name(), a.getStatusName()));
 		return list;
 	}
 
 	@Override
 	public List<MLPStepStatus> getStepStatuses() {
 		List<MLPStepStatus> list = new ArrayList<>();
-		for (StepStatusCode a : StepStatusCode.values()) {
-			MLPStepStatus b = new MLPStepStatus();
-			b.setStatusCode(a.name());
-			b.setStatusName(a.getStatusName());
-			// b.setTypeCode(String.valueOf(a.name()));
-			// b.setTypeName(a.getStatusName());
-			list.add(b);
-		}
+		for (StepStatusCode a : StepStatusCode.values())
+			list.add(new MLPStepStatus(a.name(), a.getStatusName()));
 		return list;
 	}
 
 	@Override
 	public List<MLPStepType> getStepTypes() {
 		List<MLPStepType> list = new ArrayList<>();
-		for (StepTypeCode a : StepTypeCode.values()) {
-			MLPStepType b = new MLPStepType();
-			b.setTypeCode(a.name());
-			b.setTypeName(a.getStepName());
-			list.add(b);
-		}
+		for (StepTypeCode a : StepTypeCode.values())
+			list.add(new MLPStepType(a.name(), a.getStepName()));
 		return list;
 	}
 
@@ -582,7 +541,8 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	@Override
-	public RestPageResponse<MLPArtifact> searchArtifacts(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest) {
+	public RestPageResponse<MLPArtifact> searchArtifacts(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
 		return searchArtifacts;
 	}
 
@@ -646,7 +606,8 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	@Override
-	public RestPageResponse<MLPUser> searchUsers(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest) {
+	public RestPageResponse<MLPUser> searchUsers(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
 		return searchUsers;
 	}
 
@@ -781,7 +742,8 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	@Override
-	public RestPageResponse<MLPRole> searchRoles(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest) {
+	public RestPageResponse<MLPRole> searchRoles(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
 		return searchRoles;
 	}
 
@@ -873,7 +835,8 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	@Override
-	public RestPageResponse<MLPPeer> searchPeers(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest) {
+	public RestPageResponse<MLPPeer> searchPeers(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
 		return searchPeers;
 	}
 
@@ -1363,7 +1326,8 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	@Override
-	public RestPageResponse<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest) {
+	public RestPageResponse<MLPSolution> searchSolutions(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
 		return this.searchSolutions;
 	}
 
@@ -1401,7 +1365,8 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	@Override
-	public RestPageResponse<MLPStepResult> searchStepResults(Map<String, Object> queryParameters, boolean isOr, RestPageRequest pageRequest) {
+	public RestPageResponse<MLPStepResult> searchStepResults(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
 		return this.searchStepResults;
 	}
 

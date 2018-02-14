@@ -20,6 +20,9 @@
 
 package org.acumos.cds;
 
+/**
+ * This enum defines Acumos step status codes.
+ */
 public enum StepStatusCode {
 
 	ST("Started"), //

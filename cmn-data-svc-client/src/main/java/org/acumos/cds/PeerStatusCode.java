@@ -21,9 +21,7 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP peer status codes for developer convenience only. The
- * valid values are maintained in a database table modeled by the class
- * {@link org.acumos.cds.domain.MLPPeerStatus}.
+ * This enum defines Acumos peer status codes.
  */
 public enum PeerStatusCode {
 	AC("Active"), //

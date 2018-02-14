@@ -21,9 +21,7 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP access type codes for developer convenience. It
- * replicates the values maintained in a database table modeled by the class
- * {@link org.acumos.cds.domain.MLPAccessType}.
+ * This enum defines Acumos access type codes. 
  */
 public enum AccessTypeCode {
 

@@ -21,9 +21,7 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP validation status codes for developer convenience
- * only. The valid values are maintained in a database table modeled by the
- * class {@link org.acumos.cds.domain.MLPValidationStatus}.
+ * This enum defines Acumos validation status codes.
  */
 public enum ValidationStatusCode {
 	FA("Failed"), //

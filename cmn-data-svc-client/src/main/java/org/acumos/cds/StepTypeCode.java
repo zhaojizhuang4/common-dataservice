@@ -20,7 +20,11 @@
 
 package org.acumos.cds;
 
+/**
+ * This enum defines Acumos step type codes.
+ */
 public enum StepTypeCode {
+
 	OB("Onboarding"), //
 	VL("Validation");
 

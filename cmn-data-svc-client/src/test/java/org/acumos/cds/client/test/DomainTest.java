@@ -75,10 +75,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPAccessType() {
 		MLPAccessType m = new MLPAccessType();
-		m.setTypeCode(s1);
-		m.setTypeName(s2);
-		Assert.assertEquals(s1, m.getAccessCode());
-		Assert.assertEquals(s2, m.getAccessName());
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -129,10 +129,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPArtifactType() {
 		MLPArtifactType m = new MLPArtifactType();
-		m.setTypeCode(s1);
-		m.setTypeName(s2);
-		Assert.assertEquals(s1, m.getTypeCode());
-		Assert.assertEquals(s2, m.getTypeName());
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -170,10 +170,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPDeploymentStatus() {
 		MLPDeploymentStatus m = new MLPDeploymentStatus();
-		m.setStatusCode(s1);
-		m.setStatusName(s2);
-		Assert.assertEquals(s1, m.getStatusCode());
-		Assert.assertEquals(s2, m.getStatusName());
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -184,10 +184,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPLoginProvider() {
 		MLPLoginProvider m = new MLPLoginProvider();
-		m.setProviderCode(s1);
-		m.setProviderName(s2);
-		Assert.assertEquals(s1, m.getProviderCode());
-		Assert.assertEquals(s2, m.getProviderName());
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -198,10 +198,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPModelType() {
 		MLPModelType m = new MLPModelType();
-		m.setTypeCode(s1);
-		m.setTypeName(s2);
-		Assert.assertEquals(s1, m.getTypeCode());
-		Assert.assertEquals(s2, m.getTypeName());
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -339,10 +339,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPPeerStatus() {
 		MLPPeerStatus m = new MLPPeerStatus();
-		m.setStatusCode(s1);
-		m.setStatusName(s2);
-		Assert.assertEquals(s1, m.getStatusCode());
-		Assert.assertEquals(s2, m.getStatusName());
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -870,10 +870,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPStepStatus() {
 		MLPStepStatus m = new MLPStepStatus();
-		m.setStatusCode(s1);
-		m.setStatusName(s2);
-		Assert.assertEquals(s1, m.getStatusCode());
-		Assert.assertEquals(s2, m.getStatusName());
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -884,10 +884,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPStepType() {
 		MLPStepType m = new MLPStepType();
-		m.setTypeCode(s1);
-		m.setTypeName(s2);
-		Assert.assertEquals(s1, m.getTypeCode());
-		Assert.assertEquals(s2, m.getTypeName());
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -942,10 +942,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPToolkitType() {
 		MLPToolkitType m = new MLPToolkitType();
-		m.setTypeCode(s1);
-		m.setTypeName(s2);
-		Assert.assertEquals(s1, m.getTypeCode());
-		Assert.assertEquals(s2, m.getTypeName());
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -1137,10 +1137,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPValidationStatus() {
 		MLPValidationStatus m = new MLPValidationStatus();
-		m.setStatusCode(s1);
-		m.setStatusName(s2);
-		Assert.assertEquals(s1, m.getStatusCode());
-		Assert.assertEquals(s2, m.getStatusName());
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -1151,10 +1151,10 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPValidationType() {
 		MLPValidationType m = new MLPValidationType();
-		m.setTypeCode(s1);
-		m.setTypeName(s2);
-		Assert.assertEquals(s1, m.getTypeCode());
-		Assert.assertEquals(s2, m.getTypeName());
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));

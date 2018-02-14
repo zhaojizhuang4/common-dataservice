@@ -21,9 +21,7 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP artifact type codes for developer convenience. It
- * replicates the values maintained in a database table modeled by the class
- * {@link org.acumos.cds.domain.MLPArtifactType}.
+ * This enum defines Acumos artifact type codes.
  */
 public enum ArtifactTypeCode {
 

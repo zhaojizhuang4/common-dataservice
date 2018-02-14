@@ -22,15 +22,19 @@ package org.acumos.cds.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 /**
  * Model for deployment status, a code-name pair.
  */
-@Entity
-@Table(name = "C_DEPLOYMENT_STATUS")
-public class MLPDeploymentStatus extends MLPStatusCodeEntity implements Serializable {
+public class MLPDeploymentStatus extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = 4071413895054694395L;
+
+	public MLPDeploymentStatus() {
+		super();
+	}
+
+	public MLPDeploymentStatus(String code, String name) {
+		super(code, name);
+	}
+
 }

@@ -26,7 +26,11 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.CCDSConstants;
+import org.acumos.cds.PeerStatusCode;
+import org.acumos.cds.SubscriptionScopeTypeCode;
+import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.domain.MLPPeer;
 import org.acumos.cds.domain.MLPPeerSubscription;
 import org.acumos.cds.repository.PeerRepository;
@@ -160,6 +164,9 @@ public class PeerController extends AbstractController {
 					return result;
 				}
 			}
+			// Validate enum codes
+			PeerStatusCode.valueOf(peer.getStatusCode());
+			ValidationStatusCode.valueOf(peer.getValidationStatusCode());
 			// Create a new row
 			result = peerRepository.save(peer);
 			response.setStatus(HttpServletResponse.SC_CREATED);
@@ -196,6 +203,9 @@ public class PeerController extends AbstractController {
 		}
 		MLPTransportModel result = null;
 		try {
+			// Validate enum codes
+			PeerStatusCode.valueOf(peer.getStatusCode());
+			ValidationStatusCode.valueOf(peer.getValidationStatusCode());
 			// Use the path-parameter id; don't trust the one in the object
 			peer.setPeerId(peerId);
 			// Update the existing row
@@ -300,6 +310,9 @@ public class PeerController extends AbstractController {
 		}
 		Object result;
 		try {
+			// Validate enum codes
+			AccessTypeCode.valueOf(peerSub.getAccessType());
+			SubscriptionScopeTypeCode.valueOf(peerSub.getScopeType());
 			// Null out any existing ID to get an auto-generated ID
 			peerSub.setSubId(null);
 			// Create a new row
@@ -341,6 +354,9 @@ public class PeerController extends AbstractController {
 		}
 		MLPTransportModel result = null;
 		try {
+			// Validate enum codes
+			AccessTypeCode.valueOf(peerSub.getAccessType());
+			SubscriptionScopeTypeCode.valueOf(peerSub.getScopeType());
 			// Use the path-parameter id; don't trust the one in the object
 			peerSub.setSubId(subId);
 			// Update the existing row

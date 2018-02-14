@@ -21,66 +21,54 @@
 package org.acumos.cds.domain;
 
 import java.io.Serializable;
-import java.util.Objects;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.Size;
 
 /**
  * Model for login provider, a code-name pair.
  */
-@Entity
-@Table(name = "C_LOGIN_PROVIDER")
-public class MLPLoginProvider implements MLPEntity, Serializable {
+public class MLPLoginProvider extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = -1405595448809901709L;
 
-	@Id
-	@Column(name = "PROVIDER_CD", updatable = false, nullable = false, columnDefinition = "CHAR(2)")
-	@Size(max = 2)
-	private String providerCode;
+	public MLPLoginProvider() {
+		super();
+	}
 
-	@Column(name = "PROVIDER_NAME", columnDefinition = "VARCHAR(100)")
-	@Size(max = 100)
-	private String providerName;
+	public MLPLoginProvider(String code, String name) {
+		super(code, name);
+	}
 
+	/**
+	 * @deprecated use {@link #getCode()}
+	 * @return the code
+	 */
 	public String getProviderCode() {
-		return providerCode;
+		return getCode();
 	}
 
-	public void setProviderCode(String providerCode) {
-		this.providerCode = providerCode;
+	/**
+	 * @deprecated use {@link #setCode(String)}
+	 * @param code
+	 *            the code
+	 */
+	public void setProviderCode(String code) {
+		setCode(code);
 	}
 
+	/**
+	 * @deprecated use {@link #getName()}
+	 * @return the name
+	 */
 	public String getProviderName() {
-		return providerName;
+		return getName();
 	}
 
-	public void setProviderName(String providerName) {
-		this.providerName = providerName;
-	}
-
-	@Override
-	public boolean equals(Object that) {
-		if (that == null)
-			return false;
-		if (!(that instanceof MLPLoginProvider))
-			return false;
-		MLPLoginProvider thatObj = (MLPLoginProvider) that;
-		return Objects.equals(providerCode, thatObj.providerCode) && Objects.equals(providerName, thatObj.providerName);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(providerCode, providerName);
-	}
-
-	@Override
-	public String toString() {
-		return this.getClass().getName() + "[code=" + providerCode + ", name=" + providerName + "]";
+	/**
+	 * @deprecated use {@link #setName(String)}
+	 * @param name
+	 *            the name
+	 */
+	public void setProviderName(String name) {
+		setName(name);
 	}
 
 }

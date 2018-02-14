@@ -27,7 +27,13 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.CCDSConstants;
+import org.acumos.cds.DeploymentStatusCode;
+import org.acumos.cds.ModelTypeCode;
+import org.acumos.cds.ToolkitTypeCode;
+import org.acumos.cds.ValidationStatusCode;
+import org.acumos.cds.ValidationTypeCode;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPSolRevArtMap;
 import org.acumos.cds.domain.MLPSolTagMap;
@@ -359,6 +365,15 @@ public class SolutionController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "createSolution: received object: {} ", solution);
 		Object result;
 		try {
+			// Validate enum codes
+			if (solution.getAccessTypeCode() != null)
+				AccessTypeCode.valueOf(solution.getAccessTypeCode());
+			if (solution.getModelTypeCode() != null)
+				ModelTypeCode.valueOf(solution.getModelTypeCode());
+			if (solution.getToolkitTypeCode() != null)
+				ToolkitTypeCode.valueOf(solution.getToolkitTypeCode());
+			if (solution.getValidationStatusCode() != null)
+				ValidationStatusCode.valueOf(solution.getValidationStatusCode());
 			String id = solution.getSolutionId();
 			if (id != null) {
 				UUID.fromString(id);
@@ -411,6 +426,15 @@ public class SolutionController extends AbstractController {
 		}
 		MLPTransportModel result = null;
 		try {
+			// Validate enum codes
+			if (solution.getAccessTypeCode() != null)
+				AccessTypeCode.valueOf(solution.getAccessTypeCode());
+			if (solution.getModelTypeCode() != null)
+				ModelTypeCode.valueOf(solution.getModelTypeCode());
+			if (solution.getToolkitTypeCode() != null)
+				ToolkitTypeCode.valueOf(solution.getToolkitTypeCode());
+			if (solution.getValidationStatusCode() != null)
+				ValidationStatusCode.valueOf(solution.getValidationStatusCode());
 			// Use the path-parameter id; don't trust the one in the object
 			solution.setSolutionId(solutionId);
 			// Discard any stats object; updates don't happen via this interface
@@ -1244,6 +1268,10 @@ public class SolutionController extends AbstractController {
 		}
 		Object result;
 		try {
+			// Validate enum codes
+			if (sv.getValidationStatusCode() != null)
+				ValidationStatusCode.valueOf(sv.getValidationStatusCode());
+			ValidationTypeCode.valueOf(sv.getValidationTypeCode());
 			// Use path IDs
 			sv.setSolutionId(solutionId);
 			sv.setRevisionId(revisionId);
@@ -1292,6 +1320,10 @@ public class SolutionController extends AbstractController {
 		}
 		MLPTransportModel result = null;
 		try {
+			// Validate enum codes
+			if (sv.getValidationStatusCode() != null)
+				ValidationStatusCode.valueOf(sv.getValidationStatusCode());
+			ValidationTypeCode.valueOf(sv.getValidationTypeCode());
 			// Use path IDs
 			sv.setSolutionId(solutionId);
 			sv.setRevisionId(revisionId);
@@ -1427,6 +1459,8 @@ public class SolutionController extends AbstractController {
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USR_WITH_ID + sd.getUserId(), null);
 		}
 		try {
+			// Validate enum codes
+			DeploymentStatusCode.valueOf(sd.getDeploymentStatusCode());
 			// Validate ID if present
 			String id = sd.getDeploymentId();
 			if (id != null) {

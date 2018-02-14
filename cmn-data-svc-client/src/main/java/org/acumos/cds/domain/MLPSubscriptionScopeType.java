@@ -22,16 +22,19 @@ package org.acumos.cds.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 /**
  * Model for subscription scope type, a code-name pair.
  */
-@Entity
-@Table(name = "C_SUB_SCOPE_TYPE")
-public class MLPSubscriptionScopeType extends MLPTypeCodeEntity implements Serializable {
+public class MLPSubscriptionScopeType extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = 3181398731734798726L;
+
+	public MLPSubscriptionScopeType() {
+		super();
+	}
+
+	public MLPSubscriptionScopeType(String code, String name) {
+		super(code, name);
+	}
 
 }

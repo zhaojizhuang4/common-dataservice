@@ -22,16 +22,19 @@ package org.acumos.cds.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 /**
  * Model for an artifact type, a code-name pair.
  */
-@Entity
-@Table(name = "C_ARTIFACT_TYPE")
-public class MLPArtifactType extends MLPTypeCodeEntity implements Serializable {
+public class MLPArtifactType extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = -967589730503293850L;
+
+	public MLPArtifactType() {
+		super();
+	}
+
+	public MLPArtifactType(String code, String name) {
+		super(code, name);
+	}
 
 }

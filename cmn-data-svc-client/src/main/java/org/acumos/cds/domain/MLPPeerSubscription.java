@@ -39,7 +39,7 @@ import javax.validation.constraints.Size;
 @Table(name = "C_PEER_SUB")
 public class MLPPeerSubscription extends MLPTimestampedEntity implements Serializable {
 
-	private static final long serialVersionUID = -250189208515313944L;
+	private static final long serialVersionUID = 1622011489027160908L;
 
 	// Hibernate is weak on the ID column generator, the method is specific to
 	// the backing database. For portability, specify AUTO and define the column

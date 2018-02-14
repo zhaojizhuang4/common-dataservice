@@ -5,6 +5,12 @@ Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
+Version 1.14.0, ? February 2018
+-------------------------------
+
+* Refactor to drop code-name database tables (ACUMOS-144)
+* Requires database schema version 1.14
+
 Version 1.13.1, 9 February 2018
 -------------------------------
 

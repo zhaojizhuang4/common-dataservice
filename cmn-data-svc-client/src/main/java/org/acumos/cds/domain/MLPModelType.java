@@ -22,16 +22,19 @@ package org.acumos.cds.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 /**
  * Model for a model type, a code-name pair.
  */
-@Entity
-@Table(name = "C_MODEL_TYPE")
-public class MLPModelType extends MLPTypeCodeEntity implements Serializable {
+public class MLPModelType extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = -3255824160071465448L;
+
+	public MLPModelType() {
+		super();
+	}
+
+	public MLPModelType(String code, String name) {
+		super(code, name);
+	}
 
 }

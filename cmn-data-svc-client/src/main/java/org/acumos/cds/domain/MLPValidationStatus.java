@@ -22,16 +22,19 @@ package org.acumos.cds.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 /**
  * Model for validation status, a code-name pair.
  */
-@Entity
-@Table(name = "C_VALIDATION_STATUS")
-public class MLPValidationStatus extends MLPStatusCodeEntity implements Serializable {
+public class MLPValidationStatus extends MLPCodeNamePair implements Serializable {
 
-	private static final long serialVersionUID = -6136016586898282688L;
+	private static final long serialVersionUID = -3885553055494881292L;
+
+	public MLPValidationStatus() {
+		super();
+	}
+
+	public MLPValidationStatus(String code, String name) {
+		super(code, name);
+	}
 
 }

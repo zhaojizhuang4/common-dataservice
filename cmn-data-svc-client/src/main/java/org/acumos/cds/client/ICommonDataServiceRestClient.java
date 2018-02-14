@@ -89,59 +89,59 @@ public interface ICommonDataServiceRestClient {
 
 	/**
 	 * Gets all access types.
-	 * 
 	 * @return List of access type objects.
+	 * @deprecated Java clients should use {@link org.acumos.cds.AccessTypeCode#values()}
 	 */
 	List<MLPAccessType> getAccessTypes();
 
 	/**
 	 * Gets all artifact types.
-	 * 
 	 * @return List of artifact type objects.
+	 * @deprecated Java clients should use {@link org.acumos.cds.ArtifactTypeCode#values()}
 	 */
 	List<MLPArtifactType> getArtifactTypes();
 
 	/**
+	 * Gets all deployment status codes
+	 * @return List of deployment status objects.
+	 * @deprecated Java clients should use {@link org.acumos.cds.DeploymentStatusCode#values()}
+	 */
+	List<MLPDeploymentStatus> getDeploymentStatuses();
+
+	/**
 	 * Gets all login providers.
-	 * 
 	 * @return List of login provider objects.
+	 * @deprecated Java clients should use {@link org.acumos.cds.LoginProviderCode#values()}
 	 */
 	List<MLPLoginProvider> getLoginProviders();
 
 	/**
 	 * Gets all model types.
-	 * 
 	 * @return List of model type objects.
+	 * @deprecated Java clients should use {@link org.acumos.cds.ModelTypeCode#values()}
 	 */
 	List<MLPModelType> getModelTypes();
 
 	/**
 	 * Gets all toolkit types.
-	 * 
 	 * @return List of tookit type objects.
+	 * @deprecated Java clients should use {@link org.acumos.cds.ToolkitTypeCode#values()}
 	 */
 	List<MLPToolkitType> getToolkitTypes();
 
 	/**
 	 * Gets all validation status codes
-	 * 
 	 * @return List of validation status objects.
+	 * @deprecated Java clients should use {@link org.acumos.cds.ValidationStatusCode#values()}
 	 */
 	List<MLPValidationStatus> getValidationStatuses();
 
 	/**
 	 * Gets all validation type codes.
-	 * 
 	 * @return List of validation type objects.
+	 * @deprecated Java clients should use {@link org.acumos.cds.ValidationTypeCode#values()}
 	 */
 	List<MLPValidationType> getValidationTypes();
-
-	/**
-	 * Gets all deployment status codes
-	 * 
-	 * @return List of deployment status objects.
-	 */
-	List<MLPDeploymentStatus> getDeploymentStatuses();
 
 	/**
 	 * Gets count of solutions.

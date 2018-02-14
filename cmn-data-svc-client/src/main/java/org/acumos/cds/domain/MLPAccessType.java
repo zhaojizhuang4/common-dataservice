@@ -22,26 +22,19 @@ package org.acumos.cds.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 /**
  * Model for access type, a code-name pair.
  */
-@Entity
-@Table(name = "C_ACCESS_TYPE")
-public class MLPAccessType extends MLPTypeCodeEntity implements MLPEntity, Serializable {
+public class MLPAccessType extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = -3836564419430582350L;
 
-	// Getters for backward compatibility
-
-	public String getAccessCode() {
-		return getTypeCode();
+	public MLPAccessType() {
+		super();
 	}
 
-	public String getAccessName() {
-		return getTypeName();
+	public MLPAccessType(String code, String name) {
+		super(code, name);
 	}
 
 }

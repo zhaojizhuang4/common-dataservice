@@ -21,9 +21,7 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP model type codes for developer convenience. The valid
- * values are maintained in a database table modeled by the class
- * {@link org.acumos.cds.domain.MLPModelType}.
+ * This enum defines Acumos model type codes.
  */
 public enum ModelTypeCode {
 	CL("Classification"), //

@@ -21,9 +21,7 @@
 package org.acumos.cds;
 
 /**
- * This enum provides MLP validation type codes for developer convenience only.
- * The valid values are maintained in a database table modeled by the class
- * {@link org.acumos.cds.domain.MLPValidationType}.
+ * This enum defines Acumos validation type codes.
  */
 public enum ValidationTypeCode {
 

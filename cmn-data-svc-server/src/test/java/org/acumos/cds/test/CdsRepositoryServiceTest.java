@@ -23,14 +23,12 @@ package org.acumos.cds.test;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.validation.ConstraintViolationException;
 
 import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.ArtifactTypeCode;
-import org.acumos.cds.DeploymentStatusCode;
 import org.acumos.cds.LoginProviderCode;
 import org.acumos.cds.ModelTypeCode;
 import org.acumos.cds.PeerStatusCode;
@@ -39,18 +37,11 @@ import org.acumos.cds.StepTypeCode;
 import org.acumos.cds.SubscriptionScopeTypeCode;
 import org.acumos.cds.ToolkitTypeCode;
 import org.acumos.cds.ValidationStatusCode;
-import org.acumos.cds.ValidationTypeCode;
-import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifact;
-import org.acumos.cds.domain.MLPArtifactType;
 import org.acumos.cds.domain.MLPComment;
-import org.acumos.cds.domain.MLPDeploymentStatus;
-import org.acumos.cds.domain.MLPLoginProvider;
-import org.acumos.cds.domain.MLPModelType;
 import org.acumos.cds.domain.MLPNotifUserMap;
 import org.acumos.cds.domain.MLPNotification;
 import org.acumos.cds.domain.MLPPeer;
-import org.acumos.cds.domain.MLPPeerStatus;
 import org.acumos.cds.domain.MLPPeerSubscription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
@@ -65,29 +56,17 @@ import org.acumos.cds.domain.MLPSolutionRating.SolutionRatingPK;
 import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionWeb;
 import org.acumos.cds.domain.MLPStepResult;
-import org.acumos.cds.domain.MLPStepStatus;
-import org.acumos.cds.domain.MLPStepType;
-import org.acumos.cds.domain.MLPSubscriptionScopeType;
 import org.acumos.cds.domain.MLPTag;
 import org.acumos.cds.domain.MLPThread;
-import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
 import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPUserRoleMap;
-import org.acumos.cds.domain.MLPValidationStatus;
-import org.acumos.cds.domain.MLPValidationType;
-import org.acumos.cds.repository.AccessTypeRepository;
 import org.acumos.cds.repository.ArtifactRepository;
-import org.acumos.cds.repository.ArtifactTypeRepository;
 import org.acumos.cds.repository.CommentRepository;
-import org.acumos.cds.repository.DeploymentStatusRepository;
-import org.acumos.cds.repository.LoginProviderRepository;
-import org.acumos.cds.repository.ModelTypeRepository;
 import org.acumos.cds.repository.NotifUserMapRepository;
 import org.acumos.cds.repository.NotificationRepository;
 import org.acumos.cds.repository.PeerRepository;
-import org.acumos.cds.repository.PeerStatusRepository;
 import org.acumos.cds.repository.PeerSubscriptionRepository;
 import org.acumos.cds.repository.RoleFunctionRepository;
 import org.acumos.cds.repository.RoleRepository;
@@ -101,17 +80,11 @@ import org.acumos.cds.repository.SolutionRepository;
 import org.acumos.cds.repository.SolutionRevisionRepository;
 import org.acumos.cds.repository.SolutionWebRepository;
 import org.acumos.cds.repository.StepResultRepository;
-import org.acumos.cds.repository.StepStatusRepository;
-import org.acumos.cds.repository.StepTypeRepository;
-import org.acumos.cds.repository.SubscriptionScopeRepository;
 import org.acumos.cds.repository.TagRepository;
 import org.acumos.cds.repository.ThreadRepository;
-import org.acumos.cds.repository.ToolkitTypeRepository;
 import org.acumos.cds.repository.UserLoginProviderRepository;
 import org.acumos.cds.repository.UserRepository;
 import org.acumos.cds.repository.UserRoleMapRepository;
-import org.acumos.cds.repository.ValidationStatusRepository;
-import org.acumos.cds.repository.ValidationTypeRepository;
 import org.acumos.cds.service.ArtifactSearchService;
 import org.acumos.cds.service.PeerSearchService;
 import org.acumos.cds.service.RoleSearchService;
@@ -141,27 +114,15 @@ public class CdsRepositoryServiceTest {
 	private final static EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(CdsRepositoryServiceTest.class);
 
 	@Autowired
-	private AccessTypeRepository accessTypeRepository;
-	@Autowired
 	private ArtifactRepository artifactRepository;
 	@Autowired
-	private ArtifactTypeRepository artifactTypeRepository;
-	@Autowired
 	private CommentRepository commentRepository;
-	@Autowired
-	private DeploymentStatusRepository deploymentStatusRepository;
-	@Autowired
-	private LoginProviderRepository loginProviderRepository;
-	@Autowired
-	private ModelTypeRepository modelTypeRepository;
 	@Autowired
 	private NotificationRepository notificationRepository;
 	@Autowired
 	private NotifUserMapRepository notifUserMapRepository;
 	@Autowired
 	private PeerRepository peerRepository;
-	@Autowired
-	private PeerStatusRepository peerStatusRepository;
 	@Autowired
 	private PeerSubscriptionRepository peerSubscriptionRepository;
 	@Autowired
@@ -187,17 +148,9 @@ public class CdsRepositoryServiceTest {
 	@Autowired
 	private SolUserAccMapRepository solUserAccMapRepository;
 	@Autowired
-	private StepStatusRepository stepStatusRepository;
-	@Autowired
-	private StepTypeRepository stepTypeRepository;
-	@Autowired
-	private SubscriptionScopeRepository subscriptionScopeRepository;
-	@Autowired
 	private TagRepository solutionTagRepository;
 	@Autowired
 	private ThreadRepository threadRepository;
-	@Autowired
-	private ToolkitTypeRepository toolkitTypeRepository;
 	@Autowired
 	private UserLoginProviderRepository userLoginProviderRepository;
 	@Autowired
@@ -218,161 +171,6 @@ public class CdsRepositoryServiceTest {
 	private StepResultRepository stepResultRepository;
 	@Autowired
 	private StepResultSearchService stepResultSearchService;
-	@Autowired
-	private ValidationStatusRepository validationStatusRepository;
-	@Autowired
-	private ValidationTypeRepository validationTypeRepository;
-
-	@Test
-	public void testEnums() throws Exception {
-
-		int count;
-
-		Iterable<MLPAccessType> accessTypeList = accessTypeRepository.findAll();
-		logger.info("Access types {}", accessTypeList);
-		Assert.assertTrue(accessTypeList.iterator().hasNext());
-		Iterator<MLPAccessType> atIter = accessTypeList.iterator();
-		count = 0;
-		while (atIter.hasNext()) {
-			++count;
-			MLPAccessType act = atIter.next();
-			AccessTypeCode.valueOf(act.getTypeCode());
-		}
-		Assert.assertEquals(count, AccessTypeCode.values().length);
-
-		Iterable<MLPArtifactType> artifactTypeList = artifactTypeRepository.findAll();
-		Assert.assertTrue(artifactTypeList.iterator().hasNext());
-		logger.info("Artifact types {}", accessTypeList);
-		Iterator<MLPArtifactType> artIter = artifactTypeList.iterator();
-		count = 0;
-		while (artIter.hasNext()) {
-			++count;
-			MLPArtifactType art = artIter.next();
-			ArtifactTypeCode.valueOf(art.getTypeCode());
-		}
-		Assert.assertEquals(count, ArtifactTypeCode.values().length);
-
-		Iterable<MLPDeploymentStatus> deploymentStatusList = deploymentStatusRepository.findAll();
-		Assert.assertTrue(deploymentStatusList.iterator().hasNext());
-		logger.info("Deployment statuses {}", deploymentStatusList);
-		Iterator<MLPDeploymentStatus> dsIter = deploymentStatusList.iterator();
-		count = 0;
-		while (dsIter.hasNext()) {
-			++count;
-			MLPDeploymentStatus ds = dsIter.next();
-			DeploymentStatusCode.valueOf(ds.getStatusCode());
-		}
-		Assert.assertEquals(count, DeploymentStatusCode.values().length);
-
-		Iterable<MLPLoginProvider> loginProviderList = loginProviderRepository.findAll();
-		Assert.assertTrue(loginProviderList.iterator().hasNext());
-		logger.info("Login providers {}", loginProviderList);
-		Iterator<MLPLoginProvider> lpIter = loginProviderList.iterator();
-		count = 0;
-		while (lpIter.hasNext()) {
-			++count;
-			MLPLoginProvider lp = lpIter.next();
-			LoginProviderCode.valueOf(lp.getProviderCode());
-		}
-		Assert.assertEquals(count, LoginProviderCode.values().length);
-
-		Iterable<MLPModelType> modelTypeList = modelTypeRepository.findAll();
-		Assert.assertTrue(modelTypeList.iterator().hasNext());
-		logger.info("Model types {}", modelTypeList);
-		Iterator<MLPModelType> mtIter = modelTypeList.iterator();
-		count = 0;
-		while (mtIter.hasNext()) {
-			++count;
-			MLPModelType lp = mtIter.next();
-			ModelTypeCode.valueOf(lp.getTypeCode());
-		}
-		Assert.assertEquals(count, ModelTypeCode.values().length);
-
-		Iterable<MLPPeerStatus> peerStatusList = peerStatusRepository.findAll();
-		Assert.assertTrue(peerStatusList.iterator().hasNext());
-		logger.info("Peer statuses {}", peerStatusList);
-		Iterator<MLPPeerStatus> psIter = peerStatusList.iterator();
-		count = 0;
-		while (psIter.hasNext()) {
-			++count;
-			MLPPeerStatus ps = psIter.next();
-			PeerStatusCode.valueOf(ps.getStatusCode());
-		}
-		Assert.assertEquals(count, PeerStatusCode.values().length);
-
-		Iterable<MLPStepStatus> stepStatusList = stepStatusRepository.findAll();
-		Assert.assertTrue(stepStatusList.iterator().hasNext());
-		logger.info("Step statuses {}", stepStatusList);
-		Iterator<MLPStepStatus> ssIter = stepStatusList.iterator();
-		count = 0;
-		while (ssIter.hasNext()) {
-			++count;
-			MLPStepStatus ss = ssIter.next();
-			StepStatusCode.valueOf(ss.getStatusCode());
-		}
-		Assert.assertEquals(count, StepStatusCode.values().length);
-
-		Iterable<MLPStepType> stepTypeList = stepTypeRepository.findAll();
-		Assert.assertTrue(stepTypeList.iterator().hasNext());
-		logger.info("Step types {}", stepTypeList);
-		Iterator<MLPStepType> stIter = stepTypeList.iterator();
-		count = 0;
-		while (stIter.hasNext()) {
-			++count;
-			MLPStepType st = stIter.next();
-			StepTypeCode.valueOf(st.getTypeCode());
-		}
-		Assert.assertEquals(count, StepTypeCode.values().length);
-
-		Iterable<MLPSubscriptionScopeType> sstList = subscriptionScopeRepository.findAll();
-		Assert.assertTrue(sstList.iterator().hasNext());
-		logger.info("SubscriptionScope type list {}", sstList);
-		Iterator<MLPSubscriptionScopeType> sstIter = sstList.iterator();
-		count = 0;
-		while (sstIter.hasNext()) {
-			++count;
-			MLPSubscriptionScopeType sst = sstIter.next();
-			SubscriptionScopeTypeCode.valueOf(sst.getTypeCode());
-		}
-		Assert.assertEquals(count, SubscriptionScopeTypeCode.values().length);
-
-		Iterable<MLPToolkitType> toolkitTypeList = toolkitTypeRepository.findAll();
-		Assert.assertTrue(toolkitTypeList.iterator().hasNext());
-		logger.info("Toolkit type list {}", toolkitTypeList);
-		Iterator<MLPToolkitType> ttIter = toolkitTypeList.iterator();
-		count = 0;
-		while (ttIter.hasNext()) {
-			++count;
-			MLPToolkitType tt = ttIter.next();
-			ToolkitTypeCode.valueOf(tt.getTypeCode());
-		}
-		Assert.assertEquals(count, ToolkitTypeCode.values().length);
-
-		Iterable<MLPValidationStatus> validStatusList = validationStatusRepository.findAll();
-		Assert.assertTrue(validStatusList.iterator().hasNext());
-		logger.info("Validation status code list {}", validStatusList);
-		Iterator<MLPValidationStatus> vsIter = validStatusList.iterator();
-		count = 0;
-		while (vsIter.hasNext()) {
-			++count;
-			MLPValidationStatus vs = vsIter.next();
-			ValidationStatusCode.valueOf(vs.getStatusCode());
-		}
-		Assert.assertEquals(count, ValidationStatusCode.values().length);
-
-		Iterable<MLPValidationType> validTypeList = validationTypeRepository.findAll();
-		Assert.assertTrue(validTypeList.iterator().hasNext());
-		logger.info("Validation type list {}", validTypeList);
-		Iterator<MLPValidationType> vtIter = validTypeList.iterator();
-		count = 0;
-		while (vtIter.hasNext()) {
-			++count;
-			MLPValidationType vt = vtIter.next();
-			ValidationTypeCode.valueOf(vt.getTypeCode());
-		}
-		Assert.assertEquals(count, ValidationTypeCode.values().length);
-
-	}
 
 	@Test
 	public void testingRepositories() throws Exception {
@@ -848,15 +646,9 @@ public class CdsRepositoryServiceTest {
 			Page<MLPUser> userPage = userService.findUsers(restr, false, new PageRequest(0,5));
 			Assert.assertTrue(userPage.getNumberOfElements() == 1);
 
-			// social login
-			Iterable<MLPLoginProvider> provs = loginProviderRepository.findAll();
-			// Derby has no data preloaded
-			Assert.assertTrue(provs != null);// && provs.iterator().hasNext());
-			logger.info("Login providers: " + provs);
-
 			MLPUserLoginProvider ulp = new MLPUserLoginProvider();
 			ulp.setUserId(cu.getUserId());
-			ulp.setProviderCode("GH");
+			ulp.setProviderCode(LoginProviderCode.GH.name());
 			ulp.setProviderUserId("something");
 			ulp.setAccessToken("bogus");
 			ulp.setRank(0);
