@@ -1064,36 +1064,68 @@ public class CdsControllerTest {
 	@Test
 	public void testStepResult() throws Exception {
 		try {
-
 			MLPStepResult sr = new MLPStepResult();
 			sr.setStepCode(StepTypeCode.OB.name());
-
 			sr.setName("Solution ID creation");
-
 			sr.setStatusCode(String.valueOf(StepStatusCode.SU));
-
 			Date now = new Date();
 			sr.setStartDate(new Date(now.getTime() - 60 * 1000));
-
 			sr = client.createStepResult(sr);
 			Assert.assertNotNull(sr.getStepResultId());
+			logger.info("Created step result " + sr);
 
-			sr.setResult("New stack trace");
+			sr.setResult("Some new stack trace result");
 			client.updateStepResult(sr);
 
-			RestPageResponse<MLPStepResult> stepResults = client.getStepResults(new RestPageRequest(0, 100));
-
+			RestPageResponse<MLPStepResult> stepResults = client.getStepResults(new RestPageRequest(0, 10));
 			Assert.assertTrue(stepResults.iterator().hasNext());
 			logger.info("First step result {}", stepResults.iterator().next());
 
 			client.deleteStepResult(sr.getStepResultId());
-
 		} catch (HttpStatusCodeException ex) {
 			logger.error("testStepResults got response {}", ex.getResponseBodyAsString());
 			logger.error("testStepResults failed", ex);
 			throw ex;
 		}
 
+		// invalid tests
+		
+		try {
+			HashMap<String, Object> restr = new HashMap<>();
+			client.searchStepResults(restr, true, new RestPageRequest(0,1));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("search step result empty failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			HashMap<String, Object> restr = new HashMap<>();
+			restr.put("bogus", "value");
+			client.searchStepResults(restr, true, new RestPageRequest(0,1));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("search step result bad field failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createStepResult(new MLPStepResult());
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("create step result failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPStepResult stepResult = new MLPStepResult();
+			stepResult.setStepResultId(999L);
+			client.updateStepResult(stepResult);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("update step result failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.deleteStepResult(999L);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("delete step result failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		
 	}
 
 	@Test
