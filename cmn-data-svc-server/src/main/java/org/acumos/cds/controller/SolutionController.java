@@ -202,7 +202,8 @@ public class SolutionController extends AbstractController {
 	 * @param term
 	 *            Search term used for partial match ("like")
 	 * @param pageRequest
-	 *            Page and sort criteria.  Spring sets to page 0 of size 20 if client sends nothing.
+	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
+	 *            sends nothing.
 	 * @param response
 	 *            HttpServletResponse
 	 * @return Page of solutions
@@ -210,8 +211,8 @@ public class SolutionController extends AbstractController {
 	@ApiOperation(value = "Searches for solutions with names or descriptions that contain the search term.", response = MLPSolution.class, responseContainer = "Page")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH + "/" + CCDSConstants.LIKE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Page<MLPSolution> findByLikeKeyword(@RequestParam(CCDSConstants.TERM_PATH) String term, Pageable pageRequest,
-			HttpServletResponse response) {
+	public Page<MLPSolution> findSolutionsByLikeKeyword(@RequestParam(CCDSConstants.TERM_PATH) String term,
+			Pageable pageRequest, HttpServletResponse response) {
 		return solutionRepository.findBySearchTerm(term, pageRequest);
 	}
 
@@ -220,7 +221,8 @@ public class SolutionController extends AbstractController {
 	 * @param tag
 	 *            Tag string to find
 	 * @param pageRequest
-	 *            Page and sort criteria.  Spring sets to page 0 of size 20 if client sends nothing.
+	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
+	 *            sends nothing.
 	 * @param response
 	 *            HttpServletResponse
 	 * @return Page of solutions
@@ -228,13 +230,39 @@ public class SolutionController extends AbstractController {
 	@ApiOperation(value = "Gets a page of solutions matching the specified tag.", response = MLPSolution.class, responseContainer = "Page")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH + "/" + CCDSConstants.TAG_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object findByTag(@RequestParam("tag") String tag, Pageable pageRequest, HttpServletResponse response) {
+	public Object findSolutionsByTag(@RequestParam("tag") String tag, Pageable pageRequest,
+			HttpServletResponse response) {
 		MLPTag existing = solutionTagRepository.findOne(tag);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_TAG + tag, null);
 		}
 		return solutionRepository.findByTag(tag, pageRequest);
+	}
+
+	/**
+	 * @param queryParameters
+	 *            Map of String (field name) to String (value) for restricting the
+	 *            query. Expected parameters are access-type codes and date as milliseconds.
+	 * @param pageRequest
+	 *            Page and sort criteria
+	 * @param response
+	 *            HttpServletResponse
+	 * @return Page of solutions
+	 */
+	@ApiOperation(value = "Gets a page of solutions modified after the specified time, expressed in milliseconds since the Epoch.", response = MLPSolution.class, responseContainer = "Page")
+	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH + "/" + CCDSConstants.DATE_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public Object findSolutionsByDate(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
+			HttpServletResponse response) {
+		String[] accessTypeCodes = getOptStringArray(CCDSConstants.SEARCH_ACCESS_TYPES, queryParameters);
+		String[] dateMillis = getOptStringArray(CCDSConstants.SEARCH_DATE, queryParameters);
+		if (accessTypeCodes.length < 1 || dateMillis.length != 1) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
+		}
+		Date date = new Date(Long.parseLong(dateMillis[0]));
+		return solutionRepository.findModifiedAfter(accessTypeCodes, date, pageRequest);
 	}
 
 	/**
@@ -264,7 +292,8 @@ public class SolutionController extends AbstractController {
 	 *            Map of String (field name) to String (value) for restricting the
 	 *            query
 	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client sends nothing.
+	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
+	 *            sends nothing.
 	 * @param response
 	 *            HttpServletResponse
 	 * @return Page of solutions
@@ -299,7 +328,8 @@ public class SolutionController extends AbstractController {
 	 *            Field names-value pairs, see below for names. Some values can be
 	 *            comma-separated lists.
 	 * @param pageRequest
-	 *            Page and sort criteria.  Spring sets to page 0 of size 20 if client sends nothing.
+	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
+	 *            sends nothing.
 	 * @param response
 	 *            HttpServletResponse
 	 * @return Page of solutions
@@ -827,7 +857,8 @@ public class SolutionController extends AbstractController {
 	 * @param solutionId
 	 *            Path parameter with solution ID
 	 * @param pageRequest
-	 *            Page and sort criteria.  Spring sets to page 0 of size 20 if client sends nothing.
+	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
+	 *            sends nothing.
 	 * @param response
 	 *            HttpServletResponse
 	 * @return A page of download records
@@ -934,7 +965,8 @@ public class SolutionController extends AbstractController {
 	 * @param solutionId
 	 *            Path parameter with ID
 	 * @param pageRequest
-	 *            Page and sort criteria.  Spring sets to page 0 of size 20 if client sends nothing.
+	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
+	 *            sends nothing.
 	 * @param response
 	 *            HttpServletResponse
 	 * @return A list of solution ratings
@@ -1198,7 +1230,8 @@ public class SolutionController extends AbstractController {
 	 * @param userId
 	 *            Path parameter with user ID
 	 * @param pageable
-	 *            Page and sort criteria.  Spring sets to page 0 of size 20 if client sends nothing.
+	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
+	 *            sends nothing.
 	 * @param response
 	 *            HttpServletResponse
 	 * @return A usage if found, an error otherwise.
@@ -1375,7 +1408,8 @@ public class SolutionController extends AbstractController {
 	 * @param revisionId
 	 *            Path parameter with revision ID
 	 * @param pageRequest
-	 *            Page and sort criteria.  Spring sets to page 0 of size 20 if client sends nothing.
+	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
+	 *            sends nothing.
 	 * @param response
 	 *            HttpServletResponse
 	 * @return Page of deployments
@@ -1404,7 +1438,8 @@ public class SolutionController extends AbstractController {
 	 * @param userId
 	 *            Path parameter with user ID
 	 * @param pageRequest
-	 *            Page and sort criteria.  Spring sets to page 0 of size 20 if client sends nothing.
+	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
+	 *            sends nothing.
 	 * @param response
 	 *            HttpServletResponse
 	 * @return Page of deployments

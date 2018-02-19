@@ -75,6 +75,7 @@ public abstract class CCDSConstants {
 	public static final String STEP_STAT_PATH = "stepstat";
 	public static final String STEP_TYPE_PATH = "steptype";
 	public static final String GROUP_PATH = "group";
+	public static final String DATE_PATH = "date";
 
 	// Actions on entities
 	public static final String LIKE_PATH = "like";
@@ -94,6 +95,7 @@ public abstract class CCDSConstants {
 	public static final String SEARCH_NAME = "name";
 	public static final String SEARCH_TAGS = "tag";
 	public static final String SEARCH_VAL_STATUSES = "vsc";
+	public static final String SEARCH_DATE = "datems";
 
 	// Sonar wants a private constructor, placed after all fields
 	private CCDSConstants() {

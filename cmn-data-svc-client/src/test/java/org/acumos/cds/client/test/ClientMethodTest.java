@@ -21,6 +21,7 @@
 package org.acumos.cds.client.test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -189,6 +190,11 @@ public class ClientMethodTest {
 		}
 		try {
 			client.findSolutionsByTag("tag", new RestPageRequest());
+		} catch (ResourceAccessException ex) {
+			logger.info("Client failed as expected: {}", ex.toString());
+		}
+		try {
+			client.findSolutionsByDate(new String[0], new Date(), new RestPageRequest());
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}

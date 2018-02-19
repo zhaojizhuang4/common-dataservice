@@ -21,6 +21,7 @@
 package org.acumos.cds.client.test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,14 +111,19 @@ public class MockClientTest {
 		client.setSolutionCount(count);
 		Assert.assertTrue(count == client.getSolutionCount());
 
-		RestPageResponse<MLPSolution> solutions = new RestPageResponse<>();
-		client.setSolutions(solutions);
-		Assert.assertTrue(solutions == client.getSolutions(pageRequest));
-		client.setSolutionsBySearchTerm(solutions);
-		Assert.assertTrue(solutions == client.findSolutionsBySearchTerm("string", pageRequest));
-		client.setSolutionsByTag(solutions);
-		Assert.assertTrue(solutions == client.findSolutionsByTag("string", pageRequest));
-
+		RestPageResponse<MLPSolution> solutions1 = new RestPageResponse<>();
+		client.setSolutions(solutions1);
+		Assert.assertTrue(solutions1 == client.getSolutions(pageRequest));
+		RestPageResponse<MLPSolution> solutions2 = new RestPageResponse<>();
+		client.setSolutionsBySearchTerm(solutions2);
+		Assert.assertTrue(solutions2 == client.findSolutionsBySearchTerm("string", pageRequest));
+		RestPageResponse<MLPSolution> solutions3 = new RestPageResponse<>();
+		client.setSolutionsByTag(solutions3);
+		Assert.assertTrue(solutions3 == client.findSolutionsByTag("string", pageRequest));
+		RestPageResponse<MLPSolution> solutions4 = new RestPageResponse<>();
+		client.setSolutionsByDate(solutions4);
+		Assert.assertTrue(solutions4 == client.findSolutionsByDate(new String[0], new Date(), pageRequest));
+		
 		MLPSolution solution = new MLPSolution();
 		client.setSolutionById(solution);
 		Assert.assertTrue(solution == client.getSolution("id"));
@@ -303,8 +309,9 @@ public class MockClientTest {
 		Assert.assertTrue(solutionDownload == client.createSolutionDownload(solutionDownload));
 		client.deleteSolutionDownload(solutionDownload);
 
-		client.setFavoriteSolutions(solutions);
-		Assert.assertTrue(solutions == client.getFavoriteSolutions("id", pageRequest));
+		RestPageResponse<MLPSolution> faves = new RestPageResponse<>();
+		client.setFavoriteSolutions(faves);
+		Assert.assertTrue(faves == client.getFavoriteSolutions("id", pageRequest));
 
 		MLPSolutionFavorite favorite = new MLPSolutionFavorite();
 		client.setSolutionFavorite(favorite);
@@ -351,8 +358,9 @@ public class MockClientTest {
 		client.setSolutionAccessUsers(userList);
 		Assert.assertTrue(userList == client.getSolutionAccessUsers("id"));
 
-		client.setUserAccessSolutions(solutions);
-		Assert.assertTrue(solutions == client.getUserAccessSolutions("id", pageRequest));
+		RestPageResponse<MLPSolution> userAccSol = new RestPageResponse<>();
+		client.setUserAccessSolutions(userAccSol);
+		Assert.assertTrue(userAccSol == client.getUserAccessSolutions("id", pageRequest));
 		client.addSolutionUserAccess("id", "id");
 		client.dropSolutionUserAccess("id", "id");
 
@@ -429,9 +437,10 @@ public class MockClientTest {
 		client.updateComment(comment);
 		client.deleteComment("id", "id");
 
-		client.setPortalSolutions(solutions);
+		RestPageResponse<MLPSolution> portalSols = new RestPageResponse<>();
+		client.setPortalSolutions(portalSols);
 		Assert.assertTrue(
-				solutions == client.findPortalSolutions(null, null, true, null, null, null, null, null, pageRequest));
+				portalSols == client.findPortalSolutions(null, null, true, null, null, null, null, null, pageRequest));
 
 		RestPageResponse<MLPSolution> solutionResponse = new RestPageResponse<>();
 		client.setSearchSolutions(solutionResponse);

@@ -61,24 +61,28 @@ public interface SolutionRepository extends JpaRepository<MLPSolution, String>, 
 	Page<MLPSolution> findByTag(@Param("tag") String tag, Pageable pageRequest);
 
 	/**
-	 * Gets all solutions with any update after the specified date, including the
-	 * solution, revision and artifact entities. Returns no results for a solution
-	 * with no revision(s) and/or no artifact(s).
+	 * Gets all solutions with any modifications after the specified date, including
+	 * the solution, revision and artifact entities. Returns no results for a
+	 * solution with no revision(s) and/or no artifact(s).
 	 * 
-	 * @param thedate
+	 * @param accessTypeCodes
+	 *            Array of access-type codes
+	 * @param theDate
 	 *            Date threshold
 	 * @param pageRequest
 	 *            Page and sort criteria
 	 * @return Page of MLPSolution
 	 */
 	@Query(value = "SELECT s FROM MLPSolution s, MLPSolutionRevision r, MLPSolRevArtMap m, MLPArtifact a "
-			+ " WHERE s.solutionId = r.solutionId " //
+			+ " WHERE s.accessTypeCode in :accessTypeCodes " //
+			+ "   AND s.solutionId = r.solutionId " //
 			+ "   AND r.revisionId = m.revisionId " //
 			+ "   AND m.artifactId = a.artifactId " //
 			+ "   AND " //
-			+ "   ( s.modified >= :thedate " //
-			+ "  OR r.modified >= :thedate " //
-			+ "  OR a.modified >= :thedate ) ")
-	Page<MLPSolution> findModifiedAfter(@Param("thedate") Date thedate, Pageable pageRequest);
+			+ "   ( s.modified >= :theDate " //
+			+ "  OR r.modified >= :theDate " //
+			+ "  OR a.modified >= :theDate ) ")
+	Page<MLPSolution> findModifiedAfter(@Param("accessTypeCodes") String[] accessTypeCodes,
+			@Param("theDate") Date theDate, Pageable pageRequest);
 
 }

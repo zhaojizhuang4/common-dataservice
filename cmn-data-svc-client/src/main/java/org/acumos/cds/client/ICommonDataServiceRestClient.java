@@ -20,6 +20,7 @@
 
 package org.acumos.cds.client;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -56,8 +57,8 @@ import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
-import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPUserNotifPref;
+import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
 import org.acumos.cds.domain.MLPValidationType;
@@ -165,18 +166,22 @@ public interface ICommonDataServiceRestClient {
 
 	/**
 	 * Gets all step status codes.
+	 * 
 	 * @return List of step status objects.
-	 * @deprecated Java clients should use {@link org.acumos.cds.StepStatusCode#values()}
+	 * @deprecated Java clients should use
+	 *             {@link org.acumos.cds.StepStatusCode#values()}
 	 */
 	List<MLPStepStatus> getStepStatuses();
 
 	/**
 	 * Gets all step type codes.
+	 * 
 	 * @return List of step type objects.
-	 * @deprecated Java clients should use {@link org.acumos.cds.StepTypeCode#values()}
+	 * @deprecated Java clients should use
+	 *             {@link org.acumos.cds.StepTypeCode#values()}
 	 */
 	List<MLPStepType> getStepTypes();
-		
+
 	/**
 	 * Gets count of solutions.
 	 * 
@@ -217,6 +222,22 @@ public interface ICommonDataServiceRestClient {
 	 * @return Page of solution objects.
 	 */
 	RestPageResponse<MLPSolution> findSolutionsByTag(String tag, RestPageRequest pageRequest);
+
+	/**
+	 * Finds solutions modified after the specified date, including modifications to
+	 * the solution, the revisions for the solution, and the artifacts in the
+	 * revisions.
+	 * 
+	 * @param accessTypeCodes
+	 *            Array of access-type codes (required).
+	 * @param date
+	 *            Date threshold
+	 * @param pageRequest
+	 *            Page index, page size, sort information; ignored if null.
+	 * @return Page of solution objects.
+	 */
+	RestPageResponse<MLPSolution> findSolutionsByDate(String[] accessTypeCodes, Date date,
+			RestPageRequest pageRequest);
 
 	/**
 	 * Finds solutions that match every specified condition. Special-purpose method

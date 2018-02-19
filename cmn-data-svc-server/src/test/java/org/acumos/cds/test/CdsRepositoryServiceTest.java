@@ -540,9 +540,10 @@ public class CdsRepositoryServiceTest {
 			logger.info("Solutions by tag: {}", solByTag);
 			Assert.assertTrue(solByTag != null && solByTag.iterator().hasNext());
 
+			String[] accessTypes = new String[] { AccessTypeCode.PB.name() };
 			Date anHourAgo = new java.util.Date();
 			anHourAgo.setTime(new Date().getTime() - (1000L * 60 * 60));
-			Iterable<MLPSolution> solByDate = solutionRepository.findModifiedAfter(anHourAgo,
+			Iterable<MLPSolution> solByDate = solutionRepository.findModifiedAfter(accessTypes, anHourAgo,
 					new PageRequest(0, 5, null));
 			logger.info("Solutions by date: {}", solByDate);
 			Assert.assertTrue(solByDate != null && solByDate.iterator().hasNext());
@@ -1162,8 +1163,8 @@ public class CdsRepositoryServiceTest {
 		logger.info("Created peer " + pr);
 
 		final String peerName2 = "Peer-" + Long.toString(new Date().getTime());
-		MLPPeer pr2 = new MLPPeer(peerName2, "x.509", "http://peer-api", true, false, "contact", PeerStatusCode.AC.name(),
-				ValidationStatusCode.FA.name());
+		MLPPeer pr2 = new MLPPeer(peerName2, "x.509", "http://peer-api", true, false, "contact",
+				PeerStatusCode.AC.name(), ValidationStatusCode.FA.name());
 		pr2 = peerRepository.save(pr2);
 		logger.info("Created second peer " + pr2);
 
@@ -1208,7 +1209,7 @@ public class CdsRepositoryServiceTest {
 		MLPPeerSolAccMap.PeerSolAccMapPK pk = new MLPPeerSolAccMap.PeerSolAccMapPK(pg1.getGroupId(), sg.getGroupId());
 		MLPPeerSolAccMap map = peerSolAccMapRepository.findOne(pk);
 		Assert.assertNotNull(map);
-		
+
 		MLPPeerPeerAccMap gppm = new MLPPeerPeerAccMap(pg1.getGroupId(), pg2.getGroupId());
 		gppm = peerPeerAccMapRepository.save(gppm);
 		logger.info("Created peer group - peer group map " + gppm);
@@ -1216,7 +1217,7 @@ public class CdsRepositoryServiceTest {
 				pg2.getGroupId());
 		MLPPeerPeerAccMap ppMap = peerPeerAccMapRepository.findOne(ppKey);
 		Assert.assertNotNull(ppMap);
-		
+
 		List<MLPPeer> accessPeers = peerPeerAccMapRepository.findAccessPeers(pr.getPeerId());
 		Assert.assertTrue(accessPeers != null && !accessPeers.isEmpty());
 

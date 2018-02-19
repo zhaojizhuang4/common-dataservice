@@ -665,6 +665,15 @@ public class CdsControllerTest {
 				}
 			}
 
+			// Requires revisions and artifacts!
+			String[] searchAccessTypeCodes = new String[] { AccessTypeCode.PB.name() };
+			Date anHourAgo = new java.util.Date();
+			anHourAgo.setTime(new Date().getTime() - (1000L * 60 * 60));
+			RestPageResponse<MLPSolution> sld = client.findSolutionsByDate(searchAccessTypeCodes, anHourAgo,
+					new RestPageRequest(0, 1));
+			Assert.assertTrue(sld != null && sld.getNumberOfElements() > 0);
+			logger.info("Found solutions by date: " + sld.getContent().size());
+
 			// Create Solution Rating
 			logger.info("Creating solution rating");
 			MLPSolutionRating ur = new MLPSolutionRating();
@@ -1094,10 +1103,10 @@ public class CdsControllerTest {
 		}
 
 		// invalid tests
-		
+
 		try {
 			HashMap<String, Object> restr = new HashMap<>();
-			client.searchStepResults(restr, true, new RestPageRequest(0,1));
+			client.searchStepResults(restr, true, new RestPageRequest(0, 1));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("search step result empty failed as expected: {}", ex.getResponseBodyAsString());
@@ -1105,7 +1114,7 @@ public class CdsControllerTest {
 		try {
 			HashMap<String, Object> restr = new HashMap<>();
 			restr.put("bogus", "value");
-			client.searchStepResults(restr, true, new RestPageRequest(0,1));
+			client.searchStepResults(restr, true, new RestPageRequest(0, 1));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("search step result bad field failed as expected: {}", ex.getResponseBodyAsString());
@@ -1130,7 +1139,7 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("delete step result failed as expected: {}", ex.getResponseBodyAsString());
 		}
-		
+
 	}
 
 	@Test

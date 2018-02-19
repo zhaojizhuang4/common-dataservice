@@ -66,8 +66,8 @@ import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
-import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPUserNotifPref;
+import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPUserRoleMap;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
@@ -444,6 +444,21 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 				new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH, CCDSConstants.TAG_PATH }, parms,
 				pageRequest);
 		logger.debug("findSolutionsByTag: uri {}", uri);
+		ResponseEntity<RestPageResponse<MLPSolution>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPSolution>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public RestPageResponse<MLPSolution> findSolutionsByDate(String[] accessTypeCodes, Date date, RestPageRequest pageRequest) {
+		HashMap<String, Object> parms = new HashMap<>();
+		parms.put(CCDSConstants.SEARCH_ACCESS_TYPES, accessTypeCodes);
+		parms.put(CCDSConstants.SEARCH_DATE, new Long(date.getTime()));
+		URI uri = buildUri(
+				new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH, CCDSConstants.DATE_PATH }, parms,
+				pageRequest);
+		logger.debug("findSolutionsByDate: uri {}", uri);
 		ResponseEntity<RestPageResponse<MLPSolution>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<RestPageResponse<MLPSolution>>() {
 				});

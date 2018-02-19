@@ -195,6 +195,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private RestPageResponse<MLPPeerSolAccMap> peerSolutionGroupMaps;
 	private long peerSolutionAccess;
 	private List<MLPPeer> peerAccessList;
+	private RestPageResponse<MLPSolution> solutionsByDate;
 
 	/**
 	 * No-argument constructor.
@@ -376,6 +377,15 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return solutionsByTag;
 	}
 
+	public void setSolutionsByDate(RestPageResponse<MLPSolution> solutions) {
+		this.solutionsByDate = solutions;
+	}
+	
+	@Override
+	public RestPageResponse<MLPSolution> findSolutionsByDate(String[] accessTypeCodes, Date date, RestPageRequest pageRequest) {
+		return solutionsByDate;
+	}
+	
 	public void setSolutionById(MLPSolution solution) {
 		this.solutionById = solution;
 	}
