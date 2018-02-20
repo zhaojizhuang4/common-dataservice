@@ -67,9 +67,9 @@ import org.acumos.cds.transport.RestPageResponse;
 import org.acumos.cds.transport.SuccessTransport;
 
 /**
- * Defines the interface of the Controller REST client. On a request that is
- * missing required data the response code is 400 (bad request); on a request
- * for an entity that does not exist the response code is 404 (not found).
+ * Defines the interface of the Controller REST client. The server answers 400
+ * (bad request) on any problem in the request, such as missing required data or
+ * attempting to update or delete an item that does not exists.
  * 
  * Callers are STRONGLY advised to catch the runtime (unchecked) exception
  * HttpStatusCodeException and call its method

@@ -52,7 +52,8 @@ public class MLPUserNotifPref implements MLPEntity, Serializable {
 	private String userId;
 
 	/**
-	 * This code is defined by {@link org.acumos.cds.NotificationDeliveryMechanismCode}
+	 * This code is defined by
+	 * {@link org.acumos.cds.NotificationDeliveryMechanismCode}
 	 */
 	@Column(name = "NOTIF_DELV_MECH_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Notification delivery mechanism code cannot be null")

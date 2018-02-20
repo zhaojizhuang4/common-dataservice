@@ -1418,7 +1418,7 @@ public class SolutionController extends AbstractController {
 	 */
 	@ApiOperation(value = "Gets the deployments for the specified solution and revision IDs.", response = MLPSolutionDeployment.class, responseContainer = "Page")
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/"
-			+ CCDSConstants.DEPLOYMENT_PATH, method = RequestMethod.GET)
+			+ CCDSConstants.DEPLOY_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getSolutionDeployments(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, Pageable pageRequest, HttpServletResponse response) {
@@ -1448,7 +1448,7 @@ public class SolutionController extends AbstractController {
 	 */
 	@ApiOperation(value = "Gets the deployments for the specified solution, revision and user IDs.", response = MLPSolutionDeployment.class, responseContainer = "Page")
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/" + CCDSConstants.USER_PATH
-			+ "/{userId}/" + CCDSConstants.DEPLOYMENT_PATH, method = RequestMethod.GET)
+			+ "/{userId}/" + CCDSConstants.DEPLOY_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getUserSolutionRevisionDeployments(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, @PathVariable("userId") String userId, Pageable pageRequest,
@@ -1476,7 +1476,7 @@ public class SolutionController extends AbstractController {
 	 */
 	@ApiOperation(value = "Creates a new deployment record for the specified solution and revision.", response = MLPSolutionDeployment.class)
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/"
-			+ CCDSConstants.DEPLOYMENT_PATH, method = RequestMethod.POST)
+			+ CCDSConstants.DEPLOY_PATH, method = RequestMethod.POST)
 	@ResponseBody
 	public Object createSolutionDeployment(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, @RequestBody MLPSolutionDeployment sd,
@@ -1516,7 +1516,7 @@ public class SolutionController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			response.setHeader(HttpHeaders.LOCATION,
 					CCDSConstants.SOLUTION_PATH + "/" + sd.getSolutionId() + "/" + CCDSConstants.REVISION_PATH
-							+ revisionId + CCDSConstants.DEPLOYMENT_PATH + "/" + sd.getDeploymentId());
+							+ revisionId + CCDSConstants.DEPLOY_PATH + "/" + sd.getDeploymentId());
 		} catch (Exception ex) {
 			logger.error(EELFLoggerDelegate.errorLogger, "createSolutionDeployment failed", ex);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -1541,7 +1541,7 @@ public class SolutionController extends AbstractController {
 	 */
 	@ApiOperation(value = "Updates the deployment record for the specified ID.", response = MLPSolutionDeployment.class)
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/"
-			+ CCDSConstants.DEPLOYMENT_PATH + "/{deploymentId}", method = RequestMethod.PUT)
+			+ CCDSConstants.DEPLOY_PATH + "/{deploymentId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updateSolutionDeployment(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, @PathVariable("deploymentId") String deploymentId,
@@ -1583,7 +1583,7 @@ public class SolutionController extends AbstractController {
 	 */
 	@ApiOperation(value = "Deletes the specified deployment record.", response = SuccessTransport.class)
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/"
-			+ CCDSConstants.DEPLOYMENT_PATH + "/{deploymentId}", method = RequestMethod.DELETE)
+			+ CCDSConstants.DEPLOY_PATH + "/{deploymentId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteSolutionDeployment(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, @PathVariable("deploymentId") String deploymentId,

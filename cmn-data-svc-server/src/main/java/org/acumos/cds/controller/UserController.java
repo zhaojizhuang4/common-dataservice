@@ -1172,7 +1172,7 @@ public class UserController extends AbstractController {
 	 * @return Page of deployments
 	 */
 	@ApiOperation(value = "Gets the deployments for the specified user ID.", response = MLPSolutionDeployment.class, responseContainer = "Page")
-	@RequestMapping(value = "/{userId}/" + CCDSConstants.DEPLOYMENT_PATH, method = RequestMethod.GET)
+	@RequestMapping(value = "/{userId}/" + CCDSConstants.DEPLOY_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getUserDeployments(@PathVariable("userId") String userId, Pageable pageRequest,
 			HttpServletResponse response) {

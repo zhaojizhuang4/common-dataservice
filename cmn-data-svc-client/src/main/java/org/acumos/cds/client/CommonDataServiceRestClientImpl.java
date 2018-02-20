@@ -303,8 +303,10 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
+	@Deprecated
 	public List<MLPAccessType> getAccessTypes() {
-		URI uri = buildUri(new String[] { CCDSConstants.ACCESS_PATH, CCDSConstants.TYPE_PATH }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.ACCESS_PATH, CCDSConstants.TYPE_PATH },
+				null, null);
 		logger.debug("getAccessTypes: uri {}", uri);
 		ResponseEntity<List<MLPAccessType>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPAccessType>>() {
@@ -313,8 +315,11 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
+	@Deprecated
 	public List<MLPArtifactType> getArtifactTypes() {
-		URI uri = buildUri(new String[] { CCDSConstants.ARTIFACT_PATH, CCDSConstants.TYPE_PATH }, null, null);
+		URI uri = buildUri(
+				new String[] { CCDSConstants.CODE_PATH, CCDSConstants.ARTIFACT_PATH, CCDSConstants.TYPE_PATH }, null,
+				null);
 		logger.debug("getArtifactTypes: uri {}", uri);
 		ResponseEntity<List<MLPArtifactType>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPArtifactType>>() {
@@ -323,8 +328,9 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
+	@Deprecated
 	public List<MLPLoginProvider> getLoginProviders() {
-		URI uri = buildUri(new String[] { CCDSConstants.LOGIN_PROVIDER_PATH }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.LOGIN_PROVIDER_PATH }, null, null);
 		logger.debug("getLoginProviders: uri {}", uri);
 		ResponseEntity<List<MLPLoginProvider>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPLoginProvider>>() {
@@ -333,8 +339,10 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
+	@Deprecated
 	public List<MLPModelType> getModelTypes() {
-		URI uri = buildUri(new String[] { CCDSConstants.MODEL_PATH, CCDSConstants.TYPE_PATH }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.MODEL_PATH, CCDSConstants.TYPE_PATH },
+				null, null);
 		logger.debug("getModelTypes: uri {}", uri);
 		ResponseEntity<List<MLPModelType>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPModelType>>() {
@@ -343,8 +351,11 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
+	@Deprecated
 	public List<MLPToolkitType> getToolkitTypes() {
-		URI uri = buildUri(new String[] { CCDSConstants.TOOLKIT_PATH, CCDSConstants.TYPE_PATH }, null, null);
+		URI uri = buildUri(
+				new String[] { CCDSConstants.CODE_PATH, CCDSConstants.TOOLKIT_PATH, CCDSConstants.TYPE_PATH }, null,
+				null);
 		logger.debug("getTookitTypes: uri {}", uri);
 		ResponseEntity<List<MLPToolkitType>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPToolkitType>>() {
@@ -353,8 +364,10 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
+	@Deprecated
 	public List<MLPValidationStatus> getValidationStatuses() {
-		URI uri = buildUri(new String[] { CCDSConstants.VAL_STAT_PATH }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.VAL_PATH, CCDSConstants.STATUS_PATH },
+				null, null);
 		logger.debug("getValidationStatuses: uri {}", uri);
 		ResponseEntity<List<MLPValidationStatus>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPValidationStatus>>() {
@@ -363,8 +376,10 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
+	@Deprecated
 	public List<MLPValidationType> getValidationTypes() {
-		URI uri = buildUri(new String[] { CCDSConstants.VAL_TYPE_PATH }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.VAL_PATH, CCDSConstants.TYPE_PATH },
+				null, null);
 		logger.debug("getValidationTypes: uri {}", uri);
 		ResponseEntity<List<MLPValidationType>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPValidationType>>() {
@@ -373,8 +388,11 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
+	@Deprecated
 	public List<MLPDeploymentStatus> getDeploymentStatuses() {
-		URI uri = buildUri(new String[] { CCDSConstants.DEP_STAT_PATH }, null, null);
+		URI uri = buildUri(
+				new String[] { CCDSConstants.CODE_PATH, CCDSConstants.DEPLOY_PATH, CCDSConstants.STATUS_PATH }, null,
+				null);
 		logger.debug("getDeploymentStatuses: uri {}", uri);
 		ResponseEntity<List<MLPDeploymentStatus>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPDeploymentStatus>>() {
@@ -383,8 +401,10 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
+	@Deprecated
 	public List<MLPStepStatus> getStepStatuses() {
-		URI uri = buildUri(new String[] { CCDSConstants.STEP_STAT_PATH }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.STEP_PATH, CCDSConstants.STATUS_PATH },
+				null, null);
 		logger.debug("getStepStatuses: uri {}", uri);
 		ResponseEntity<List<MLPStepStatus>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPStepStatus>>() {
@@ -393,8 +413,10 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
+	@Deprecated
 	public List<MLPStepType> getStepTypes() {
-		URI uri = buildUri(new String[] { CCDSConstants.STEP_TYPE_PATH }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.STEP_PATH, CCDSConstants.TYPE_PATH },
+				null, null);
 		logger.debug("getStepTypes: uri {}", uri);
 		ResponseEntity<List<MLPStepType>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPStepType>>() {
@@ -1492,7 +1514,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public RestPageResponse<MLPSolutionDeployment> getUserDeployments(String userId, RestPageRequest pageRequest) {
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.DEPLOYMENT_PATH }, null,
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.DEPLOY_PATH }, null,
 				pageRequest);
 		logger.debug("getUserDeployments: uri {}", uri);
 		ResponseEntity<RestPageResponse<MLPSolutionDeployment>> response = restTemplate.exchange(uri, HttpMethod.GET,
@@ -1505,7 +1527,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	public RestPageResponse<MLPSolutionDeployment> getSolutionDeployments(String solutionId, String revisionId,
 			RestPageRequest pageRequest) {
 		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, solutionId, CCDSConstants.REVISION_PATH,
-				revisionId, CCDSConstants.DEPLOYMENT_PATH }, null, pageRequest);
+				revisionId, CCDSConstants.DEPLOY_PATH }, null, pageRequest);
 		logger.debug("getSolutionDeployments: uri {}", uri);
 		ResponseEntity<RestPageResponse<MLPSolutionDeployment>> response = restTemplate.exchange(uri, HttpMethod.GET,
 				null, new ParameterizedTypeReference<RestPageResponse<MLPSolutionDeployment>>() {
@@ -1517,7 +1539,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	public RestPageResponse<MLPSolutionDeployment> getUserSolutionDeployments(String solutionId, String revisionId,
 			String userId, RestPageRequest pageRequest) {
 		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, solutionId, CCDSConstants.REVISION_PATH,
-				revisionId, CCDSConstants.USER_PATH, userId, CCDSConstants.DEPLOYMENT_PATH }, null, pageRequest);
+				revisionId, CCDSConstants.USER_PATH, userId, CCDSConstants.DEPLOY_PATH }, null, pageRequest);
 		logger.debug("getUserSolutionDeployments: uri {}", uri);
 		ResponseEntity<RestPageResponse<MLPSolutionDeployment>> response = restTemplate.exchange(uri, HttpMethod.GET,
 				null, new ParameterizedTypeReference<RestPageResponse<MLPSolutionDeployment>>() {
@@ -1528,7 +1550,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	@Override
 	public MLPSolutionDeployment createSolutionDeployment(MLPSolutionDeployment deployment) {
 		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, deployment.getSolutionId(),
-				CCDSConstants.REVISION_PATH, deployment.getRevisionId(), CCDSConstants.DEPLOYMENT_PATH }, null, null);
+				CCDSConstants.REVISION_PATH, deployment.getRevisionId(), CCDSConstants.DEPLOY_PATH }, null, null);
 		logger.debug("createSolutionDeployment: uri {}", uri);
 		return restTemplate.postForObject(uri, deployment, MLPSolutionDeployment.class);
 	}
@@ -1537,7 +1559,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	public void updateSolutionDeployment(MLPSolutionDeployment deployment) {
 		URI uri = buildUri(
 				new String[] { CCDSConstants.SOLUTION_PATH, deployment.getSolutionId(), CCDSConstants.REVISION_PATH,
-						deployment.getRevisionId(), CCDSConstants.DEPLOYMENT_PATH, deployment.getDeploymentId() },
+						deployment.getRevisionId(), CCDSConstants.DEPLOY_PATH, deployment.getDeploymentId() },
 				null, null);
 		logger.debug("updateSolutionDeployment: url {}", uri);
 		restTemplate.put(uri, deployment);
@@ -1547,7 +1569,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	public void deleteSolutionDeployment(MLPSolutionDeployment deployment) {
 		URI uri = buildUri(
 				new String[] { CCDSConstants.SOLUTION_PATH, deployment.getSolutionId(), CCDSConstants.REVISION_PATH,
-						deployment.getRevisionId(), CCDSConstants.DEPLOYMENT_PATH, deployment.getDeploymentId() },
+						deployment.getRevisionId(), CCDSConstants.DEPLOY_PATH, deployment.getDeploymentId() },
 				null, null);
 		logger.debug("deleteSolutionDeployment: url {}", uri);
 		restTemplate.delete(uri);

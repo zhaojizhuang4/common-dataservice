@@ -45,37 +45,39 @@ public abstract class CCDSConstants {
 	public static final String FUNCTION_PATH = "function";
 	public static final String USER_PATH = "user";
 	public static final String COUNT_PATH = "count";
-	public static final String MODEL_PATH = "model";
-	public static final String TYPE_PATH = "type";
-	public static final String ACCESS_PATH = "access";
-	public static final String TOOLKIT_PATH = "toolkit";
 	public static final String VALIDATION_PATH = "validation";
-	public static final String VAL_STAT_PATH = "valstat";
-	public static final String VAL_TYPE_PATH = "valtype";
-	public static final String DEP_STAT_PATH = "depstat";
-	public static final String VAL_SEQ_PATH = "valseq";
 	public static final String PEER_PATH = "peer";
 	public static final String DOWNLOAD_PATH = "dnld";
 	public static final String FAVORITE_PATH = "favorite";
 	public static final String RATING_PATH = "rating";
 	public static final String SUBSCRIPTION_PATH = "sub";
-	public static final String LOGIN_PROVIDER_PATH = "logprov";
 	public static final String TAG_PATH = "tag";
 	public static final String NOTIFICATION_PATH = "notif";
 	public static final String NOTIFICATION_PREF_PATH = "notifpref";
 	public static final String VIEW_PATH = "view";
 	public static final String WEB_PATH = "web";
-	public static final String DEPLOYMENT_PATH = "deploy";
+	public static final String DEPLOY_PATH = "deploy";
 	public static final String CONFIG_PATH = "config";
 	public static final String THREAD_PATH = "thread";
 	public static final String COMMENT_PATH = "comment";
-	public static final String PEER_STAT_PATH = "peerstat";
-	public static final String SUB_SCOPE_TYPE_PATH = "subscope";
 	public static final String STEP_RESULT_PATH = "stepresult";
-	public static final String STEP_STAT_PATH = "stepstat";
-	public static final String STEP_TYPE_PATH = "steptype";
 	public static final String GROUP_PATH = "group";
 	public static final String DATE_PATH = "date";
+	public static final String VAL_SEQ_PATH = "valseq";
+	public static final String VAL_TYPE_PATH = "valtype";
+
+	// Code-name pairs
+	public static final String ACCESS_PATH = "access";
+	public static final String CODE_PATH = "code";
+	public static final String LOGIN_PROVIDER_PATH = "logprov";
+	public static final String MODEL_PATH = "model";
+	public static final String NOTIFICATION_MECH_PATH = "notifmech";
+	public static final String STATUS_PATH = "status";
+	public static final String STEP_PATH = "step";
+	public static final String TOOLKIT_PATH = "toolkit";
+	public static final String TYPE_PATH = "type";
+	public static final String VAL_PATH = "val";
+	public static final String MSG_SEV_PATH = "msgsev";
 
 	// Actions on entities
 	public static final String LIKE_PATH = "like";

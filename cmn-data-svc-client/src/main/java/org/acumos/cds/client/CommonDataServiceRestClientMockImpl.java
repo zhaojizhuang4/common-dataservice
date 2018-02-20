@@ -380,13 +380,13 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	public void setSolutionsByDate(RestPageResponse<MLPSolution> solutions) {
 		this.solutionsByDate = solutions;
 	}
-	
+
 	@Override
 	public RestPageResponse<MLPSolution> findSolutionsByDate(boolean active, String[] accessTypeCodes,
 			String[] validationStatusCodes, Date date, RestPageRequest pageRequest) {
 		return solutionsByDate;
 	}
-	
+
 	public void setSolutionById(MLPSolution solution) {
 		this.solutionById = solution;
 	}
@@ -1079,7 +1079,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	public void setUserNotificationPreference(MLPUserNotifPref usrNotifPref) {
 		this.usrNotifPref = usrNotifPref;
 	}
-	
+
 	@Override
 	public MLPUserNotifPref createUserNotificationPreference(MLPUserNotifPref usrNotifPref) {
 		return this.usrNotifPref;

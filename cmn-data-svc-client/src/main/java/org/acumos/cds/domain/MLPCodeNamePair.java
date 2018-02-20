@@ -25,7 +25,7 @@ import java.util.Objects;
 /**
  * Defines fields, getters and setters to avoid code repetitions.
  */
-public abstract class MLPCodeNamePair implements MLPEntity {
+public class MLPCodeNamePair implements MLPEntity {
 
 	private String code;
 	private String name;
