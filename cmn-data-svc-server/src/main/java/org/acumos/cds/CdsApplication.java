@@ -47,6 +47,10 @@ public class CdsApplication implements ApplicationContextAware {
 	 * on the command line via java -jar ..; does not run when started by test use
 	 * of Spring Runner.
 	 * 
+	 * This method uses the default logger (i.e., does not select the application or
+	 * debug logger) at level info to ensure its messages appear at startup on
+	 * stdout.
+	 * 
 	 * @param args
 	 *            Command line
 	 * @throws IOException
@@ -56,7 +60,7 @@ public class CdsApplication implements ApplicationContextAware {
 		final String springApplicationJson = System.getenv(CONFIG_ENV_VAR_NAME);
 		if (springApplicationJson != null && springApplicationJson.contains("{")) {
 			final ObjectMapper mapper = new ObjectMapper();
-			// ensure it's valid
+			// ensure it's valid; Spring silently ignores if not parseable
 			mapper.readTree(springApplicationJson);
 			logger.info("main: successfully parsed configuration from environment {}", CONFIG_ENV_VAR_NAME);
 		} else {

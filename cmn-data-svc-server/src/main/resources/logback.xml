@@ -115,6 +115,7 @@
 
 	<!-- ============================================================================ -->
 	<!-- EELF loggers -->
+	<!-- com.att.eelf.* constants must match values in com.att.eelf.configuration.Configuration -->
 	<!-- ============================================================================ -->
 	<logger name="com.att.eelf" level="info" additivity="false">
 		<appender-ref ref="asyncEELF" />
