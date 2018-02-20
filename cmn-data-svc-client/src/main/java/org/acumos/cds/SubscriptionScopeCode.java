@@ -21,22 +21,21 @@
 package org.acumos.cds;
 
 /**
- * This enum defines Acumos message severity type codes.
+ * This enum defines Acumos subscription scope type codes.
  */
-public enum MessageSeverityTypeCode {
+public enum SubscriptionScopeCode {
 
-	HI("High"), //
-	ME("Medium"), //
-	LO("Low");
+	RF("Reference"), //
+	FL("Full");
 
-	private String typeName;
+	private String scopeName;
 
-	private MessageSeverityTypeCode(final String typeName) {
-		this.typeName = typeName;
+	private SubscriptionScopeCode(final String scopeName) {
+		this.scopeName = scopeName;
 	}
 
-	public String getTypeName() {
-		return typeName;
+	public String getScopeName() {
+		return scopeName;
 	}
 
 }

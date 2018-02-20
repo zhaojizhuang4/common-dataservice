@@ -111,19 +111,19 @@ public class MLPStepResult implements MLPEntity, Serializable {
 	 * This constructor accepts the required fields; i.e., the minimum that the user
 	 * must supply to create a valid instance.
 	 * 
-	 * @param stepCode
-	 *            Step Code
+	 * @param stepTypeCode
+	 *            Step type code
 	 * @param name
-	 *            Step type
+	 *            Step name
 	 * @param statusCode
-	 *            Status Code
+	 *            Step status code
 	 * @param startDate
-	 *            Start Date
+	 *            Start date
 	 */
-	public MLPStepResult(String stepCode, String name, String statusCode, Date startDate) {
-		if (stepCode == null || name == null || statusCode == null || startDate == null)
+	public MLPStepResult(String stepTypeCode, String name, String statusCode, Date startDate) {
+		if (stepTypeCode == null || name == null || statusCode == null || startDate == null)
 			throw new IllegalArgumentException("Null not permitted");
-		this.stepCode = stepCode;
+		this.stepCode = stepTypeCode;
 		this.name = name;
 		this.statusCode = statusCode;
 		this.startDate = startDate;

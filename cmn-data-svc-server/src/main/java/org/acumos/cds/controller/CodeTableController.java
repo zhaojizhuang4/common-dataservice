@@ -34,7 +34,7 @@ import org.acumos.cds.ModelTypeCode;
 import org.acumos.cds.PeerStatusCode;
 import org.acumos.cds.StepStatusCode;
 import org.acumos.cds.StepTypeCode;
-import org.acumos.cds.SubscriptionScopeTypeCode;
+import org.acumos.cds.SubscriptionScopeCode;
 import org.acumos.cds.ToolkitTypeCode;
 import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.ValidationTypeCode;
@@ -193,7 +193,7 @@ public class CodeTableController extends AbstractController {
 	@ResponseBody
 	public Iterable<MLPSubscriptionScopeType> getSubscriptionScopes() {
 		List<MLPSubscriptionScopeType> list = new ArrayList<>();
-		for (SubscriptionScopeTypeCode cn : SubscriptionScopeTypeCode.values())
+		for (SubscriptionScopeCode cn : SubscriptionScopeCode.values())
 			list.add(new MLPSubscriptionScopeType(cn.name(), cn.getScopeName()));
 		return list;
 	}

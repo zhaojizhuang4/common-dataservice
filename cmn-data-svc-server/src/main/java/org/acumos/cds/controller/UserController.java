@@ -30,8 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.acumos.cds.CCDSConstants;
 import org.acumos.cds.LoginProviderCode;
-import org.acumos.cds.MessageSeverityTypeCode;
-import org.acumos.cds.NotificationDeliveryMechanismTypeCode;
+import org.acumos.cds.MessageSeverityCode;
+import org.acumos.cds.NotificationDeliveryMechanismCode;
 import org.acumos.cds.domain.MLPNotifUserMap;
 import org.acumos.cds.domain.MLPPasswordChangeRequest;
 import org.acumos.cds.domain.MLPRole;
@@ -1074,8 +1074,8 @@ public class UserController extends AbstractController {
 		Object result;
 		try {
 			// Validate enum codes
-			MessageSeverityTypeCode.valueOf(usrNotifPref.getMsgSeverityCode());
-			NotificationDeliveryMechanismTypeCode.valueOf(usrNotifPref.getNotfDelvMechCode());
+			MessageSeverityCode.valueOf(usrNotifPref.getMsgSeverityCode());
+			NotificationDeliveryMechanismCode.valueOf(usrNotifPref.getNotfDelvMechCode());
 			// Create a new row
 			result = notificationPreferenceRepository.save(usrNotifPref);
 			response.setStatus(HttpServletResponse.SC_CREATED);
@@ -1117,8 +1117,8 @@ public class UserController extends AbstractController {
 		MLPTransportModel result = null;
 		try {
 			// Validate enum codes
-			MessageSeverityTypeCode.valueOf(usrNotifPref.getMsgSeverityCode());
-			NotificationDeliveryMechanismTypeCode.valueOf(usrNotifPref.getNotfDelvMechCode());
+			MessageSeverityCode.valueOf(usrNotifPref.getMsgSeverityCode());
+			NotificationDeliveryMechanismCode.valueOf(usrNotifPref.getNotfDelvMechCode());
 			// Use the path-parameter id; don't trust the one in the object
 			usrNotifPref.setUserNotifPrefId(userNotifPrefId);
 			// Update the existing row

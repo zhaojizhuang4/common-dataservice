@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.CCDSConstants;
 import org.acumos.cds.PeerStatusCode;
-import org.acumos.cds.SubscriptionScopeTypeCode;
+import org.acumos.cds.SubscriptionScopeCode;
 import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.domain.MLPPeer;
 import org.acumos.cds.domain.MLPPeerSubscription;
@@ -312,7 +312,7 @@ public class PeerController extends AbstractController {
 		try {
 			// Validate enum codes
 			AccessTypeCode.valueOf(peerSub.getAccessType());
-			SubscriptionScopeTypeCode.valueOf(peerSub.getScopeType());
+			SubscriptionScopeCode.valueOf(peerSub.getScopeType());
 			// Null out any existing ID to get an auto-generated ID
 			peerSub.setSubId(null);
 			// Create a new row
@@ -356,7 +356,7 @@ public class PeerController extends AbstractController {
 		try {
 			// Validate enum codes
 			AccessTypeCode.valueOf(peerSub.getAccessType());
-			SubscriptionScopeTypeCode.valueOf(peerSub.getScopeType());
+			SubscriptionScopeCode.valueOf(peerSub.getScopeType());
 			// Use the path-parameter id; don't trust the one in the object
 			peerSub.setSubId(subId);
 			// Update the existing row

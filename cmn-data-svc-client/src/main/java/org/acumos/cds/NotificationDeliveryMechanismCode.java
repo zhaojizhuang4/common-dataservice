@@ -21,21 +21,20 @@
 package org.acumos.cds;
 
 /**
- * This enum defines Acumos subscription scope type codes.
+ * This enum defines Acumos notification delivery mechanism type codes.
  */
-public enum SubscriptionScopeTypeCode {
+public enum NotificationDeliveryMechanismCode {
+	EM("Email"), //
+	TX("Text"); //
 
-	RF("Reference"), //
-	FL("Full");
+	private String typeName;
 
-	private String scopeName;
-
-	private SubscriptionScopeTypeCode(final String scopeName) {
-		this.scopeName = scopeName;
+	private NotificationDeliveryMechanismCode(final String typeName) {
+		this.typeName = typeName;
 	}
 
-	public String getScopeName() {
-		return scopeName;
+	public String getTypeName() {
+		return typeName;
 	}
 
 }

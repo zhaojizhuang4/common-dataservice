@@ -21,15 +21,17 @@
 package org.acumos.cds;
 
 /**
- * This enum defines Acumos notification delivery mechanism type codes.
+ * This enum defines Acumos message severity type codes.
  */
-public enum NotificationDeliveryMechanismTypeCode {
-	EM("Email"), //
-	TX("Text"); //
+public enum MessageSeverityCode {
+
+	HI("High"), //
+	ME("Medium"), //
+	LO("Low");
 
 	private String typeName;
 
-	private NotificationDeliveryMechanismTypeCode(final String typeName) {
+	private MessageSeverityCode(final String typeName) {
 		this.typeName = typeName;
 	}
 

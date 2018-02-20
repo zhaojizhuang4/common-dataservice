@@ -32,13 +32,13 @@ import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.ArtifactTypeCode;
 import org.acumos.cds.DeploymentStatusCode;
 import org.acumos.cds.LoginProviderCode;
-import org.acumos.cds.MessageSeverityTypeCode;
+import org.acumos.cds.MessageSeverityCode;
 import org.acumos.cds.ModelTypeCode;
-import org.acumos.cds.NotificationDeliveryMechanismTypeCode;
+import org.acumos.cds.NotificationDeliveryMechanismCode;
 import org.acumos.cds.PeerStatusCode;
 import org.acumos.cds.StepStatusCode;
 import org.acumos.cds.StepTypeCode;
-import org.acumos.cds.SubscriptionScopeTypeCode;
+import org.acumos.cds.SubscriptionScopeCode;
 import org.acumos.cds.ToolkitTypeCode;
 import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.ValidationTypeCode;
@@ -410,7 +410,7 @@ public class CdsControllerTest {
 			Assert.assertEquals(pr.getPeerId(), pr2.getPeerId());
 
 			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId(),
-					SubscriptionScopeTypeCode.FL.name(), AccessTypeCode.PB.toString());
+					SubscriptionScopeCode.FL.name(), AccessTypeCode.PB.toString());
 			ps = client.createPeerSubscription(ps);
 			logger.info("Created peer subscription {}", ps);
 
@@ -974,7 +974,7 @@ public class CdsControllerTest {
 			Date now = new Date();
 			no.setStart(new Date(now.getTime() - 60 * 1000));
 			no.setEnd(new Date(now.getTime() + 60 * 1000));
-			no.setMsgSeverityCode(String.valueOf(MessageSeverityTypeCode.LO));
+			no.setMsgSeverityCode(String.valueOf(MessageSeverityCode.LO));
 			no = client.createNotification(no);
 			Assert.assertNotNull(no.getNotificationId());
 
@@ -987,7 +987,7 @@ public class CdsControllerTest {
 			no2.setUrl("http://notify2.me");
 			no2.setStart(new Date(now.getTime() - 60 * 1000));
 			no2.setEnd(new Date(now.getTime() + 60 * 1000));
-			no2.setMsgSeverityCode(String.valueOf(MessageSeverityTypeCode.HI));
+			no2.setMsgSeverityCode(String.valueOf(MessageSeverityCode.HI));
 			no2 = client.createNotification(no2);
 
 			long notCountTrans = client.getNotificationCount();
@@ -1021,31 +1021,29 @@ public class CdsControllerTest {
 
 	@Test
 	public void testUserNotificationPreferences() throws Exception {
+		MLPUser cu = new MLPUser();
+		MLPUserNotifPref usrNotifPref = new MLPUserNotifPref();
+		
 		try {
-			MLPUser cu = new MLPUser();
 			final String loginName = "notif_" + Long.toString(new Date().getTime());
 			cu.setLoginName(loginName);
 			cu = client.createUser(cu);
 			Assert.assertNotNull(cu.getUserId());
 
-			MLPUserNotifPref usrNotifPref = new MLPUserNotifPref();
-
 			usrNotifPref.setUserId(cu.getUserId());
-			usrNotifPref.setNotfDelvMechCode(String.valueOf(NotificationDeliveryMechanismTypeCode.TX));
-			usrNotifPref.setMsgSeverityCode(String.valueOf(MessageSeverityTypeCode.HI));
+			usrNotifPref.setNotfDelvMechCode(String.valueOf(NotificationDeliveryMechanismCode.TX));
+			usrNotifPref.setMsgSeverityCode(String.valueOf(MessageSeverityCode.HI));
 
 			usrNotifPref = client.createUserNotificationPreference(usrNotifPref);
 			Assert.assertNotNull(usrNotifPref.getUserNotifPrefId());
 
-			usrNotifPref.setNotfDelvMechCode(String.valueOf(NotificationDeliveryMechanismTypeCode.EM));
+			usrNotifPref.setNotfDelvMechCode(String.valueOf(NotificationDeliveryMechanismCode.EM));
 			client.updateUserNotificationPreference(usrNotifPref);
 
 			List<MLPUserNotifPref> usrNotifPrefs = client.getUserNotificationPreferences(cu.getUserId());
 			Assert.assertTrue(usrNotifPrefs.iterator().hasNext());
 			logger.info("First user notification preference{}", usrNotifPrefs.iterator().next());
 
-			client.deleteUserNotificationPreference(usrNotifPref.getUserNotifPrefId());
-			client.deleteUser(cu.getUserId());
 		} catch (HttpStatusCodeException ex) {
 			logger.error("testUserNotificationPreferences got response {}", ex.getResponseBodyAsString());
 			logger.error("testUserNotificationPreferences failed", ex);
@@ -1060,9 +1058,21 @@ public class CdsControllerTest {
 			logger.info("create user notification preference failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			MLPUserNotifPref usrNotifPref = new MLPUserNotifPref();
-			usrNotifPref.setUserNotifPrefId(999L);
-			client.updateUserNotificationPreference(usrNotifPref);
+			client.createUserNotificationPreference(new MLPUserNotifPref(cu.getUserId(), "bogus", MessageSeverityCode.HI.name()));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("create user notification preference failed on bad deliv code as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createUserNotificationPreference(new MLPUserNotifPref(cu.getUserId(), NotificationDeliveryMechanismCode.EM.name(), "bogus"));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("create user notification preference failed on severity code as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPUserNotifPref unp = new MLPUserNotifPref();
+			unp.setUserNotifPrefId(999L);
+			client.updateUserNotificationPreference(unp);
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("update user notification preference failed as expected: {}", ex.getResponseBodyAsString());
@@ -1073,6 +1083,10 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("delete user notification prference failed as expected: {}", ex.getResponseBodyAsString());
 		}
+		
+		client.deleteUserNotificationPreference(usrNotifPref.getUserNotifPrefId());
+		client.deleteUser(cu.getUserId());
+
 	}
 
 	@Test
@@ -1124,6 +1138,18 @@ public class CdsControllerTest {
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("create step result failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createStepResult(new MLPStepResult("bogus", "name", StepStatusCode.FA.name(), new Date()));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("create step result failed on bad type code as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createStepResult(new MLPStepResult(StepTypeCode.OB.name(), "name", "bogus", new Date()));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("create step result failed on bad status code as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
 			MLPStepResult stepResult = new MLPStepResult();
@@ -1812,6 +1838,38 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create solution failed on constraints as expected: {}", ex.getResponseBodyAsString());
 		}
+		try {
+			MLPSolution s = new MLPSolution("name", cu.getUserId(), true);
+			s.setAccessTypeCode("bogus");
+			client.createSolution(s);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create solution failed on acc code as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPSolution s = new MLPSolution("name", cu.getUserId(), true);
+			s.setModelTypeCode("bogus");
+			client.createSolution(s);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create solution failed on model code as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPSolution s = new MLPSolution("name", cu.getUserId(), true);
+			s.setToolkitTypeCode("bogus");
+			client.createSolution(s);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create solution failed on toolkit code as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPSolution s = new MLPSolution("name", cu.getUserId(), true);
+			s.setValidationStatusCode("bogus");
+			client.createSolution(s);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create solution failed on validation code as expected: {}", ex.getResponseBodyAsString());
+		}
 		// This one is supposed to work
 		cs = new MLPSolution("sol name", cu.getUserId(), true);
 		cs = client.createSolution(cs);
@@ -1944,6 +2002,24 @@ public class CdsControllerTest {
 					ex.getResponseBodyAsString());
 		}
 		try {
+			client.createSolutionValidation(
+					new MLPSolutionValidation(cs.getSolutionId(), csr.getRevisionId(), "taskId", "bogus"));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create solution validation failed on bad type code as expected: {}",
+					ex.getResponseBodyAsString());
+		}
+		try {
+			MLPSolutionValidation sv = new MLPSolutionValidation(cs.getSolutionId(), csr.getRevisionId(), "taskId",
+					ValidationTypeCode.LC.name());
+			sv.setValidationStatusCode("bogus");
+			client.createSolutionValidation(sv);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create solution validation failed on bad status code as expected: {}",
+					ex.getResponseBodyAsString());
+		}
+		try {
 			client.updateSolutionValidation(
 					new MLPSolutionValidation(cs.getSolutionId(), "revId", "taskId", ValidationTypeCode.LC.name()));
 			throw new Exception("Unexpected success");
@@ -1981,6 +2057,12 @@ public class CdsControllerTest {
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create artifact failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createArtifact(new MLPArtifact("version", "bogus", "name", "URI", cu.getUserId(), 1));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create artifact failed on type code as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
 			client.updateArtifact(ca);
@@ -2066,13 +2148,13 @@ public class CdsControllerTest {
 			client.createValidationSequence(seq);
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("createValidationSequence failed as expected: {}", ex.getResponseBodyAsString());
+			logger.info("createValidationSequence failed on long code as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
 			client.deleteValidationSequence(new MLPValidationSequence(0, "bogus"));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("deleteValidationSequence failed as expected: {}", ex.getResponseBodyAsString());
+			logger.info("deleteValidationSequence failed on bad code as expected: {}", ex.getResponseBodyAsString());
 		}
 
 		try {
@@ -2217,8 +2299,6 @@ public class CdsControllerTest {
 			logger.info("Update rating failed on constraint as expected: {}", ex.getResponseBodyAsString());
 		}
 
-		MLPSolutionDeployment solDep = new MLPSolutionDeployment();
-		solDep.setDeploymentId(UUID.randomUUID().toString());
 		try {
 			client.getSolutionDeployments("bogus", "bogus", new RestPageRequest());
 			throw new Exception("Unexpected success");
@@ -2226,36 +2306,32 @@ public class CdsControllerTest {
 			logger.info("Get solution deployments failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			solDep.setSolutionId("bogus");
-			solDep.setRevisionId("bogus");
-			client.createSolutionDeployment(solDep);
+			client.createSolutionDeployment(new MLPSolutionDeployment("bogus", csr.getRevisionId(), cu.getUserId(),
+					DeploymentStatusCode.DP.name()));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create solution deployment failed on bad solution ID as expected: {}",
 					ex.getResponseBodyAsString());
 		}
 		try {
-			solDep.setSolutionId(cs.getSolutionId());
-			solDep.setRevisionId("bogus");
-			client.createSolutionDeployment(solDep);
+			client.createSolutionDeployment(new MLPSolutionDeployment(cs.getSolutionId(), "bogus", cu.getUserId(),
+					DeploymentStatusCode.DP.name()));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create solution deployment failed on bad revision ID as expected: {}",
 					ex.getResponseBodyAsString());
 		}
-		solDep.setRevisionId(csr.getRevisionId());
 		try {
-			solDep.setSolutionId(cs.getSolutionId());
-			solDep.setRevisionId(csr.getRevisionId());
-			solDep.setUserId("bogus");
-			client.createSolutionDeployment(solDep);
+			client.createSolutionDeployment(new MLPSolutionDeployment(cs.getSolutionId(), csr.getRevisionId(), "bogus",
+					DeploymentStatusCode.DP.name()));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create solution deployment failed on bad user ID as expected: {}",
 					ex.getResponseBodyAsString());
 		}
 		try {
-			solDep.setUserId(cu.getUserId());
+			MLPSolutionDeployment solDep = new MLPSolutionDeployment(cs.getSolutionId(), csr.getRevisionId(),
+					cu.getUserId(), DeploymentStatusCode.DP.name());
 			// Field too large
 			solDep.setTarget(s64 + s64);
 			client.createSolutionDeployment(solDep);
@@ -2264,7 +2340,17 @@ public class CdsControllerTest {
 			logger.info("Create solution deployment failed on constraints as expected: {}",
 					ex.getResponseBodyAsString());
 		}
+		try {
+			client.createSolutionDeployment(
+					new MLPSolutionDeployment(cs.getSolutionId(), csr.getRevisionId(), cu.getUserId(), "bogus"));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create solution deployment failed on bad code as expected: {}", ex.getResponseBodyAsString());
+		}
 
+		MLPSolutionDeployment solDep = new MLPSolutionDeployment(cs.getSolutionId(), csr.getRevisionId(),
+				cu.getUserId(), DeploymentStatusCode.DP.name());
+		solDep.setDeploymentId("bogus");
 		try {
 			client.updateSolutionDeployment(solDep);
 			throw new Exception("Unexpected success");
@@ -2351,7 +2437,7 @@ public class CdsControllerTest {
 		}
 		// This one should work
 		cn.setTitle("notif title");
-		cn.setMsgSeverityCode(String.valueOf(MessageSeverityTypeCode.HI));
+		cn.setMsgSeverityCode(String.valueOf(MessageSeverityCode.HI));
 		cn = client.createNotification(cn);
 		try {
 			client.createNotification(cn);
@@ -2386,6 +2472,20 @@ public class CdsControllerTest {
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create peer failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createPeer(new MLPPeer("peer name", "subj name", "api url", false, false, "contact 1", "bogus",
+					ValidationStatusCode.FA.name()));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create peer failed on bad peer stat code as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			cp = client.createPeer(new MLPPeer("peer name", "subj name", "api url", false, false, "contact 1",
+					PeerStatusCode.AC.name(), "bogus"));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create peer failed on bad val stat code as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
 			client.updatePeer(cp);
@@ -2439,6 +2539,20 @@ public class CdsControllerTest {
 			logger.info("Create peer sub failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
+			client.createPeerSubscription(
+					new MLPPeerSubscription(cp.getPeerId(), cu.getUserId(), "bogus", AccessTypeCode.PB.toString()));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create peer sub failed on bad scope code as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createPeerSubscription(new MLPPeerSubscription(cp.getPeerId(), cu.getUserId(),
+					SubscriptionScopeCode.FL.name(), "bogus"));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create peer sub failed on bad access code as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
 			MLPPeerSubscription ps = new MLPPeerSubscription(cp.getPeerId(), cu.getUserId(), "scope", "access");
 			ps.setSelector(
 					s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64 + s64);
@@ -2449,7 +2563,7 @@ public class CdsControllerTest {
 		}
 		// Supposed to work
 		MLPPeerSubscription ps = new MLPPeerSubscription(cp.getPeerId(), cu.getUserId(),
-				SubscriptionScopeTypeCode.FL.toString(), AccessTypeCode.PB.toString());
+				SubscriptionScopeCode.FL.toString(), AccessTypeCode.PB.toString());
 		ps = client.createPeerSubscription(ps);
 		try {
 			ps.setSelector(

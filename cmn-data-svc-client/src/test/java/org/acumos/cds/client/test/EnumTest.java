@@ -28,8 +28,8 @@ import org.acumos.cds.ModelTypeCode;
 import org.acumos.cds.ToolkitTypeCode;
 import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.ValidationTypeCode;
-import org.acumos.cds.MessageSeverityTypeCode;
-import org.acumos.cds.NotificationDeliveryMechanismTypeCode;
+import org.acumos.cds.MessageSeverityCode;
+import org.acumos.cds.NotificationDeliveryMechanismCode;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,7 +50,7 @@ public class EnumTest {
 		Assert.assertTrue(ValidationTypeCode.values().length > 0);
 		Assert.assertTrue(ValidationTypeCode.values().length > 0);
 		Assert.assertTrue(ValidationTypeCode.values().length > 0);
-		Assert.assertTrue(MessageSeverityTypeCode.values().length > 0);
-		Assert.assertTrue(NotificationDeliveryMechanismTypeCode.values().length > 0);
+		Assert.assertTrue(MessageSeverityCode.values().length > 0);
+		Assert.assertTrue(NotificationDeliveryMechanismCode.values().length > 0);
 	}
 }

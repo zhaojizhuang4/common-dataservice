@@ -32,13 +32,13 @@ import javax.validation.ConstraintViolationException;
 import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.ArtifactTypeCode;
 import org.acumos.cds.LoginProviderCode;
-import org.acumos.cds.MessageSeverityTypeCode;
+import org.acumos.cds.MessageSeverityCode;
 import org.acumos.cds.ModelTypeCode;
-import org.acumos.cds.NotificationDeliveryMechanismTypeCode;
+import org.acumos.cds.NotificationDeliveryMechanismCode;
 import org.acumos.cds.PeerStatusCode;
 import org.acumos.cds.StepStatusCode;
 import org.acumos.cds.StepTypeCode;
-import org.acumos.cds.SubscriptionScopeTypeCode;
+import org.acumos.cds.SubscriptionScopeCode;
 import org.acumos.cds.ToolkitTypeCode;
 import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.domain.MLPArtifact;
@@ -244,7 +244,7 @@ public class CdsRepositoryServiceTest {
 			notif.setMessage("Notification message");
 			notif.setUrl("http://www.yahoo.com");
 			notif.setStart(new Date());
-			notif.setMsgSeverityCode(String.valueOf(MessageSeverityTypeCode.LO));
+			notif.setMsgSeverityCode(String.valueOf(MessageSeverityCode.LO));
 			Calendar c = Calendar.getInstance();
 			c.setTime(new Date()); // Now use today date.
 			c.add(Calendar.DATE, 5); // Adding 5 days
@@ -298,7 +298,7 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(searchPeers.getNumberOfElements() == 1);
 
 			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId(),
-					SubscriptionScopeTypeCode.FL.name(), AccessTypeCode.PB.name());
+					SubscriptionScopeCode.FL.name(), AccessTypeCode.PB.name());
 			ps = peerSubscriptionRepository.save(ps);
 			logger.info("Peer subscription {}", ps);
 
@@ -702,7 +702,7 @@ public class CdsRepositoryServiceTest {
 			Assert.assertNotNull(pr.getCreated());
 
 			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId(),
-					SubscriptionScopeTypeCode.FL.toString(), AccessTypeCode.PB.toString());
+					SubscriptionScopeCode.FL.toString(), AccessTypeCode.PB.toString());
 			ps = peerSubscriptionRepository.save(ps);
 			Assert.assertNotNull(ps.getSubId());
 
@@ -1017,7 +1017,7 @@ public class CdsRepositoryServiceTest {
 			no.setTitle("notif title");
 			no.setMessage("notif msg");
 			no.setUrl("http://notify.me");
-			no.setMsgSeverityCode(String.valueOf(MessageSeverityTypeCode.HI));
+			no.setMsgSeverityCode(String.valueOf(MessageSeverityCode.HI));
 			Date now = new Date();
 			no.setStart(new Date(now.getTime() - 1000));
 			no.setEnd(new Date(now.getTime() + 60 * 60 * 1000));
@@ -1060,8 +1060,8 @@ public class CdsRepositoryServiceTest {
 
 			MLPUserNotifPref usrNotifPref = new MLPUserNotifPref();
 			usrNotifPref.setUserId(cu.getUserId());
-			usrNotifPref.setNotfDelvMechCode(String.valueOf(NotificationDeliveryMechanismTypeCode.TX));
-			usrNotifPref.setMsgSeverityCode(String.valueOf(MessageSeverityTypeCode.HI));
+			usrNotifPref.setNotfDelvMechCode(String.valueOf(NotificationDeliveryMechanismCode.TX));
+			usrNotifPref.setMsgSeverityCode(String.valueOf(MessageSeverityCode.HI));
 
 			usrNotifPref = usrNotifPrefRepository.save(usrNotifPref);
 			Assert.assertNotNull(usrNotifPref.getUserNotifPrefId());
@@ -1069,7 +1069,7 @@ public class CdsRepositoryServiceTest {
 			Iterable<MLPUserNotifPref> usrNotifPrefs = usrNotifPrefRepository.findByUserId(cu.getUserId());
 			Assert.assertTrue(usrNotifPrefs.iterator().hasNext());
 
-			usrNotifPref.setNotfDelvMechCode(String.valueOf(NotificationDeliveryMechanismTypeCode.EM));
+			usrNotifPref.setNotfDelvMechCode(String.valueOf(NotificationDeliveryMechanismCode.EM));
 			usrNotifPref = usrNotifPrefRepository.save(usrNotifPref);
 			Assert.assertTrue(usrNotifPrefRepository.findOne(usrNotifPref.getUserNotifPrefId()).getNotfDelvMechCode()
 					.equals("EM"));
