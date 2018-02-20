@@ -282,7 +282,7 @@ public class CdsRepositoryServiceTest {
 			// Create Peer
 			MLPPeer pr = new MLPPeer();
 			pr.setName("Peer-" + Long.toString(new Date().getTime()));
-			pr.setSubjectName("x.509");
+			pr.setSubjectName("x."+ String.valueOf(new Random().nextInt()));
 			pr.setApiUrl("http://peer-api");
 			pr.setContact1("Tyrion Lannister");
 			pr.setStatusCode(PeerStatusCode.AC.name());
@@ -695,7 +695,7 @@ public class CdsRepositoryServiceTest {
 
 			// Create Peer
 			final String peerName = "Peer-" + Long.toString(new Date().getTime());
-			MLPPeer pr = new MLPPeer(peerName, "x.509", "http://peer-api", true, true, "", PeerStatusCode.AC.name(),
+			MLPPeer pr = new MLPPeer(peerName, "x."+ String.valueOf(new Random().nextInt()), "http://peer-api", true, true, "", PeerStatusCode.AC.name(),
 					ValidationStatusCode.IP.name());
 			pr = peerRepository.save(pr);
 			Assert.assertNotNull(pr.getPeerId());
@@ -1157,13 +1157,13 @@ public class CdsRepositoryServiceTest {
 		logger.info("Created solution " + cs2);
 
 		final String peerName = "Peer-" + Long.toString(new Date().getTime());
-		MLPPeer pr = new MLPPeer(peerName, "x.509", "http://peer-api", true, false, "contact", PeerStatusCode.AC.name(),
+		MLPPeer pr = new MLPPeer(peerName, "x."+ String.valueOf(new Random().nextInt()), "http://peer-api", true, false, "contact", PeerStatusCode.AC.name(),
 				ValidationStatusCode.FA.name());
 		pr = peerRepository.save(pr);
 		logger.info("Created peer " + pr);
 
 		final String peerName2 = "Peer-" + Long.toString(new Date().getTime());
-		MLPPeer pr2 = new MLPPeer(peerName2, "x.509", "http://peer-api", true, false, "contact",
+		MLPPeer pr2 = new MLPPeer(peerName2, "x."+ String.valueOf(new Random().nextInt()), "http://peer-api", true, false, "contact",
 				PeerStatusCode.AC.name(), ValidationStatusCode.FA.name());
 		pr2 = peerRepository.save(pr2);
 		logger.info("Created second peer " + pr2);

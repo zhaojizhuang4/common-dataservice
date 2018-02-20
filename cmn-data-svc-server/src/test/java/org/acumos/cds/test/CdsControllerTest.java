@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import org.acumos.cds.AccessTypeCode;
@@ -1023,7 +1024,7 @@ public class CdsControllerTest {
 	public void testUserNotificationPreferences() throws Exception {
 		MLPUser cu = new MLPUser();
 		MLPUserNotifPref usrNotifPref = new MLPUserNotifPref();
-		
+
 		try {
 			final String loginName = "notif_" + Long.toString(new Date().getTime());
 			cu.setLoginName(loginName);
@@ -1058,16 +1059,20 @@ public class CdsControllerTest {
 			logger.info("create user notification preference failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.createUserNotificationPreference(new MLPUserNotifPref(cu.getUserId(), "bogus", MessageSeverityCode.HI.name()));
+			client.createUserNotificationPreference(
+					new MLPUserNotifPref(cu.getUserId(), "bogus", MessageSeverityCode.HI.name()));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("create user notification preference failed on bad deliv code as expected: {}", ex.getResponseBodyAsString());
+			logger.info("create user notification preference failed on bad deliv code as expected: {}",
+					ex.getResponseBodyAsString());
 		}
 		try {
-			client.createUserNotificationPreference(new MLPUserNotifPref(cu.getUserId(), NotificationDeliveryMechanismCode.EM.name(), "bogus"));
+			client.createUserNotificationPreference(
+					new MLPUserNotifPref(cu.getUserId(), NotificationDeliveryMechanismCode.EM.name(), "bogus"));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("create user notification preference failed on severity code as expected: {}", ex.getResponseBodyAsString());
+			logger.info("create user notification preference failed on severity code as expected: {}",
+					ex.getResponseBodyAsString());
 		}
 		try {
 			MLPUserNotifPref unp = new MLPUserNotifPref();
@@ -1083,7 +1088,7 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("delete user notification prference failed as expected: {}", ex.getResponseBodyAsString());
 		}
-		
+
 		client.deleteUserNotificationPreference(usrNotifPref.getUserNotifPrefId());
 		client.deleteUser(cu.getUserId());
 
@@ -1464,8 +1469,8 @@ public class CdsControllerTest {
 			logger.info("Created solution " + cs.getSolutionId());
 
 			final String peerName = "Peer-" + Long.toString(new Date().getTime());
-			MLPPeer pr = new MLPPeer(peerName, "x.509", "http://peer-api", true, true, "contact",
-					PeerStatusCode.AC.name(), ValidationStatusCode.FA.name());
+			MLPPeer pr = new MLPPeer(peerName, "x." + String.valueOf(new Random().nextInt()), "http://peer-api", true,
+					true, "contact", PeerStatusCode.AC.name(), ValidationStatusCode.FA.name());
 			pr = client.createPeer(pr);
 			logger.info("Created peer " + pr.getPeerId());
 
@@ -2512,6 +2517,14 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create peer failed on dupe as expected: {}", ex.getResponseBodyAsString());
 		}
+
+		try {
+			cp = client.createPeer(new MLPPeer("another peer name", "subj name", "api url", false, false, "contact 2",
+					PeerStatusCode.DC.name(), ValidationStatusCode.FA.name()));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create peer failed on duplicate subject name as expected: {}", ex.getResponseBodyAsString());
+		}
 		try {
 			cp.setName(s64);
 			client.updatePeer(cp);
@@ -2546,8 +2559,8 @@ public class CdsControllerTest {
 			logger.info("Create peer sub failed on bad scope code as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.createPeerSubscription(new MLPPeerSubscription(cp.getPeerId(), cu.getUserId(),
-					SubscriptionScopeCode.FL.name(), "bogus"));
+			client.createPeerSubscription(
+					new MLPPeerSubscription(cp.getPeerId(), cu.getUserId(), SubscriptionScopeCode.FL.name(), "bogus"));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create peer sub failed on bad access code as expected: {}", ex.getResponseBodyAsString());

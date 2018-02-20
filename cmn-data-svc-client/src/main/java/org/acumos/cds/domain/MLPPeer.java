@@ -56,7 +56,7 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	/**
 	 * For x.509 certificate
 	 */
-	@Column(name = "SUBJECT_NAME", columnDefinition = "VARCHAR(100)")
+	@Column(name = "SUBJECT_NAME", nullable = false, unique = true, columnDefinition = "VARCHAR(100)")
 	@Size(max = 100)
 	private String subjectName;
 

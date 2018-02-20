@@ -26,9 +26,9 @@ package org.acumos.cds;
 public enum PeerStatusCode {
 	AC("Active"), //
 	IN("Inactive"), //
-	PA("Pending Active"), //
-	RM("Removed"), //
-	PR("Pending Remove");
+	RQ("Requested"), //
+	RN("Renounced"), //
+	DC("Declined");
 
 	private String statusName;
 
