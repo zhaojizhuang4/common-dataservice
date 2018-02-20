@@ -86,18 +86,14 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	private String contact1;
 
 	/**
-	 * Peer status. This exposes the database code for simplicity. Alternately this
-	 * column could be mapped using @ManyToOne and @JoinColumn as an MLPPeerStatus
-	 * object.
+	 * This code is defined by {@link org.acumos.cds.PeerStatusCode}
 	 */
 	@Column(name = "STATUS_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@Size(max = 2)
 	private String statusCode;
 
 	/**
-	 * Validation status. This exposes the database code for simplicity. Alternately
-	 * this column could be mapped using @ManyToOne and @JoinColumn as an
-	 * MLPValidationStatus object.
+	 * This code is defined by {@link org.acumos.cds.ValidationStatusCode}
 	 */
 	@Column(name = "VALIDATION_STATUS_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@Size(max = 2)

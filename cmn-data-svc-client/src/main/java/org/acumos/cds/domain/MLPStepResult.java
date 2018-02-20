@@ -56,6 +56,9 @@ public class MLPStepResult implements MLPEntity, Serializable {
 	@Size(max = 36)
 	private String trackingId;
 
+	/**
+	 * This code is defined by {@link org.acumos.cds.StepTypeCode}
+	 */
 	@Column(name = "STEP_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Step code cannot be null")
 	@Size(max = 2)
@@ -82,6 +85,9 @@ public class MLPStepResult implements MLPEntity, Serializable {
 	@Size(max = 100)
 	private String name;
 
+	/**
+	 * This code is defined by {@link org.acumos.cds.StepStatusCode}
+	 */
 	@Column(name = "STATUS_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Status code cannot be null")
 	@Size(max = 2)

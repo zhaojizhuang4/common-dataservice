@@ -103,7 +103,7 @@ public class MLPValidationSequence extends MLPTimestampedEntity implements Seria
 	private Integer sequence;
 
 	/**
-	 * Validation type; e.g., security scan
+	 * This code is defined by {@link org.acumos.cds.ValidationTypeCode}
 	 */
 	@Id
 	@Column(name = "VAL_TYPE_CD", updatable = false, nullable = false, columnDefinition = "CHAR(2)")

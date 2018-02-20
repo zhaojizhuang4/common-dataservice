@@ -117,7 +117,7 @@ public abstract class AbstractSearchServiceImpl {
 	 *            Query criteria
 	 * @param pageable
 	 *            Page size and sort criteria
-	 * @return
+	 * @return a list containing at most the specified number of results
 	 */
 	protected List<?> getPageOfResults(Criteria criteria, Pageable pageable) {
 

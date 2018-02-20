@@ -58,17 +58,14 @@ public class MLPPeerSubscription extends MLPTimestampedEntity implements Seriali
 	private String ownerId;
 
 	/**
-	 * This exposes the database code for simplicity. Alternately this column could
-	 * be mapped using @ManyToOne and @JoinColumn as an MLPSubscriptionScopeType
-	 * object.
+	 * This code is defined by {@link org.acumos.cds.SubscriptionScopeCode}
 	 */
 	@Column(name = "SCOPE_TYPE", nullable = false, columnDefinition = "CHAR(2)")
 	@Size(max = 2)
 	private String scopeType;
 
 	/**
-	 * This exposes the database code for simplicity. Alternately this column could
-	 * be mapped using @ManyToOne and @JoinColumn as an MLPAccessType object.
+	 * This code is defined by {@link org.acumos.cds.AccessTypeCode}
 	 */
 	@Column(name = "ACCESS_TYPE", nullable = false, columnDefinition = "CHAR(2)")
 	@Size(max = 2)

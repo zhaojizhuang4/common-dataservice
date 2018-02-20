@@ -65,6 +65,9 @@ public class MLPSolutionDeployment extends MLPTimestampedEntity implements Seria
 	@Size(max = 36)
 	private String userId;
 
+	/**
+	 * This code is defined by {@link org.acumos.cds.DeploymentStatusCode}
+	 */
 	@Column(name = "DEP_STATUS_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@Size(max = 2)
 	private String deploymentStatusCode;

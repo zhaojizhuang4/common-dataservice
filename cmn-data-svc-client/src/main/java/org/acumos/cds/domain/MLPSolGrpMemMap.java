@@ -35,7 +35,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
 
 /**
- * Model for a row in the solution group - solution mapping table. 
+ * Model for a row in the solution group - solution mapping table.
  */
 @Entity
 @IdClass(MLPSolGrpMemMap.SolGrpMemMapPK.class)

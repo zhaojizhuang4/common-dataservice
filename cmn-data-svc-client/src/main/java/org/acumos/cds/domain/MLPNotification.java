@@ -61,6 +61,9 @@ public class MLPNotification extends MLPTimestampedEntity implements Serializabl
 	@Size(max = 2048)
 	private String message;
 
+	/**
+	 * This code is defined by {@link org.acumos.cds.MessageSeverityCode}
+	 */
 	@Column(name = "MSG_SEVERITY_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Message Severity Code cannot be null")
 	@Size(max = 2)

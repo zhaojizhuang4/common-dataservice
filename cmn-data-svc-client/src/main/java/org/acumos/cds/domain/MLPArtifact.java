@@ -58,8 +58,7 @@ public final class MLPArtifact extends MLPTimestampedEntity implements Serializa
 	private String version;
 
 	/**
-	 * This exposes the database code for simplicity. Alternately this column could
-	 * be mapped using @ManyToOne and @JoinColumn as an MLPArtifactType object.
+	 * This code is defined by {@link org.acumos.cds.ArtifactTypeCode}
 	 */
 	@Column(name = "ARTIFACT_TYPE_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "The type code cannot be null")

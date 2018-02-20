@@ -86,32 +86,28 @@ public class MLPSolution extends MLPTimestampedEntity implements Serializable {
 	private boolean active;
 
 	/**
-	 * This exposes the database code for simplicity. Alternately this column could
-	 * be mapped using @ManyToOne and @JoinColumn as an MLPAcessType object.
+	 * This code is defined by {@link org.acumos.cds.AccessTypeCode}
 	 */
 	@Column(name = "ACCESS_TYPE_CD", columnDefinition = "CHAR(2)")
 	@Size(max = 2)
 	private String accessTypeCode;
 
 	/**
-	 * This exposes the database code for simplicity. Alternately this column could
-	 * be mapped using @ManyToOne and @JoinColumn as an MLPModelType object.
+	 * This code is defined by {@link org.acumos.cds.ModelTypeCode}
 	 */
 	@Column(name = "MODEL_TYPE_CD", columnDefinition = "CHAR(2)")
 	@Size(max = 2)
 	private String modelTypeCode;
 
 	/**
-	 * This exposes the database code for simplicity. Alternately this column could
-	 * be mapped using @ManyToOne and @JoinColumn as an MLPToolkitType object.
+	 * This code is defined by {@link org.acumos.cds.ToolkitTypeCode}
 	 */
 	@Column(name = "TOOLKIT_TYPE_CD", columnDefinition = "CHAR(2)")
 	@Size(max = 2)
 	private String toolkitTypeCode;
 
 	/**
-	 * This exposes the database code for simplicity. Alternately this column could
-	 * be mapped using @ManyToOne and @JoinColumn as an MLPValidationStatus object.
+	 * This code is defined by {@link org.acumos.cds.ValidationStatusCode}
 	 */
 	@Column(name = "VALIDATION_STATUS_CD", columnDefinition = "CHAR(2)")
 	@Size(max = 2)

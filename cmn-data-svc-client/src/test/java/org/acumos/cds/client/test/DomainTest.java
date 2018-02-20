@@ -25,24 +25,22 @@ import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
-import org.acumos.cds.domain.MLPPeerGrpMemMap;
-import org.acumos.cds.domain.MLPPeerPeerAccMap;
-import org.acumos.cds.domain.MLPPeerSolAccMap;
-import org.acumos.cds.domain.MLPSolGrpMemMap;
 import org.acumos.cds.domain.MLPLoginProvider;
-import org.acumos.cds.domain.MLPMessageSeverityType;
 import org.acumos.cds.domain.MLPModelType;
 import org.acumos.cds.domain.MLPNotifUserMap;
 import org.acumos.cds.domain.MLPNotification;
-import org.acumos.cds.domain.MLPNotificationDeliveryMechanismType;
 import org.acumos.cds.domain.MLPPasswordChangeRequest;
 import org.acumos.cds.domain.MLPPeer;
-import org.acumos.cds.domain.MLPPeerStatus;
 import org.acumos.cds.domain.MLPPeerGroup;
+import org.acumos.cds.domain.MLPPeerGrpMemMap;
+import org.acumos.cds.domain.MLPPeerPeerAccMap;
+import org.acumos.cds.domain.MLPPeerSolAccMap;
+import org.acumos.cds.domain.MLPPeerStatus;
 import org.acumos.cds.domain.MLPPeerSubscription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
 import org.acumos.cds.domain.MLPSiteConfig;
+import org.acumos.cds.domain.MLPSolGrpMemMap;
 import org.acumos.cds.domain.MLPSolRevArtMap;
 import org.acumos.cds.domain.MLPSolTagMap;
 import org.acumos.cds.domain.MLPSolUserAccMap;
@@ -63,8 +61,8 @@ import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
-import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPUserNotifPref;
+import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPUserRoleMap;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
@@ -207,34 +205,6 @@ public class DomainTest extends AbstractModelTest {
 	@Test
 	public void testMLPModelType() {
 		MLPModelType m = new MLPModelType();
-		m.setCode(s1);
-		m.setName(s2);
-		Assert.assertEquals(s1, m.getCode());
-		Assert.assertEquals(s2, m.getName());
-		Assert.assertFalse(m.equals(null));
-		Assert.assertFalse(m.equals(new Object()));
-		Assert.assertTrue(m.equals(m));
-		Assert.assertNotNull(m.hashCode());
-		logger.info(m.toString());
-	}
-
-	@Test
-	public void testMLPMessageSeverityType() {
-		MLPMessageSeverityType m = new MLPMessageSeverityType();
-		m.setCode(s1);
-		m.setName(s2);
-		Assert.assertEquals(s1, m.getCode());
-		Assert.assertEquals(s2, m.getName());
-		Assert.assertFalse(m.equals(null));
-		Assert.assertFalse(m.equals(new Object()));
-		Assert.assertTrue(m.equals(m));
-		Assert.assertNotNull(m.hashCode());
-		logger.info(m.toString());
-	}
-
-	@Test
-	public void testMLPNotifDelvMechType() {
-		MLPNotificationDeliveryMechanismType m = new MLPNotificationDeliveryMechanismType();
 		m.setCode(s1);
 		m.setName(s2);
 		Assert.assertEquals(s1, m.getCode());

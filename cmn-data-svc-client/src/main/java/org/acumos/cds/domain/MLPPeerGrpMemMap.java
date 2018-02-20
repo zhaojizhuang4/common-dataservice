@@ -35,7 +35,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
 
 /**
- * Model for a row in the peer group - peer mapping table. 
+ * Model for a row in the peer group - peer mapping table.
  */
 @Entity
 @IdClass(MLPPeerGrpMemMap.PeerGrpMemMapPK.class)

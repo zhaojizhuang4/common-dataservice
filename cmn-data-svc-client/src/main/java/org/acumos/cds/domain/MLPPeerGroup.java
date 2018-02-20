@@ -52,5 +52,5 @@ public class MLPPeerGroup extends MLPAbstractGroup implements Serializable {
 	public MLPPeerGroup(String name) {
 		super(name);
 	}
-	
+
 }

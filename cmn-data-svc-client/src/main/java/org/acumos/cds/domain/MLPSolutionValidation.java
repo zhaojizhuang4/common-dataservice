@@ -117,17 +117,14 @@ public class MLPSolutionValidation extends MLPTimestampedEntity implements Seria
 	private String taskId;
 
 	/**
-	 * Validation type; e.g., security scan
+	 * This code is defined by {@link org.acumos.cds.ValidationTypeCode}
 	 */
 	@Column(name = "VAL_TYPE_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@Size(max = 2)
 	private String validationTypeCode;
 
 	/**
-	 * Validation status; e.g., pass. Can be null.
-	 * 
-	 * This exposes the database code for simplicity. Alternately this column could
-	 * be mapped using @ManyToOne and @JoinColumn as an MLPValidationStatus object.
+	 * This code is defined by {@link org.acumos.cds.ValidationStatusCode}
 	 */
 	@Column(name = "VAL_STATUS_CD", columnDefinition = "CHAR(2)")
 	@Size(max = 2)

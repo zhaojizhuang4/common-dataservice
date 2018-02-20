@@ -106,6 +106,9 @@ public class MLPUserLoginProvider extends MLPTimestampedEntity implements Serial
 	@NotNull(message = "UserId cannot be null")
 	private String userId;
 
+	/**
+	 * This code is defined by {@link org.acumos.cds.LoginProviderCode}
+	 */
 	@Id
 	@Column(name = "PROVIDER_CD", updatable = false, nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "ProviderCode cannot be null")
