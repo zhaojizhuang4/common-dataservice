@@ -498,7 +498,7 @@ public class CdsControllerTest {
 			MLPSolution cs = new MLPSolution();
 			cs.setName("solution name");
 			cs.setOwnerId(cu.getUserId());
-			cs.setValidationStatusCode(ValidationStatusCode.IP.name());
+			cs.setValidationStatusCode(ValidationStatusCode.PS.name());
 			cs.setProvider("Big Data Org");
 			cs.setAccessTypeCode(AccessTypeCode.PB.name());
 			cs.setModelTypeCode(ModelTypeCode.CL.name());
@@ -514,7 +514,7 @@ public class CdsControllerTest {
 			MLPSolution csOrg = new MLPSolution();
 			csOrg.setName("solution organization");
 			csOrg.setOwnerId(cu.getUserId());
-			csOrg.setValidationStatusCode(ValidationStatusCode.IP.name());
+			csOrg.setValidationStatusCode(ValidationStatusCode.PS.name());
 			csOrg.setProvider("Sol Org");
 			csOrg.setAccessTypeCode(AccessTypeCode.OR.name());
 			csOrg.setModelTypeCode(ModelTypeCode.DS.name());
@@ -621,7 +621,7 @@ public class CdsControllerTest {
 
 			String[] accessTypeCodes = { AccessTypeCode.PB.name(), AccessTypeCode.OR.name() };
 			String[] modelTypeCodes = null;
-			String[] valStatusCodes = { ValidationStatusCode.IP.name(), "null" };
+			String[] valStatusCodes = { ValidationStatusCode.PS.name(), "null" };
 			searchTags = null;
 			// find active solutions
 			RestPageResponse<MLPSolution> portalActiveMatches = client.findPortalSolutions(nameKw, descKw, true, owners,
@@ -667,10 +667,11 @@ public class CdsControllerTest {
 
 			// Requires revisions and artifacts!
 			String[] searchAccessTypeCodes = new String[] { AccessTypeCode.PB.name() };
+			String[] searchValidationStatusCodes = new String[] { ValidationStatusCode.PS.name() };
 			Date anHourAgo = new java.util.Date();
 			anHourAgo.setTime(new Date().getTime() - (1000L * 60 * 60));
-			RestPageResponse<MLPSolution> sld = client.findSolutionsByDate(searchAccessTypeCodes, anHourAgo,
-					new RestPageRequest(0, 1));
+			RestPageResponse<MLPSolution> sld = client.findSolutionsByDate(true, searchAccessTypeCodes,
+					searchValidationStatusCodes, anHourAgo, new RestPageRequest(0, 1));
 			Assert.assertTrue(sld != null && sld.getNumberOfElements() > 0);
 			logger.info("Found solutions by date: " + sld.getContent().size());
 

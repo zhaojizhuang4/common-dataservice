@@ -451,9 +451,12 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public RestPageResponse<MLPSolution> findSolutionsByDate(String[] accessTypeCodes, Date date, RestPageRequest pageRequest) {
+	public RestPageResponse<MLPSolution> findSolutionsByDate(boolean active, String[] accessTypeCodes,
+			String[] validationStatusCodes, Date date, RestPageRequest pageRequest) {
 		HashMap<String, Object> parms = new HashMap<>();
+		parms.put(CCDSConstants.SEARCH_ACTIVE, active);
 		parms.put(CCDSConstants.SEARCH_ACCESS_TYPES, accessTypeCodes);
+		parms.put(CCDSConstants.SEARCH_VAL_STATUSES, validationStatusCodes);
 		parms.put(CCDSConstants.SEARCH_DATE, new Long(date.getTime()));
 		URI uri = buildUri(
 				new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH, CCDSConstants.DATE_PATH }, parms,

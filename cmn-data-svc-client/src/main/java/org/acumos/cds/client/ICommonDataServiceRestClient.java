@@ -224,20 +224,25 @@ public interface ICommonDataServiceRestClient {
 	RestPageResponse<MLPSolution> findSolutionsByTag(String tag, RestPageRequest pageRequest);
 
 	/**
-	 * Finds solutions modified after the specified date, including modifications to
-	 * the solution, the revisions for the solution, and the artifacts in the
-	 * revisions.
+	 * Finds solutions with the specified status, access type and validation status
+	 * code(s) that were modified after the specified date. Checks the last-updated
+	 * date on the solution, the revisions for the solution, and the artifacts in
+	 * the revisions.
 	 * 
+	 * @param active
+	 *            Solution active status; true for active, false for inactive
 	 * @param accessTypeCodes
-	 *            Array of access-type codes (required).
+	 *            Array of access-type codes (required)
+	 * @param validationStatusCodes
+	 *            Array of Validation status codes (required)
 	 * @param date
 	 *            Date threshold
 	 * @param pageRequest
 	 *            Page index, page size, sort information; ignored if null.
 	 * @return Page of solution objects.
 	 */
-	RestPageResponse<MLPSolution> findSolutionsByDate(String[] accessTypeCodes, Date date,
-			RestPageRequest pageRequest);
+	RestPageResponse<MLPSolution> findSolutionsByDate(boolean active, String[] accessTypeCodes,
+			String[] validationStatusCodes, Date date, RestPageRequest pageRequest);
 
 	/**
 	 * Finds solutions that match every specified condition. Special-purpose method

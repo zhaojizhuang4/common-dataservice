@@ -286,7 +286,7 @@ public class CdsRepositoryServiceTest {
 			pr.setApiUrl("http://peer-api");
 			pr.setContact1("Tyrion Lannister");
 			pr.setStatusCode(PeerStatusCode.AC.name());
-			pr.setValidationStatusCode(ValidationStatusCode.FA.name());
+			pr.setValidationStatusCode(ValidationStatusCode.PS.name());
 			pr = peerRepository.save(pr);
 			Assert.assertNotNull(pr.getPeerId());
 			Assert.assertNotNull(pr.getCreated());
@@ -391,7 +391,7 @@ public class CdsRepositoryServiceTest {
 			cs.setAccessTypeCode(AccessTypeCode.PB.name());
 			cs.setModelTypeCode(ModelTypeCode.CL.name());
 			cs.setToolkitTypeCode(ToolkitTypeCode.SK.name());
-			cs.setValidationStatusCode(ValidationStatusCode.SB.name());
+			cs.setValidationStatusCode(ValidationStatusCode.PS.name());
 			// tags must exist; they are not created here
 			cs.getTags().add(solTag1);
 			cs = solutionRepository.save(cs);
@@ -420,7 +420,7 @@ public class CdsRepositoryServiceTest {
 			String[] ownerIds = { cu.getUserId() };
 			String[] accessTypeCodes = { null, AccessTypeCode.PB.name() };
 			String[] modelTypeCodes = { ModelTypeCode.CL.name() };
-			String[] valStatusCodes = { ValidationStatusCode.SB.name() };
+			String[] valStatusCodes = { ValidationStatusCode.PS.name() };
 			String[] searchTags = { solTag1.getTag() };
 			Page<MLPSolution> portalSearchResult = solutionSearchService.findPortalSolutions(solKw, descKw, active,
 					ownerIds, accessTypeCodes, modelTypeCodes, valStatusCodes, searchTags,
@@ -541,10 +541,11 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(solByTag != null && solByTag.iterator().hasNext());
 
 			String[] accessTypes = new String[] { AccessTypeCode.PB.name() };
+			String[] valStatuses = new String[] { ValidationStatusCode.PS.name() };
 			Date anHourAgo = new java.util.Date();
 			anHourAgo.setTime(new Date().getTime() - (1000L * 60 * 60));
-			Iterable<MLPSolution> solByDate = solutionRepository.findModifiedAfter(accessTypes, anHourAgo,
-					new PageRequest(0, 5, null));
+			Iterable<MLPSolution> solByDate = solutionRepository.findModifiedAfter(true, accessTypes, valStatuses,
+					anHourAgo, new PageRequest(0, 5, null));
 			logger.info("Solutions by date: {}", solByDate);
 			Assert.assertTrue(solByDate != null && solByDate.iterator().hasNext());
 

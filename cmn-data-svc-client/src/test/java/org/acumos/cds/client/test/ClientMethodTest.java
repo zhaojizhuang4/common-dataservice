@@ -130,7 +130,7 @@ public class ClientMethodTest {
 			client.getStepTypes();
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
-		}		
+		}
 	}
 
 	@Test
@@ -194,7 +194,7 @@ public class ClientMethodTest {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
 		try {
-			client.findSolutionsByDate(new String[0], new Date(), new RestPageRequest());
+			client.findSolutionsByDate(true, new String[0], new String[0], new Date(), new RestPageRequest());
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}

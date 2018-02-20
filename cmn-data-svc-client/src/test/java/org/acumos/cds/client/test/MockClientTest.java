@@ -122,8 +122,9 @@ public class MockClientTest {
 		Assert.assertTrue(solutions3 == client.findSolutionsByTag("string", pageRequest));
 		RestPageResponse<MLPSolution> solutions4 = new RestPageResponse<>();
 		client.setSolutionsByDate(solutions4);
-		Assert.assertTrue(solutions4 == client.findSolutionsByDate(new String[0], new Date(), pageRequest));
-		
+		Assert.assertTrue(
+				solutions4 == client.findSolutionsByDate(true, new String[0], new String[0], new Date(), pageRequest));
+
 		MLPSolution solution = new MLPSolution();
 		client.setSolutionById(solution);
 		Assert.assertTrue(solution == client.getSolution("id"));
@@ -461,7 +462,7 @@ public class MockClientTest {
 		Assert.assertTrue(stepResult == client.createStepResult(stepResult));
 		client.updateStepResult(stepResult);
 		client.deleteStepResult(0L);
-		
+
 		RestPageResponse<MLPPeerGroup> peerGroups = new RestPageResponse<>();
 		client.setPeerGroups(peerGroups);
 		Assert.assertTrue(peerGroups == client.getPeerGroups(new RestPageRequest()));
@@ -479,15 +480,15 @@ public class MockClientTest {
 		Assert.assertTrue(solGroup == client.createSolutionGroup(solGroup));
 		client.updateSolutionGroup(solGroup);
 		client.deleteSolutionGroup(0L);
-	
+
 		RestPageResponse<MLPPeer> peersInGroup = new RestPageResponse<>();
-		client. setPeersInGroup(peersInGroup);
+		client.setPeersInGroup(peersInGroup);
 		Assert.assertTrue(peersInGroup == client.getPeersInGroup(0L, new RestPageRequest()));
 		client.addPeerToGroup("peerId", 0L);
 		client.dropPeerFromGroup("peerId", 0L);
-		
+
 		RestPageResponse<MLPSolution> solsInGroup = new RestPageResponse<>();
-		client. setSolutionsInGroup(solsInGroup);
+		client.setSolutionsInGroup(solsInGroup);
 		Assert.assertTrue(solsInGroup == client.getSolutionsInGroup(0L, new RestPageRequest()));
 		client.addSolutionToGroup("peerId", 0L);
 		client.dropSolutionFromGroup("peerId", 0L);
@@ -503,11 +504,11 @@ public class MockClientTest {
 		long peerSolutionAccess = 1;
 		client.setPeerSolutionAccess(peerSolutionAccess);
 		Assert.assertTrue(peerSolutionAccess == client.checkPeerSolutionAccess("peerId", "solutionId"));
-		
+
 		List<MLPPeer> peerAccessList = new ArrayList<>();
 		client.setPeerAccess(peerAccessList);
 		Assert.assertTrue(peerAccessList == client.getPeerAccess("peerId"));
 
 	}
-	
+
 }

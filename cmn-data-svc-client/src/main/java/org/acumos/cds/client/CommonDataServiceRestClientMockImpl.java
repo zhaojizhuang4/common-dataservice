@@ -382,7 +382,8 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 	
 	@Override
-	public RestPageResponse<MLPSolution> findSolutionsByDate(String[] accessTypeCodes, Date date, RestPageRequest pageRequest) {
+	public RestPageResponse<MLPSolution> findSolutionsByDate(boolean active, String[] accessTypeCodes,
+			String[] validationStatusCodes, Date date, RestPageRequest pageRequest) {
 		return solutionsByDate;
 	}
 	
