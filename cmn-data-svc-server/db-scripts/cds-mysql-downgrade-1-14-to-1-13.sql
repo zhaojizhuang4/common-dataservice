@@ -2,6 +2,9 @@
 -- FROM version 1.14.x TO version 1.13.x.
 -- No database is specified to allow flexible deployment!
 
+-- 38
+ALTER TABLE C_PEER
+DROP INDEX C_PEER_C_SUBJECT_NAME;
 -- 36
 DROP TABLE C_PEER_PEER_ACC_MAP;
 -- 35

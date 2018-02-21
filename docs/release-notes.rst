@@ -30,6 +30,8 @@ Version 1.14.0, 19 February 2018
 * Add peer group, solution group and mapping features for federation access control (ACUMOS-62)
 * Add feature for User notification preference and user notification (ACUMOS-166) 
 * Refactor to drop code-name database tables (ACUMOS-144)
+* Assert unique constraint on peer subjectName attribute (ACUMOS-214)
+* Revise peer status code/name value set (ACUMOS-215)
 * Requires database schema version 1.14
 
 Version 1.13.1, 9 February 2018
