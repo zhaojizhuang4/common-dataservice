@@ -97,16 +97,20 @@ Prerequisites
 Configuring the system
 ~~~~~~~~~~~~~~~~~~~~~~
 
-First the database must be created and configured using scripts in the
-"db-scripts" directory:
+First the database must be created or upgraded, depending on the situation,
+using scripts in the "db-scripts" directory.  Please note the version number is
+represented here as "N.N" or "M.M".
 
 - cmn-data-svc-user-mysql.sql: This file is a TEMPLATE can be used to
   create a Mysql/MariaDB database, to create a user, and to grant the
   user permission on the database.  The values in CAPITALS shown in
   the file must be adjusted for each use.
-- cmn-data-svc-ddl-cml-mysql-N-N.sql: This has the data-definition and
-  data-modeling language statements that create the tables and
+- cmn-data-svc-ddl-dml-mysql-N-N.sql: This file has the data-definition and
+  data-modeling language statements that create new tables and
   populate them.
+- cds-mysql-upgrade-N.N-to-M.M.sql: If an existing system must be upgraded
+  instead of creating a new one, this file has the data-definition and data-modeling 
+  language statements to modify an existing database.
 
 Next, configuration parameters must be specified.  A template with
 default values can be found in the top level of this project named
@@ -196,7 +200,26 @@ Launch Instructions
 Once the configuration is provided either in an application.properties file or in an environment variable,
 start the application with the following command::
 
-    java -Djava.security.egd=file:/dev/./urandom -jar common-dataservice-1.2.3.jar
+    java -Xms128m -Xmx512m -Djava.security.egd=file:/dev/./urandom -jar common-dataservice-N.N.N.jar
+    
+Quickstart Version Upgrade
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Create a new database by copying the old one.  For example, if working on the Mysql/Mariadb database server the command is something like the following, depending on system configuration and user privileges::
+
+    sudo mysqldump cds1130m | sudo mysql cds1140m
+
+2. Upgrade the new database by running the appropriate upgrade script.  For example, the command sequence may be something like this::
+
+    % sudo mysql 
+    > use cds1140m;
+    > source cds-mysql-upgrade-1-13-to-1-14.sql;
+    
+3. Revise the appropriate docker-compose file to have an entry for the new version, using an available network port.
+
+4. Use the docker-compose start script (varies by environment) to start the new image::
+
+    docker-compose up -d common-dataservice-NNN
 
 Troubleshooting
 ---------------
