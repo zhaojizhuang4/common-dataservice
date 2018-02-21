@@ -32,6 +32,7 @@ Version 1.14.0, 19 February 2018
 * Refactor to drop code-name database tables (ACUMOS-144)
 * Assert unique constraint on peer subjectName attribute (ACUMOS-214)
 * Revise peer status code/name value set (ACUMOS-215)
+* Add new toolkit type code for ONAP (ACUMOS-232)
 * Requires database schema version 1.14
 
 Version 1.13.1, 9 February 2018

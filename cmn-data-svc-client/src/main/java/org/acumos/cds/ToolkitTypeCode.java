@@ -32,7 +32,8 @@ public enum ToolkitTypeCode {
 	SK("Scikit-Learn"), //
 	TF("TensorFlow"), //
 	TC("Training Client"), //
-	BR("Data Broker"); //
+	BR("Data Broker"), //
+	ON("ONAP"); //
 
 	private String typeName;
 
