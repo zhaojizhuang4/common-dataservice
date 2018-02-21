@@ -205,19 +205,26 @@ start the application with the following command::
 Quickstart Version Upgrade
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Create a new database by copying the old one.  For example, if working on the Mysql/Mariadb database server the command is something like the following, depending on system configuration and user privileges::
+1. Create a new database. If needed, create a new user and grant access to the database for the new user.  Example commands to do this are in script "cmn-data-svc-basemysql.sql" and are something like this::
+
+    % sudo mysql
+    > create database cds1140m;
+    > create user 'CDS_USER'@'%' identified by 'CDS_PASS';
+    > grant all on cds1140m.* to 'CDS_USER'@'%';
+
+2. Populate the new database with the contents of the previous one.  For example, if working on the Mysql/Mariadb database server the command is something like the following, depending on system configuration and user privileges::
 
     sudo mysqldump cds1130m | sudo mysql cds1140m
 
-2. Upgrade the new database by running the appropriate upgrade script.  For example, the command sequence may be something like this::
+3. Upgrade the new database to the latest structure by running the appropriate upgrade script.  For example, the command sequence may be something like this::
 
     % sudo mysql 
     > use cds1140m;
     > source cds-mysql-upgrade-1-13-to-1-14.sql;
     
-3. Revise the appropriate docker-compose file to have an entry for the new version, using an available network port.
+4. Configure the docker image for the new version.  Assuming that the docker compose is being used, revise the appropriate docker-compose file to have an entry for the new version, using an available network port.
 
-4. Use the docker-compose start script (varies by environment) to start the new image::
+5. Use an appropriate docker-compose start script (varies by environment) to start the new image, for example::
 
     docker-compose up -d common-dataservice-NNN
 
