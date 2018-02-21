@@ -199,8 +199,8 @@ public class MLPSolution extends MLPAbstractSolution implements Serializable {
 	public String toString() {
 		return this.getClass().getName() + "[solutionId=" + getSolutionId() + ", name=" + getName() + ", owner="
 				+ ownerId + ", desc=" + getDescription() + ", active=" + isActive() + ", modelTypeCode="
-				+ getModelTypeCode() + ", validationStatusCode=" + getValidationStatusCode() + ", provider="
-				+ getProvider() + ", created=" + getCreated() + ", modified=" + getModified() + "]";
+				+ getModelTypeCode() + ", provider=" + getProvider() + ", created=" + getCreated() + ", modified="
+				+ getModified() + "]";
 	}
 
 }

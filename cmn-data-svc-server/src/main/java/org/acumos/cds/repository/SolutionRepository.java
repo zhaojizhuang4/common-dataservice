@@ -80,11 +80,11 @@ public interface SolutionRepository extends JpaRepository<MLPSolution, String>, 
 	 */
 	@Query(value = "SELECT DISTINCT s FROM MLPSolution s, MLPSolutionRevision r, MLPSolRevArtMap m, MLPArtifact a "
 			+ " WHERE s.active = :active " //
-			+ "   AND s.accessTypeCode in :accessTypeCodes " //
-			+ "   AND s.validationStatusCode in :valStatusCodes " //
 			+ "   AND s.solutionId = r.solutionId " //
 			+ "   AND r.revisionId = m.revisionId " //
 			+ "   AND m.artifactId = a.artifactId " //
+			+ "   AND r.accessTypeCode in :accessTypeCodes " //
+			+ "   AND r.validationStatusCode in :valStatusCodes " //
 			+ "   AND " //
 			+ "   ( s.modified >= :theDate " //
 			+ "  OR r.modified >= :theDate " //

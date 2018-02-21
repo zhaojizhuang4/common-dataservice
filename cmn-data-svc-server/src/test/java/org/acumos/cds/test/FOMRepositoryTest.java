@@ -23,12 +23,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.acumos.cds.domain.MLPArtifact;
-import org.acumos.cds.domain.MLPArtifactFOM;
 import org.acumos.cds.domain.MLPSolRevArtMap;
 import org.acumos.cds.domain.MLPSolution;
 import org.acumos.cds.domain.MLPSolutionFOM;
 import org.acumos.cds.domain.MLPSolutionRevision;
-import org.acumos.cds.domain.MLPSolutionRevisionFOM;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.repository.ArtifactRepository;
 import org.acumos.cds.repository.SolRevArtMapRepository;
@@ -38,7 +36,6 @@ import org.acumos.cds.repository.SolutionRevisionRepository;
 import org.acumos.cds.repository.UserRepository;
 import org.acumos.cds.service.SolutionSearchService;
 import org.acumos.cds.util.EELFLoggerDelegate;
-import org.hibernate.SessionFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -94,12 +91,10 @@ public class FOMRepositoryTest {
 			logger.info("Created user {}", cu);
 
 			cs = new MLPSolution("sol name", cu.getUserId(), true);
-			cs.setAccessTypeCode("PR");
-			cs.setValidationStatusCode("NV");
 			cs = solutionRepository.save(cs);
 			Assert.assertNotNull("Solution ID", cs.getSolutionId());
 
-			cr = new MLPSolutionRevision(cs.getSolutionId(), "version", cu.getUserId());
+			cr = new MLPSolutionRevision(cs.getSolutionId(), "version", cu.getUserId(), "PR", "NV");
 			cr = revisionRepository.save(cr);
 			Assert.assertNotNull("Revision ID", cr.getRevisionId());
 			logger.info("Created solution revision {}", cr.getRevisionId());
@@ -126,13 +121,6 @@ public class FOMRepositoryTest {
 		Date modifiedDate = new Date();
 		modifiedDate.setTime(modifiedDate.getTime() - 60 * 1000);
 
-		// Via hand-written SQL
-		logger.info("Querying for FOM via repo find-by-date method");
-		Page<MLPSolution> solsBySql = solutionRepository.findByModifiedDate(true, accTypes, valCodes, modifiedDate,
-				new PageRequest(0, 4, null));
-		// Assert.assertTrue(solsBySql != null && solsBySql.getNumberOfElements() > 0);
-		logger.info("Found sols by date via sql: size {}", solsBySql.getContent().size());
-
 		// Via Hibernate constraint
 		logger.info("Querying for FOM via search service");
 		Page<MLPSolution> solsByDate = solutionSearchService.findSolutionsByModifiedDate(true, accTypes, valCodes,
@@ -148,33 +136,6 @@ public class FOMRepositoryTest {
 			solutionRepository.delete(cs);
 			userRepository.delete(cu);
 		}
-	}
-
-	@Autowired
-	private SessionFactory sessionFactory;
-
-	// @Test
-	// Helped me find annotation errors in the FOM classes
-	// Requires @Transactional at the class level
-	@SuppressWarnings("rawtypes")
-	public void testFomVsSimple() throws Exception {
-		List sol = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class).list();
-		System.out.println("Found sol fom count: " + sol.size());
-
-		List solPlain = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class).list();
-		System.out.println("Found sol plain count: " + solPlain.size());
-
-		List rev = sessionFactory.getCurrentSession().createCriteria(MLPSolutionRevisionFOM.class).list();
-		System.out.println("Found rev fom count: " + rev.size());
-
-		List revPlain = sessionFactory.getCurrentSession().createCriteria(MLPSolutionRevision.class).list();
-		System.out.println("Found rev plain count: " + revPlain.size());
-
-		List art = sessionFactory.getCurrentSession().createCriteria(MLPArtifactFOM.class).list();
-		System.out.println("Found art fom count: " + art.size());
-
-		List artPlain = sessionFactory.getCurrentSession().createCriteria(MLPArtifact.class).list();
-		System.out.println("Found art plain count: " + artPlain.size());
 	}
 
 }

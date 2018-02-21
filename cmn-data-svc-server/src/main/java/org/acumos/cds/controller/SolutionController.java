@@ -314,12 +314,12 @@ public class SolutionController extends AbstractController {
 			String[] nameKws = getOptStringArray(CCDSConstants.SEARCH_NAME, queryParameters);
 			String[] descKws = getOptStringArray(CCDSConstants.SEARCH_DESC, queryParameters);
 			String[] ownerIds = getOptStringArray(CCDSConstants.SEARCH_OWNERS, queryParameters);
-			String[] accessTypeCodes = getOptStringArray(CCDSConstants.SEARCH_ACCESS_TYPES, queryParameters);
 			String[] modelTypeCodes = getOptStringArray(CCDSConstants.SEARCH_MODEL_TYPES, queryParameters);
+			String[] accTypeCodes = getOptStringArray(CCDSConstants.SEARCH_ACCESS_TYPES, queryParameters);
 			String[] valStatusCodes = getOptStringArray(CCDSConstants.SEARCH_VAL_STATUSES, queryParameters);
 			String[] tags = getOptStringArray(CCDSConstants.SEARCH_TAGS, queryParameters);
-			return solutionSearchService.findPortalSolutions(nameKws, descKws, active, ownerIds, accessTypeCodes,
-					modelTypeCodes, valStatusCodes, tags, pageRequest);
+			return solutionSearchService.findPortalSolutions(nameKws, descKws, active, ownerIds, modelTypeCodes,
+					accTypeCodes, valStatusCodes, tags, pageRequest);
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "findPortalSolutions failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -392,14 +392,10 @@ public class SolutionController extends AbstractController {
 		Object result;
 		try {
 			// Validate enum codes
-			if (solution.getAccessTypeCode() != null)
-				super.validateCode(solution.getAccessTypeCode(), CodeNameType.ACCESS_TYPE);
 			if (solution.getModelTypeCode() != null)
 				super.validateCode(solution.getModelTypeCode(), CodeNameType.MODEL_TYPE);
 			if (solution.getToolkitTypeCode() != null)
 				super.validateCode(solution.getToolkitTypeCode(), CodeNameType.TOOLKIT_TYPE);
-			if (solution.getValidationStatusCode() != null)
-				super.validateCode(solution.getValidationStatusCode(), CodeNameType.VALIDATION_STATUS);
 			String id = solution.getSolutionId();
 			if (id != null) {
 				UUID.fromString(id);
@@ -453,14 +449,10 @@ public class SolutionController extends AbstractController {
 		MLPTransportModel result = null;
 		try {
 			// Validate enum codes
-			if (solution.getAccessTypeCode() != null)
-				super.validateCode(solution.getAccessTypeCode(), CodeNameType.ACCESS_TYPE);
 			if (solution.getModelTypeCode() != null)
 				super.validateCode(solution.getModelTypeCode(), CodeNameType.MODEL_TYPE);
 			if (solution.getToolkitTypeCode() != null)
 				super.validateCode(solution.getToolkitTypeCode(), CodeNameType.TOOLKIT_TYPE);
-			if (solution.getValidationStatusCode() != null)
-				super.validateCode(solution.getValidationStatusCode(), CodeNameType.VALIDATION_STATUS);
 			// Use the path-parameter id; don't trust the one in the object
 			solution.setSolutionId(solutionId);
 			// Discard any stats object; updates don't happen via this interface
@@ -616,6 +608,11 @@ public class SolutionController extends AbstractController {
 		}
 		Object result;
 		try {
+			// Validate enum codes
+			if (revision.getAccessTypeCode() != null)
+				super.validateCode(revision.getAccessTypeCode(), CodeNameType.ACCESS_TYPE);
+			if (revision.getValidationStatusCode() != null)
+				super.validateCode(revision.getValidationStatusCode(), CodeNameType.VALIDATION_STATUS);
 			String id = revision.getRevisionId();
 			if (id != null) {
 				UUID.fromString(id);
@@ -668,6 +665,11 @@ public class SolutionController extends AbstractController {
 		}
 		Object result;
 		try {
+			// Validate enum codes
+			if (revision.getAccessTypeCode() != null)
+				super.validateCode(revision.getAccessTypeCode(), CodeNameType.ACCESS_TYPE);
+			if (revision.getValidationStatusCode() != null)
+				super.validateCode(revision.getValidationStatusCode(), CodeNameType.VALIDATION_STATUS);
 			// Use the validated values
 			revision.setRevisionId(revisionId);
 			revision.setSolutionId(solutionId);
@@ -1403,8 +1405,8 @@ public class SolutionController extends AbstractController {
 	@ResponseBody
 	public Object getSolutionDeployments(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, Pageable pageRequest, HttpServletResponse response) {
-		Page<MLPSolutionDeployment> da = solutionDeploymentRepository.findBySolutionIdAndRevisionId(solutionId, revisionId,
-				pageRequest);
+		Page<MLPSolutionDeployment> da = solutionDeploymentRepository.findBySolutionIdAndRevisionId(solutionId,
+				revisionId, pageRequest);
 		if (da == null || !da.iterator().hasNext()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,

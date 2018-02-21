@@ -73,6 +73,7 @@ public class MockClientTest {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void coverMockMethods() {
 

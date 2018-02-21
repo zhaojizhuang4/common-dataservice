@@ -99,8 +99,7 @@ public interface ICommonDataServiceRestClient {
 	 * Gets all access types.
 	 * 
 	 * @return List of access type objects.
-	 * @deprecated Java clients should use
-	 *             {@link org.acumos.cds.AccessTypeCode#values()}
+	 * @deprecated Use {@link #getCodeNamePairs(CodeNameType)}
 	 */
 	@Deprecated
 	List<MLPAccessType> getAccessTypes();
@@ -108,9 +107,8 @@ public interface ICommonDataServiceRestClient {
 	/**
 	 * Gets all artifact types.
 	 * 
-	 * @return List of artifact type objects.
-	 * @deprecated Java clients should use
-	 *             {@link org.acumos.cds.ArtifactTypeCode#values()}
+	 * @return List of artifact type code-name pairs.
+	 * @deprecated Use {@link #getCodeNamePairs(CodeNameType)}
 	 */
 	@Deprecated
 	List<MLPArtifactType> getArtifactTypes();
@@ -118,9 +116,8 @@ public interface ICommonDataServiceRestClient {
 	/**
 	 * Gets all deployment status codes
 	 * 
-	 * @return List of deployment status objects.
-	 * @deprecated Java clients should use
-	 *             {@link org.acumos.cds.DeploymentStatusCode#values()}
+	 * @return List of deployment status code-name pairs.
+	 * @deprecated Use {@link #getCodeNamePairs(CodeNameType)}
 	 */
 	@Deprecated
 	List<MLPDeploymentStatus> getDeploymentStatuses();
@@ -128,9 +125,8 @@ public interface ICommonDataServiceRestClient {
 	/**
 	 * Gets all login providers.
 	 * 
-	 * @return List of login provider objects.
-	 * @deprecated Java clients should use
-	 *             {@link org.acumos.cds.LoginProviderCode#values()}
+	 * @return List of login provider code-name pairs.
+	 * @deprecated Use {@link #getCodeNamePairs(CodeNameType)}
 	 */
 	@Deprecated
 	List<MLPLoginProvider> getLoginProviders();
@@ -138,49 +134,17 @@ public interface ICommonDataServiceRestClient {
 	/**
 	 * Gets all model types.
 	 * 
-	 * @return List of model type objects.
-	 * @deprecated Java clients should use
-	 *             {@link org.acumos.cds.ModelTypeCode#values()}
+	 * @return List of model type code-name pairs.
+	 * @deprecated Use {@link #getCodeNamePairs(CodeNameType)}
 	 */
 	@Deprecated
 	List<MLPModelType> getModelTypes();
 
 	/**
-	 * Gets all toolkit types.
-	 * 
-	 * @return List of tookit type objects.
-	 * @deprecated Java clients should use
-	 *             {@link org.acumos.cds.ToolkitTypeCode#values()}
-	 */
-	@Deprecated
-	List<MLPToolkitType> getToolkitTypes();
-
-	/**
-	 * Gets all validation status codes
-	 * 
-	 * @return List of validation status objects.
-	 * @deprecated Java clients should use
-	 *             {@link org.acumos.cds.ValidationStatusCode#values()}
-	 */
-	@Deprecated
-	List<MLPValidationStatus> getValidationStatuses();
-
-	/**
-	 * Gets all validation type codes.
-	 * 
-	 * @return List of validation type objects.
-	 * @deprecated Java clients should use
-	 *             {@link org.acumos.cds.ValidationTypeCode#values()}
-	 */
-	@Deprecated
-	List<MLPValidationType> getValidationTypes();
-
-	/**
 	 * Gets all step status codes.
 	 * 
-	 * @return List of step status objects.
-	 * @deprecated Java clients should use
-	 *             {@link org.acumos.cds.StepStatusCode#values()}
+	 * @return List of step status code-name pairs.
+	 * @deprecated Use {@link #getCodeNamePairs(CodeNameType)}
 	 */
 	@Deprecated
 	List<MLPStepStatus> getStepStatuses();
@@ -188,12 +152,38 @@ public interface ICommonDataServiceRestClient {
 	/**
 	 * Gets all step type codes.
 	 * 
-	 * @return List of step type objects.
-	 * @deprecated Java clients should use
-	 *             {@link org.acumos.cds.StepTypeCode#values()}
+	 * @return List of step type code-name pairs.
+	 * @deprecated Use {@link #getCodeNamePairs(CodeNameType)}
 	 */
 	@Deprecated
 	List<MLPStepType> getStepTypes();
+
+	/**
+	 * Gets all toolkit types.
+	 * 
+	 * @return List of tookit type code-name pairs.
+	 * @deprecated Use {@link #getCodeNamePairs(CodeNameType)}
+	 */
+	@Deprecated
+	List<MLPToolkitType> getToolkitTypes();
+
+	/**
+	 * Gets all validation status codes
+	 * 
+	 * @return List of validation status code-name pairs.
+	 * @deprecated Use {@link #getCodeNamePairs(CodeNameType)}
+	 */
+	@Deprecated
+	List<MLPValidationStatus> getValidationStatuses();
+
+	/**
+	 * Gets all validation type codes.
+	 * 
+	 * @return List of validation type code-name pairs.
+	 * @deprecated Use {@link #getCodeNamePairs(CodeNameType)}
+	 */
+	@Deprecated
+	List<MLPValidationType> getValidationTypes();
 
 	/**
 	 * Gets count of solutions.
@@ -442,11 +432,11 @@ public interface ICommonDataServiceRestClient {
 	 * Adds an artifact to a solution revision
 	 * 
 	 * @param solutionId
-	 *            solution ID
+	 *            Solution ID
 	 * @param revisionId
-	 *            revision ID
+	 *            Revision ID
 	 * @param artifactId
-	 *            artifact Id
+	 *            Artifact Id
 	 */
 	void addSolutionRevisionArtifact(String solutionId, String revisionId, String artifactId);
 
@@ -454,11 +444,11 @@ public interface ICommonDataServiceRestClient {
 	 * Removes an artifact from a solution revision
 	 * 
 	 * @param solutionId
-	 *            solution ID
+	 *            Solution ID
 	 * @param revisionId
-	 *            revision ID
+	 *            Revision ID
 	 * @param artifactId
-	 *            artifact Id
+	 *            Artifact Id
 	 */
 	void dropSolutionRevisionArtifact(String solutionId, String revisionId, String artifactId);
 

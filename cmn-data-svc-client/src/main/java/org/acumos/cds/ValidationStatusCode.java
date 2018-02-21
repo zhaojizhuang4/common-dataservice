@@ -26,6 +26,7 @@ package org.acumos.cds;
  * @deprecated Use
  *             {@link org.acumos.cds.client.ICommonDataServiceRestClient#getCodeNamePairs(CodeNameType)}
  */
+@Deprecated
 public enum ValidationStatusCode {
 	FA("Failed"), //
 	IP("In Progress"), //

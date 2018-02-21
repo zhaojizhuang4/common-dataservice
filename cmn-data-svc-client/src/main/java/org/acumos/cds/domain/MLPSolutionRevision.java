@@ -77,9 +77,14 @@ public class MLPSolutionRevision extends MLPAbstractSolutionRevision implements 
 	 *            User-assigned version string
 	 * @param ownerId
 	 *            User ID
+	 * @param accessTypeCode
+	 *            Access type code
+	 * @param validationStatusCode
+	 *            Validation status code
 	 */
-	public MLPSolutionRevision(String solutionId, String version, String ownerId) {
-		super(version);
+	public MLPSolutionRevision(String solutionId, String version, String ownerId, String accessTypeCode,
+			String validationStatusCode) {
+		super(version, accessTypeCode, validationStatusCode);
 		if (solutionId == null || ownerId == null)
 			throw new IllegalArgumentException("Null not permitted");
 		this.solutionId = solutionId;
@@ -126,7 +131,8 @@ public class MLPSolutionRevision extends MLPAbstractSolutionRevision implements 
 	@Override
 	public String toString() {
 		return this.getClass().getName() + "[revisionId=" + getRevisionId() + ", solutionId=" + solutionId
-				+ ", ownerId=" + ownerId + ", meta=" + getMetadata() + ", version=" + getVersion() + ", created="
+				+ ", ownerId=" + ownerId + ", meta=" + getMetadata() + ", version=" + getVersion() + ", accessTypeCode="
+				+ getAccessTypeCode() + ", validationStatusCode=" + getValidationStatusCode() + ", created="
 				+ getCreated() + ", modified=" + getModified() + "]";
 	}
 }

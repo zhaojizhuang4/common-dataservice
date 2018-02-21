@@ -82,7 +82,6 @@ public class MLPSolutionFOM extends MLPAbstractSolution implements Serializable 
 	 * annotation, use of an EXISTING tag when creating a solution yields a SQL
 	 * constraint-violation error, Hibernate attempts to insert a duplicate row to
 	 * the join table, also see https://hibernate.atlassian.net/browse/HHH-6776
-	 * 
 	 */
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = MLPSolTagMap.TABLE_NAME, //
@@ -152,9 +151,8 @@ public class MLPSolutionFOM extends MLPAbstractSolution implements Serializable 
 	public String toString() {
 		return this.getClass().getName() + "[solutionId=" + getSolutionId() + ", name=" + getName() + ", owner=" + owner
 				+ ", desc=" + getDescription() + ", active=" + isActive() + ", modelTypeCode=" + getModelTypeCode()
-				+ ", validationStatusCode=" + getValidationStatusCode() + ", provider=" + getProvider() + ", source="
-				+ source + ", revisions=" + revisions + ", created=" + getCreated() + ", modified=" + getModified()
-				+ "]";
+				+ ", provider=" + getProvider() + ", source=" + source + ", revisions=" + revisions + ", created="
+				+ getCreated() + ", modified=" + getModified() + "]";
 	}
 
 	/**
@@ -175,7 +173,6 @@ public class MLPSolutionFOM extends MLPAbstractSolution implements Serializable 
 			sol.setSourceId(source.getPeerId());
 		sol.setTags(getTags());
 		sol.setToolkitTypeCode(getToolkitTypeCode());
-		sol.setValidationStatusCode(getValidationStatusCode());
 		sol.setWebStats(getWebStats());
 		return sol;
 	}

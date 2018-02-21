@@ -75,11 +75,11 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	@Size(max = 50)
 	private String orgName;
 
-	@Column(name = "EMAIL", columnDefinition = "VARCHAR(50)")
+	@Column(name = "EMAIL", unique = true, columnDefinition = "VARCHAR(50)")
 	@Size(max = 50)
 	private String email;
 
-	@Column(name = "LOGIN_NAME", nullable = false, columnDefinition = "VARCHAR(25)")
+	@Column(name = "LOGIN_NAME", nullable = false, unique = true, columnDefinition = "VARCHAR(25)")
 	@NotNull(message = "LoginName cannot be null")
 	@Size(max = 25)
 	@ApiModelProperty(required = true)
@@ -302,7 +302,10 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 
 	@Override
 	public String toString() {
-		return this.getClass().getName() + "[userId=" + userId + ", loginName=" + loginName + ", lastName=" + lastName
-				+ ", email=" + email + ", ...]";
+		return this.getClass().getName() + "[userId=" + userId + ", loginName=" + loginName + ", email=" + email
+				+ ", lastName=" + lastName + ", middleName=" + middleName + ", firstName=" + firstName + "orgName="
+				+ orgName + ", lastLogin = " + lastLogin + "loginPassExpires=" + loginPassExpire + ", created="
+				+ getCreated() + ", modified=" + getModified() + "]";
 	}
+
 }

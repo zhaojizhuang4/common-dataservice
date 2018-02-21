@@ -726,43 +726,38 @@ public class DomainTest extends AbstractModelTest {
 	}
 
 	private void checkMLPSolution(MLPSolution m) {
-		Assert.assertEquals(s1, m.getAccessTypeCode());
 		Assert.assertEquals(b1, m.isActive());
 		Assert.assertEquals(d1, m.getCreated());
-		Assert.assertEquals(s2, m.getDescription());
-		Assert.assertEquals(s3, m.getMetadata());
-		Assert.assertEquals(s4, m.getModelTypeCode());
+		Assert.assertEquals(s1, m.getDescription());
+		Assert.assertEquals(s2, m.getMetadata());
+		Assert.assertEquals(s3, m.getModelTypeCode());
 		Assert.assertEquals(d2, m.getModified());
-		Assert.assertEquals(s5, m.getName());
-		Assert.assertEquals(s6, m.getOrigin());
-		Assert.assertEquals(s7, m.getOwnerId());
-		Assert.assertEquals(s8, m.getSourceId());
-		Assert.assertEquals(s9, m.getProvider());
-		Assert.assertEquals(s10, m.getSolutionId());
-		Assert.assertEquals(s11, m.getToolkitTypeCode());
-		Assert.assertEquals(s12, m.getValidationStatusCode());
+		Assert.assertEquals(s4, m.getName());
+		Assert.assertEquals(s5, m.getOrigin());
+		Assert.assertEquals(s6, m.getOwnerId());
+		Assert.assertEquals(s7, m.getProvider());
+		Assert.assertEquals(s8, m.getSolutionId());
+		Assert.assertEquals(s9, m.getSourceId());
+		Assert.assertEquals(s10, m.getToolkitTypeCode());
 	}
 
 	@Test
 	public void testMLPSolution() {
 		MLPSolution m = new MLPSolution(s1, s1, b1);
 		m = new MLPSolution();
-		m.setAccessTypeCode(s1);
-		m.setAccessTypeCode(s1);
 		m.setActive(b1);
 		m.setCreated(d1);
-		m.setDescription(s2);
-		m.setMetadata(s3);
-		m.setModelTypeCode(s4);
+		m.setDescription(s1);
+		m.setMetadata(s2);
+		m.setModelTypeCode(s3);
 		m.setModified(d2);
-		m.setName(s5);
-		m.setOrigin(s6);
-		m.setOwnerId(s7);
-		m.setSourceId(s8);
-		m.setProvider(s9);
-		m.setSolutionId(s10);
-		m.setToolkitTypeCode(s11);
-		m.setValidationStatusCode(s12);
+		m.setName(s4);
+		m.setOrigin(s5);
+		m.setOwnerId(s6);
+		m.setProvider(s7);
+		m.setSolutionId(s8);
+		m.setSourceId(s9);
+		m.setToolkitTypeCode(s10);
 		checkMLPSolution(m);
 		m = new MLPSolution(m);
 		checkMLPSolution(m);
@@ -962,32 +957,36 @@ public class DomainTest extends AbstractModelTest {
 	}
 
 	private void checkMLPSolutionRevision(MLPSolutionRevision m) {
+		Assert.assertEquals(s1, m.getAccessTypeCode());
 		Assert.assertEquals(d1, m.getCreated());
-		Assert.assertEquals(s1, m.getDescription());
-		Assert.assertEquals(s2, m.getMetadata());
+		Assert.assertEquals(s2, m.getDescription());
+		Assert.assertEquals(s3, m.getMetadata());
 		Assert.assertEquals(d2, m.getModified());
-		Assert.assertEquals(s3, m.getOrigin());
-		Assert.assertEquals(s4, m.getOwnerId());
-		Assert.assertEquals(s5, m.getRevisionId());
-		Assert.assertEquals(s6, m.getSolutionId());
-		Assert.assertEquals(s7, m.getSourceId());
-		Assert.assertEquals(s8, m.getVersion());
+		Assert.assertEquals(s4, m.getOrigin());
+		Assert.assertEquals(s5, m.getOwnerId());
+		Assert.assertEquals(s6, m.getRevisionId());
+		Assert.assertEquals(s7, m.getSolutionId());
+		Assert.assertEquals(s8, m.getSourceId());
+		Assert.assertEquals(s9, m.getValidationStatusCode());
+		Assert.assertEquals(s10, m.getVersion());
 	}
 
 	@Test
 	public void testMLPSolutionRevision() {
-		MLPSolutionRevision m = new MLPSolutionRevision(s1, s1, s1);
+		MLPSolutionRevision m = new MLPSolutionRevision(s1, s1, s1, s1, s1);
 		m = new MLPSolutionRevision();
+		m.setAccessTypeCode(s1);
 		m.setCreated(d1);
-		m.setDescription(s1);
-		m.setMetadata(s2);
+		m.setDescription(s2);
+		m.setMetadata(s3);
 		m.setModified(d2);
-		m.setOrigin(s3);
-		m.setOwnerId(s4);
-		m.setRevisionId(s5);
-		m.setSolutionId(s6);
-		m.setSourceId(s7);
-		m.setVersion(s8);
+		m.setOrigin(s4);
+		m.setOwnerId(s5);
+		m.setRevisionId(s6);
+		m.setSolutionId(s7);
+		m.setSourceId(s8);
+		m.setValidationStatusCode(s9);
+		m.setVersion(s10);
 		checkMLPSolutionRevision(m);
 		m = new MLPSolutionRevision(m);
 		checkMLPSolutionRevision(m);
@@ -997,7 +996,7 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
 		try {
-			new MLPSolutionRevision(null, null, null);
+			new MLPSolutionRevision(null, null, null, null, null);
 			Assert.assertTrue("Unexpected success", false);
 		} catch (IllegalArgumentException iae) {
 			// null arg is rejected

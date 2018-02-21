@@ -62,7 +62,7 @@ public class CodeNameConfiguration {
 	private Map<String, String> toolkitType;
 	private Map<String, String> validationStatus;
 	private Map<String, String> validationType;
-	
+
 	public Map<String, String> getAccessType() {
 		return accessType;
 	}

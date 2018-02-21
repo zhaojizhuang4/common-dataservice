@@ -89,11 +89,11 @@ import org.springframework.web.client.RestTemplate;
 public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRestClient {
 
 	public static ICommonDataServiceRestClient getInstance(String webapiUrl, String user, String pass) {
-		return new CommonDataServiceRestClientMockImpl();
+		return new CommonDataServiceRestClientMockImpl(webapiUrl, user, pass);
 	}
 
 	public static ICommonDataServiceRestClient getInstance(String webapiUrl, RestTemplate restTemplate) {
-		return new CommonDataServiceRestClientMockImpl();
+		return new CommonDataServiceRestClientMockImpl(webapiUrl, restTemplate);
 	}
 
 	private RestTemplate restTemplate = null;
@@ -266,6 +266,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return version;
 	}
 
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	public List<MLPAccessType> getAccessTypes() {
 		List<MLPAccessType> list = new ArrayList<>();
@@ -274,6 +275,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return list;
 	}
 
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	public List<MLPArtifactType> getArtifactTypes() {
 		List<MLPArtifactType> list = new ArrayList<>();
@@ -282,6 +284,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return list;
 	}
 
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	public List<MLPLoginProvider> getLoginProviders() {
 		List<MLPLoginProvider> list = new ArrayList<>();
@@ -290,6 +293,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return list;
 	}
 
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	public List<MLPModelType> getModelTypes() {
 		List<MLPModelType> list = new ArrayList<>();
@@ -298,38 +302,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return list;
 	}
 
-	@Override
-	public List<MLPToolkitType> getToolkitTypes() {
-		List<MLPToolkitType> list = new ArrayList<>();
-		for (ToolkitTypeCode a : ToolkitTypeCode.values())
-			list.add(new MLPToolkitType(a.name(), a.getTypeName()));
-		return list;
-	}
-
-	@Override
-	public List<MLPValidationStatus> getValidationStatuses() {
-		List<MLPValidationStatus> list = new ArrayList<>();
-		for (ValidationStatusCode a : ValidationStatusCode.values())
-			list.add(new MLPValidationStatus(a.name(), a.getStatusName()));
-		return list;
-	}
-
-	@Override
-	public List<MLPValidationType> getValidationTypes() {
-		List<MLPValidationType> list = new ArrayList<>();
-		for (ValidationTypeCode a : ValidationTypeCode.values())
-			list.add(new MLPValidationType(a.name(), a.getTypeName()));
-		return list;
-	}
-
-	@Override
-	public List<MLPDeploymentStatus> getDeploymentStatuses() {
-		List<MLPDeploymentStatus> list = new ArrayList<>();
-		for (DeploymentStatusCode a : DeploymentStatusCode.values())
-			list.add(new MLPDeploymentStatus(a.name(), a.getStatusName()));
-		return list;
-	}
-
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	public List<MLPStepStatus> getStepStatuses() {
 		List<MLPStepStatus> list = new ArrayList<>();
@@ -338,11 +311,48 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return list;
 	}
 
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	public List<MLPStepType> getStepTypes() {
 		List<MLPStepType> list = new ArrayList<>();
 		for (StepTypeCode a : StepTypeCode.values())
 			list.add(new MLPStepType(a.name(), a.getStepName()));
+		return list;
+	}
+
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Override
+	public List<MLPToolkitType> getToolkitTypes() {
+		List<MLPToolkitType> list = new ArrayList<>();
+		for (ToolkitTypeCode a : ToolkitTypeCode.values())
+			list.add(new MLPToolkitType(a.name(), a.getTypeName()));
+		return list;
+	}
+
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Override
+	public List<MLPValidationStatus> getValidationStatuses() {
+		List<MLPValidationStatus> list = new ArrayList<>();
+		for (ValidationStatusCode a : ValidationStatusCode.values())
+			list.add(new MLPValidationStatus(a.name(), a.getStatusName()));
+		return list;
+	}
+
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Override
+	public List<MLPValidationType> getValidationTypes() {
+		List<MLPValidationType> list = new ArrayList<>();
+		for (ValidationTypeCode a : ValidationTypeCode.values())
+			list.add(new MLPValidationType(a.name(), a.getTypeName()));
+		return list;
+	}
+
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Override
+	public List<MLPDeploymentStatus> getDeploymentStatuses() {
+		List<MLPDeploymentStatus> list = new ArrayList<>();
+		for (DeploymentStatusCode a : DeploymentStatusCode.values())
+			list.add(new MLPDeploymentStatus(a.name(), a.getStatusName()));
 		return list;
 	}
 
@@ -1611,7 +1621,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	public void setCodeNamePairs(List<MLPCodeNamePair> pairs) {
 		this.pairs = pairs;
 	}
-	
+
 	@Override
 	public List<MLPCodeNamePair> getCodeNamePairs(CodeNameType type) {
 		return pairs;

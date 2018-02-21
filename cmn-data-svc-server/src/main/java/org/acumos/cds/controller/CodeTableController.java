@@ -82,6 +82,7 @@ public class CodeTableController extends AbstractController {
 	@ApiOperation(value = "Gets the list of access type codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.ACCESS_PATH + "/" + CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getAccessTypeList(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.ACCESS_TYPE.name(), response);
 	}
@@ -96,6 +97,7 @@ public class CodeTableController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.ARTIFACT_PATH + "/"
 			+ CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getArtifactTypeList(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.ARTIFACT_TYPE.name(), response);
 	}
@@ -110,6 +112,7 @@ public class CodeTableController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.DEPLOY_PATH + "/"
 			+ CCDSConstants.STATUS_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getDeploymentStatusList(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.DEPLOYMENT_STATUS.name(), response);
 	}
@@ -123,6 +126,7 @@ public class CodeTableController extends AbstractController {
 	@ApiOperation(value = "Gets the list of login provider codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.LOGIN_PROVIDER_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getLoginProviderList(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.LOGIN_PROVIDER.name(), response);
 	}
@@ -136,6 +140,7 @@ public class CodeTableController extends AbstractController {
 	@ApiOperation(value = "Gets the list of message severity codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.MSG_SEV_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getMessageSeverityList(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.MESSAGE_SEVERITY.name(), response);
 	}
@@ -149,6 +154,7 @@ public class CodeTableController extends AbstractController {
 	@ApiOperation(value = "Gets the list of model type codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.MODEL_PATH + "/" + CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getModelTypeList(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.MODEL_TYPE.name(), response);
 	}
@@ -163,6 +169,7 @@ public class CodeTableController extends AbstractController {
 	@ApiOperation(value = "Gets the list of notification delivery mechanism codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.NOTIFICATION_MECH_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getNotificationDeliveryMechanismList(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.NOTIFICATION_DELIVERY_MECHANISM.name(), response);
 	}
@@ -176,6 +183,7 @@ public class CodeTableController extends AbstractController {
 	@ApiOperation(value = "Gets the list of peer status codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.PEER_PATH + "/" + CCDSConstants.STATUS_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getPeerStatusList(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.PEER_STATUS.name(), response);
 	}
@@ -189,6 +197,7 @@ public class CodeTableController extends AbstractController {
 	@ApiOperation(value = "Gets the list of step status codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.STEP_PATH + "/" + CCDSConstants.STATUS_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getStepStatusList(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.STEP_STATUS.name(), response);
 	}
@@ -202,6 +211,7 @@ public class CodeTableController extends AbstractController {
 	@ApiOperation(value = "Gets the list of step type codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.STEP_PATH + "/" + CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getStepTypeList(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.STEP_TYPE.name(), response);
 	}
@@ -216,6 +226,7 @@ public class CodeTableController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.SUBSCRIPTION_PATH + "/"
 			+ CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getSubscriptionScopes(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.SUBSCRIPTION_SCOPE.name(), response);
 	}
@@ -230,6 +241,7 @@ public class CodeTableController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.TOOLKIT_PATH + "/"
 			+ CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getToolkitTypeList(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.TOOLKIT_TYPE.name(), response);
 	}
@@ -243,6 +255,7 @@ public class CodeTableController extends AbstractController {
 	@ApiOperation(value = "Gets the list of validation status codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.VAL_PATH + "/" + CCDSConstants.STATUS_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getValidationStatusList(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.VALIDATION_STATUS.name(), response);
 	}
@@ -256,6 +269,7 @@ public class CodeTableController extends AbstractController {
 	@ApiOperation(value = "Gets the list of validation type codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.VAL_PATH + "/" + CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
+	@Deprecated
 	public Object getValidationTypeList(HttpServletResponse response) {
 		return getCodeNamePairs(CodeNameType.VALIDATION_TYPE.name(), response);
 	}

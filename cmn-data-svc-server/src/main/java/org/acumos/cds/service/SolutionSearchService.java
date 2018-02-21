@@ -63,18 +63,18 @@ public interface SolutionSearchService {
 	 * @param ownerIds
 	 *            Limits match to solutions with one of the specified values;
 	 *            ignored if null or empty
-	 * @param accessTypeCodes
-	 *            Limits match to solutions with one of the specified values
-	 *            including null (not the 4-character sequence "null"); ignored if
-	 *            null or empty
 	 * @param modelTypeCodes
 	 *            Limits match to solutions with one of the specified values
 	 *            including null (not the 4-character sequence "null"); ignored if
 	 *            null or empty
+	 * @param accessTypeCodes
+	 *            Limits match to solutions containing revisions with one of the
+	 *            specified values including null (not the 4-character sequence
+	 *            "null"); ignored if null or empty
 	 * @param validationStatusCodes
-	 *            Limits match to solutions with one of the specified values
-	 *            including null (not the 4-character sequence "null"); ignored if
-	 *            null or empty
+	 *            Limits match to solutions containing revisions with one of the
+	 *            specified values including null (not the 4-character sequence
+	 *            "null"); ignored if null or empty
 	 * @param tags
 	 *            Limits match to solutions with one of the specified tags; ignored
 	 *            if null or empty
@@ -83,7 +83,7 @@ public interface SolutionSearchService {
 	 * @return Page of matches
 	 */
 	Page<MLPSolution> findPortalSolutions(String[] nameKeywords, String[] descriptionKeywords, boolean active,
-			String[] ownerIds, String[] accessTypeCodes, String[] modelTypeCodes, String[] validationStatusCodes,
+			String[] ownerIds, String[] modelTypeCodes, String[] accessTypeCodes, String[] validationStatusCodes,
 			String[] tags, Pageable pageable);
 
 	/**

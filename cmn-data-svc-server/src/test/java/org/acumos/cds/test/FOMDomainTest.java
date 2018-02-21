@@ -22,25 +22,41 @@ package org.acumos.cds.test;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactFOM;
 import org.acumos.cds.domain.MLPPeer;
+import org.acumos.cds.domain.MLPSolution;
 import org.acumos.cds.domain.MLPSolutionFOM;
+import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionRevisionFOM;
 import org.acumos.cds.domain.MLPUser;
+import org.hibernate.SessionFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Tests getters and setters of server-side domain (model) classes.
  */
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@Transactional
 public class FOMDomainTest {
 
 	private static Logger logger = LoggerFactory.getLogger(FOMDomainTest.class);
+
+	@Autowired
+	private SessionFactory sessionFactory;
 
 	// Values for properties
 	final long time = new Date().getTime();
@@ -124,38 +140,34 @@ public class FOMDomainTest {
 	@Test
 	public void testMLPSolutionFOM() {
 		MLPSolutionFOM m = new MLPSolutionFOM();
-		m.setAccessTypeCode(s1);
 		m.setActive(b1);
 		m.setCreated(d1);
-		m.setDescription(s2);
-		m.setMetadata(s3);
-		m.setModelTypeCode(s4);
+		m.setDescription(s1);
+		m.setMetadata(s2);
+		m.setModelTypeCode(s3);
 		m.setModified(d2);
-		m.setName(s5);
-		m.setOrigin(s6);
+		m.setName(s4);
+		m.setOrigin(s5);
 		m.setOwner(user1);
 		m.setSource(peer1);
-		m.setProvider(s9);
+		m.setProvider(s6);
 		m.setRevisions(revs);
-		m.setSolutionId(s10);
-		m.setToolkitTypeCode(s11);
-		m.setValidationStatusCode(s12);
-		Assert.assertEquals(s1, m.getAccessTypeCode());
+		m.setSolutionId(s7);
+		m.setToolkitTypeCode(s8);
 		Assert.assertEquals(b1, m.isActive());
 		Assert.assertEquals(d1, m.getCreated());
-		Assert.assertEquals(s2, m.getDescription());
-		Assert.assertEquals(s3, m.getMetadata());
-		Assert.assertEquals(s4, m.getModelTypeCode());
+		Assert.assertEquals(s1, m.getDescription());
+		Assert.assertEquals(s2, m.getMetadata());
+		Assert.assertEquals(s3, m.getModelTypeCode());
 		Assert.assertEquals(d2, m.getModified());
-		Assert.assertEquals(s5, m.getName());
-		Assert.assertEquals(s6, m.getOrigin());
+		Assert.assertEquals(s4, m.getName());
+		Assert.assertEquals(s5, m.getOrigin());
 		Assert.assertEquals(user1, m.getOwner());
 		Assert.assertEquals(peer1, m.getSource());
-		Assert.assertEquals(s9, m.getProvider());
+		Assert.assertEquals(s6, m.getProvider());
 		Assert.assertTrue(revs == m.getRevisions());
-		Assert.assertEquals(s10, m.getSolutionId());
-		Assert.assertEquals(s11, m.getToolkitTypeCode());
-		Assert.assertEquals(s12, m.getValidationStatusCode());
+		Assert.assertEquals(s7, m.getSolutionId());
+		Assert.assertEquals(s8, m.getToolkitTypeCode());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -168,28 +180,32 @@ public class FOMDomainTest {
 	public void testMLPSolutionRevisionFOM() {
 		Set<MLPArtifactFOM> arts = new HashSet<>();
 		MLPSolutionRevisionFOM m = new MLPSolutionRevisionFOM();
+		m.setAccessTypeCode(s1);
 		m.setArtifacts(arts);
 		m.setCreated(d1);
-		m.setDescription(s1);
-		m.setMetadata(s2);
+		m.setDescription(s2);
+		m.setMetadata(s3);
 		m.setModified(d2);
-		m.setOrigin(s3);
+		m.setOrigin(s4);
 		m.setOwner(user1);
 		m.setRevisionId(s5);
 		m.setSolution(sol1);
 		m.setSource(peer1);
-		m.setVersion(s8);
+		m.setValidationStatusCode(s6);
+		m.setVersion(s7);
 		Assert.assertTrue(arts == m.getArtifacts());
 		Assert.assertEquals(d1, m.getCreated());
-		Assert.assertEquals(s1, m.getDescription());
-		Assert.assertEquals(s2, m.getMetadata());
+		Assert.assertEquals(s1, m.getAccessTypeCode());
+		Assert.assertEquals(s2, m.getDescription());
+		Assert.assertEquals(s3, m.getMetadata());
 		Assert.assertEquals(d2, m.getModified());
-		Assert.assertEquals(s3, m.getOrigin());
+		Assert.assertEquals(s4, m.getOrigin());
 		Assert.assertEquals(user1, m.getOwner());
 		Assert.assertEquals(s5, m.getRevisionId());
 		Assert.assertEquals(sol1, m.getSolution());
 		Assert.assertEquals(peer1, m.getSource());
-		Assert.assertEquals(s8, m.getVersion());
+		Assert.assertEquals(s6, m.getValidationStatusCode());
+		Assert.assertEquals(s7, m.getVersion());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
@@ -197,4 +213,30 @@ public class FOMDomainTest {
 		logger.info(m.toString());
 		logger.info(m.toMLPSolutionRevision().toString());
 	}
+
+	/**
+	 * Tests for annotation errors in the FOM classes
+	 */
+	@Test
+	@SuppressWarnings("rawtypes")
+	public void testFomVsSimple() {
+		List sol = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class).list();
+		logger.info("Found sol fom count: {}", sol.size());
+		List solPlain = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class).list();
+		logger.info("Found sol plain count: {} ", solPlain.size());
+		Assert.assertEquals("solutions", sol.size(), solPlain.size());
+
+		List rev = sessionFactory.getCurrentSession().createCriteria(MLPSolutionRevisionFOM.class).list();
+		logger.info("Found rev fom count: {}", rev.size());
+		List revPlain = sessionFactory.getCurrentSession().createCriteria(MLPSolutionRevision.class).list();
+		logger.info("Found rev plain count: {}", revPlain.size());
+		Assert.assertEquals("revisions", rev.size(), revPlain.size());
+
+		List art = sessionFactory.getCurrentSession().createCriteria(MLPArtifactFOM.class).list();
+		logger.info("Found art fom count: {}", art.size());
+		List artPlain = sessionFactory.getCurrentSession().createCriteria(MLPArtifact.class).list();
+		logger.info("Found art plain count: {}", artPlain.size());
+		Assert.assertEquals("artifact", art.size(), artPlain.size());
+	}
+
 }

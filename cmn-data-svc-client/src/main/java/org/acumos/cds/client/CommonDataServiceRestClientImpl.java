@@ -315,6 +315,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		return response.getBody();
 	}
 
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	@Deprecated
 	public List<MLPAccessType> getAccessTypes() {
@@ -327,6 +328,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		return response.getBody();
 	}
 
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	@Deprecated
 	public List<MLPArtifactType> getArtifactTypes() {
@@ -340,6 +342,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		return response.getBody();
 	}
 
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	@Deprecated
 	public List<MLPLoginProvider> getLoginProviders() {
@@ -351,6 +354,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		return response.getBody();
 	}
 
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	@Deprecated
 	public List<MLPModelType> getModelTypes() {
@@ -363,6 +367,33 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		return response.getBody();
 	}
 
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Override
+	@Deprecated
+	public List<MLPStepStatus> getStepStatuses() {
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.STEP_PATH, CCDSConstants.STATUS_PATH },
+				null, null);
+		logger.debug("getStepStatuses: uri {}", uri);
+		ResponseEntity<List<MLPStepStatus>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<MLPStepStatus>>() {
+				});
+		return response.getBody();
+	}
+
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Override
+	@Deprecated
+	public List<MLPStepType> getStepTypes() {
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.STEP_PATH, CCDSConstants.TYPE_PATH },
+				null, null);
+		logger.debug("getStepTypes: uri {}", uri);
+		ResponseEntity<List<MLPStepType>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<MLPStepType>>() {
+				});
+		return response.getBody();
+	}
+
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	@Deprecated
 	public List<MLPToolkitType> getToolkitTypes() {
@@ -376,6 +407,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		return response.getBody();
 	}
 
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	@Deprecated
 	public List<MLPValidationStatus> getValidationStatuses() {
@@ -388,6 +420,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		return response.getBody();
 	}
 
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	@Deprecated
 	public List<MLPValidationType> getValidationTypes() {
@@ -400,6 +433,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		return response.getBody();
 	}
 
+	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
 	@Override
 	@Deprecated
 	public List<MLPDeploymentStatus> getDeploymentStatuses() {
@@ -409,30 +443,6 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		logger.debug("getDeploymentStatuses: uri {}", uri);
 		ResponseEntity<List<MLPDeploymentStatus>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPDeploymentStatus>>() {
-				});
-		return response.getBody();
-	}
-
-	@Override
-	@Deprecated
-	public List<MLPStepStatus> getStepStatuses() {
-		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.STEP_PATH, CCDSConstants.STATUS_PATH },
-				null, null);
-		logger.debug("getStepStatuses: uri {}", uri);
-		ResponseEntity<List<MLPStepStatus>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<MLPStepStatus>>() {
-				});
-		return response.getBody();
-	}
-
-	@Override
-	@Deprecated
-	public List<MLPStepType> getStepTypes() {
-		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.STEP_PATH, CCDSConstants.TYPE_PATH },
-				null, null);
-		logger.debug("getStepTypes: uri {}", uri);
-		ResponseEntity<List<MLPStepType>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<MLPStepType>>() {
 				});
 		return response.getBody();
 	}
