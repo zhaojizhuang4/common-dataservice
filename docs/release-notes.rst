@@ -33,6 +33,7 @@ Version 1.14.0, 21 February 2018
 * Assert unique constraint on peer subjectName attribute (ACUMOS-214)
 * Revise peer status code/name value set (ACUMOS-215)
 * Add new toolkit type code for ONAP (ACUMOS-232)
+* Add license headers to sql files (ACUMOS-275)
 * Requires database schema version 1.14
 
 Version 1.13.1, 9 February 2018
