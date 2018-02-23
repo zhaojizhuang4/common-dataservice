@@ -196,6 +196,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private long peerSolutionAccess;
 	private List<MLPPeer> peerAccessList;
 	private RestPageResponse<MLPSolution> solutionsByDate;
+	private MLPStepResult stepResultById;
 
 	/**
 	 * No-argument constructor.
@@ -1413,6 +1414,15 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	public RestPageResponse<MLPComment> getSolutionRevisionComments(String solutionId, String revisionId,
 			RestPageRequest pageRequest) {
 		return this.solutionRevisionComments;
+	}
+
+	public void setStepResultById(MLPStepResult stepResult) {
+		this.stepResultById = stepResult;
+	}
+
+	@Override
+	public MLPStepResult getStepResult(long stepResultId) {
+		return stepResultById;
 	}
 
 	public void setStepResults(RestPageResponse<MLPStepResult> results) {

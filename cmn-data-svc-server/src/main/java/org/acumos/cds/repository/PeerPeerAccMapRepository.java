@@ -28,7 +28,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface PeerPeerAccMapRepository extends PagingAndSortingRepository<MLPPeerPeerAccMap, MLPPeerPeerAccMap.PeerPeerAccMapPK> {
+public interface PeerPeerAccMapRepository
+		extends PagingAndSortingRepository<MLPPeerPeerAccMap, MLPPeerPeerAccMap.PeerPeerAccMapPK> {
 
 	/**
 	 * Gets the list of peers accessible to the specified peer.
@@ -41,11 +42,10 @@ public interface PeerPeerAccMapRepository extends PagingAndSortingRepository<MLP
 	 */
 	@Query("SELECT p FROM MLPPeer p WHERE p.peerId IN  "//
 			+ " ( SELECT pg.peerId FROM MLPPeerGrpMemMap pg WHERE pg.groupId IN " //
-			+ "    ( SELECT pp.resourcePeerGroupId FROM MLPPeerPeerAccMap pp WHERE pp.principalPeerGroupId IN "
-			+ "       ( SELECT pg2.groupId FROM MLPPeerGrpMemMap pg2 WHERE pg2.peerId = :peerId ) "
-			+ "    ) "
-			+ " ) "
-			)
+			+ "    ( SELECT pp.resourcePeerGroupId FROM MLPPeerPeerAccMap pp WHERE pp.principalPeerGroupId IN " //
+			+ "       ( SELECT pg2.groupId FROM MLPPeerGrpMemMap pg2 WHERE pg2.peerId = :peerId ) " //
+			+ "    ) " //
+			+ " ) ")
 	List<MLPPeer> findAccessPeers(@Param("peerId") String peerId);
 
 }

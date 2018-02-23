@@ -78,7 +78,7 @@ public interface SolutionRepository extends JpaRepository<MLPSolution, String>, 
 	 *            Page and sort criteria
 	 * @return Page of MLPSolution
 	 */
-	@Query(value = "SELECT s FROM MLPSolution s, MLPSolutionRevision r, MLPSolRevArtMap m, MLPArtifact a "
+	@Query(value = "SELECT DISTINCT s FROM MLPSolution s, MLPSolutionRevision r, MLPSolRevArtMap m, MLPArtifact a "
 			+ " WHERE s.active = :active " //
 			+ "   AND s.accessTypeCode in :accessTypeCodes " //
 			+ "   AND s.validationStatusCode in :valStatusCodes " //
@@ -89,7 +89,7 @@ public interface SolutionRepository extends JpaRepository<MLPSolution, String>, 
 			+ "   ( s.modified >= :theDate " //
 			+ "  OR r.modified >= :theDate " //
 			+ "  OR a.modified >= :theDate ) ")
-	Page<MLPSolution> findModifiedAfter(@Param("active") Boolean active,
+	Page<MLPSolution> findByModifiedDate(@Param("active") Boolean active,
 			@Param("accessTypeCodes") String[] accessTypeCodes, @Param("valStatusCodes") String[] valStatusCodes,
 			@Param("theDate") Date theDate, Pageable pageRequest);
 

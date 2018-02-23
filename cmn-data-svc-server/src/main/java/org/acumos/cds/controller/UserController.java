@@ -1034,7 +1034,7 @@ public class UserController extends AbstractController {
 	 * @return a user notification preference if found, an error otherwise.
 	 */
 	@ApiOperation(value = "Gets the user notification preference for the specified ID.", response = MLPUserNotifPref.class)
-	@RequestMapping(value = CCDSConstants.NOTIFICATION_PREF_PATH + "/{userNotifPrefId}/", method = RequestMethod.GET)
+	@RequestMapping(value = CCDSConstants.NOTIFICATION_PREF_PATH + "/{userNotifPrefId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getUserNotificationPreference(@PathVariable("userNotifPrefId") Long userNotifPrefId,
 			HttpServletResponse response) {

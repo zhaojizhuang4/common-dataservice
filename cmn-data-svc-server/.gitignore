@@ -5,3 +5,4 @@
 /logs/
 /derby.log
 /application.properties
+/application-cognitadb.properties

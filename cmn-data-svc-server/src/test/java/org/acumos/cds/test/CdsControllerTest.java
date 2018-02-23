@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 import org.acumos.cds.AccessTypeCode;
@@ -50,13 +49,13 @@ import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
-import org.acumos.cds.domain.MLPPeerSolAccMap;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPModelType;
 import org.acumos.cds.domain.MLPNotification;
 import org.acumos.cds.domain.MLPPasswordChangeRequest;
 import org.acumos.cds.domain.MLPPeer;
 import org.acumos.cds.domain.MLPPeerGroup;
+import org.acumos.cds.domain.MLPPeerSolAccMap;
 import org.acumos.cds.domain.MLPPeerSubscription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
@@ -78,8 +77,8 @@ import org.acumos.cds.domain.MLPThread;
 import org.acumos.cds.domain.MLPToolkitType;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
-import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPUserNotifPref;
+import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
 import org.acumos.cds.domain.MLPValidationType;
@@ -98,7 +97,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 
 /**
@@ -351,8 +349,13 @@ public class CdsControllerTest {
 			logger.info("Logged in successfully, password expires {}", loggedIn.getLoginPassExpire());
 			Assert.assertArrayEquals(fakePicture, loggedIn.getPicture());
 
-			// Fetch it back
+			// First an empty result
 			HashMap<String, Object> userRestr = new HashMap<>();
+			userRestr.put("firstName", "~never~match~hahaha");
+			RestPageResponse<MLPUser> emptyUserPage = client.searchUsers(userRestr, false, new RestPageRequest());
+			Assert.assertTrue(emptyUserPage.getNumberOfElements() == 0);
+
+			// Now use query parameters that should match
 			userRestr.put("active", "true");
 			userRestr.put("firstName", firstName);
 			userRestr.put("lastName", lastName);
@@ -401,10 +404,19 @@ public class CdsControllerTest {
 			RestPageResponse<MLPPeer> peerPage = client.getPeers(rp);
 			Assert.assertTrue(peerPage.getNumberOfElements() > 0);
 
+			// Cover case of zero results
 			HashMap<String, Object> peerRestr = new HashMap<>();
-			peerRestr.put("name", peerName);
-			RestPageResponse<MLPPeer> peerSearchResult = client.searchPeers(peerRestr, false,
+			peerRestr.put("name", "bogusbogus~~nevermatch");
+			RestPageResponse<MLPPeer> emptyPerSearchResult = client.searchPeers(peerRestr, false,
 					new RestPageRequest(0, 1));
+			Assert.assertTrue(emptyPerSearchResult.getNumberOfElements() == 0);
+
+			// Conver case of non-zero results
+			peerRestr.put("name", peerName);
+			Map<String, String> peerFieldMap = new HashMap<>();
+			peerFieldMap.put("name", "ASC");
+			RestPageResponse<MLPPeer> peerSearchResult = client.searchPeers(peerRestr, false,
+					new RestPageRequest(0, 1, peerFieldMap));
 			Assert.assertTrue(peerSearchResult.getNumberOfElements() > 0);
 
 			MLPPeer pr2 = client.getPeer(pr.getPeerId());
@@ -481,7 +493,7 @@ public class CdsControllerTest {
 			// This will get no results but will cover some clauses
 			restr.clear();
 			restr.put("created", new Date());
-			restr.put("size", 0);
+			restr.put("size", 10);
 			filtered = client.searchArtifacts(restr, true, new RestPageRequest(0, 10));
 			Assert.assertTrue(filtered.getNumberOfElements() == 0);
 
@@ -710,6 +722,7 @@ public class CdsControllerTest {
 			sv.setRevisionId(cr.getRevisionId());
 			sv.setTaskId("fake-task-id");
 			sv.setValidationTypeCode(ValidationTypeCode.LC.name());
+			sv.setValidationStatusCode(ValidationStatusCode.FA.name());
 			sv = client.createSolutionValidation(sv);
 			Assert.assertNotNull(sv);
 			logger.info("Created solution validation {}", sv);
@@ -766,7 +779,8 @@ public class CdsControllerTest {
 			Assert.assertNotNull(dep.getDeploymentId());
 			logger.info("Created solution deployent {}", dep);
 
-			dep.setDetail("{ 'tag' : 'value' }");
+			// Must be valid JSON
+			dep.setDetail("{ \"tag\" : \"value\" }");
 			client.updateSolutionDeployment(dep);
 
 			// Query for solution deployments
@@ -869,7 +883,13 @@ public class CdsControllerTest {
 			RestPageResponse<MLPRole> roles = client.getRoles(new RestPageRequest());
 			Assert.assertTrue(roles.getNumberOfElements() > 0);
 
+			// Empty result
 			HashMap<String, Object> roleRestr = new HashMap<>();
+			roleRestr.put("name", "never~ever~match~role");
+			RestPageResponse<MLPRole> emptyRoleResult = client.searchRoles(roleRestr, false, new RestPageRequest());
+			Assert.assertTrue(emptyRoleResult.getNumberOfElements() == 0);
+
+			// Nonempty result
 			roleRestr.put("name", roleName);
 			RestPageResponse<MLPRole> roleResult = client.searchRoles(roleRestr, false, new RestPageRequest());
 			Assert.assertTrue(roleResult.getNumberOfElements() > 0);
@@ -949,13 +969,7 @@ public class CdsControllerTest {
 			client.deleteRole(cr2.getRoleId());
 			client.deleteUser(cu.getUserId());
 		} catch (HttpClientErrorException ex) {
-			logger.error("Client reported error; body is {}", ex.getResponseBodyAsString());
-			throw ex;
-		} catch (HttpServerErrorException ex) {
-			logger.error("Server reported error; body is {}", ex.getResponseBodyAsString());
-			throw ex;
-		} catch (Exception ex) {
-			logger.error("testRoleAndFunctions failed", ex);
+			logger.error("testRoleAndFunctions failed with response {}", ex.getResponseBodyAsString());
 			throw ex;
 		}
 
@@ -975,8 +989,10 @@ public class CdsControllerTest {
 			no.setMessage("notif msg");
 			no.setUrl("http://notify.me");
 			Date now = new Date();
-			no.setStart(new Date(now.getTime() - 60 * 1000));
-			no.setEnd(new Date(now.getTime() + 60 * 1000));
+			// An hour ago
+			no.setStart(new Date(now.getTime() - 60 * 60 * 1000));
+			// An hour from now
+			no.setEnd(new Date(now.getTime() + 60 * 60 * 1000));
 			no.setMsgSeverityCode(String.valueOf(MessageSeverityCode.LO));
 			no = client.createNotification(no);
 			Assert.assertNotNull(no.getNotificationId());
@@ -1015,8 +1031,7 @@ public class CdsControllerTest {
 			client.deleteNotification(no.getNotificationId());
 			client.deleteUser(cu.getUserId());
 		} catch (HttpStatusCodeException ex) {
-			logger.error("testNotifications got response {}", ex.getResponseBodyAsString());
-			logger.error("testNotifications failed", ex);
+			logger.error("testNotifications failed with response {}", ex.getResponseBodyAsString());
 			throw ex;
 		}
 
@@ -1043,17 +1058,25 @@ public class CdsControllerTest {
 			usrNotifPref.setNotfDelvMechCode(String.valueOf(NotificationDeliveryMechanismCode.EM));
 			client.updateUserNotificationPreference(usrNotifPref);
 
+			MLPUserNotifPref prefById = client.getUserNotificationPreference(usrNotifPref.getUserNotifPrefId());
+			Assert.assertNotNull(prefById);
+					
 			List<MLPUserNotifPref> usrNotifPrefs = client.getUserNotificationPreferences(cu.getUserId());
 			Assert.assertTrue(usrNotifPrefs.iterator().hasNext());
 			logger.info("First user notification preference{}", usrNotifPrefs.iterator().next());
 
 		} catch (HttpStatusCodeException ex) {
-			logger.error("testUserNotificationPreferences got response {}", ex.getResponseBodyAsString());
-			logger.error("testUserNotificationPreferences failed", ex);
+			logger.error("testUserNotificationPreferences failed with response {}", ex.getResponseBodyAsString());
 			throw ex;
 		}
 
 		// invalid tests
+		try {
+			client.getUserNotificationPreference(99999L);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("get user notification preference failed as expected: {}", ex.getResponseBodyAsString());
+		}
 		try {
 			client.createUserNotificationPreference(new MLPUserNotifPref());
 			throw new Exception("Unexpected success");
@@ -1099,9 +1122,10 @@ public class CdsControllerTest {
 	@Test
 	public void testStepResult() throws Exception {
 		try {
+			final String name = "Solution ID creation";
 			MLPStepResult sr = new MLPStepResult();
 			sr.setStepCode(StepTypeCode.OB.name());
-			sr.setName("Solution ID creation");
+			sr.setName(name);
 			sr.setStatusCode(String.valueOf(StepStatusCode.SU));
 			Date now = new Date();
 			sr.setStartDate(new Date(now.getTime() - 60 * 1000));
@@ -1112,19 +1136,38 @@ public class CdsControllerTest {
 			sr.setResult("Some new stack trace result");
 			client.updateStepResult(sr);
 
+			MLPStepResult getById = client.getStepResult(sr.getStepResultId());
+			Assert.assertNotNull(getById.getStepResultId());
+			
 			RestPageResponse<MLPStepResult> stepResults = client.getStepResults(new RestPageRequest(0, 10));
 			Assert.assertTrue(stepResults.iterator().hasNext());
 			logger.info("First step result {}", stepResults.iterator().next());
 
+			HashMap<String, Object> queryParameters = new HashMap<>();
+			queryParameters.put("name", "~bogus~never~match");
+			RestPageResponse<MLPStepResult> emptySearchResults = client.searchStepResults(queryParameters, true,
+					new RestPageRequest(0, 10));
+			Assert.assertTrue(emptySearchResults.getNumberOfElements() == 0);
+
+			queryParameters.put("name", name);
+			RestPageResponse<MLPStepResult> searchResults = client.searchStepResults(queryParameters, true,
+					new RestPageRequest(0, 10));
+			Assert.assertTrue(searchResults.getNumberOfElements() == 1);
+
 			client.deleteStepResult(sr.getStepResultId());
 		} catch (HttpStatusCodeException ex) {
-			logger.error("testStepResults got response {}", ex.getResponseBodyAsString());
-			logger.error("testStepResults failed", ex);
+			logger.error("testStepResults failed with response {}", ex.getResponseBodyAsString());
 			throw ex;
 		}
 
 		// invalid tests
 
+		try {
+			client.getStepResult(99999L);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("get step result failed as expected: {}", ex.getResponseBodyAsString());
+		}
 		try {
 			HashMap<String, Object> restr = new HashMap<>();
 			client.searchStepResults(restr, true, new RestPageRequest(0, 1));
@@ -1185,7 +1228,7 @@ public class CdsControllerTest {
 			logger.info("Failed to get missing config as expected {}", ex.getResponseBodyAsString());
 		}
 		try {
-			MLPSiteConfig sc = new MLPSiteConfig("bogus", "{ 'some' : 'json' }");
+			MLPSiteConfig sc = new MLPSiteConfig("bogus", "{ \"some\" : \"json\" }");
 			sc.setUserId("bogus");
 			client.createSiteConfig(sc);
 			throw new Exception("Unexpected succes on invalid user ID");
@@ -1193,20 +1236,20 @@ public class CdsControllerTest {
 			logger.info("Failed to create config with bad user as expected {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.createSiteConfig(new MLPSiteConfig(s64, "{ 'some' : 'json' }"));
+			client.createSiteConfig(new MLPSiteConfig(s64, "{ \"some\" : \"json\" }"));
 			throw new Exception("Unexpected success on long key");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Failed to create config with long key as expected {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.updateSiteConfig(new MLPSiteConfig("bogus", "{ 'some' : 'json' }"));
+			client.updateSiteConfig(new MLPSiteConfig("bogus", "{ \"some\" : \"json\" }"));
 			throw new Exception("Unexpected success of bogus update");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Failed to update non-existent config as expected {}", ex.getResponseBodyAsString());
 		}
 		// this should work
-		final String key = "myKey";
-		MLPSiteConfig config = new MLPSiteConfig(key, "{ 'some' : 'json' }");
+		final String key = "controllerTest-siteConfig";
+		MLPSiteConfig config = new MLPSiteConfig(key, "{ \"some\" : \"json\" }");
 		config = client.createSiteConfig(config);
 		Assert.assertNotNull(config.getCreated());
 		logger.info("Created site config {}", config);
@@ -1219,7 +1262,7 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Failed to create dupe config as expected {}", ex.getResponseBodyAsString());
 		}
-		config.setConfigValue("{ 'other' : 'stuff' }");
+		config.setConfigValue("{ \"other\" : \"stuff\" }");
 		client.updateSiteConfig(config);
 		try {
 			config.setConfigValue(null);
@@ -1269,7 +1312,7 @@ public class CdsControllerTest {
 		thread.setTitle("thread title");
 		client.updateThread(thread);
 
-		// Violate contraints
+		// Violate constraints
 		try {
 			MLPThread t = new MLPThread();
 			t.setTitle(s64 + s64);
@@ -1452,95 +1495,264 @@ public class CdsControllerTest {
 	}
 
 	@Test
-	public void testPeerSolutionGroups() {
+	public void testPeerSolutionGroups() throws Exception {
+
+		// Need a user to create a solution
+		MLPUser cu = null;
+		cu = new MLPUser();
+		cu.setActive(true);
+		final String loginName = "test_user_" + Long.toString(new Date().getTime());
+		cu.setLoginName(loginName);
+		cu = client.createUser(cu);
+		Assert.assertNotNull("User ID", cu.getUserId());
+		logger.info("Created user " + cu.getUserId());
+
+		MLPSolution cs = new MLPSolution("solutionName", cu.getUserId(), false);
+		cs = client.createSolution(cs);
+		Assert.assertNotNull("Solution ID", cs.getSolutionId());
+		logger.info("Created solution " + cs.getSolutionId());
+
+		final String peerName = "Peer-" + Long.toString(new Date().getTime());
+		MLPPeer pr = new MLPPeer(peerName, "x." + Long.toString(new Date().getTime()), "http://peer-api", true, true,
+				"contact", PeerStatusCode.AC.name(), ValidationStatusCode.FA.name());
+		pr = client.createPeer(pr);
+		logger.info("Created peer " + pr.getPeerId());
+
+		MLPPeerGroup pg1 = new MLPPeerGroup("peer group one");
+		pg1 = client.createPeerGroup(pg1);
+		Assert.assertNotNull(pg1.getGroupId());
+		logger.info("Created peer group " + pg1.getGroupId());
+
+		pg1.setDescription("some description");
+		client.updatePeerGroup(pg1);
+
+		MLPPeerGroup pg2 = new MLPPeerGroup("peer group 2");
+		pg2 = client.createPeerGroup(pg2);
+		Assert.assertNotNull(pg2.getGroupId());
+		logger.info("Created peer group " + pg2.getGroupId());
+
+		RestPageResponse<MLPPeerGroup> peerGroups = client.getPeerGroups(new RestPageRequest(0, 5));
+		Assert.assertTrue(peerGroups != null && peerGroups.getNumberOfElements() > 0);
+
+		MLPSolutionGroup sg = new MLPSolutionGroup("solution group");
+		sg = client.createSolutionGroup(sg);
+		Assert.assertNotNull(sg.getGroupId());
+		logger.info("Created solution group " + sg.getGroupId());
+
+		sg.setDescription("some description");
+		client.updateSolutionGroup(sg);
+
+		RestPageResponse<MLPSolutionGroup> solGroups = client.getSolutionGroups(new RestPageRequest(0, 5));
+		Assert.assertTrue(solGroups != null && solGroups.getNumberOfElements() > 0);
+
+		RestPageResponse<MLPPeer> peersInGroup = null;
+		client.addPeerToGroup(pr.getPeerId(), pg1.getGroupId());
+		peersInGroup = client.getPeersInGroup(pg1.getGroupId(), new RestPageRequest());
+		Assert.assertTrue(peersInGroup != null && peersInGroup.getNumberOfElements() > 0);
+
+		RestPageResponse<MLPSolution> solutionsInGroup = null;
+		client.addSolutionToGroup(cs.getSolutionId(), sg.getGroupId());
+		solutionsInGroup = client.getSolutionsInGroup(sg.getGroupId(), new RestPageRequest());
+		Assert.assertTrue(solutionsInGroup != null && solutionsInGroup.getNumberOfElements() > 0);
+
+		RestPageResponse<MLPPeerSolAccMap> maps = null;
+
+		client.mapPeerSolutionGroups(pg1.getGroupId(), sg.getGroupId());
+		maps = client.getPeerSolutionGroupMaps(new RestPageRequest());
+		Assert.assertTrue(maps != null && maps.getNumberOfElements() > 0);
+
+		long access = client.checkPeerSolutionAccess(pr.getPeerId(), cs.getSolutionId());
+		Assert.assertTrue(access > 0);
+
+		client.unmapPeerSolutionGroups(pg1.getGroupId(), sg.getGroupId());
+		maps = client.getPeerSolutionGroupMaps(new RestPageRequest());
+		Assert.assertTrue(maps != null && maps.getNumberOfElements() == 0);
+
+		client.mapPeerPeerGroups(pg2.getGroupId(), pg1.getGroupId());
+
+		List<MLPPeer> peers = client.getPeerAccess(pr.getPeerId());
+		Assert.assertNotNull(peers);
+
+		client.unmapPeerPeerGroups(pg2.getGroupId(), pg1.getGroupId());
+
+		client.dropSolutionFromGroup(cs.getSolutionId(), sg.getGroupId());
+		solutionsInGroup = client.getSolutionsInGroup(sg.getGroupId(), new RestPageRequest());
+		Assert.assertTrue(solutionsInGroup != null && solutionsInGroup.getNumberOfElements() == 0);
+
+		client.dropPeerFromGroup(pr.getPeerId(), pg1.getGroupId());
+		peersInGroup = client.getPeersInGroup(pg1.getGroupId(), new RestPageRequest());
+		Assert.assertTrue(peersInGroup != null && peersInGroup.getNumberOfElements() == 0);
+
+		access = client.checkPeerSolutionAccess(pr.getPeerId(), cs.getSolutionId());
+		Assert.assertTrue(access <= 0);
+
+		// Invalid cases
+		try {
+			MLPSolutionGroup sgx = new MLPSolutionGroup("solution group");
+			sgx.setGroupId(999L);
+			client.updateSolutionGroup(sgx);
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPPeerGroup pg = new MLPPeerGroup("peer group");
+			pg.setGroupId(999L);
+			client.updatePeerGroup(pg);
+		} catch (HttpStatusCodeException ex) {
+			logger.info("updatePeerGroup failed as expected: {}", ex.getResponseBodyAsString());
+		}
 
 		try {
-			// Need a user to create a solution
-			MLPUser cu = null;
-			cu = new MLPUser();
-			cu.setActive(true);
-			final String loginName = "test_user_" + Long.toString(new Date().getTime());
-			cu.setLoginName(loginName);
-			cu = client.createUser(cu);
-			Assert.assertNotNull("User ID", cu.getUserId());
-			logger.info("Created user " + cu.getUserId());
-
-			MLPSolution cs = new MLPSolution("solutionName", cu.getUserId(), false);
-			cs = client.createSolution(cs);
-			Assert.assertNotNull("Solution ID", cs.getSolutionId());
-			logger.info("Created solution " + cs.getSolutionId());
-
-			final String peerName = "Peer-" + Long.toString(new Date().getTime());
-			MLPPeer pr = new MLPPeer(peerName, "x." + String.valueOf(new Random().nextInt()), "http://peer-api", true,
-					true, "contact", PeerStatusCode.AC.name(), ValidationStatusCode.FA.name());
-			pr = client.createPeer(pr);
-			logger.info("Created peer " + pr.getPeerId());
-
-			MLPPeerGroup pg1 = new MLPPeerGroup("peer group one");
-			pg1 = client.createPeerGroup(pg1);
-			Assert.assertNotNull(pg1.getGroupId());
-			logger.info("Created peer group " + pg1.getGroupId());
-
-			MLPPeerGroup pg2 = new MLPPeerGroup("peer group 2");
-			pg2 = client.createPeerGroup(pg2);
-			Assert.assertNotNull(pg2.getGroupId());
-			logger.info("Created peer group " + pg2.getGroupId());
-
-			MLPSolutionGroup sg = new MLPSolutionGroup("solution group");
-			sg = client.createSolutionGroup(sg);
-			Assert.assertNotNull(sg.getGroupId());
-			logger.info("Created solution group " + sg.getGroupId());
-
-			RestPageResponse<MLPPeer> peersInGroup = null;
-			client.addPeerToGroup(pr.getPeerId(), pg1.getGroupId());
-			peersInGroup = client.getPeersInGroup(pg1.getGroupId(), new RestPageRequest());
-			Assert.assertTrue(peersInGroup != null && peersInGroup.getNumberOfElements() > 0);
-
-			RestPageResponse<MLPSolution> solutionsInGroup = null;
-			client.addSolutionToGroup(cs.getSolutionId(), sg.getGroupId());
-			solutionsInGroup = client.getSolutionsInGroup(sg.getGroupId(), new RestPageRequest());
-			Assert.assertTrue(solutionsInGroup != null && solutionsInGroup.getNumberOfElements() > 0);
-
-			RestPageResponse<MLPPeerSolAccMap> maps = null;
-
-			client.mapPeerSolutionGroups(pg1.getGroupId(), sg.getGroupId());
-			maps = client.getPeerSolutionGroupMaps(new RestPageRequest());
-			Assert.assertTrue(maps != null && maps.getNumberOfElements() > 0);
-
-			long access = client.checkPeerSolutionAccess(pr.getPeerId(), cs.getSolutionId());
-			Assert.assertTrue(access > 0);
-
-			client.unmapPeerSolutionGroups(pg1.getGroupId(), sg.getGroupId());
-			maps = client.getPeerSolutionGroupMaps(new RestPageRequest());
-			Assert.assertTrue(maps != null && maps.getNumberOfElements() == 0);
-
-			client.mapPeerPeerGroups(pg2.getGroupId(), pg1.getGroupId());
-
-			List<MLPPeer> peers = client.getPeerAccess(pr.getPeerId());
-			Assert.assertNotNull(peers);
-
-			client.unmapPeerPeerGroups(pg2.getGroupId(), pg1.getGroupId());
-
-			client.dropSolutionFromGroup(cs.getSolutionId(), sg.getGroupId());
-			solutionsInGroup = client.getSolutionsInGroup(sg.getGroupId(), new RestPageRequest());
-			Assert.assertTrue(solutionsInGroup != null && solutionsInGroup.getNumberOfElements() == 0);
-
-			client.dropPeerFromGroup(pr.getPeerId(), pg1.getGroupId());
-			peersInGroup = client.getPeersInGroup(pg1.getGroupId(), new RestPageRequest());
-			Assert.assertTrue(peersInGroup != null && peersInGroup.getNumberOfElements() == 0);
-
-			access = client.checkPeerSolutionAccess(pr.getPeerId(), cs.getSolutionId());
-			Assert.assertTrue(access <= 0);
-
-			client.deleteSolutionGroup(sg.getGroupId());
-			client.deletePeerGroup(pg2.getGroupId());
-			client.deletePeerGroup(pg1.getGroupId());
-			client.deleteSolution(cs.getSolutionId());
-			client.deleteUser(cu.getUserId());
+			client.createPeerGroup(new MLPPeerGroup());
+			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("Failed: {}", ex.getResponseBodyAsString());
-			throw ex;
+			logger.info("Create peer group failed as expected: {}", ex.getResponseBodyAsString());
 		}
+		try {
+			MLPPeerGroup pgx = new MLPPeerGroup();
+			pgx.setGroupId(1L);
+			client.updatePeerGroup(pgx);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Update peer group failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.deletePeerGroup(0L);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Delete peer group failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createSolutionGroup(new MLPSolutionGroup());
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create solution group failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPSolutionGroup sg2 = new MLPSolutionGroup();
+			sg2.setGroupId(1L);
+			client.updateSolutionGroup(sg2);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Update solution group failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.deleteSolutionGroup(0L);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Delete solution group failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			long bogus = 0L;
+			client.addPeerToGroup("bogus", bogus);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Add peer group failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			long bogus = 0L;
+			client.addPeerToGroup(pr.getPeerId(), bogus);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Add peer to group failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			long bogus = 0L;
+			client.dropPeerFromGroup(pr.getPeerId(), bogus);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Drop peer from group failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			long bogus = 0L;
+			client.addSolutionToGroup("bogus", bogus);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Add solution to group failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			long bogus = 0L;
+			client.addSolutionToGroup(cs.getSolutionId(), bogus);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Add solution to group failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			long bogus = 0L;
+			client.dropSolutionFromGroup(cs.getSolutionId(), bogus);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Drop solution from group failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.mapPeerSolutionGroups(9999L, 9999L);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("map peer solution groups failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.mapPeerSolutionGroups(pg1.getGroupId(), 9999L);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("map peer solution groups failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.unmapPeerSolutionGroups(9999L, 9999L);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("unmap peer solution groups failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.mapPeerPeerGroups(9999L, 9999L);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("map peer peer groups failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.mapPeerPeerGroups(pg1.getGroupId(), 9999L);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("map peer peer groups failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.mapPeerPeerGroups(pg1.getGroupId(), pg1.getGroupId());
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("map peer peer groups failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.unmapPeerPeerGroups(9999L, 9999L);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("unmap peer peer groups failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.checkPeerSolutionAccess("peerId", "solutionId");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("checkPeerSolutionAccess failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.checkPeerSolutionAccess(pr.getPeerId(), "solutionId");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("checkPeerSolutionAccess failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.getPeerAccess("bogus peer id");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("checkPeerSolutionAccess failed as expected: {}", ex.getResponseBodyAsString());
+		}
+
+
+		client.deleteSolutionGroup(sg.getGroupId());
+		client.deletePeerGroup(pg2.getGroupId());
+		client.deletePeerGroup(pg1.getGroupId());
+		client.deleteSolution(cs.getSolutionId());
+		client.deletePeer(pr.getPeerId());
+		client.deleteUser(cu.getUserId());
+
 	}
 
 	@Test
@@ -1896,6 +2108,13 @@ public class CdsControllerTest {
 		// restore valid value
 		cs.setOwnerId(cu.getUserId());
 
+		try {
+			Map<String, Object> queryParameters = new HashMap<>();
+			client.searchSolutions(queryParameters, false, new RestPageRequest());
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Search solution failed on empty query as expected: {}", ex.getResponseBodyAsString());
+		}
 		try {
 			Map<String, Object> queryParameters = new HashMap<>();
 			queryParameters.put("bogusFieldName", "bogusFieldFValue");
@@ -2803,144 +3022,7 @@ public class CdsControllerTest {
 			logger.info("Get user soln deps failed as expected: {}", ex.getResponseBodyAsString());
 		}
 
-		MLPPeerGroup pg = new MLPPeerGroup("peer group 2");
-		pg = client.createPeerGroup(pg);
-		Assert.assertNotNull(pg.getGroupId());
-		logger.info("Created peer group " + pg.getGroupId());
-
-		MLPSolutionGroup sg = new MLPSolutionGroup("solution group");
-		sg = client.createSolutionGroup(sg);
-		Assert.assertNotNull(sg.getGroupId());
-		logger.info("Created solution group " + sg.getGroupId());
-
 		try {
-			client.createPeerGroup(new MLPPeerGroup());
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Create peer group failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			MLPPeerGroup pg2 = new MLPPeerGroup();
-			pg2.setGroupId(1L);
-			client.updatePeerGroup(pg2);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Update peer group failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.deletePeerGroup(0L);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Delete peer group failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.createSolutionGroup(new MLPSolutionGroup());
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Create solution group failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			MLPSolutionGroup sg2 = new MLPSolutionGroup();
-			sg2.setGroupId(1L);
-			client.updateSolutionGroup(sg2);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Update solution group failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.deleteSolutionGroup(0L);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Delete solution group failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			long bogus = 0L;
-			client.addPeerToGroup("bogus", bogus);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Add peer group failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			long bogus = 0L;
-			client.addPeerToGroup(cp.getPeerId(), bogus);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Add peer to group failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			long bogus = 0L;
-			client.dropPeerFromGroup(cp.getPeerId(), bogus);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Drop peer from group failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			long bogus = 0L;
-			client.addSolutionToGroup("bogus", bogus);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Add solution to group failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			long bogus = 0L;
-			client.addSolutionToGroup(cs.getSolutionId(), bogus);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Add solution to group failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			long bogus = 0L;
-			client.dropSolutionFromGroup(cs.getSolutionId(), bogus);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Drop solution from group failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.mapPeerSolutionGroups(9999L, 9999L);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("map peer solution groups failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.mapPeerSolutionGroups(pg.getGroupId(), 9999L);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("map peer solution groups failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.unmapPeerSolutionGroups(9999L, 9999L);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("unmap peer solution groups failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.mapPeerPeerGroups(9999L, 9999L);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("map peer peer groups failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.mapPeerPeerGroups(pg.getGroupId(), 9999L);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("map peer peer groups failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.unmapPeerPeerGroups(9999L, 9999L);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("unmap peer peer groups failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.checkPeerSolutionAccess("peerId", "solutionId");
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("checkPeerSolutionAccess failed as expected: {}", ex.getResponseBodyAsString());
-		}
-
-		try {
-			client.deleteSolutionGroup(sg.getGroupId());
-			client.deletePeerGroup(pg.getGroupId());
 			client.deleteSolutionValidation(sv);
 			client.deleteSolutionDeployment(solDep);
 			client.dropSolutionRevisionArtifact(cs.getSolutionId(), csr.getRevisionId(), ca.getArtifactId());

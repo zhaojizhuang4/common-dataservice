@@ -26,10 +26,10 @@ Maven Nexus repository. The server is deployed as a Docker image to a Docker reg
 Version 1.14.0, 21 February 2018
 -------------------------------
 
-* Add search-by-date method for federation subscription update (ACUMOS-61)
+* Add domain classes and search-by-date method for federation subscription update (ACUMOS-61)
 * Add peer group, solution group and mapping features for federation access control (ACUMOS-62)
 * Refactor to drop code-name database tables (ACUMOS-144)
-* Add feature for user notification preference and user notification (ACUMOS-166) 
+* Add feature for user notification preference and user notification (ACUMOS-166)
 * Assert unique constraint on peer subjectName attribute (ACUMOS-214)
 * Revise peer status code/name value set (ACUMOS-215)
 * Add new toolkit type code for ONAP (ACUMOS-232)

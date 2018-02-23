@@ -282,7 +282,7 @@ public class CdsRepositoryServiceTest {
 			// Create Peer
 			MLPPeer pr = new MLPPeer();
 			pr.setName("Peer-" + Long.toString(new Date().getTime()));
-			pr.setSubjectName("x."+ String.valueOf(new Random().nextInt()));
+			pr.setSubjectName("x." + String.valueOf(new Random().nextInt()));
 			pr.setApiUrl("http://peer-api");
 			pr.setContact1("Tyrion Lannister");
 			pr.setStatusCode(PeerStatusCode.AC.name());
@@ -399,19 +399,19 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(cs.getTags().size() == 1);
 			logger.info("Created solution " + cs.getSolutionId());
 
-			// Search for a single value
+			// Search with a single value
 			Map<String, String> solParms = new HashMap<>();
 			solParms.put("name", cs.getName());
 			Page<MLPSolution> searchSols = solutionSearchService.findSolutions(solParms, false,
 					new PageRequest(0, 5, null));
-			Assert.assertTrue(searchSols.getNumberOfElements() == 1);
+			Assert.assertFalse(searchSols.getContent().isEmpty());
 
-			// Search for a list
+			// Search with a list of values
 			Map<String, Object> solListParms = new HashMap<>();
 			solListParms.put("name", new String[] { cs.getName() });
 			Page<MLPSolution> searchPageSols = solutionSearchService.findSolutions(solListParms, false,
 					new PageRequest(0, 5, null));
-			Assert.assertTrue(searchPageSols.getNumberOfElements() == 1);
+			Assert.assertFalse(searchPageSols.getContent().isEmpty());
 
 			logger.info("Finding portal solutions");
 			String[] solKw = { solName };
@@ -526,28 +526,32 @@ public class CdsRepositoryServiceTest {
 				logger.info("\tRevision for artifact: " + r.toString());
 
 			logger.info("Querying for revisions by search term");
-			Iterable<MLPSolutionRevision> rl = revisionRepository.findBySearchTerm("Some", new PageRequest(0, 5, null));
-			Assert.assertTrue(rl != null && rl.iterator().hasNext());
+			Page<MLPSolutionRevision> rl = revisionRepository.findBySearchTerm("Some", new PageRequest(0, 5, null));
+			Assert.assertFalse(rl.getContent().isEmpty());
 			logger.info("Revision list: {}", rl);
-			logger.info("revisionRepository list above");
 
 			logger.info("Querying for user by partial match");
-			Iterable<MLPUser> sul = userRepository.findBySearchTerm("Test", new PageRequest(0, 5, null));
-			Assert.assertTrue(sul != null && sul.iterator().hasNext());
+			Page<MLPUser> sul = userRepository.findBySearchTerm("Test", new PageRequest(0, 5, null));
+			Assert.assertFalse(sul.getContent().isEmpty());
 			logger.info("User list: {}", sul);
 
-			Iterable<MLPSolution> solByTag = solutionRepository.findByTag("Java", new PageRequest(0, 5, null));
+			Page<MLPSolution> solByTag = solutionRepository.findByTag("Java", new PageRequest(0, 5, null));
 			logger.info("Solutions by tag: {}", solByTag);
-			Assert.assertTrue(solByTag != null && solByTag.iterator().hasNext());
+			Assert.assertFalse(solByTag.getContent().isEmpty());
 
 			String[] accessTypes = new String[] { AccessTypeCode.PB.name() };
 			String[] valStatuses = new String[] { ValidationStatusCode.PS.name() };
 			Date anHourAgo = new java.util.Date();
 			anHourAgo.setTime(new Date().getTime() - (1000L * 60 * 60));
-			Iterable<MLPSolution> solByDate = solutionRepository.findModifiedAfter(true, accessTypes, valStatuses,
-					anHourAgo, new PageRequest(0, 5, null));
-			logger.info("Solutions by date: {}", solByDate);
-			Assert.assertTrue(solByDate != null && solByDate.iterator().hasNext());
+			
+			Page<MLPSolution> solByJoin = solutionRepository.findByModifiedDate(true, accessTypes,
+					valStatuses, anHourAgo, new PageRequest(0, 5));
+			logger.info("Solutions by date via join: {}", solByJoin);
+
+			Page<MLPSolution> solByCriteria = solutionSearchService.findSolutionsByModifiedDate(true, accessTypes,
+					valStatuses, anHourAgo, new PageRequest(0, 5));
+			logger.info("Solutions by date via criteria: {}", solByCriteria);
+			Assert.assertFalse(solByCriteria.getContent().isEmpty());
 
 			MLPUser founduser = userRepository.findByLoginOrEmail("test_user7");
 			logger.info("Found user: {}", founduser);
@@ -556,7 +560,7 @@ public class CdsRepositoryServiceTest {
 			solRevArtMapRepository.delete(new MLPSolRevArtMap.SolRevArtMapPK(cr.getRevisionId(), ca.getArtifactId()));
 			logger.info("Dropped" + cr.getRevisionId() + " and " + ca.getArtifactId());
 
-			MLPSiteConfig cc = new MLPSiteConfig("myKey", " { 'json' : 'block' }");
+			MLPSiteConfig cc = new MLPSiteConfig("repotest-siteconfig", " { \"json\" : \"block\" }");
 			cc = siteConfigRepository.save(cc);
 			Assert.assertNotNull(cc);
 			logger.info("Created site config {}", cc);
@@ -696,8 +700,8 @@ public class CdsRepositoryServiceTest {
 
 			// Create Peer
 			final String peerName = "Peer-" + Long.toString(new Date().getTime());
-			MLPPeer pr = new MLPPeer(peerName, "x."+ String.valueOf(new Random().nextInt()), "http://peer-api", true, true, "", PeerStatusCode.AC.name(),
-					ValidationStatusCode.IP.name());
+			MLPPeer pr = new MLPPeer(peerName, "x." + String.valueOf(new Random().nextInt()), "http://peer-api", true,
+					true, "", PeerStatusCode.AC.name(), ValidationStatusCode.IP.name());
 			pr = peerRepository.save(pr);
 			Assert.assertNotNull(pr.getPeerId());
 			Assert.assertNotNull(pr.getCreated());
@@ -1020,7 +1024,9 @@ public class CdsRepositoryServiceTest {
 			no.setUrl("http://notify.me");
 			no.setMsgSeverityCode(String.valueOf(MessageSeverityCode.HI));
 			Date now = new Date();
-			no.setStart(new Date(now.getTime() - 1000));
+			// Start an hour ago
+			no.setStart(new Date(now.getTime() - 60 * 60 * 1000));
+			// End an hour from now
 			no.setEnd(new Date(now.getTime() + 60 * 60 * 1000));
 			no = notificationRepository.save(no);
 			Assert.assertNotNull(no.getNotificationId());
@@ -1030,8 +1036,8 @@ public class CdsRepositoryServiceTest {
 			nm.setUserId(cu.getUserId());
 			nm = notifUserMapRepository.save(nm);
 
-			Iterable<MLPUserNotification> notifs = notificationRepository.findActiveByUser(cu.getUserId(), null);
-			Assert.assertTrue(notifs.iterator().hasNext());
+			Page<MLPUserNotification> notifs = notificationRepository.findActiveByUser(cu.getUserId(), new PageRequest(0,5));
+			Assert.assertFalse(notifs.getContent().isEmpty());
 
 			// This next step mimics what a controller will do
 			nm.setViewed(new Date());
@@ -1158,28 +1164,28 @@ public class CdsRepositoryServiceTest {
 		logger.info("Created solution " + cs2);
 
 		final String peerName = "Peer-" + Long.toString(new Date().getTime());
-		MLPPeer pr = new MLPPeer(peerName, "x."+ String.valueOf(new Random().nextInt()), "http://peer-api", true, false, "contact", PeerStatusCode.AC.name(),
-				ValidationStatusCode.FA.name());
+		MLPPeer pr = new MLPPeer(peerName, "x." + String.valueOf(new Random().nextInt()), "http://peer-api", true,
+				false, "contact", PeerStatusCode.AC.name(), ValidationStatusCode.FA.name());
 		pr = peerRepository.save(pr);
 		logger.info("Created peer " + pr);
 
 		final String peerName2 = "Peer-" + Long.toString(new Date().getTime());
-		MLPPeer pr2 = new MLPPeer(peerName2, "x."+ String.valueOf(new Random().nextInt()), "http://peer-api", true, false, "contact",
-				PeerStatusCode.AC.name(), ValidationStatusCode.FA.name());
+		MLPPeer pr2 = new MLPPeer(peerName2, "x." + String.valueOf(new Random().nextInt()), "http://peer-api", true,
+				false, "contact", PeerStatusCode.AC.name(), ValidationStatusCode.FA.name());
 		pr2 = peerRepository.save(pr2);
 		logger.info("Created second peer " + pr2);
 
-		MLPPeerGroup pg1 = new MLPPeerGroup("peer group 1");
+		MLPPeerGroup pg1 = new MLPPeerGroup("RepSvcTst peer group 1");
 		pg1 = peerGroupRepository.save(pg1);
 		Assert.assertNotNull(pg1.getGroupId());
 		logger.info("Created peer group " + pg1);
 
-		MLPPeerGroup pg2 = new MLPPeerGroup("peer group 2");
+		MLPPeerGroup pg2 = new MLPPeerGroup("RepSvcTest peer group 2");
 		pg2 = peerGroupRepository.save(pg2);
 		Assert.assertNotNull(pg2.getGroupId());
 		logger.info("Created peer group " + pg2);
 
-		MLPSolutionGroup sg = new MLPSolutionGroup("solution group");
+		MLPSolutionGroup sg = new MLPSolutionGroup("RevSvcTst sol group 1");
 		sg = solutionGroupRepository.save(sg);
 		Assert.assertNotNull(sg.getGroupId());
 		logger.info("Created solution group " + sg);
@@ -1201,7 +1207,7 @@ public class CdsRepositoryServiceTest {
 		MLPSolGrpMemMap gsm = new MLPSolGrpMemMap(sg.getGroupId(), cs1.getSolutionId());
 		gsm = solGroupMemMapRepository.save(gsm);
 		logger.info("Created solution group map " + gsm);
-		Page<MLPSolution> sols = solGroupMemMapRepository.findSolutionsByGroupId(pg1.getGroupId(), pageable);
+		Page<MLPSolution> sols = solGroupMemMapRepository.findSolutionsByGroupId(sg.getGroupId(), pageable);
 		Assert.assertTrue(sols != null && sols.getNumberOfElements() > 0);
 
 		MLPPeerSolAccMap gpsm = new MLPPeerSolAccMap(pg1.getGroupId(), sg.getGroupId(), true);
@@ -1238,6 +1244,7 @@ public class CdsRepositoryServiceTest {
 		peerGroupMemMapRepository.delete(pgm2);
 		peerGroupMemMapRepository.delete(pgm1);
 		solutionGroupRepository.delete(sg);
+		peerGroupRepository.delete(pg2);
 		peerGroupRepository.delete(pg1);
 		peerRepository.delete(pr2);
 		peerRepository.delete(pr);

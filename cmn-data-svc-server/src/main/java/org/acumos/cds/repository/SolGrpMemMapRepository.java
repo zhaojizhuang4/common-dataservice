@@ -30,7 +30,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface SolGrpMemMapRepository extends PagingAndSortingRepository<MLPSolGrpMemMap, MLPSolGrpMemMap.SolGrpMemMapPK> {
+public interface SolGrpMemMapRepository
+		extends PagingAndSortingRepository<MLPSolGrpMemMap, MLPSolGrpMemMap.SolGrpMemMapPK> {
 
 	/**
 	 * Gets a page of solutions in the specified group by joining on the

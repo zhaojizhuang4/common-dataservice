@@ -81,68 +81,36 @@ public class MLPCodeNamePair implements MLPEntity {
 	 * @deprecated use {@link #getCode()}
 	 * @return the code
 	 */
+	@Deprecated
 	public String getTypeCode() {
 		return getCode();
-	}
-
-	/**
-	 * @deprecated use {@link #setCode(String)}
-	 * @param code
-	 *            the code
-	 */
-	public void setTypeCode(String code) {
-		setCode(code);
 	}
 
 	/**
 	 * @deprecated use {@link #getName()}
 	 * @return the name
 	 */
+	@Deprecated
 	public String getTypeName() {
 		return getName();
-	}
-
-	/**
-	 * @deprecated use {@link #setName(String)}
-	 * @param name
-	 *            the name
-	 */
-	public void setTypeName(String name) {
-		setName(name);
 	}
 
 	/**
 	 * @deprecated use {@link #getCode()}
 	 * @return the code
 	 */
+	@Deprecated
 	public String getStatusCode() {
 		return getCode();
-	}
-
-	/**
-	 * @deprecated use {@link #setCode(String)}
-	 * @param code
-	 *            the code
-	 */
-	public void setStatusCode(String code) {
-		setCode(code);
 	}
 
 	/**
 	 * @deprecated use {@link #getName()}
 	 * @return the name
 	 */
+	@Deprecated
 	public String getStatusName() {
 		return getName();
-	}
-
-	/**
-	 * @deprecated use {@link #setName(String)}
-	 * @param name
-	 *            the name
-	 */
-	public void setStatusName(String name) {
-		setName(name);
 	}
 
 }

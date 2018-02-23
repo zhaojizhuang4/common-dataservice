@@ -21,15 +21,19 @@
 package org.acumos.cds.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.transaction.Transactional;
 
 import org.acumos.cds.domain.MLPSolution;
+import org.acumos.cds.domain.MLPSolutionFOM;
 import org.acumos.cds.util.EELFLoggerDelegate;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,6 +131,63 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		List<MLPSolution> items = solCriteria.list();
 		logger.debug(EELFLoggerDelegate.debugLogger, "findPortalSolutions: result size={}", items.size());
 		return new PageImpl<>(items, pageable, count);
+	}
+
+	@Override
+	@SuppressWarnings("rawtypes")
+	public Page<MLPSolution> findSolutionsByModifiedDate(boolean active, String[] accessTypeCode,
+			String[] validationStatusCode, Date date, Pageable pageable) {
+
+		Criteria solCriteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
+		final String revAlias = "revs";
+		final String artAlias = "arts";
+		solCriteria.createAlias("revisions", revAlias);
+		solCriteria.createAlias(revAlias + ".artifacts", artAlias);
+
+		solCriteria.add(Restrictions.eq("active", active));
+		if (accessTypeCode != null && accessTypeCode.length > 0)
+			solCriteria.add(buildEqualsListCriterion("accessTypeCode", accessTypeCode));
+		if (validationStatusCode != null && validationStatusCode.length > 0)
+			solCriteria.add(buildEqualsListCriterion("validationStatusCode", validationStatusCode));
+
+		// Construct a disjunction to find any updated item;
+		// unfortunately this requires hardcoded field names
+		Criterion solModified = Restrictions.ge("modified", date);
+		Criterion revModified = Restrictions.ge(revAlias + ".modified", date);
+		Criterion artModified = Restrictions.ge(artAlias + ".modified", date);
+		Disjunction itemModifiedAfter = Restrictions.disjunction();
+		itemModifiedAfter.add(solModified);
+		itemModifiedAfter.add(revModified);
+		itemModifiedAfter.add(artModified);
+		solCriteria.add(itemModifiedAfter);
+
+		// Count the total rows
+		solCriteria.setProjection(Projections.rowCount());
+		Long count = (Long) solCriteria.uniqueResult();
+		if (count == 0)
+			return new PageImpl<>(new ArrayList<>(), pageable, count);
+
+		// Remove the count projections
+		solCriteria.setProjection(null);
+		// Want unique set; cross product yields multiple rows with same solution
+		solCriteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		// Add pagination and sort
+		super.applyPageableCriteria(solCriteria, pageable);
+
+		// Get a page of results
+		List items = solCriteria.list();
+		if (items.isEmpty())
+			throw new RuntimeException("findSolutionsByModifiedDate: unexpected empty result");
+		logger.debug(EELFLoggerDelegate.debugLogger, "findSolutionsByModifiedDate: result size={}", items.size());
+
+		List<MLPSolution> solutions = new ArrayList<>();
+		for (Object item : items) {
+			if (item instanceof MLPSolutionFOM)
+				solutions.add(((MLPSolutionFOM) item).toMLPSolution());
+			else
+				logger.error("Unexpected type: " + item.getClass().getName());
+		}
+		return new PageImpl<>(solutions, pageable, count);
 	}
 
 }

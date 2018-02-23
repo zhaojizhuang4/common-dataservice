@@ -24,12 +24,14 @@ import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.ArtifactTypeCode;
 import org.acumos.cds.DeploymentStatusCode;
 import org.acumos.cds.LoginProviderCode;
+import org.acumos.cds.MessageSeverityCode;
 import org.acumos.cds.ModelTypeCode;
+import org.acumos.cds.NotificationDeliveryMechanismCode;
+import org.acumos.cds.PeerStatusCode;
+import org.acumos.cds.SubscriptionScopeCode;
 import org.acumos.cds.ToolkitTypeCode;
 import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.ValidationTypeCode;
-import org.acumos.cds.MessageSeverityCode;
-import org.acumos.cds.NotificationDeliveryMechanismCode;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -44,13 +46,15 @@ public class EnumTest {
 		Assert.assertTrue(ArtifactTypeCode.values().length > 0);
 		Assert.assertTrue(DeploymentStatusCode.values().length > 0);
 		Assert.assertTrue(LoginProviderCode.values().length > 0);
+		Assert.assertTrue(MessageSeverityCode.values().length > 0);
 		Assert.assertTrue(ModelTypeCode.values().length > 0);
+		Assert.assertTrue(NotificationDeliveryMechanismCode.values().length > 0);
+		Assert.assertTrue(PeerStatusCode.values().length > 0);
+		Assert.assertTrue(SubscriptionScopeCode.values().length > 0);
 		Assert.assertTrue(ToolkitTypeCode.values().length > 0);
 		Assert.assertTrue(ValidationStatusCode.values().length > 0);
 		Assert.assertTrue(ValidationTypeCode.values().length > 0);
 		Assert.assertTrue(ValidationTypeCode.values().length > 0);
 		Assert.assertTrue(ValidationTypeCode.values().length > 0);
-		Assert.assertTrue(MessageSeverityCode.values().length > 0);
-		Assert.assertTrue(NotificationDeliveryMechanismCode.values().length > 0);
 	}
 }

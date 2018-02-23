@@ -67,9 +67,9 @@ public interface PeerSolAccMapRepository
 	@Query("SELECT count(pg.groupId) FROM MLPPeerGrpMemMap pg, MLPPeerSolAccMap ps, MLPSolGrpMemMap sg " //
 			+ " WHERE pg.peerId = :peerId " //
 			+ " AND pg.groupId = ps.peerGroupId " //
-			+ " AND ps.granted = true "
+			+ " AND ps.granted = true " //
 			+ " AND ps.solutionGroupId = sg.groupId " //
 			+ " AND sg.solutionId = :solutionId")
 	Long checkPeerSolutionAccess(@Param("peerId") String peerId, @Param("solutionId") String solutionId);
-	
+
 }

@@ -23,6 +23,7 @@ package org.acumos.cds.client.test;
 import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
+import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
 import org.acumos.cds.domain.MLPLoginProvider;
@@ -73,7 +74,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Tests getters and setters of domain (model) classes.
+ * Tests getters and setters of client-side domain (model) classes.
  */
 public class DomainTest extends AbstractModelTest {
 
@@ -145,6 +146,31 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
+	}
+
+	@SuppressWarnings("deprecation")
+	@Test
+	public void testMLPCodeNamePair() {
+		MLPCodeNamePair m = new MLPCodeNamePair(s1, s1);
+		m = new MLPCodeNamePair();
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		Assert.assertNotNull(m.getStatusCode());
+		Assert.assertNotNull(m.getTypeCode());
+		Assert.assertNotNull(m.getTypeName());
+		logger.info(m.toString());
+		try {
+			new MLPPeerGroup(null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	@Test
@@ -283,17 +309,20 @@ public class DomainTest extends AbstractModelTest {
 
 	@Test
 	public void testMLPUserNotifPreference() {
-		MLPUserNotifPref m = new MLPUserNotifPref();
+		MLPUserNotifPref m = new MLPUserNotifPref(s1, s1, s1);
+		m = new MLPUserNotifPref();
 		m.setUserNotifPrefId(l1);
 		m.setMsgSeverityCode(s1);
 		m.setNotfDelvMechCode(s2);
 		m.setUserId(s3);
-
 		Assert.assertEquals(l1, m.getUserNotifPrefId());
 		Assert.assertEquals(s1, m.getMsgSeverityCode());
 		Assert.assertEquals(s2, m.getNotfDelvMechCode());
 		Assert.assertEquals(s3, m.getUserId());
-
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
 		try {
 			new MLPUserNotifPref(null, null, null);
@@ -371,8 +400,17 @@ public class DomainTest extends AbstractModelTest {
 	public void testMLPPeerGroup() {
 		MLPPeerGroup m = new MLPPeerGroup(s1);
 		m = new MLPPeerGroup();
-		m.setName(s1);
-		Assert.assertEquals(s1, m.getName());
+		m.setCreated(d1);
+		m.setDescription(s1);
+		m.setGroupId(l1);
+		m.setModified(d2);
+		m.setName(s2);
+		Assert.assertEquals(d1, m.getCreated());
+		Assert.assertEquals(s1, m.getDescription());
+		Assert.assertEquals(l1, m.getGroupId());
+		Assert.assertEquals(d2, m.getModified());
+		Assert.assertEquals(s2, m.getName());
+		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
 		try {
 			new MLPPeerGroup(null);
@@ -520,7 +558,7 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertFalse(pk.hashCode() == 0);
 		logger.info(pk.toString());
 	}
-	
+
 	@Test
 	public void testMLPRole() {
 		MLPRole m = new MLPRole(s1, b1);
@@ -852,11 +890,20 @@ public class DomainTest extends AbstractModelTest {
 	public void testMLPSolutionGroup() {
 		MLPSolutionGroup m = new MLPSolutionGroup(s1);
 		m = new MLPSolutionGroup();
-		m.setName(s1);
-		Assert.assertEquals(s1, m.getName());
+		m.setCreated(d1);
+		m.setDescription(s1);
+		m.setGroupId(l1);
+		m.setModified(d2);
+		m.setName(s2);
+		Assert.assertEquals(d1, m.getCreated());
+		Assert.assertEquals(s1, m.getDescription());
+		Assert.assertEquals(l1, m.getGroupId());
+		Assert.assertEquals(d2, m.getModified());
+		Assert.assertEquals(s2, m.getName());
 		Assert.assertFalse(m.equals(null));
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
 		try {
 			new MLPSolutionGroup(null);

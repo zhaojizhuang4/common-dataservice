@@ -99,6 +99,7 @@ public interface ICommonDataServiceRestClient {
 	 * @deprecated Java clients should use
 	 *             {@link org.acumos.cds.AccessTypeCode#values()}
 	 */
+	@Deprecated
 	List<MLPAccessType> getAccessTypes();
 
 	/**
@@ -108,6 +109,7 @@ public interface ICommonDataServiceRestClient {
 	 * @deprecated Java clients should use
 	 *             {@link org.acumos.cds.ArtifactTypeCode#values()}
 	 */
+	@Deprecated
 	List<MLPArtifactType> getArtifactTypes();
 
 	/**
@@ -117,6 +119,7 @@ public interface ICommonDataServiceRestClient {
 	 * @deprecated Java clients should use
 	 *             {@link org.acumos.cds.DeploymentStatusCode#values()}
 	 */
+	@Deprecated
 	List<MLPDeploymentStatus> getDeploymentStatuses();
 
 	/**
@@ -126,6 +129,7 @@ public interface ICommonDataServiceRestClient {
 	 * @deprecated Java clients should use
 	 *             {@link org.acumos.cds.LoginProviderCode#values()}
 	 */
+	@Deprecated
 	List<MLPLoginProvider> getLoginProviders();
 
 	/**
@@ -135,6 +139,7 @@ public interface ICommonDataServiceRestClient {
 	 * @deprecated Java clients should use
 	 *             {@link org.acumos.cds.ModelTypeCode#values()}
 	 */
+	@Deprecated
 	List<MLPModelType> getModelTypes();
 
 	/**
@@ -144,6 +149,7 @@ public interface ICommonDataServiceRestClient {
 	 * @deprecated Java clients should use
 	 *             {@link org.acumos.cds.ToolkitTypeCode#values()}
 	 */
+	@Deprecated
 	List<MLPToolkitType> getToolkitTypes();
 
 	/**
@@ -153,6 +159,7 @@ public interface ICommonDataServiceRestClient {
 	 * @deprecated Java clients should use
 	 *             {@link org.acumos.cds.ValidationStatusCode#values()}
 	 */
+	@Deprecated
 	List<MLPValidationStatus> getValidationStatuses();
 
 	/**
@@ -162,6 +169,7 @@ public interface ICommonDataServiceRestClient {
 	 * @deprecated Java clients should use
 	 *             {@link org.acumos.cds.ValidationTypeCode#values()}
 	 */
+	@Deprecated
 	List<MLPValidationType> getValidationTypes();
 
 	/**
@@ -171,6 +179,7 @@ public interface ICommonDataServiceRestClient {
 	 * @deprecated Java clients should use
 	 *             {@link org.acumos.cds.StepStatusCode#values()}
 	 */
+	@Deprecated
 	List<MLPStepStatus> getStepStatuses();
 
 	/**
@@ -180,6 +189,7 @@ public interface ICommonDataServiceRestClient {
 	 * @deprecated Java clients should use
 	 *             {@link org.acumos.cds.StepTypeCode#values()}
 	 */
+	@Deprecated
 	List<MLPStepType> getStepTypes();
 
 	/**
@@ -225,16 +235,17 @@ public interface ICommonDataServiceRestClient {
 
 	/**
 	 * Finds solutions with the specified status, access type and validation status
-	 * code(s) that were modified after the specified date. Checks the last-updated
-	 * date on the solution, the revisions for the solution, and the artifacts in
-	 * the revisions.
+	 * code(s), and that were modified after the specified date. Checks the
+	 * last-updated date on the solution, the revisions for the solution, and the
+	 * artifacts in the revisions. A solution must have revision(s) and artifact(s)
+	 * to match.
 	 * 
 	 * @param active
 	 *            Solution active status; true for active, false for inactive
 	 * @param accessTypeCodes
-	 *            Array of access-type codes (required)
+	 *            Access type codes (required)
 	 * @param validationStatusCodes
-	 *            Array of Validation status codes (required)
+	 *            Validation status codes (required)
 	 * @param date
 	 *            Date threshold
 	 * @param pageRequest
@@ -1595,6 +1606,15 @@ public interface ICommonDataServiceRestClient {
 	 *            comment ID
 	 */
 	void deleteComment(String threadId, String commentId);
+
+	/**
+	 * Gets a step result.
+	 * 
+	 * @param stepResultId
+	 *            Step result ID
+	 * @return MLPStepResult
+	 */
+	MLPStepResult getStepResult(long stepResultId);
 
 	/**
 	 * Gets a page of step results.

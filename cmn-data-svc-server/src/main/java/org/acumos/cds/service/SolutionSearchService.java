@@ -20,6 +20,7 @@
 
 package org.acumos.cds.service;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.acumos.cds.domain.MLPSolution;
@@ -84,5 +85,31 @@ public interface SolutionSearchService {
 	Page<MLPSolution> findPortalSolutions(String[] nameKeywords, String[] descriptionKeywords, boolean active,
 			String[] ownerIds, String[] accessTypeCodes, String[] modelTypeCodes, String[] validationStatusCodes,
 			String[] tags, Pageable pageable);
+
+	/**
+	 * Gets a page of solutions with a change after the specified date. A match is
+	 * found if the solution's modified field, an associated revision's modified
+	 * field, or an associated artifact's modified field has a value larger than the
+	 * specified date. Only finds solutions that have 1+ revision(s) and in turn 1+
+	 * artifact(s). A freshly created solution with no revisions will not be found.
+	 * 
+	 * @param active
+	 *            Active status: true or false; required
+	 * @param accessTypeCodes
+	 *            Limits match to solutions with one of the specified values
+	 *            including null (not the 4-character sequence "null"); ignored if
+	 *            null or empty
+	 * @param validationStatusCodes
+	 *            Limits match to solutions with one of the specified values
+	 *            including null (not the 4-character sequence "null"); ignored if
+	 *            null or empty
+	 * @param modifiedDate
+	 *            Last-modified date
+	 * @param pageable
+	 *            Page and sort info
+	 * @return Page of matches
+	 */
+	Page<MLPSolution> findSolutionsByModifiedDate(boolean active, String[] accessTypeCodes,
+			String[] validationStatusCodes, Date modifiedDate, Pageable pageable);
 
 }

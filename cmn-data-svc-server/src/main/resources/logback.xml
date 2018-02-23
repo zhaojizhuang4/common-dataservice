@@ -123,6 +123,8 @@
 
 	<logger name="com.att.eelf.error" level="info" additivity="false">
 		<appender-ref ref="asyncEELFError" />
+		<!-- append errors to stdout so they appear in docker log -->
+		<appender-ref ref="STDOUT" />
 	</logger>
 
 	<logger name="com.att.eelf.debug" level="debug" additivity="false">

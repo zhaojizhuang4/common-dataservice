@@ -86,7 +86,8 @@ public class CodeTableController extends AbstractController {
 	 * @return List of MLPCodeNamePair with deployment status code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of deployment status codes.", response = MLPCodeNamePair.class, responseContainer = "List")
-	@RequestMapping(value = "/" + CCDSConstants.DEPLOY_PATH + "/" + CCDSConstants.STATUS_PATH, method = RequestMethod.GET)
+	@RequestMapping(value = "/" + CCDSConstants.DEPLOY_PATH + "/"
+			+ CCDSConstants.STATUS_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public List<MLPCodeNamePair> getDeploymentStatusList() {
 		List<MLPCodeNamePair> list = new ArrayList<>();

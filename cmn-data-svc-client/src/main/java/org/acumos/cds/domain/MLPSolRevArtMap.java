@@ -39,10 +39,14 @@ import org.acumos.cds.domain.MLPSolRevArtMap.SolRevArtMapPK;
  */
 @Entity
 @IdClass(SolRevArtMapPK.class)
-@Table(name = "C_SOL_REV_ART_MAP")
+@Table(name = MLPSolRevArtMap.TABLE_NAME)
 public class MLPSolRevArtMap implements MLPEntity, Serializable {
 
 	private static final long serialVersionUID = 1721531464277548759L;
+
+	/* package */ static final String TABLE_NAME = "C_SOL_REV_ART_MAP";
+	/* package */ static final String REVISION_ID_COL_NAME = "REVISION_ID";
+	/* package */ static final String ARTIFACT_ID_COL_NAME = "ARTIFACT_ID";
 
 	/**
 	 * Embedded key for Hibernate
@@ -89,12 +93,12 @@ public class MLPSolRevArtMap implements MLPEntity, Serializable {
 	}
 
 	@Id
-	@Column(name = "REVISION_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = REVISION_ID_COL_NAME, updatable = false, nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
 	private String revisionId;
 
 	@Id
-	@Column(name = "ARTIFACT_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = ARTIFACT_ID_COL_NAME, updatable = false, nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
 	private String artifactId;
 

@@ -20,16 +20,13 @@
 
 package org.acumos.cds.service;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -106,45 +103,6 @@ public abstract class AbstractSearchServiceImpl {
 				junction.add(Restrictions.like(fieldName, '%' + v + '%'));
 		}
 		return junction;
-	}
-
-	/**
-	 * Executes the query to count total rows, and if nonzero, executes the query
-	 * again to get one page of results. Must count so the paged result can report
-	 * the total number of pages available.
-	 * 
-	 * @param criteria
-	 *            Query criteria
-	 * @param pageable
-	 *            Page size and sort criteria
-	 * @return a list containing at most the specified number of results
-	 */
-	protected List<?> getPageOfResults(Criteria criteria, Pageable pageable) {
-
-		// Count the total rows
-		criteria.setProjection(Projections.rowCount());
-		Long count = (Long) criteria.uniqueResult();
-		if (count == 0)
-			return new ArrayList<Object>();
-
-		// Reset the criteria, add pagination and sort
-		criteria.setProjection(null);
-		criteria.setResultTransformer(Criteria.ROOT_ENTITY);
-		criteria.setFirstResult(pageable.getOffset());
-		criteria.setMaxResults(pageable.getPageSize());
-		if (pageable.getSort() != null) {
-			Iterator<Sort.Order> orderIter = pageable.getSort().iterator();
-			while (orderIter.hasNext()) {
-				Sort.Order sortOrder = orderIter.next();
-				Order order;
-				if (sortOrder.isAscending())
-					order = Order.asc(sortOrder.getProperty());
-				else
-					order = Order.desc(sortOrder.getProperty());
-				criteria.addOrder(order);
-			}
-		}
-		return criteria.list();
 	}
 
 	/**

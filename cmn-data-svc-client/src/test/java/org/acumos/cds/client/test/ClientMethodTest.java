@@ -56,6 +56,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Exercises the client methods solely to get coverage and pass the Sonar
@@ -77,9 +78,21 @@ public class ClientMethodTest {
 	@SuppressWarnings("deprecation")
 	@Test
 	public void coverClientEnumMethods() {
-		ICommonDataServiceRestClient client = CommonDataServiceRestClientImpl.getInstance("http://invalidhost:51243",
+		final String uri = "http://invalidhost:51243";
+		ICommonDataServiceRestClient client = CommonDataServiceRestClientImpl.getInstance(uri,
 				"user", "pass");
-
+		client = CommonDataServiceRestClientImpl.getInstance(uri, new RestTemplate());
+				
+		try {
+			CommonDataServiceRestClientImpl.getInstance(null, null, null);
+		} catch (IllegalArgumentException ex) {
+			logger.info("getInstance failed as expected: {}", ex.toString());
+		}
+		try {
+			CommonDataServiceRestClientImpl.getInstance("bogus:/host;port", null, null);
+		} catch (IllegalArgumentException ex) {
+			logger.info("getInstance failed as expected: {}", ex.toString());
+		}
 		try {
 			client.getAccessTypes();
 		} catch (ResourceAccessException ex) {

@@ -18,41 +18,13 @@
  * ===============LICENSE_END=========================================================
  */
 
-package org.acumos.cds.domain;
+package org.acumos.cds.repository;
 
-import java.io.Serializable;
+import org.acumos.cds.domain.MLPSolutionFOM;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-/**
- * Model for login provider, a code-name pair.
- */
-public class MLPLoginProvider extends MLPCodeNamePair implements Serializable {
-
-	private static final long serialVersionUID = -1405595448809901709L;
-
-	public MLPLoginProvider() {
-		super();
-	}
-
-	public MLPLoginProvider(String code, String name) {
-		super(code, name);
-	}
-
-	/**
-	 * @deprecated use {@link #getCode()}
-	 * @return the code
-	 */
-	@Deprecated
-	public String getProviderCode() {
-		return getCode();
-	}
-
-	/**
-	 * @deprecated use {@link #getName()}
-	 * @return the name
-	 */
-	@Deprecated
-	public String getProviderName() {
-		return getName();
-	}
+public interface SolutionFOMRepository
+		extends JpaRepository<MLPSolutionFOM, String>, JpaSpecificationExecutor<MLPSolutionFOM> {
 
 }

@@ -30,11 +30,12 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface PeerGrpMemMapRepository extends PagingAndSortingRepository<MLPPeerGrpMemMap, MLPPeerGrpMemMap.PeerGrpMemMapPK> {
+public interface PeerGrpMemMapRepository
+		extends PagingAndSortingRepository<MLPPeerGrpMemMap, MLPPeerGrpMemMap.PeerGrpMemMapPK> {
 
 	/**
-	 * Gets a page of peers in the specified group by joining on the 
-	 * peer-group mapping table.
+	 * Gets a page of peers in the specified group by joining on the peer-group
+	 * mapping table.
 	 * 
 	 * @param groupId
 	 *            Peer group ID

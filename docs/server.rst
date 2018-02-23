@@ -52,31 +52,37 @@ Development and Local Testing
 
 This section provides information for developing and testing the server locally; e.g., on a personal machine.
 
-Using an in-memory database
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Testing with an in-memory database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration for the server uses an in-memory Derby database, which is created at launch time.
+The default test configuration for the server uses an in-memory Derby database, which is created at launch time.
 
-Using an external database
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Testing with an external database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The server can be configured to use an external database as follows:
+A properties file "application-mariadb.properties" is provided that configures the server to use an
+external MariaDB database running on the local host at port 3306.  Launch the test like this::
+
+    mvn -Dspring.config.name=application-mariadb test
+    
+The server can be configured to use a different external database as follows:
 
     1. Copy the local application.properties file to a new file "application-mydb.properties"
     2. Revise the new "mydb" properties file to have suitable server coordinates and credentials
     3. Ensure the newly configured database server is reachable at the expected port
     4. Check that the database tables have been created and populated
-    5. Launch the test as usual, adding this extra argument to use the alternate properties file:
-          -Dspring.config.name=application-mydb
+    5. Launch the test as usual, adding this extra argument to use the alternate properties file::
+    
+    mvn -Dspring.config.name=application-mydb test
 
 Launching
 ~~~~~~~~~
 
-Start the microservice for development and testing like this::
+Launch the microservice for development and testing like this::
 
      mvn clean spring-boot:run
 
-Alternately, launch the service from Eclipse by starting this class::
+Alternately, launch the microservice from Eclipse by starting this class::
 
     org.acumos.cds.CdsApplication.
 
@@ -90,7 +96,7 @@ Prerequisites
 ~~~~~~~~~~~~~
 
 1. Java version 1.8 in the runtime environment (e.g., docker container)
-2. A Mariadb or Mysql database with the required tables, instructions are shown below
+2. A Mariadb or Mysql database with the required tables; instructions are shown below
 3. The username/password combination to access the database
 4. A valid configuration with database coordinates.
 
