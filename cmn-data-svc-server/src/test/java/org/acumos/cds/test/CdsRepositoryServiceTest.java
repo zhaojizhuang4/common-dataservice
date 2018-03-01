@@ -376,12 +376,13 @@ public class CdsRepositoryServiceTest {
 					new PageRequest(0, 5, null));
 			Assert.assertTrue(searchArts.getNumberOfElements() > 0);
 
-			// This tag is existing
 			MLPTag solTag1 = new MLPTag("soltag1");
 			solTag1 = solutionTagRepository.save(solTag1);
+			MLPTag solTag2 = new MLPTag("soltag2");
+			solTag2 = solutionTagRepository.save(solTag2);
 
 			MLPSolution cs = new MLPSolution();
-			final String solName = "solution name";
+			final String solName = "solution name " + Long.toString(new Date().getTime());
 			final String solDesc = "description";
 			cs.setName(solName);
 			cs.setDescription(solDesc);
@@ -394,17 +395,20 @@ public class CdsRepositoryServiceTest {
 			cs.setValidationStatusCode(ValidationStatusCode.PS.name());
 			// tags must exist; they are not created here
 			cs.getTags().add(solTag1);
+			cs.getTags().add(solTag2);
 			cs = solutionRepository.save(cs);
 			Assert.assertNotNull("Solution ID", cs.getSolutionId());
-			Assert.assertTrue(cs.getTags().size() == 1);
+			Assert.assertTrue(cs.getTags().size() == 2);
 			logger.info("Created solution " + cs.getSolutionId());
 
-			// Search with a single value
+			// Search with single values
 			Map<String, String> solParms = new HashMap<>();
-			solParms.put("name", cs.getName());
+			solParms.put("name", solName);
+			solParms.put("description", solDesc);
 			Page<MLPSolution> searchSols = solutionSearchService.findSolutions(solParms, false,
 					new PageRequest(0, 5, null));
-			Assert.assertFalse(searchSols.getContent().isEmpty());
+			// Ensure a single result; had a bug with dupes due to tags
+			Assert.assertTrue(searchSols.getContent().size() == 1);
 
 			// Search with a list of values
 			Map<String, Object> solListParms = new HashMap<>();

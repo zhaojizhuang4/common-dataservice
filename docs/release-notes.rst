@@ -23,8 +23,8 @@ Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
-Version 1.14.0, 21 February 2018
--------------------------------
+Version 1.14.0, 1 March 2018
+----------------------------
 
 * Add domain classes and search-by-date method for federation subscription update (ACUMOS-61)
 * Add peer group, solution group and mapping features for federation access control (ACUMOS-62)
@@ -34,6 +34,7 @@ Version 1.14.0, 21 February 2018
 * Revise peer status code/name value set (ACUMOS-215)
 * Add new toolkit type code for ONAP (ACUMOS-232)
 * Add license headers to sql files (ACUMOS-275)
+* Apply distinct transformer to avoid duplicate search results (ACUMOS-298)
 * Requires database schema version 1.14
 
 Version 1.13.1, 9 February 2018

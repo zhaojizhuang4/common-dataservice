@@ -69,7 +69,8 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 		// Reset the count criteria; add pagination and sort
 		criteria.setProjection(null);
-		criteria.setResultTransformer(Criteria.ROOT_ENTITY);
+		// Want unique set; cross product yields multiple rows with same solution
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		super.applyPageableCriteria(criteria, pageable);
 
 		// Get a page of results and send it back with the total available
@@ -92,43 +93,44 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			String[] ownerIds, String[] accessTypeCode, String[] modelTypeCode, String[] validationStatusCode,
 			String[] tags, Pageable pageable) {
 
-		Criteria solCriteria = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class);
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class);
 
 		// Always check active status
-		solCriteria.add(Restrictions.eq("active", active));
+		criteria.add(Restrictions.eq("active", active));
 
 		if (nameKeywords != null && nameKeywords.length > 0)
-			solCriteria.add(buildLikeListCriterion("name", nameKeywords));
+			criteria.add(buildLikeListCriterion("name", nameKeywords));
 		if (descKeywords != null && descKeywords.length > 0)
-			solCriteria.add(buildLikeListCriterion("description", descKeywords));
+			criteria.add(buildLikeListCriterion("description", descKeywords));
 		if (ownerIds != null && ownerIds.length > 0)
-			solCriteria.add(Restrictions.in("ownerId", ownerIds));
+			criteria.add(Restrictions.in("ownerId", ownerIds));
 		if (accessTypeCode != null && accessTypeCode.length > 0)
-			solCriteria.add(buildEqualsListCriterion("accessTypeCode", accessTypeCode));
+			criteria.add(buildEqualsListCriterion("accessTypeCode", accessTypeCode));
 		if (modelTypeCode != null && modelTypeCode.length > 0)
-			solCriteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode));
+			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode));
 		if (validationStatusCode != null && validationStatusCode.length > 0)
-			solCriteria.add(buildEqualsListCriterion("validationStatusCode", validationStatusCode));
+			criteria.add(buildEqualsListCriterion("validationStatusCode", validationStatusCode));
 		if (tags != null && tags.length > 0) {
 			// "tags" is the field name in MLPSolution
-			Criteria tagCriteria = solCriteria.createCriteria("tags");
+			Criteria tagCriteria = criteria.createCriteria("tags");
 			// "tag" is the field name in MLPTag
 			tagCriteria.add(Restrictions.in("tag", tags));
 		}
 
 		// Count the total rows
-		solCriteria.setProjection(Projections.rowCount());
-		Long count = (Long) solCriteria.uniqueResult();
+		criteria.setProjection(Projections.rowCount());
+		Long count = (Long) criteria.uniqueResult();
 		if (count == 0)
 			return new PageImpl<>(new ArrayList<>(), pageable, count);
 
 		// Reset the count criteria; add pagination and sort
-		solCriteria.setProjection(null);
-		solCriteria.setResultTransformer(Criteria.ROOT_ENTITY);
-		super.applyPageableCriteria(solCriteria, pageable);
+		criteria.setProjection(null);
+		// Want unique set; cross product yields multiple rows with same solution
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		super.applyPageableCriteria(criteria, pageable);
 
 		// Get a page of results
-		List<MLPSolution> items = solCriteria.list();
+		List<MLPSolution> items = criteria.list();
 		logger.debug(EELFLoggerDelegate.debugLogger, "findPortalSolutions: result size={}", items.size());
 		return new PageImpl<>(items, pageable, count);
 	}
@@ -138,17 +140,17 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 	public Page<MLPSolution> findSolutionsByModifiedDate(boolean active, String[] accessTypeCode,
 			String[] validationStatusCode, Date date, Pageable pageable) {
 
-		Criteria solCriteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
 		final String revAlias = "revs";
 		final String artAlias = "arts";
-		solCriteria.createAlias("revisions", revAlias);
-		solCriteria.createAlias(revAlias + ".artifacts", artAlias);
+		criteria.createAlias("revisions", revAlias);
+		criteria.createAlias(revAlias + ".artifacts", artAlias);
 
-		solCriteria.add(Restrictions.eq("active", active));
+		criteria.add(Restrictions.eq("active", active));
 		if (accessTypeCode != null && accessTypeCode.length > 0)
-			solCriteria.add(buildEqualsListCriterion("accessTypeCode", accessTypeCode));
+			criteria.add(buildEqualsListCriterion("accessTypeCode", accessTypeCode));
 		if (validationStatusCode != null && validationStatusCode.length > 0)
-			solCriteria.add(buildEqualsListCriterion("validationStatusCode", validationStatusCode));
+			criteria.add(buildEqualsListCriterion("validationStatusCode", validationStatusCode));
 
 		// Construct a disjunction to find any updated item;
 		// unfortunately this requires hardcoded field names
@@ -159,23 +161,23 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		itemModifiedAfter.add(solModified);
 		itemModifiedAfter.add(revModified);
 		itemModifiedAfter.add(artModified);
-		solCriteria.add(itemModifiedAfter);
+		criteria.add(itemModifiedAfter);
 
 		// Count the total rows
-		solCriteria.setProjection(Projections.rowCount());
-		Long count = (Long) solCriteria.uniqueResult();
+		criteria.setProjection(Projections.rowCount());
+		Long count = (Long) criteria.uniqueResult();
 		if (count == 0)
 			return new PageImpl<>(new ArrayList<>(), pageable, count);
 
 		// Remove the count projections
-		solCriteria.setProjection(null);
+		criteria.setProjection(null);
 		// Want unique set; cross product yields multiple rows with same solution
-		solCriteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		// Add pagination and sort
-		super.applyPageableCriteria(solCriteria, pageable);
+		super.applyPageableCriteria(criteria, pageable);
 
 		// Get a page of results
-		List items = solCriteria.list();
+		List items = criteria.list();
 		if (items.isEmpty())
 			throw new RuntimeException("findSolutionsByModifiedDate: unexpected empty result");
 		logger.debug(EELFLoggerDelegate.debugLogger, "findSolutionsByModifiedDate: result size={}", items.size());
