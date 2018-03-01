@@ -35,6 +35,7 @@ Version 1.14.0, 1 March 2018
 * Add new toolkit type code for ONAP (ACUMOS-232)
 * Add license headers to sql files (ACUMOS-275)
 * Apply distinct transformer to avoid duplicate search results (ACUMOS-298)
+* Report consistent error message when an item is not found
 * Requires database schema version 1.14
 
 Version 1.13.1, 9 February 2018

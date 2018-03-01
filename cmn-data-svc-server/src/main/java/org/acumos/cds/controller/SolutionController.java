@@ -126,12 +126,6 @@ public class SolutionController extends AbstractController {
 	@Autowired
 	private UserRepository userRepository;
 
-	// Silence Sonar complaints
-	private static final String NO_REV_WITH_ID = "No revision with ID ";
-	private static final String NO_SOL_WITH_ID = "No solution with ID ";
-	private static final String NO_TAG = "No tag ";
-	private static final String NO_USR_WITH_ID = "No user with ID ";
-
 	/**
 	 * Updates the cached value(s) for solution downloads.
 	 * 
@@ -235,7 +229,7 @@ public class SolutionController extends AbstractController {
 		MLPTag existing = solutionTagRepository.findOne(tag);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_TAG + tag, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + tag, null);
 		}
 		return solutionRepository.findByTag(tag, pageRequest);
 	}
@@ -361,7 +355,8 @@ public class SolutionController extends AbstractController {
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
 		}
 		Date date = new Date(Long.parseLong(dateMillis[0]));
-		return solutionSearchService.findSolutionsByModifiedDate(active, accessTypeCodes, valStatusCodes, date, pageRequest);
+		return solutionSearchService.findSolutionsByModifiedDate(active, accessTypeCodes, valStatusCodes, date,
+				pageRequest);
 	}
 
 	/**
@@ -378,7 +373,7 @@ public class SolutionController extends AbstractController {
 		MLPSolution da = solutionRepository.findOne(solutionId);
 		if (da == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		return da;
 	}
@@ -455,7 +450,7 @@ public class SolutionController extends AbstractController {
 		MLPSolution existing = solutionRepository.findOne(solutionId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		MLPTransportModel result = null;
 		try {
@@ -501,7 +496,7 @@ public class SolutionController extends AbstractController {
 		MLPSolutionWeb existing = solutionWebRepository.findOne(solutionId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		MLPTransportModel result = null;
 		try {
@@ -595,7 +590,7 @@ public class SolutionController extends AbstractController {
 		MLPSolutionRevision da = solutionRevisionRepository.findOne(revisionId);
 		if (da == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_REV_WITH_ID + revisionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + revisionId, null);
 		}
 		return da;
 	}
@@ -618,7 +613,7 @@ public class SolutionController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "create: solution ID {}", solutionId);
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		Object result;
 		try {
@@ -666,11 +661,11 @@ public class SolutionController extends AbstractController {
 				solutionId, revisionId);
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		if (solutionRevisionRepository.findOne(revisionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_REV_WITH_ID + revisionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + revisionId, null);
 		}
 		Object result;
 		try {
@@ -813,10 +808,10 @@ public class SolutionController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "addTag: solution {}, tag {}", solutionId, tag);
 		if (solutionTagRepository.findOne(tag) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_TAG + tag, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + tag, null);
 		} else if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		} else {
 			solTagMapRepository.save(new MLPSolTagMap(solutionId, tag));
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
@@ -840,10 +835,10 @@ public class SolutionController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "dropTag: solution {}, tag {}", solutionId, tag);
 		if (solutionTagRepository.findOne(tag) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_TAG + tag, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + tag, null);
 		} else if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		} else {
 			solTagMapRepository.delete(new MLPSolTagMap.SolTagMapPK(solutionId, tag));
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
@@ -868,8 +863,7 @@ public class SolutionController extends AbstractController {
 		Iterable<MLPSolutionDownload> da = solutionDownloadRepository.findBySolutionId(solutionId, pageRequest);
 		if (da == null || !da.iterator().hasNext()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entries for solution ID " + solutionId,
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		return da;
 	}
@@ -898,15 +892,15 @@ public class SolutionController extends AbstractController {
 		// These validations duplicate the constraints but are much user friendlier.
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		if (artifactRepository.findOne(artifactId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No artifact with ID " + artifactId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + artifactId, null);
 		}
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USR_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		Object result;
 		try {
@@ -976,8 +970,7 @@ public class SolutionController extends AbstractController {
 		Iterable<MLPSolutionRating> sr = solutionRatingRepository.findBySolutionId(solutionId, pageRequest);
 		if (sr == null || !sr.iterator().hasNext()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No ratings for solution " + solutionId,
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		return sr;
 	}
@@ -997,11 +990,11 @@ public class SolutionController extends AbstractController {
 	@ResponseBody
 	public Object getSolutionRating(@PathVariable("solutionId") String solutionId,
 			@PathVariable("userId") String userId, HttpServletResponse response) {
-		MLPSolutionRating da = solutionRatingRepository.findOne(new SolutionRatingPK(solutionId, userId));
+		SolutionRatingPK pk = new SolutionRatingPK(solutionId, userId);
+		MLPSolutionRating da = solutionRatingRepository.findOne(pk);
 		if (da == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
-					"No rating for solution ID " + solutionId + " by user " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + pk);
 		}
 		return da;
 	}
@@ -1026,11 +1019,11 @@ public class SolutionController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "createSolutionRating: received object: {} ", sr);
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USR_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		Object result;
 		try {
@@ -1075,7 +1068,7 @@ public class SolutionController extends AbstractController {
 		MLPSolutionRating existing = solutionRatingRepository.findOne(pk);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No rating with ID " + pk, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + pk, null);
 		}
 		MLPTransportModel result = null;
 		try {
@@ -1140,7 +1133,7 @@ public class SolutionController extends AbstractController {
 		MLPSolutionWeb stats = solutionWebRepository.findOne(solutionId);
 		if (stats == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No sol web with id " + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		return stats;
 	}
@@ -1176,10 +1169,10 @@ public class SolutionController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "addUserToSolutionACL: solution {}, user {}", solutionId, userId);
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		} else if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USR_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		} else {
 			solUserAccMapRepository.save(new MLPSolUserAccMap(solutionId, userId));
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
@@ -1205,10 +1198,10 @@ public class SolutionController extends AbstractController {
 				userId);
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		} else if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USR_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		} else {
 			solUserAccMapRepository.delete(new MLPSolUserAccMap.SolUserAccessMapPK(solutionId, userId));
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
@@ -1254,7 +1247,7 @@ public class SolutionController extends AbstractController {
 		if (items == null || !items.iterator().hasNext()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
-					"No validations for solution " + solutionId + ", revision " + revisionId, null);
+					NO_ENTRY_WITH_ID + solutionId + ", " + revisionId, null);
 		}
 		return items;
 	}
@@ -1282,11 +1275,11 @@ public class SolutionController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "createSolutionValidation: received object: {} ", sv);
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		if (solutionRevisionRepository.findOne(revisionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_REV_WITH_ID + revisionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + revisionId, null);
 		}
 		Object result;
 		try {
@@ -1338,7 +1331,7 @@ public class SolutionController extends AbstractController {
 		MLPSolutionValidation existing = solutionValidationRepository.findOne(pk);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No sol val with id " + pk, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + pk, null);
 		}
 		MLPTransportModel result = null;
 		try {
@@ -1414,7 +1407,7 @@ public class SolutionController extends AbstractController {
 		if (da == null || !da.iterator().hasNext()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
-					"No deployments for solution ID " + solutionId + ", revision ID " + revisionId, null);
+					NO_ENTRY_WITH_ID + solutionId + ", " + revisionId, null);
 		}
 		return da;
 	}
@@ -1444,8 +1437,8 @@ public class SolutionController extends AbstractController {
 				revisionId, userId, pageRequest);
 		if (da == null || !da.iterator().hasNext()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user deployments for solution ID "
-					+ solutionId + ", revision ID " + revisionId + ", user ID " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+					NO_ENTRY_WITH_ID + solutionId + ", revision " + revisionId + ", user " + userId, null);
 		}
 		return da;
 	}
@@ -1472,15 +1465,15 @@ public class SolutionController extends AbstractController {
 		Object result;
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_SOL_WITH_ID + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		if (solutionRevisionRepository.findOne(revisionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_REV_WITH_ID + revisionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + revisionId, null);
 		}
 		if (userRepository.findOne(sd.getUserId()) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USR_WITH_ID + sd.getUserId(), null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + sd.getUserId(), null);
 		}
 		try {
 			// Validate enum codes
@@ -1536,8 +1529,7 @@ public class SolutionController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "update: received object: {} ", sd);
 		if (solutionDeploymentRepository.findOne(deploymentId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No deployment with ID " + deploymentId,
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + deploymentId, null);
 		}
 		Object result;
 		try {

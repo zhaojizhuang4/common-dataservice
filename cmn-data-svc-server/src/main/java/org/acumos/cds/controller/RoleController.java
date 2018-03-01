@@ -140,7 +140,7 @@ public class RoleController extends AbstractController {
 		MLPRole da = roleRepository.findOne(rowId);
 		if (da == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for row ID " + rowId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + rowId, null);
 		}
 		return da;
 	}
@@ -202,8 +202,7 @@ public class RoleController extends AbstractController {
 		MLPRole existing = roleRepository.findOne(rowId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + rowId,
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + rowId, null);
 		}
 		MLPTransportModel result = null;
 		try {
@@ -260,7 +259,7 @@ public class RoleController extends AbstractController {
 	public Object getListOfRoleFunc(@PathVariable("roleId") String roleId, HttpServletResponse response) {
 		if (roleRepository.findOne(roleId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for ID " + roleId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
 		}
 		return roleFunctionRepository.findByRole(roleId);
 	}
@@ -282,7 +281,7 @@ public class RoleController extends AbstractController {
 		MLPRoleFunction rf = roleFunctionRepository.findOne(functionId);
 		if (rf == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for ID " + functionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + functionId, null);
 		}
 		return rf;
 	}
@@ -304,7 +303,7 @@ public class RoleController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "createRoleFunc: role ID {}", roleId);
 		if (roleRepository.findOne(roleId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No role for ID " + roleId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
 		}
 		Object result;
 		try {
@@ -342,12 +341,11 @@ public class RoleController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "updateRoleFunc: role ID {}, function ID {}", roleId, functionId);
 		if (roleRepository.findOne(roleId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No role for ID " + roleId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
 		}
 		if (roleFunctionRepository.findOne(functionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No role function for ID " + functionId,
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + functionId, null);
 		}
 		Object result;
 		try {

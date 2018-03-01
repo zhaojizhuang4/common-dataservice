@@ -73,9 +73,6 @@ public class PeerController extends AbstractController {
 	@Autowired
 	private PeerSearchService peerSearchService;
 
-	// Silence Sonar complaints
-	private static final String NO_PEER_WITH_ID = "No peer with ID ";
-
 	/**
 	 * 
 	 * @param pageable
@@ -136,7 +133,7 @@ public class PeerController extends AbstractController {
 		MLPPeer peer = peerRepository.findOne(peerId);
 		if (peer == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for row ID " + peerId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerId, null);
 		}
 		return peer;
 	}
@@ -199,7 +196,7 @@ public class PeerController extends AbstractController {
 		// Get the existing one
 		if (peerRepository.findOne(peerId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_PEER_WITH_ID + peerId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerId, null);
 		}
 		MLPTransportModel result = null;
 		try {
@@ -267,7 +264,7 @@ public class PeerController extends AbstractController {
 		// Get the existing one
 		if (peerRepository.findOne(peerId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_PEER_WITH_ID + peerId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerId, null);
 		}
 		return peerSubRepository.findByPeer(peerId);
 	}
@@ -286,7 +283,7 @@ public class PeerController extends AbstractController {
 		MLPPeerSubscription peerSub = peerSubRepository.findOne(subId);
 		if (peerSub == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for ID " + subId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + subId, null);
 		}
 		return peerSub;
 	}
@@ -305,8 +302,7 @@ public class PeerController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "createPeerSub: received object: {} ", peerSub);
 		if (peerRepository.findOne(peerSub.getPeerId()) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No peer sub with id " + peerSub.getPeerId(),
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerSub.getPeerId(), null);
 		}
 		Object result;
 		try {
@@ -349,8 +345,7 @@ public class PeerController extends AbstractController {
 		MLPPeerSubscription existingPeerSub = peerSubRepository.findOne(subId);
 		if (existingPeerSub == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find peer sub with id " + subId,
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + subId, null);
 		}
 		MLPTransportModel result = null;
 		try {

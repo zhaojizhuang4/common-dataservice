@@ -69,7 +69,7 @@ public class SiteConfigController extends AbstractController {
 		MLPSiteConfig da = siteConfigRepository.findOne(configKey);
 		if (da == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for ID " + configKey, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + configKey, null);
 		}
 		return da;
 	}
@@ -93,7 +93,7 @@ public class SiteConfigController extends AbstractController {
 		// UserID is optional
 		if (sc.getUserId() != null && userRepository.findOne(sc.getUserId()) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user " + sc.getUserId(), null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + sc.getUserId(), null);
 		}
 		Object result;
 		try {
@@ -129,8 +129,7 @@ public class SiteConfigController extends AbstractController {
 		MLPSiteConfig existing = siteConfigRepository.findOne(configKey);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + configKey,
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + configKey, null);
 		}
 		MLPTransportModel result = null;
 		try {

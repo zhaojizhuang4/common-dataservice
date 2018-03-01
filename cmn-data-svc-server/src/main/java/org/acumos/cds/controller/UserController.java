@@ -119,11 +119,6 @@ public class UserController extends AbstractController {
 	@Autowired
 	private SolutionDeploymentRepository solutionDeploymentRepository;
 
-	// Silence Sonar complaints
-	private static final String NO_ROLE_WITH_ID = "No role with ID ";
-	private static final String NO_USER_WITH_ID = "No user with ID ";
-	private static final String NO_NOIF_WITH_ID = "No notification with ID ";
-
 	/**
 	 * @return Model that maps String to Object, for serialization as JSON
 	 */
@@ -263,7 +258,7 @@ public class UserController extends AbstractController {
 		MLPUser user = userRepository.findOne(userId);
 		if (user == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for row ID " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		// detach from Hibernate and wipe password
 		entityManager.detach(user);
@@ -339,7 +334,7 @@ public class UserController extends AbstractController {
 		MLPUser existingUser = userRepository.findOne(userId);
 		if (existingUser == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		MLPTransportModel result = null;
 		try {
@@ -383,7 +378,7 @@ public class UserController extends AbstractController {
 		MLPUser existingUser = userRepository.findOne(userId);
 		if (existingUser == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		// Reject empty passwords
 		if (changeRequest.getNewLoginPass() == null || changeRequest.getNewLoginPass().length() == 0) {
@@ -493,10 +488,10 @@ public class UserController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "addUserRole: user {}, role {}", userId, roleId);
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		} else if (roleRepository.findOne(roleId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ROLE_WITH_ID + roleId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
 		} else {
 			userRoleMapRepository.save(new MLPUserRoleMap(userId, roleId));
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
@@ -521,12 +516,12 @@ public class UserController extends AbstractController {
 
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		for (String roleId : roleIds) {
 			if (roleRepository.findOne(roleId) == null) {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ROLE_WITH_ID + roleId, null);
+				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
 			}
 		}
 
@@ -558,10 +553,10 @@ public class UserController extends AbstractController {
 
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		} else if (roleRepository.findOne(roleId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ROLE_WITH_ID + roleId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
 		} else {
 			userRoleMapRepository.delete(new MLPUserRoleMap(userId, roleId));
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
@@ -587,7 +582,7 @@ public class UserController extends AbstractController {
 		// midway
 		if (roleRepository.findOne(roleId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ROLE_WITH_ID + roleId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
 		}
 		if (usersRoleRequest.getUserIds().isEmpty()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -596,7 +591,7 @@ public class UserController extends AbstractController {
 		for (String userId : usersRoleRequest.getUserIds()) {
 			if (userRepository.findOne(userId) == null) {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 			}
 		}
 		for (String userId : usersRoleRequest.getUserIds()) {
@@ -643,14 +638,14 @@ public class UserController extends AbstractController {
 			HttpServletResponse response) {
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		// Build a key for fetch
 		UserLoginProviderPK pk = new UserLoginProviderPK(userId, providerCode, providerUserId);
 		MLPUserLoginProvider ulp = userLoginProviderRepository.findOne(pk);
 		if (ulp == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entries for PK " + pk, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + pk, null);
 		}
 		return ulp;
 	}
@@ -668,7 +663,7 @@ public class UserController extends AbstractController {
 	public Object getAllLoginProviders(@PathVariable("userId") String userId, HttpServletResponse response) {
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		// this might be an empty list, which is ok.
 		return userLoginProviderRepository.findByUser(userId);
@@ -698,7 +693,7 @@ public class UserController extends AbstractController {
 		// Validate args
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		Object result;
 		try {
@@ -747,7 +742,7 @@ public class UserController extends AbstractController {
 		// Validate args
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		// Get the existing one
 		// Build a key for fetch
@@ -755,7 +750,7 @@ public class UserController extends AbstractController {
 		MLPUserLoginProvider existing = userLoginProviderRepository.findOne(pk);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + pk, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + pk, null);
 		}
 		MLPTransportModel result = null;
 		try {
@@ -825,7 +820,7 @@ public class UserController extends AbstractController {
 			HttpServletResponse response) {
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		// this might be empty, which is ok.
 		return solutionFavoriteRepository.findByUserId(userId, pageRequest);
@@ -851,11 +846,11 @@ public class UserController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "createSolutionFavorite: received object: {} ", sfv);
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No solution with ID " + solutionId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		Object result;
 		try {
@@ -942,10 +937,10 @@ public class UserController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "addUserNotification: user {}, notif {}", userId, notificationId);
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		} else if (notificationRepository.findOne(notificationId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_NOIF_WITH_ID + notificationId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + notificationId, null);
 		} else {
 			notifUserMap.setUserId(userId);
 			notifUserMap.setNotificationId(notificationId);
@@ -976,11 +971,11 @@ public class UserController extends AbstractController {
 				notificationId);
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		if (notificationRepository.findOne(notificationId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_NOIF_WITH_ID + notificationId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + notificationId, null);
 		}
 		Object result;
 		try {
@@ -1015,10 +1010,10 @@ public class UserController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "dropUserRecipient: user {}, notif{}", userId, notificationId);
 		if (userRepository.findOne(userId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_USER_WITH_ID + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		} else if (notificationRepository.findOne(notificationId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_NOIF_WITH_ID + notificationId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + notificationId, null);
 		} else {
 			MLPNotifUserMap map = new MLPNotifUserMap(notificationId, userId);
 			notifUserMapRepository.delete(map);
@@ -1041,7 +1036,7 @@ public class UserController extends AbstractController {
 		MLPUserNotifPref usrnp = notificationPreferenceRepository.findOne(userNotifPrefId);
 		if (usrnp == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for ID " + userNotifPrefId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userNotifPrefId, null);
 		}
 		return usrnp;
 	}
@@ -1111,8 +1106,7 @@ public class UserController extends AbstractController {
 		MLPUserNotifPref existing = notificationPreferenceRepository.findOne(userNotifPrefId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
-					"Failed to find object with id " + userNotifPrefId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userNotifPrefId, null);
 		}
 		MLPTransportModel result = null;
 		try {
@@ -1179,7 +1173,7 @@ public class UserController extends AbstractController {
 		Page<MLPSolutionDeployment> da = solutionDeploymentRepository.findByUserId(userId, pageRequest);
 		if (da == null || !da.iterator().hasNext()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entries for user ID " + userId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		return da;
 	}

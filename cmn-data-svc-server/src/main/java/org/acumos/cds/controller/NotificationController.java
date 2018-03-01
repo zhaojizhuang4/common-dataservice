@@ -143,8 +143,7 @@ public class NotificationController extends AbstractController {
 		MLPNotification existing = notificationRepository.findOne(rowId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + rowId,
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + rowId, null);
 		}
 		MLPTransportModel result = null;
 		try {

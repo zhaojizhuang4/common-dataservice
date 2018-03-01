@@ -119,7 +119,7 @@ public class ThreadController extends AbstractController {
 		MLPThread thread = threadRepository.findOne(threadId);
 		if (thread == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for row ID " + threadId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + threadId, null);
 		}
 		return thread;
 	}
@@ -180,7 +180,7 @@ public class ThreadController extends AbstractController {
 		MLPThread existing = threadRepository.findOne(threadId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find thread " + threadId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + threadId, null);
 		}
 		MLPTransportModel result = null;
 		try {
@@ -253,7 +253,7 @@ public class ThreadController extends AbstractController {
 		MLPThread thread = threadRepository.findOne(threadId);
 		if (thread == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find thread " + threadId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + threadId, null);
 		}
 		return commentRepository.findByThreadId(threadId, pageable);
 	}
@@ -294,7 +294,7 @@ public class ThreadController extends AbstractController {
 		MLPComment comment = commentRepository.findOne(commentId);
 		if (comment == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for row ID " + commentId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + commentId, null);
 		}
 		return comment;
 	}
@@ -326,15 +326,15 @@ public class ThreadController extends AbstractController {
 			}
 			if (comment.getParentId() != null && commentRepository.findOne(comment.getParentId()) == null) {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No comment: " + comment.getParentId());
+				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + comment.getParentId());
 			}
 			if (threadRepository.findOne(comment.getThreadId()) == null) {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No thread: " + comment.getThreadId());
+				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + comment.getThreadId());
 			}
 			if (userRepository.findOne(comment.getUserId()) == null) {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user: " + comment.getUserId());
+				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + comment.getUserId());
 			}
 			// Create a new row
 			MLPComment newComment = commentRepository.save(comment);
@@ -372,20 +372,19 @@ public class ThreadController extends AbstractController {
 		MLPComment existing = commentRepository.findOne(commentId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + commentId,
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + commentId, null);
 		}
 		if (comment.getParentId() != null && commentRepository.findOne(comment.getParentId()) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No comment: " + comment.getParentId());
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + comment.getParentId());
 		}
 		if (threadRepository.findOne(comment.getThreadId()) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No thread: " + comment.getThreadId());
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + comment.getThreadId());
 		}
 		if (userRepository.findOne(comment.getUserId()) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No user: " + comment.getUserId());
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + comment.getUserId());
 		}
 		MLPTransportModel result = null;
 		try {

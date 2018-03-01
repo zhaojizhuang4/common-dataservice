@@ -140,8 +140,7 @@ public class FOMRepositoryTest {
 		logger.info("Querying for FOM via search service");
 		Page<MLPSolution> solsByDate = solutionSearchService.findSolutionsByModifiedDate(true, accTypes, valCodes,
 				modifiedDate, new PageRequest(0, 6, null));
-		// TODO Assert.assertTrue(solsByDate != null && solsByDate.getNumberOfElements()
-		// > 0);
+		Assert.assertTrue(solsByDate != null && solsByDate.getNumberOfElements() > 0);
 		logger.info("Found sols by date via criteria: size {}", solsByDate.getContent().size());
 
 		if (setupTeardown) {

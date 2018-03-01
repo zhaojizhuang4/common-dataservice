@@ -155,7 +155,7 @@ public class ArtifactController extends AbstractController {
 		MLPArtifact da = artifactRepository.findOne(artifactId);
 		if (da == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for ID " + artifactId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + artifactId, null);
 		}
 		return da;
 	}
@@ -174,7 +174,7 @@ public class ArtifactController extends AbstractController {
 		MLPArtifact da = artifactRepository.findOne(artifactId);
 		if (da == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for ID " + artifactId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + artifactId, null);
 		}
 		return solutionRevisionRepository.findByArtifact(artifactId);
 	}
@@ -236,8 +236,7 @@ public class ArtifactController extends AbstractController {
 		MLPArtifact existing = artifactRepository.findOne(artifactId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Failed to find object with id " + artifactId,
-					null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + artifactId, null);
 		}
 		MLPTransportModel result = null;
 		try {

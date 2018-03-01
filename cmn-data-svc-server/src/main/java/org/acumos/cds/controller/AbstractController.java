@@ -41,6 +41,8 @@ public abstract class AbstractController {
 
 	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(AbstractController.class);
 
+	protected static final String NO_ENTRY_WITH_ID = "No entry with ID ";
+
 	/**
 	 * For general use in these methods and subclasses
 	 */

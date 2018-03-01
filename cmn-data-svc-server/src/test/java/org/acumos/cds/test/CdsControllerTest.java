@@ -1060,7 +1060,7 @@ public class CdsControllerTest {
 
 			MLPUserNotifPref prefById = client.getUserNotificationPreference(usrNotifPref.getUserNotifPrefId());
 			Assert.assertNotNull(prefById);
-					
+
 			List<MLPUserNotifPref> usrNotifPrefs = client.getUserNotificationPreferences(cu.getUserId());
 			Assert.assertTrue(usrNotifPrefs.iterator().hasNext());
 			logger.info("First user notification preference{}", usrNotifPrefs.iterator().next());
@@ -1138,7 +1138,7 @@ public class CdsControllerTest {
 
 			MLPStepResult getById = client.getStepResult(sr.getStepResultId());
 			Assert.assertNotNull(getById.getStepResultId());
-			
+
 			RestPageResponse<MLPStepResult> stepResults = client.getStepResults(new RestPageRequest(0, 10));
 			Assert.assertTrue(stepResults.iterator().hasNext());
 			logger.info("First step result {}", stepResults.iterator().next());
@@ -1545,9 +1545,8 @@ public class CdsControllerTest {
 		RestPageResponse<MLPSolutionGroup> solGroups = client.getSolutionGroups(new RestPageRequest(0, 5));
 		Assert.assertTrue(solGroups != null && solGroups.getNumberOfElements() > 0);
 
-		RestPageResponse<MLPPeer> peersInGroup = null;
 		client.addPeerToGroup(pr.getPeerId(), pg1.getGroupId());
-		peersInGroup = client.getPeersInGroup(pg1.getGroupId(), new RestPageRequest());
+		RestPageResponse<MLPPeer> peersInGroup = client.getPeersInGroup(pg1.getGroupId(), new RestPageRequest());
 		Assert.assertTrue(peersInGroup != null && peersInGroup.getNumberOfElements() > 0);
 
 		RestPageResponse<MLPSolution> solutionsInGroup = null;
@@ -1588,9 +1587,22 @@ public class CdsControllerTest {
 
 		// Invalid cases
 		try {
+			client.getPeersInGroup(99999999999L, new RestPageRequest());
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("getPeersInGroup failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.getSolutionsInGroup(99999999999L, new RestPageRequest());
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("getSolutionsInGroup failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
 			MLPSolutionGroup sgx = new MLPSolutionGroup("solution group");
 			sgx.setGroupId(999L);
 			client.updateSolutionGroup(sgx);
+			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Failed as expected: {}", ex.getResponseBodyAsString());
 		}
@@ -1598,10 +1610,10 @@ public class CdsControllerTest {
 			MLPPeerGroup pg = new MLPPeerGroup("peer group");
 			pg.setGroupId(999L);
 			client.updatePeerGroup(pg);
+			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("updatePeerGroup failed as expected: {}", ex.getResponseBodyAsString());
 		}
-
 		try {
 			client.createPeerGroup(new MLPPeerGroup());
 			throw new Exception("Unexpected success");
@@ -1744,7 +1756,6 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("checkPeerSolutionAccess failed as expected: {}", ex.getResponseBodyAsString());
 		}
-
 
 		client.deleteSolutionGroup(sg.getGroupId());
 		client.deletePeerGroup(pg2.getGroupId());

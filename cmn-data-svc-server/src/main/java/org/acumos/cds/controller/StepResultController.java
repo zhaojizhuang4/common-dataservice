@@ -120,7 +120,7 @@ public class StepResultController extends AbstractController {
 		MLPStepResult sr = stepResultRepository.findOne(stepResultId);
 		if (sr == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No entry for ID " + stepResultId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + stepResultId, null);
 		}
 		return sr;
 	}
@@ -176,8 +176,7 @@ public class StepResultController extends AbstractController {
 		MLPStepResult existing = stepResultRepository.findOne(stepResultId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
-					"Failed to find object with id " + stepResultId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + stepResultId, null);
 		}
 		MLPTransportModel result = null;
 		try {
