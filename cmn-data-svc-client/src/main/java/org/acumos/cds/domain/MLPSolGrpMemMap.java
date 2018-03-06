@@ -133,6 +133,18 @@ public class MLPSolGrpMemMap implements MLPEntity, Serializable {
 		this.solutionId = solutionId;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSolGrpMemMap(MLPSolGrpMemMap that) {
+		this.created = that.created;
+		this.groupId = that.groupId;
+		this.solutionId = that.solutionId;
+	}
+
 	public Long getGroupId() {
 		return groupId;
 	}

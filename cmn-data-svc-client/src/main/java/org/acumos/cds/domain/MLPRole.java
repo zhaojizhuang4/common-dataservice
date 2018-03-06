@@ -85,6 +85,19 @@ public class MLPRole extends MLPTimestampedEntity implements Serializable {
 		this.active = active;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPRole(MLPRole that) {
+		super(that);
+		this.active = that.active;
+		this.name = that.name;
+		this.roleId = that.roleId;
+	}
+
 	public String getRoleId() {
 		return roleId;
 	}

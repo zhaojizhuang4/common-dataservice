@@ -116,6 +116,17 @@ public class MLPSolUserAccMap implements MLPEntity, Serializable {
 		this.userId = userId;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSolUserAccMap(MLPSolUserAccMap that) {
+		this.solutionId = that.solutionId;
+		this.userId = that.userId;
+	}
+
 	public String getSolutionId() {
 		return solutionId;
 	}

@@ -90,6 +90,21 @@ public abstract class MLPAbstractSolutionRevision extends MLPTimestampedEntity {
 		this.version = version;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPAbstractSolutionRevision(MLPAbstractSolutionRevision that) {
+		super(that);
+		this.description = that.description;
+		this.metadata = that.metadata;
+		this.origin = that.origin;
+		this.revisionId = that.revisionId;
+		this.version = that.version;
+	}
+
 	public String getRevisionId() {
 		return revisionId;
 	}

@@ -116,6 +116,24 @@ public class MLPAbstractArtifact extends MLPTimestampedEntity {
 		this.size = size;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPAbstractArtifact(MLPAbstractArtifact that) {
+		super(that);
+		this.artifactId = that.artifactId;
+		this.artifactTypeCode = that.artifactTypeCode;
+		this.description = that.description;
+		this.metadata = that.metadata;
+		this.name = that.name;
+		this.size = that.size;
+		this.uri = that.uri;
+		this.version = that.version;
+	}
+
 	public String getArtifactId() {
 		return artifactId;
 	}

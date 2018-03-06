@@ -137,6 +137,20 @@ public class MLPSolutionRating extends MLPTimestampedEntity implements Serializa
 		this.rating = rating;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSolutionRating(MLPSolutionRating that) {
+		super(that);
+		this.rating = that.rating;
+		this.solutionId = that.solutionId;
+		this.textReview = that.textReview;
+		this.userId = that.userId;
+	}
+
 	public String getUserId() {
 		return userId;
 	}

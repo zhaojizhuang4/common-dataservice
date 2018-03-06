@@ -24,6 +24,8 @@ import java.io.Serializable;
 
 /**
  * Model for deployment status, a code-name pair.
+ * 
+ * @deprecated Use {@link org.acumos.cds.DeploymentStatusCode}
  */
 public class MLPDeploymentStatus extends MLPCodeNamePair implements Serializable {
 

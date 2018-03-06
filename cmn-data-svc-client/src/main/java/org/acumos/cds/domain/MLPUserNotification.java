@@ -68,6 +68,17 @@ public class MLPUserNotification extends MLPNotification {
 		this.viewed = viewed;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPUserNotification(MLPUserNotification that) {
+		super(that);
+		this.viewed = that.viewed;
+	}
+
 	public Date getViewed() {
 		return viewed;
 	}

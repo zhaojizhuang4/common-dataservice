@@ -131,6 +131,27 @@ public abstract class MLPAbstractSolution extends MLPTimestampedEntity {
 		this.active = active;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPAbstractSolution(MLPAbstractSolution that) {
+		super(that);
+		this.accessTypeCode = that.accessTypeCode;
+		this.active = that.active;
+		this.description = that.description;
+		this.metadata = that.metadata;
+		this.modelTypeCode = that.modelTypeCode;
+		this.name = that.name;
+		this.origin = that.origin;
+		this.provider = that.provider;
+		this.solutionId = that.solutionId;
+		this.toolkitTypeCode = that.toolkitTypeCode;
+		this.validationStatusCode = that.validationStatusCode;
+	}
+
 	public String getSolutionId() {
 		return solutionId;
 	}

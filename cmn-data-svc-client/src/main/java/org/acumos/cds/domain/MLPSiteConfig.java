@@ -73,6 +73,19 @@ public class MLPSiteConfig extends MLPTimestampedEntity implements Serializable 
 		this.configValue = configValue;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSiteConfig(MLPSiteConfig that) {
+		super(that);
+		this.configKey = that.configKey;
+		this.configValue = that.configValue;
+		this.userId = that.userId;
+	}
+
 	public String getConfigKey() {
 		return configKey;
 	}

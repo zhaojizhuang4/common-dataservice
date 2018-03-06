@@ -64,6 +64,17 @@ public class MLPPasswordChangeRequest implements MLPEntity, Serializable {
 		this.newLoginPass = newLoginPass;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPPasswordChangeRequest(MLPPasswordChangeRequest that) {
+		this.newLoginPass = that.newLoginPass;
+		this.oldLoginPass = that.oldLoginPass;
+	}
+
 	public String getOldLoginPass() {
 		return oldLoginPass;
 	}

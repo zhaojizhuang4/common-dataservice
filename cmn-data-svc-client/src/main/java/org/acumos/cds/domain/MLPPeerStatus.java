@@ -22,6 +22,11 @@ package org.acumos.cds.domain;
 
 import java.io.Serializable;
 
+/**
+ * Model for peer status, a code-name pair.
+ * 
+ * @deprecated Use {@link org.acumos.cds.PeerStatusCode}
+ */
 public class MLPPeerStatus extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = 5341647455351536720L;

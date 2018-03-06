@@ -94,6 +94,19 @@ public class MLPUserNotifPref implements MLPEntity, Serializable {
 		this.msgSeverityCode = msgSeverityCode;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPUserNotifPref(MLPUserNotifPref that) {
+		this.msgSeverityCode = that.msgSeverityCode;
+		this.notfDelvMechCode = that.notfDelvMechCode;
+		this.userId = that.userId;
+		this.userNotifPrefId = that.userNotifPrefId;
+	}
+
 	public Long getUserNotifPrefId() {
 		return userNotifPrefId;
 	}

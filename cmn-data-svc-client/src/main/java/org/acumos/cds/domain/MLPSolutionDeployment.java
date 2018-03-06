@@ -110,6 +110,23 @@ public class MLPSolutionDeployment extends MLPTimestampedEntity implements Seria
 		this.deploymentStatusCode = deploymentStatusCode;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSolutionDeployment(MLPSolutionDeployment that) {
+		super(that);
+		this.deploymentId = that.deploymentId;
+		this.deploymentStatusCode = that.deploymentStatusCode;
+		this.detail = that.detail;
+		this.revisionId = that.revisionId;
+		this.solutionId = that.solutionId;
+		this.target = that.target;
+		this.userId = that.userId;
+	}
+
 	public String getDeploymentId() {
 		return deploymentId;
 	}

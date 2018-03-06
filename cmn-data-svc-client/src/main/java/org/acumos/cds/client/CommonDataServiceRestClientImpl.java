@@ -109,6 +109,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * getResponseBodyAsString() method.
  * </P>
  */
+@SuppressWarnings("deprecation")
 public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestClient {
 
 	private static Logger logger = LoggerFactory.getLogger(CommonDataServiceRestClientImpl.class);

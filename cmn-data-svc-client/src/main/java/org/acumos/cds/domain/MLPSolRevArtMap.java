@@ -121,6 +121,17 @@ public class MLPSolRevArtMap implements MLPEntity, Serializable {
 		this.artifactId = artifactId;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSolRevArtMap(MLPSolRevArtMap that) {
+		this.artifactId = that.artifactId;
+		this.revisionId = that.revisionId;
+	}
+
 	public String getRevisionId() {
 		return revisionId;
 	}

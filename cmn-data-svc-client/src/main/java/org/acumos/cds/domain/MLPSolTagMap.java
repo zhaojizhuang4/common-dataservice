@@ -130,6 +130,17 @@ public class MLPSolTagMap implements MLPEntity, Serializable {
 		this.tag = tag;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSolTagMap(MLPSolTagMap that) {
+		this.solutionId = that.solutionId;
+		this.tag = that.tag;
+	}
+
 	public String getSolutionId() {
 		return solutionId;
 	}

@@ -92,6 +92,22 @@ public class MLPSolutionWeb implements MLPEntity, Serializable {
 		this.solutionId = solutionId;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSolutionWeb(MLPSolutionWeb that) {
+		this.downloadCount = that.downloadCount;
+		this.featured = that.featured;
+		this.lastDownload = that.lastDownload;
+		this.ratingAverageTenths = that.ratingAverageTenths;
+		this.ratingCount = that.ratingCount;
+		this.solutionId = that.solutionId;
+		this.viewCount = that.viewCount;
+	}
+
 	public String getSolutionId() {
 		return solutionId;
 	}

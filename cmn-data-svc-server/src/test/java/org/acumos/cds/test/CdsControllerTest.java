@@ -106,6 +106,7 @@ import org.springframework.web.client.HttpStatusCodeException;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SuppressWarnings("deprecation")
 public class CdsControllerTest {
 
 	private static Logger logger = LoggerFactory.getLogger(CdsControllerTest.class);
@@ -228,7 +229,6 @@ public class CdsControllerTest {
 		logger.info("Server version: {}", version.getData());
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getCodeValueConstants() throws Exception {
 		List<MLPAccessType> act = client.getAccessTypes();

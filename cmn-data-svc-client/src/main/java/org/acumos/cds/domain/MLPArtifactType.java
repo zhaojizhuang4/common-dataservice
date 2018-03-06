@@ -24,6 +24,8 @@ import java.io.Serializable;
 
 /**
  * Model for an artifact type, a code-name pair.
+ * 
+ * @deprecated Use {@link org.acumos.cds.ArtifactTypeCode}
  */
 public class MLPArtifactType extends MLPCodeNamePair implements Serializable {
 

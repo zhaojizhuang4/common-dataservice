@@ -166,6 +166,22 @@ public class MLPSolutionValidation extends MLPTimestampedEntity implements Seria
 		this.validationTypeCode = validationTypeCode;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSolutionValidation(MLPSolutionValidation that) {
+		super(that);
+		this.detail = that.detail;
+		this.revisionId = that.revisionId;
+		this.solutionId = that.solutionId;
+		this.taskId = that.taskId;
+		this.validationStatusCode = that.validationStatusCode;
+		this.validationTypeCode = that.validationTypeCode;
+	}
+
 	public String getSolutionId() {
 		return solutionId;
 	}

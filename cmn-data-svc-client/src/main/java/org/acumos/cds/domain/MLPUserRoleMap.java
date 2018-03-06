@@ -118,6 +118,17 @@ public class MLPUserRoleMap implements MLPEntity, Serializable {
 		this.roleId = roleId;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPUserRoleMap(MLPUserRoleMap that) {
+		this.userId = that.userId;
+		this.roleId = that.roleId;
+	}
+
 	public String getUserId() {
 		return userId;
 	}

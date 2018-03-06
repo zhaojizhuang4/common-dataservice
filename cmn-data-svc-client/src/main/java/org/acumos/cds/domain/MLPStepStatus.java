@@ -24,6 +24,8 @@ import java.io.Serializable;
 
 /**
  * Model for step status, a code-name pair.
+ * 
+ * @deprecated Use {@link org.acumos.cds.StepStatusCode}
  */
 public class MLPStepStatus extends MLPCodeNamePair implements Serializable {
 

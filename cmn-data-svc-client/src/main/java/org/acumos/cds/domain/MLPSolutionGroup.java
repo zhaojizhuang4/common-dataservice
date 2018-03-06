@@ -54,4 +54,14 @@ public class MLPSolutionGroup extends MLPAbstractGroup implements Serializable {
 		super(name);
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSolutionGroup(MLPSolutionGroup that) {
+		super(that);
+	}
+
 }

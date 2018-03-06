@@ -24,6 +24,8 @@ import java.io.Serializable;
 
 /**
  * Model for a model type, a code-name pair.
+ * 
+ * @deprecated Use {@link org.acumos.cds.ModelTypeCode}
  */
 public class MLPModelType extends MLPCodeNamePair implements Serializable {
 

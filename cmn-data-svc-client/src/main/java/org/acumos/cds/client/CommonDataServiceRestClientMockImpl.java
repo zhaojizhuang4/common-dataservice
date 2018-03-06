@@ -83,6 +83,7 @@ import org.springframework.web.client.RestTemplate;
  * Accepts objects via setters and keeps a references for later return by
  * corresponding getter methods.
  */
+@SuppressWarnings("deprecation")
 public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRestClient {
 
 	public static ICommonDataServiceRestClient getInstance(String webapiUrl, String user, String pass) {

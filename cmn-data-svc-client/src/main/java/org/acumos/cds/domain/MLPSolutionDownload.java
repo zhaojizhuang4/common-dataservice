@@ -97,6 +97,20 @@ public class MLPSolutionDownload implements MLPEntity, Serializable {
 		this.userId = userId;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSolutionDownload(MLPSolutionDownload that) {
+		this.artifactId = that.artifactId;
+		this.downloadDate = that.downloadDate;
+		this.downloadId = that.downloadId;
+		this.solutionId = that.solutionId;
+		this.userId = that.userId;
+	}
+
 	public Long getDownloadId() {
 		return downloadId;
 	}

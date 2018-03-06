@@ -77,6 +77,17 @@ public class MLPArtifact extends MLPAbstractArtifact implements Serializable {
 		this.ownerId = ownerId;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPArtifact(MLPArtifact that) {
+		super(that);
+		this.ownerId = that.ownerId;
+	}
+
 	public String getOwnerId() {
 		return ownerId;
 	}

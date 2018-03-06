@@ -53,4 +53,14 @@ public class MLPPeerGroup extends MLPAbstractGroup implements Serializable {
 		super(name);
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPPeerGroup(MLPPeerGroup that) {
+		super(that);
+	}
+
 }

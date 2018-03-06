@@ -133,6 +133,29 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 		this.active = active;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPUser(MLPUser that) {
+		super(that);
+		this.active = that.active;
+		this.authToken = that.authToken;
+		this.email = that.email;
+		this.firstName = that.firstName;
+		this.lastLogin = that.lastLogin;
+		this.lastName = that.lastName;
+		this.loginHash = that.loginHash;
+		this.loginName = that.loginName;
+		this.loginPassExpire = that.loginPassExpire;
+		this.middleName = that.middleName;
+		this.orgName = that.orgName;
+		this.picture = that.picture;
+		this.userId = that.userId;
+	}
+
 	public String getUserId() {
 		return userId;
 	}

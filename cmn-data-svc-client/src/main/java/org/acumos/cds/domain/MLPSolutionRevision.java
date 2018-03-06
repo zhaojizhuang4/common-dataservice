@@ -81,6 +81,19 @@ public class MLPSolutionRevision extends MLPAbstractSolutionRevision implements 
 		this.ownerId = ownerId;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSolutionRevision(MLPSolutionRevision that) {
+		super(that);
+		this.ownerId = that.ownerId;
+		this.solutionId = that.solutionId;
+		this.sourceId = that.sourceId;
+	}
+
 	public String getSolutionId() {
 		return solutionId;
 	}

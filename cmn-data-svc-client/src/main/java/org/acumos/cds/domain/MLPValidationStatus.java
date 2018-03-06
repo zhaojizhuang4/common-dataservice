@@ -24,6 +24,8 @@ import java.io.Serializable;
 
 /**
  * Model for validation status, a code-name pair.
+ * 
+ * @deprecated Use {@link org.acumos.cds.ValidationStatusCode}
  */
 public class MLPValidationStatus extends MLPCodeNamePair implements Serializable {
 

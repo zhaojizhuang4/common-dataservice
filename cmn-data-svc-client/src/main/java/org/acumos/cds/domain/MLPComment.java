@@ -90,6 +90,21 @@ public class MLPComment extends MLPTimestampedEntity implements Serializable {
 		this.text = text;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPComment(MLPComment that) {
+		super(that);
+		this.commentId = that.commentId;
+		this.parentId = that.parentId;
+		this.text = that.text;
+		this.threadId = that.threadId;
+		this.userId = that.userId;
+	}
+
 	public String getCommentId() {
 		return commentId;
 	}

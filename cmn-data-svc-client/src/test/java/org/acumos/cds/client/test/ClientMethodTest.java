@@ -79,10 +79,9 @@ public class ClientMethodTest {
 	@Test
 	public void coverClientEnumMethods() {
 		final String uri = "http://invalidhost:51243";
-		ICommonDataServiceRestClient client = CommonDataServiceRestClientImpl.getInstance(uri,
-				"user", "pass");
+		ICommonDataServiceRestClient client = CommonDataServiceRestClientImpl.getInstance(uri, "user", "pass");
 		client = CommonDataServiceRestClientImpl.getInstance(uri, new RestTemplate());
-				
+
 		try {
 			CommonDataServiceRestClientImpl.getInstance(null, null, null);
 		} catch (IllegalArgumentException ex) {

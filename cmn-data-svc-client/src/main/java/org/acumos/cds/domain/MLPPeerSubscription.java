@@ -119,6 +119,26 @@ public class MLPPeerSubscription extends MLPTimestampedEntity implements Seriali
 		this.accessType = accessType;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPPeerSubscription(MLPPeerSubscription that) {
+		super(that);
+		this.accessType = that.accessType;
+		this.maxArtifactSize = that.maxArtifactSize;
+		this.options = that.options;
+		this.ownerId = that.ownerId;
+		this.peerId = that.peerId;
+		this.processed = that.processed;
+		this.refreshInterval = that.refreshInterval;
+		this.scopeType = that.scopeType;
+		this.selector = that.selector;
+		this.subId = that.subId;
+	}
+
 	public Long getSubId() {
 		return subId;
 	}

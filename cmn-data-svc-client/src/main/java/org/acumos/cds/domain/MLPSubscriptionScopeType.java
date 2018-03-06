@@ -24,6 +24,8 @@ import java.io.Serializable;
 
 /**
  * Model for subscription scope type, a code-name pair.
+ * 
+ * @deprecated Use {@link org.acumos.cds.SubscriptionScopeCode}
  */
 public class MLPSubscriptionScopeType extends MLPCodeNamePair implements Serializable {
 

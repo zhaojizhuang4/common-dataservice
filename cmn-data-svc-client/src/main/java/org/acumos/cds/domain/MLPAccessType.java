@@ -24,6 +24,8 @@ import java.io.Serializable;
 
 /**
  * Model for access type, a code-name pair.
+ * 
+ * @deprecated Use {@link org.acumos.cds.AccessTypeCode}
  */
 public class MLPAccessType extends MLPCodeNamePair implements Serializable {
 

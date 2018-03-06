@@ -24,6 +24,8 @@ import java.io.Serializable;
 
 /**
  * Model for login provider, a code-name pair.
+ * 
+ * @deprecated Use {@link org.acumos.cds.LoginProviderCode}
  */
 public class MLPLoginProvider extends MLPCodeNamePair implements Serializable {
 

@@ -123,6 +123,18 @@ public class MLPNotifUserMap implements MLPEntity, Serializable {
 		this.userId = userId;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPNotifUserMap(MLPNotifUserMap that) {
+		this.notificationId = that.notificationId;
+		this.userId = that.userId;
+		this.viewed = that.viewed;
+	}
+
 	public String getNotificationId() {
 		return notificationId;
 	}

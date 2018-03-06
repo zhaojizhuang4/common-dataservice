@@ -76,6 +76,7 @@ import org.acumos.cds.transport.SuccessTransport;
  * {@link org.springframework.web.client.HttpStatusCodeException#getResponseBodyAsString()}
  * to obtain the detailed error message sent by the server.
  */
+@SuppressWarnings("deprecation")
 public interface ICommonDataServiceRestClient {
 
 	/**

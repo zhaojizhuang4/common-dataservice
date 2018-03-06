@@ -142,6 +142,19 @@ public class MLPPeerSolAccMap implements MLPEntity, Serializable {
 		this.granted = granted;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPPeerSolAccMap(MLPPeerSolAccMap that) {
+		this.created = that.created;
+		this.granted = that.granted;
+		this.peerGroupId = that.peerGroupId;
+		this.solutionGroupId = that.solutionGroupId;
+	}
+
 	public Long getPeerGroupId() {
 		return peerGroupId;
 	}

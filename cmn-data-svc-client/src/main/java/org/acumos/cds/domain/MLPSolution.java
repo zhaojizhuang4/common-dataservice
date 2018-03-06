@@ -117,6 +117,20 @@ public class MLPSolution extends MLPAbstractSolution implements Serializable {
 		this.ownerId = ownerId;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSolution(MLPSolution that) {
+		super(that);
+		this.ownerId = that.ownerId;
+		this.sourceId = that.sourceId;
+		this.tags = that.tags;
+		this.webStats = that.webStats;
+	}
+
 	public String getOwnerId() {
 		return ownerId;
 	}

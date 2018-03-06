@@ -24,6 +24,8 @@ import java.io.Serializable;
 
 /**
  * Model for step result type, a code-name pair.
+ * 
+ * @deprecated Use {@link org.acumos.cds.StepTypeCode}
  */
 public class MLPStepType extends MLPCodeNamePair implements Serializable {
 

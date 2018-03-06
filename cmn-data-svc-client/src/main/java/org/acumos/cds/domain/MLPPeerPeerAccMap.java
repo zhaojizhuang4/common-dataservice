@@ -134,6 +134,17 @@ public class MLPPeerPeerAccMap implements MLPEntity, Serializable {
 		this.resourcePeerGroupId = resourcePeerGroupId;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPPeerPeerAccMap(MLPPeerPeerAccMap that) {
+		this.principalPeerGroupId = that.principalPeerGroupId;
+		this.resourcePeerGroupId = that.resourcePeerGroupId;
+	}
+
 	public Long getPrincipalPeerGroupId() {
 		return principalPeerGroupId;
 	}

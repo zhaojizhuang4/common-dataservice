@@ -24,6 +24,8 @@ import java.io.Serializable;
 
 /**
  * Model for validation type, a code-name pair.
+ * 
+ * @deprecated Use {@link org.acumos.cds.ValidationTypeCode}
  */
 public class MLPValidationType extends MLPCodeNamePair implements Serializable {
 

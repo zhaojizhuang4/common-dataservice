@@ -183,6 +183,26 @@ public class MLPUserLoginProvider extends MLPTimestampedEntity implements Serial
 		this.rank = rank;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPUserLoginProvider(MLPUserLoginProvider that) {
+		super(that);
+		this.accessToken = that.accessToken;
+		this.displayName = that.displayName;
+		this.imageUrl = that.imageUrl;
+		this.profileUrl = that.profileUrl;
+		this.providerCode = that.providerCode;
+		this.providerUserId = that.providerUserId;
+		this.rank = that.rank;
+		this.refreshToken = that.refreshToken;
+		this.secret = that.secret;
+		this.userId = that.userId;
+	}
+
 	public String getUserId() {
 		return userId;
 	}

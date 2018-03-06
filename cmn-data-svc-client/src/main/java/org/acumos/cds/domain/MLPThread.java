@@ -83,6 +83,19 @@ public class MLPThread implements MLPEntity, Serializable {
 		this.revisionId = revisionId;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPThread(MLPThread that) {
+		this.revisionId = that.revisionId;
+		this.solutionId = that.solutionId;
+		this.threadId = that.threadId;
+		this.title = that.title;
+	}
+
 	public String getThreadId() {
 		return threadId;
 	}

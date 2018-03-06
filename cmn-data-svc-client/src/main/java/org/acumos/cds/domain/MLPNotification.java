@@ -110,6 +110,23 @@ public class MLPNotification extends MLPTimestampedEntity implements Serializabl
 		this.end = endDate;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPNotification(MLPNotification that) {
+		super(that);
+		this.end = that.end;
+		this.message = that.message;
+		this.msgSeverityCode = that.msgSeverityCode;
+		this.notificationId = that.notificationId;
+		this.start = that.start;
+		this.title = that.title;
+		this.url = that.url;
+	}
+
 	public String getNotificationId() {
 		return notificationId;
 	}

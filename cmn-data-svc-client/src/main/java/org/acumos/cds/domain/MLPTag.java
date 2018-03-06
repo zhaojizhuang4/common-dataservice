@@ -66,6 +66,16 @@ public class MLPTag implements MLPEntity, Serializable {
 		this.tag = tag;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPTag(MLPTag that) {
+		this.tag = that.tag;
+	}
+
 	public String getTag() {
 		return tag;
 	}

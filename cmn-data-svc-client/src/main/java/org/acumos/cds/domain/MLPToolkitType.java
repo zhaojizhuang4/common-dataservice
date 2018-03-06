@@ -24,6 +24,8 @@ import java.io.Serializable;
 
 /**
  * Model for toolkit type, a code-name pair.
+ * 
+ * @deprecated Use {@link org.acumos.cds.ToolkitTypeCode}
  */
 public class MLPToolkitType extends MLPCodeNamePair implements Serializable {
 

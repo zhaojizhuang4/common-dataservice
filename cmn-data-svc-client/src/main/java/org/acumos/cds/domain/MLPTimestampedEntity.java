@@ -45,6 +45,21 @@ public abstract class MLPTimestampedEntity implements MLPEntity {
 	@Column(name = "MODIFIED_DATE", nullable = false)
 	private Date modified;
 
+	public MLPTimestampedEntity() {
+		// no-arg constructor
+	}
+
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPTimestampedEntity(MLPTimestampedEntity that) {
+		this.created = that.created;
+		this.modified = that.modified;
+	}
+
 	public Date getCreated() {
 		return created;
 	}

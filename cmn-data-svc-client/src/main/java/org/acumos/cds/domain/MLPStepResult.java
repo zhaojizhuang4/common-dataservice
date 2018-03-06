@@ -135,6 +135,27 @@ public class MLPStepResult implements MLPEntity, Serializable {
 		this.startDate = startDate;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPStepResult(MLPStepResult that) {
+		this.artifactId = that.artifactId;
+		this.endDate = that.endDate;
+		this.name = that.name;
+		this.result = that.result;
+		this.revisionId = that.revisionId;
+		this.solutionId = that.solutionId;
+		this.startDate = that.startDate;
+		this.statusCode = that.statusCode;
+		this.stepCode = that.stepCode;
+		this.stepResultId = that.stepResultId;
+		this.trackingId = that.trackingId;
+		this.userId = that.userId;
+	}
+
 	public Long getStepResultId() {
 		return stepResultId;
 	}

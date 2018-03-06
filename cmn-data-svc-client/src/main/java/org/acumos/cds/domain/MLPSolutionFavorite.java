@@ -123,6 +123,17 @@ public class MLPSolutionFavorite implements MLPEntity, Serializable {
 		this.userId = userId;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPSolutionFavorite(MLPSolutionFavorite that) {
+		this.solutionId = that.solutionId;
+		this.userId = that.userId;
+	}
+
 	public String getSolutionId() {
 		return solutionId;
 	}

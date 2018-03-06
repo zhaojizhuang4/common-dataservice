@@ -131,6 +131,18 @@ public class MLPValidationSequence extends MLPTimestampedEntity implements Seria
 		this.valTypeCode = valTypeCode;
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param that
+	 *            Instance to copy
+	 */
+	public MLPValidationSequence(MLPValidationSequence that) {
+		super(that);
+		this.sequence = that.sequence;
+		this.valTypeCode = that.valTypeCode;
+	}
+
 	public Integer getSequence() {
 		return sequence;
 	}
