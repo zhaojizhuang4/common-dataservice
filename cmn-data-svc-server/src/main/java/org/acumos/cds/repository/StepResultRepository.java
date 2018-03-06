@@ -22,8 +22,22 @@ package org.acumos.cds.repository;
 import org.acumos.cds.domain.MLPStepResult;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface StepResultRepository
 		extends JpaRepository<MLPStepResult, Long>, JpaSpecificationExecutor<MLPStepResult> {
+
+	/**
+	 * Deletes all step results for the specified solution ID.
+	 * 
+	 * @param solutionId
+	 *            Solution ID
+	 */
+	@Modifying
+	@Transactional // throws exception without this
+	void deleteBySolutionId(String solutionId);
 
 }

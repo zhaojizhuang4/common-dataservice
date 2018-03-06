@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import org.acumos.cds.AccessTypeCode;
@@ -142,7 +143,7 @@ public class CdsControllerTest {
 	public void basicSequenceDemo() throws Exception {
 		try {
 			MLPUser cu = new MLPUser();
-			cu.setLoginName("user_login1");
+			cu.setLoginName("user_login" + new Random().nextInt());
 			cu.setLoginHash("user_pass");
 			cu.setFirstName("First Name");
 			cu.setLastName("Last Name");
@@ -196,6 +197,13 @@ public class CdsControllerTest {
 
 			logger.info("Adding artifact to revision");
 			client.addSolutionRevisionArtifact(cs.getSolutionId(), cr.getRevisionId(), ca.getArtifactId());
+
+			MLPStepResult sr = new MLPStepResult(StepTypeCode.VL.toString(), "New Step Result1",
+					StepStatusCode.FA.toString(), new Date());
+			sr.setSolutionId(cs.getSolutionId());
+			sr = client.createStepResult(sr);
+			Assert.assertNotNull(sr.getStepResultId());
+			logger.info("Created basicsequencedemo step result {}", sr);
 
 			logger.info("Deleting objects");
 			client.dropSolutionRevisionArtifact(cs.getSolutionId(), cr.getRevisionId(), ca.getArtifactId());
