@@ -20,15 +20,13 @@
 
 package org.acumos.cds.repository;
 
-import org.acumos.cds.domain.MLPPeerGrpMemMap;
 import org.acumos.cds.domain.MLPPeer;
+import org.acumos.cds.domain.MLPPeerGrpMemMap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface PeerGrpMemMapRepository
 		extends PagingAndSortingRepository<MLPPeerGrpMemMap, MLPPeerGrpMemMap.PeerGrpMemMapPK> {
@@ -47,29 +45,5 @@ public interface PeerGrpMemMapRepository
 			+ " where p.peerId =  m.peerId " //
 			+ " and m.groupId = :groupId")
 	Page<MLPPeer> findPeersByGroupId(@Param("groupId") Long groupId, Pageable pageable);
-
-	/**
-	 * Deletes all entries for the specified group ID.
-	 * 
-	 * @param groupId
-	 *            Group ID
-	 */
-	@Modifying
-	@Transactional // throws exception without this
-	@Query(value = "DELETE FROM MLPPeerGrpMemMap m " //
-			+ " WHERE m.groupId = :groupId")
-	void deleteForGroup(@Param("groupId") Long groupId);
-
-	/**
-	 * Deletes all entries for the specified peer ID.
-	 * 
-	 * @param peerId
-	 *            Peer ID
-	 */
-	@Modifying
-	@Transactional // throws exception without this
-	@Query(value = "DELETE FROM MLPPeerGrpMemMap m " //
-			+ " WHERE m.peerId = :peerId")
-	void deleteForSolution(@Param("peerId") String peerId);
 
 }

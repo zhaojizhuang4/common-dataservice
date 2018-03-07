@@ -21,38 +21,12 @@
 package org.acumos.cds.repository;
 
 import org.acumos.cds.domain.MLPPeerSolAccMap;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface PeerSolAccMapRepository
 		extends PagingAndSortingRepository<MLPPeerSolAccMap, MLPPeerSolAccMap.PeerSolAccMapPK> {
-
-	/**
-	 * Deletes all entries for the specified peer group ID.
-	 * 
-	 * @param peerGroupId
-	 *            Peer group ID
-	 */
-	@Modifying
-	@Transactional // throws exception without this
-	@Query(value = "DELETE FROM MLPPeerSolAccMap m " //
-			+ " WHERE m.peerGroupId = :peerGroupId")
-	void deleteForPeerGroup(@Param("peerGroupId") Long peerGroupId);
-
-	/**
-	 * Deletes all entries for the specified solution group ID.
-	 * 
-	 * @param solGroupId
-	 *            Solution group ID
-	 */
-	@Modifying
-	@Transactional // throws exception without this
-	@Query(value = "DELETE FROM MLPPeerSolAccMap m " //
-			+ " WHERE m.solutionGroupId = :solGroupId")
-	void deleteForSolGroup(@Param("solGroupId") Long solGroupId);
 
 	/**
 	 * Checks if the specified peer has access to the specified solution via peer

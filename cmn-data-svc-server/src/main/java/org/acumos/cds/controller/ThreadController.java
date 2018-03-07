@@ -210,7 +210,7 @@ public class ThreadController extends AbstractController {
 	public MLPTransportModel deleteThread(@PathVariable("threadId") String threadId, HttpServletResponse response) {
 		try {
 			// cascade the delete
-			commentRepository.deleteThreadComments(threadId);
+			commentRepository.deleteByThreadId(threadId);
 			threadRepository.delete(threadId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {

@@ -276,7 +276,7 @@ public class CdsRepositoryServiceTest {
 			Assert.assertNotNull(ulp.getCreated());
 
 			logger.info("UserLoginProviderRepository Info");
-			Iterable<MLPUserLoginProvider> ulpList = userLoginProviderRepository.findByUser(cu.getUserId());
+			Iterable<MLPUserLoginProvider> ulpList = userLoginProviderRepository.findByUserId(cu.getUserId());
 			logger.info("User Login provider list {}", ulpList);
 
 			// Create Peer
@@ -303,7 +303,7 @@ public class CdsRepositoryServiceTest {
 			logger.info("Peer subscription {}", ps);
 
 			logger.info("Fetching PeerSubscriptions");
-			Iterable<MLPPeerSubscription> peerSubscriptionList = peerSubscriptionRepository.findByPeer(pr.getPeerId());
+			Iterable<MLPPeerSubscription> peerSubscriptionList = peerSubscriptionRepository.findByPeerId(pr.getPeerId());
 			Assert.assertTrue(peerSubscriptionList.iterator().hasNext());
 			logger.info("Peer subscription list {}", peerSubscriptionList);
 
@@ -340,7 +340,7 @@ public class CdsRepositoryServiceTest {
 			MLPRole res = roleRepository.findOne(cr2.getRoleId());
 			Assert.assertNotNull(res.getRoleId());
 
-			Iterable<MLPRoleFunction> resrf = roleFunctionRepository.findByRole(cr2.getRoleId());
+			Iterable<MLPRoleFunction> resrf = roleFunctionRepository.findByRoleId(cr2.getRoleId());
 			Assert.assertTrue(resrf.iterator().hasNext());
 			MLPRoleFunction roleFuncOne = resrf.iterator().next();
 			Assert.assertEquals(roleFuncName, roleFuncOne.getName());
@@ -462,7 +462,7 @@ public class CdsRepositoryServiceTest {
 
 			logger.info("Querying for revisions by solution");
 			Iterable<MLPSolutionRevision> revs = revisionRepository
-					.findBySolution(new String[] { si.getSolutionId(), cs.getSolutionId() });
+					.findBySolutionIdIn(new String[] { si.getSolutionId(), cs.getSolutionId() });
 			Assert.assertTrue(revs.iterator().hasNext());
 			for (MLPSolutionRevision r : revs) {
 				logger.info("\tRevision: " + r.toString());
@@ -524,7 +524,7 @@ public class CdsRepositoryServiceTest {
 			logger.info("Solution Tag list above");
 
 			logger.info("Querying for revisions by artifact");
-			Iterable<MLPSolutionRevision> revsByArt = revisionRepository.findByArtifact(ca.getArtifactId());
+			Iterable<MLPSolutionRevision> revsByArt = revisionRepository.findByArtifactId(ca.getArtifactId());
 			Assert.assertTrue(revsByArt != null && revsByArt.iterator().hasNext());
 			for (MLPSolutionRevision r : revsByArt)
 				logger.info("\tRevision for artifact: " + r.toString());
@@ -857,7 +857,7 @@ public class CdsRepositoryServiceTest {
 
 			logger.info("Querying for revisions by solution");
 			Iterable<MLPSolutionRevision> revs = revisionRepository
-					.findBySolution(new String[] { si.getSolutionId(), cs2.getSolutionId() });
+					.findBySolutionIdIn(new String[] { si.getSolutionId(), cs2.getSolutionId() });
 			Assert.assertTrue(revs.iterator().hasNext());
 			for (MLPSolutionRevision r : revs) {
 				logger.info("\tRevision: " + r.toString());
@@ -868,7 +868,7 @@ public class CdsRepositoryServiceTest {
 			}
 
 			logger.info("Querying for revisions by artifact");
-			Iterable<MLPSolutionRevision> revsByArt = revisionRepository.findByArtifact(ca.getArtifactId());
+			Iterable<MLPSolutionRevision> revsByArt = revisionRepository.findByArtifactId(ca.getArtifactId());
 			Assert.assertTrue(revsByArt != null && revsByArt.iterator().hasNext());
 			for (MLPSolutionRevision r : revsByArt)
 				logger.info("\tRevision for artifact: " + r.toString());
@@ -990,7 +990,7 @@ public class CdsRepositoryServiceTest {
 			MLPRole res = roleRepository.findOne(cr.getRoleId());
 			Assert.assertNotNull(res.getRoleId());
 
-			Iterable<MLPRoleFunction> resrf = roleFunctionRepository.findByRole(cr.getRoleId());
+			Iterable<MLPRoleFunction> resrf = roleFunctionRepository.findByRoleId(cr.getRoleId());
 			Assert.assertTrue(resrf.iterator().hasNext());
 			MLPRoleFunction roleFuncOne = resrf.iterator().next();
 			Assert.assertEquals(roleFuncName, roleFuncOne.getName());

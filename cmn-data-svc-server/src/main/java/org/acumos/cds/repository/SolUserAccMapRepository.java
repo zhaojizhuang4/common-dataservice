@@ -68,8 +68,6 @@ public interface SolUserAccMapRepository
 	 */
 	@Modifying
 	@Transactional // throws exception without this
-	@Query(value = "DELETE FROM MLPSolUserAccMap m " //
-			+ " WHERE m.solutionId = :solutionId")
-	void deleteUsersForSolution(@Param("solutionId") String solutionId);
+	void deleteBySolutionId(@Param("solutionId") String solutionId);
 
 }

@@ -27,7 +27,8 @@ Version 1.14.1, 7 March 2018
 ----------------------------
 
 * Cascade solution delete to associated step results (ACUMOS-328)
-* Add copy constructors to all domain POJO classes
+* Drop unneeded queries in server-side repository methods (ACUMOS-344)
+* Add copy constructors to all domain POJO classes (ACUMOS-345)
 * Requires database schema version 1.14
 
 Version 1.14.0, 1 March 2018

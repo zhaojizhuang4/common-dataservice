@@ -233,7 +233,7 @@ public class PeerController extends AbstractController {
 	@ResponseBody
 	public MLPTransportModel deletePeer(@PathVariable("peerId") String peerId, HttpServletResponse response) {
 		try {
-			Iterable<MLPPeerSubscription> subs = peerSubRepository.findByPeer(peerId);
+			Iterable<MLPPeerSubscription> subs = peerSubRepository.findByPeerId(peerId);
 			if (subs != null)
 				peerSubRepository.delete(subs);
 			peerRepository.delete(peerId);
@@ -266,7 +266,7 @@ public class PeerController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerId, null);
 		}
-		return peerSubRepository.findByPeer(peerId);
+		return peerSubRepository.findByPeerId(peerId);
 	}
 
 	/**

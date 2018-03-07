@@ -425,13 +425,13 @@ public class UserController extends AbstractController {
 	@ResponseBody
 	public MLPTransportModel deleteUser(@PathVariable("userId") String userId, HttpServletResponse response) {
 		try {
-			Iterable<MLPUserRoleMap> roles = userRoleMapRepository.findByUser(userId);
+			Iterable<MLPUserRoleMap> roles = userRoleMapRepository.findByUserId(userId);
 			if (roles != null)
 				userRoleMapRepository.delete(roles);
-			Iterable<MLPUserLoginProvider> logins = userLoginProviderRepository.findByUser(userId);
+			Iterable<MLPUserLoginProvider> logins = userLoginProviderRepository.findByUserId(userId);
 			if (logins != null)
 				userLoginProviderRepository.delete(logins);
-			Iterable<MLPNotifUserMap> notifs = notifUserMapRepository.findByUser(userId);
+			Iterable<MLPNotifUserMap> notifs = notifUserMapRepository.findByUserId(userId);
 			if (notifs != null)
 				notifUserMapRepository.delete(notifs);
 			userRepository.delete(userId);
@@ -526,7 +526,7 @@ public class UserController extends AbstractController {
 		}
 
 		// Remove all existing role assignments
-		Iterable<MLPUserRoleMap> existing = userRoleMapRepository.findByUser(userId);
+		Iterable<MLPUserRoleMap> existing = userRoleMapRepository.findByUserId(userId);
 		userRoleMapRepository.delete(existing);
 		// Create new ones
 		for (String roleId : roleIds)
@@ -666,7 +666,7 @@ public class UserController extends AbstractController {
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
 		// this might be an empty list, which is ok.
-		return userLoginProviderRepository.findByUser(userId);
+		return userLoginProviderRepository.findByUserId(userId);
 	}
 
 	/**

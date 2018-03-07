@@ -232,7 +232,7 @@ public class RoleController extends AbstractController {
 	@ResponseBody
 	public MLPTransportModel deleteRole(@PathVariable("roleId") String roleId, HttpServletResponse response) {
 		try {
-			Iterable<MLPRoleFunction> fns = roleFunctionRepository.findByRole(roleId);
+			Iterable<MLPRoleFunction> fns = roleFunctionRepository.findByRoleId(roleId);
 			if (fns != null)
 				roleFunctionRepository.delete(fns);
 			roleRepository.delete(roleId);
@@ -261,7 +261,7 @@ public class RoleController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
 		}
-		return roleFunctionRepository.findByRole(roleId);
+		return roleFunctionRepository.findByRoleId(roleId);
 	}
 
 	/**

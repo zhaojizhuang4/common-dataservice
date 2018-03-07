@@ -176,7 +176,7 @@ public class ArtifactController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + artifactId, null);
 		}
-		return solutionRevisionRepository.findByArtifact(artifactId);
+		return solutionRevisionRepository.findByArtifactId(artifactId);
 	}
 
 	/**

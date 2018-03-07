@@ -533,25 +533,25 @@ public class SolutionController extends AbstractController {
 		try {
 			// Manually cascade the delete
 			// what about composite solutions?
-			solutionDeploymentRepository.deleteDeploymentsForSolution(solutionId);
-			solTagMapRepository.deleteTagsForSolution(solutionId);
+			solutionDeploymentRepository.deleteBySolutionId(solutionId);
+			solTagMapRepository.deleteBySolutionId(solutionId);
 			solutionDownloadRepository.deleteBySolutionId(solutionId);
 			solutionRatingRepository.deleteBySolutionId(solutionId);
 			solutionValidationRepository.deleteBySolutionId(solutionId);
-			solUserAccMapRepository.deleteUsersForSolution(solutionId);
+			solUserAccMapRepository.deleteBySolutionId(solutionId);
 			solutionFavoriteRepository.deleteBySolutionId(solutionId);
+			stepResultRepository.deleteBySolutionId(solutionId);
 			// The web stats are annotated as optional, so be cautious when deleting
 			MLPSolutionWeb webStats = solutionWebRepository.findOne(solutionId);
 			if (webStats != null)
 				solutionWebRepository.delete(solutionId);
-			for (MLPSolutionRevision r : solutionRevisionRepository.findBySolution(new String[] { solutionId })) {
+			for (MLPSolutionRevision r : solutionRevisionRepository.findBySolutionIdIn(new String[] { solutionId })) {
 				for (MLPArtifact a : artifactRepository.findByRevision(r.getRevisionId()))
 					solRevArtMapRepository
 							.delete(new MLPSolRevArtMap.SolRevArtMapPK(r.getRevisionId(), a.getArtifactId()));
 				// do NOT delete artifacts!
 				solutionRevisionRepository.delete(r);
 			}
-			stepResultRepository.deleteBySolutionId(solutionId);
 			solutionRepository.delete(solutionId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
@@ -563,7 +563,7 @@ public class SolutionController extends AbstractController {
 	}
 
 	/**
-	 * @param solutionId
+	 * @param solutionIds
 	 *            Array of solution IDs (comma-separated values - the name should be
 	 *            plural but it's declared above). Spring will split the list if the
 	 *            path variable is declared as String array or List of String.
@@ -572,8 +572,8 @@ public class SolutionController extends AbstractController {
 	@ApiOperation(value = "Gets a list of revisions for the specified solution IDs.", response = MLPSolutionRevision.class, responseContainer = "List")
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Iterable<MLPSolutionRevision> getListOfRevisions(@PathVariable("solutionId") String[] solutionId) {
-		return solutionRevisionRepository.findBySolution(solutionId);
+	public Iterable<MLPSolutionRevision> getListOfRevisions(@PathVariable("solutionId") String[] solutionIds) {
+		return solutionRevisionRepository.findBySolutionIdIn(solutionIds);
 	}
 
 	/**
@@ -1246,7 +1246,7 @@ public class SolutionController extends AbstractController {
 	@ResponseBody
 	public Object getListOfSolutionValidations(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, HttpServletResponse response) {
-		Iterable<MLPSolutionValidation> items = solutionValidationRepository.findBySolutionIdRevisionId(solutionId,
+		Iterable<MLPSolutionValidation> items = solutionValidationRepository.findBySolutionIdAndRevisionId(solutionId,
 				revisionId);
 		if (items == null || !items.iterator().hasNext()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -1406,7 +1406,7 @@ public class SolutionController extends AbstractController {
 	@ResponseBody
 	public Object getSolutionDeployments(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, Pageable pageRequest, HttpServletResponse response) {
-		Page<MLPSolutionDeployment> da = solutionDeploymentRepository.findBySolutionRevisionIds(solutionId, revisionId,
+		Page<MLPSolutionDeployment> da = solutionDeploymentRepository.findBySolutionIdAndRevisionId(solutionId, revisionId,
 				pageRequest);
 		if (da == null || !da.iterator().hasNext()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -1437,7 +1437,7 @@ public class SolutionController extends AbstractController {
 	public Object getUserSolutionRevisionDeployments(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, @PathVariable("userId") String userId, Pageable pageRequest,
 			HttpServletResponse response) {
-		Page<MLPSolutionDeployment> da = solutionDeploymentRepository.findBySolutionRevisionUserIds(solutionId,
+		Page<MLPSolutionDeployment> da = solutionDeploymentRepository.findBySolutionIdAndRevisionIdAndUserId(solutionId,
 				revisionId, userId, pageRequest);
 		if (da == null || !da.iterator().hasNext()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

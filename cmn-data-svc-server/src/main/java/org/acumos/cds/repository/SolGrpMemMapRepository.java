@@ -24,11 +24,9 @@ import org.acumos.cds.domain.MLPSolGrpMemMap;
 import org.acumos.cds.domain.MLPSolution;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface SolGrpMemMapRepository
 		extends PagingAndSortingRepository<MLPSolGrpMemMap, MLPSolGrpMemMap.SolGrpMemMapPK> {
@@ -47,29 +45,5 @@ public interface SolGrpMemMapRepository
 			+ " where s.solutionId =  m.solutionId " //
 			+ " and m.groupId = :groupId")
 	Page<MLPSolution> findSolutionsByGroupId(@Param("groupId") Long groupId, Pageable pageable);
-
-	/**
-	 * Deletes all entries for the specified group ID.
-	 * 
-	 * @param groupId
-	 *            Group ID
-	 */
-	@Modifying
-	@Transactional // throws exception without this
-	@Query(value = "DELETE FROM MLPSolGrpMemMap m " //
-			+ " WHERE m.groupId = :groupId")
-	void deleteForGroup(@Param("groupId") Long groupId);
-
-	/**
-	 * Deletes all entries for the specified solution ID.
-	 * 
-	 * @param solutionId
-	 *            Solution ID
-	 */
-	@Modifying
-	@Transactional // throws exception without this
-	@Query(value = "DELETE FROM MLPSolGrpMemMap m " //
-			+ " WHERE m.solutionId = :solutionId")
-	void deleteForSolution(@Param("solutionId") String solutionId);
 
 }
