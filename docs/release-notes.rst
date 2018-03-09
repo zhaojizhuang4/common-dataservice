@@ -23,9 +23,10 @@ Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
-Version 1.14.1, 7 March 2018
+Version 1.14.1, 9 March 2018
 ----------------------------
 
+* Define created-date columns as "DEFAULT 0" to stop Mariadb from setting to now() on update (ACUMOS-243)
 * Cascade solution delete to associated step results (ACUMOS-328)
 * Drop unneeded queries in server-side repository methods (ACUMOS-344)
 * Add copy constructors to all domain POJO classes (ACUMOS-345)
