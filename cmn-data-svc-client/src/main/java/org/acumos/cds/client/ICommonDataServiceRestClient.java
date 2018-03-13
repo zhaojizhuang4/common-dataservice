@@ -24,9 +24,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.acumos.cds.CodeNameType;
 import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
+import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
 import org.acumos.cds.domain.MLPLoginProvider;
@@ -1921,5 +1923,14 @@ public interface ICommonDataServiceRestClient {
 	 * @return User Notification Preference object
 	 */
 	MLPUserNotifPref getUserNotificationPreference(Long usrNotifPrefId);
+
+	/**
+	 * Gets the list of code-name pair entries for the specified value set.
+	 * 
+	 * @param type
+	 *            Value set name
+	 * @return List of code-name pairs
+	 */
+	List<MLPCodeNamePair> getCodeNamePairs(CodeNameType type);
 
 }

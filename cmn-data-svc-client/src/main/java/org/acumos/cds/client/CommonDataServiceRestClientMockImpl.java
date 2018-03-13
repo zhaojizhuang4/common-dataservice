@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.ArtifactTypeCode;
+import org.acumos.cds.CodeNameType;
 import org.acumos.cds.DeploymentStatusCode;
 import org.acumos.cds.LoginProviderCode;
 import org.acumos.cds.ModelTypeCode;
@@ -38,6 +39,7 @@ import org.acumos.cds.ValidationTypeCode;
 import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
+import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
 import org.acumos.cds.domain.MLPLoginProvider;
@@ -198,6 +200,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private List<MLPPeer> peerAccessList;
 	private RestPageResponse<MLPSolution> solutionsByDate;
 	private MLPStepResult stepResultById;
+	private List<MLPCodeNamePair> pairs;
 
 	/**
 	 * No-argument constructor.
@@ -1603,6 +1606,15 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	@Override
 	public List<MLPPeer> getPeerAccess(String peerId) {
 		return peerAccessList;
+	}
+
+	public void setCodeNamePairs(List<MLPCodeNamePair> pairs) {
+		this.pairs = pairs;
+	}
+	
+	@Override
+	public List<MLPCodeNamePair> getCodeNamePairs(CodeNameType type) {
+		return pairs;
 	}
 
 }

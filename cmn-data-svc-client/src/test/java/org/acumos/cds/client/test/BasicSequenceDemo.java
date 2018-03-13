@@ -24,11 +24,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.acumos.cds.AccessTypeCode;
-import org.acumos.cds.ArtifactTypeCode;
-import org.acumos.cds.ModelTypeCode;
-import org.acumos.cds.ToolkitTypeCode;
-import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.client.CommonDataServiceRestClientImpl;
 import org.acumos.cds.client.ICommonDataServiceRestClient;
 import org.acumos.cds.domain.MLPArtifact;
@@ -70,11 +65,11 @@ public class BasicSequenceDemo {
 			logger.info("Created user {}", cu);
 
 			MLPSolution cs = new MLPSolution("solution name", cu.getUserId(), true);
-			cs.setValidationStatusCode(ValidationStatusCode.IP.name());
+			cs.setValidationStatusCode("IP");
 			cs.setProvider("Big Data Org");
-			cs.setAccessTypeCode(AccessTypeCode.PB.name());
-			cs.setModelTypeCode(ModelTypeCode.CL.name());
-			cs.setToolkitTypeCode(ToolkitTypeCode.CP.name());
+			cs.setAccessTypeCode("PB");
+			cs.setModelTypeCode("CL");
+			cs.setToolkitTypeCode("CP");
 			cs = client.createSolution(cs);
 			logger.info("Created solution {}", cs);
 
@@ -83,7 +78,7 @@ public class BasicSequenceDemo {
 			cr = client.createSolutionRevision(cr);
 			logger.info("Created solution revision {}", cr);
 
-			MLPArtifact ca = new MLPArtifact("1.0A", ArtifactTypeCode.DI.toString(), "artifact name",
+			MLPArtifact ca = new MLPArtifact("1.0A", "DI", "artifact name",
 					"http://nexus/artifact", cu.getUserId(), 1);
 			ca = client.createArtifact(ca);
 			logger.info("Created artifact {}", ca);

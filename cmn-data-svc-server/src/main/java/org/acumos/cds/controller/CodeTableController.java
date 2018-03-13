@@ -20,26 +20,17 @@
 
 package org.acumos.cds.controller;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 
-import org.acumos.cds.AccessTypeCode;
-import org.acumos.cds.ArtifactTypeCode;
 import org.acumos.cds.CCDSConstants;
-import org.acumos.cds.DeploymentStatusCode;
-import org.acumos.cds.LoginProviderCode;
-import org.acumos.cds.MessageSeverityCode;
-import org.acumos.cds.ModelTypeCode;
-import org.acumos.cds.NotificationDeliveryMechanismCode;
-import org.acumos.cds.PeerStatusCode;
-import org.acumos.cds.StepStatusCode;
-import org.acumos.cds.StepTypeCode;
-import org.acumos.cds.SubscriptionScopeCode;
-import org.acumos.cds.ToolkitTypeCode;
-import org.acumos.cds.ValidationStatusCode;
-import org.acumos.cds.ValidationTypeCode;
+import org.acumos.cds.CodeNameType;
 import org.acumos.cds.domain.MLPCodeNamePair;
+import org.acumos.cds.service.CodeNameService;
+import org.acumos.cds.transport.ErrorTransport;
+import org.acumos.cds.util.EELFLoggerDelegate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -47,199 +38,226 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * Provides getters for all code-name value sets. Fixed value sets are
- * implemented as Java enums, so these controllers are only of interest to
- * systems that don't use this project's Java client.
+ * Provides getters for all code-name value sets, which are obtained from
+ * property sources.
  */
 @Controller
 @RequestMapping("/" + CCDSConstants.CODE_PATH)
 public class CodeTableController extends AbstractController {
 
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(CodeTableController.class);
+
+	@Autowired
+	private CodeNameService codeNameService;
+
 	/**
+	 * @param typeName
+	 *            Name of an field in {@link org.acumos.cds.CodeNameType}
+	 * @param response
+	 *            HttpServletResponse
+	 * @return List of MLPCodeNamePair objects for the specified value set.
+	 */
+	@ApiOperation(value = "Gets the list of code-name pairs for the specified value set name.", response = MLPCodeNamePair.class, responseContainer = "List")
+	@RequestMapping(value = "/" + CCDSConstants.PAIR_PATH + "/{type}", method = RequestMethod.GET)
+	@ResponseBody
+	public Object getCodeNamePairs(@PathVariable(CCDSConstants.TYPE_PATH) String typeName,
+			HttpServletResponse response) {
+		CodeNameType type;
+		try {
+			type = CodeNameType.valueOf(typeName);
+			return codeNameService.getCodeNamePairs(type);
+		} catch (Exception ex) {
+			logger.warn(EELFLoggerDelegate.errorLogger, "getCodeNamePairs", ex.toString());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Unexpected value set name " + typeName);
+		}
+	}
+
+	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair objects with access type code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of access type codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.ACCESS_PATH + "/" + CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public List<MLPCodeNamePair> getAccessTypeList() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (AccessTypeCode cn : AccessTypeCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getTypeName()));
-		return list;
+	public Object getAccessTypeList(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.ACCESS_TYPE.name(), response);
 	}
 
 	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair with artifact type code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of artifact type codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.ARTIFACT_PATH + "/"
 			+ CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public List<MLPCodeNamePair> getArtifactTypeList() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (ArtifactTypeCode cn : ArtifactTypeCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getTypeName()));
-		return list;
+	public Object getArtifactTypeList(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.ARTIFACT_TYPE.name(), response);
 	}
 
 	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair with deployment status code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of deployment status codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.DEPLOY_PATH + "/"
 			+ CCDSConstants.STATUS_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public List<MLPCodeNamePair> getDeploymentStatusList() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (DeploymentStatusCode cn : DeploymentStatusCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getStatusName()));
-		return list;
+	public Object getDeploymentStatusList(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.DEPLOYMENT_STATUS.name(), response);
 	}
 
 	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair with login provider code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of login provider codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.LOGIN_PROVIDER_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public List<MLPCodeNamePair> getLoginProviderList() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (LoginProviderCode cn : LoginProviderCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getProviderName()));
-		return list;
+	public Object getLoginProviderList(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.LOGIN_PROVIDER.name(), response);
 	}
 
 	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair with message severity code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of message severity codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.MSG_SEV_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Iterable<MLPCodeNamePair> getMessageSeverityList() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (MessageSeverityCode cn : MessageSeverityCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getTypeName()));
-		return list;
+	public Object getMessageSeverityList(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.MESSAGE_SEVERITY.name(), response);
 	}
 
 	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair with model type code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of model type codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.MODEL_PATH + "/" + CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public List<MLPCodeNamePair> getModelTypeList() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (ModelTypeCode cn : ModelTypeCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getTypeName()));
-		return list;
+	public Object getModelTypeList(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.MODEL_TYPE.name(), response);
 	}
 
 	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair with notification delivery mechanism
 	 *         code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of notification delivery mechanism codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.NOTIFICATION_MECH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public List<MLPCodeNamePair> getNotificationDeliveryMechanismList() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (NotificationDeliveryMechanismCode cn : NotificationDeliveryMechanismCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getTypeName()));
-		return list;
+	public Object getNotificationDeliveryMechanismList(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.NOTIFICATION_DELIVERY_MECHANISM.name(), response);
 	}
 
 	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair with peer status code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of peer status codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.PEER_PATH + "/" + CCDSConstants.STATUS_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public List<MLPCodeNamePair> getPeerStatusList() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (PeerStatusCode cn : PeerStatusCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getStatusName()));
-		return list;
+	public Object getPeerStatusList(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.PEER_STATUS.name(), response);
 	}
 
 	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair with step status code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of step status codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.STEP_PATH + "/" + CCDSConstants.STATUS_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public List<MLPCodeNamePair> getStepStatusList() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (StepStatusCode cn : StepStatusCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getStatusName()));
-		return list;
+	public Object getStepStatusList(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.STEP_STATUS.name(), response);
 	}
 
 	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair with step type code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of step type codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.STEP_PATH + "/" + CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public List<MLPCodeNamePair> getStepTypeList() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (StepTypeCode cn : StepTypeCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getStepName()));
-		return list;
+	public Object getStepTypeList(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.STEP_TYPE.name(), response);
 	}
 
 	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair with subscription scope code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of subscription scope codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.SUBSCRIPTION_PATH + "/"
 			+ CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public List<MLPCodeNamePair> getSubscriptionScopes() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (SubscriptionScopeCode cn : SubscriptionScopeCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getScopeName()));
-		return list;
+	public Object getSubscriptionScopes(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.SUBSCRIPTION_SCOPE.name(), response);
 	}
 
 	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair with toolkit type code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of toolkit type codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.TOOLKIT_PATH + "/"
 			+ CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Iterable<MLPCodeNamePair> getToolkitTypeList() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (ToolkitTypeCode cn : ToolkitTypeCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getTypeName()));
-		return list;
+	public Object getToolkitTypeList(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.TOOLKIT_TYPE.name(), response);
 	}
 
 	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair with validation status code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of validation status codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.VAL_PATH + "/" + CCDSConstants.STATUS_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public List<MLPCodeNamePair> getValidationStatusList() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (ValidationStatusCode cn : ValidationStatusCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getStatusName()));
-		return list;
+	public Object getValidationStatusList(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.VALIDATION_STATUS.name(), response);
 	}
 
 	/**
+	 * @deprecated Use {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 * @param response
+	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair with validation type code-name pairs
 	 */
 	@ApiOperation(value = "Gets the list of validation type codes.", response = MLPCodeNamePair.class, responseContainer = "List")
 	@RequestMapping(value = "/" + CCDSConstants.VAL_PATH + "/" + CCDSConstants.TYPE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public List<MLPCodeNamePair> getValidationTypeList() {
-		List<MLPCodeNamePair> list = new ArrayList<>();
-		for (ValidationTypeCode cn : ValidationTypeCode.values())
-			list.add(new MLPCodeNamePair(cn.name(), cn.getTypeName()));
-		return list;
+	public Object getValidationTypeList(HttpServletResponse response) {
+		return getCodeNamePairs(CodeNameType.VALIDATION_TYPE.name(), response);
 	}
 
 }

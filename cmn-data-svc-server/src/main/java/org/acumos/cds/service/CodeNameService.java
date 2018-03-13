@@ -18,40 +18,37 @@
  * ===============LICENSE_END=========================================================
  */
 
-package org.acumos.cds;
+package org.acumos.cds.service;
+
+import java.util.List;
+
+import org.acumos.cds.CodeNameType;
+import org.acumos.cds.domain.MLPCodeNamePair;
 
 /**
- * This enum defines Acumos artifact type codes.
- * 
- * @deprecated Use
- *             {@link org.acumos.cds.client.ICommonDataServiceRestClient#getCodeNamePairs(CodeNameType)}
+ * Defines a method to fetch a list of code-name pairs. These are read from
+ * properties (not the database) so calling this a "service" is a stretch.
  */
-public enum ArtifactTypeCode {
+public interface CodeNameService {
 
-	BP("BLUEPRINT FILE"), //
-	CD("CDUMP FILE"), //
-	DI("DOCKER IMAGE"), //
-	DS("DATA SOURCE"), //
-	MD("METADATA"), //
-	MH("MODEL-H2O"), //
-	MI("MODEL IMAGE"), //
-	MR("MODEL-R"), //
-	MS("MODEL-SCIKIT"), //
-	MT("MODEL-TENSORFLOW"), //
-	TE("TOSCA TEMPLATE"), //
-	TG("TOSCA Generator Input File"), //
-	TS("TOSCA SCHEMA"), //
-	TT("TOSCA TRANSLATE"), //
-	PJ("PROTOBUF FILE");
+	/**
+	 * Gets the list of code-name pairs in the specified value set.
+	 * 
+	 * @param type
+	 *            Name of the code-name value set; e.g., Toolkit Type.
+	 * @return List of MLPCodeNamePair objects
+	 */
+	List<MLPCodeNamePair> getCodeNamePairs(CodeNameType type);
 
-	private String typeName;
-
-	private ArtifactTypeCode(final String typeName) {
-		this.typeName = typeName;
-	}
-
-	public String getTypeName() {
-		return typeName;
-	}
+	/**
+	 * Validates the specified code against the specified value set.
+	 * 
+	 * @param code
+	 *            Code to check
+	 * @param type
+	 *            Name of the code-name value set; e.g., Toolkit Type.
+	 * @return true if the code is known, otherwise false
+	 */
+	boolean validateCode(String code, CodeNameType type);
 
 }

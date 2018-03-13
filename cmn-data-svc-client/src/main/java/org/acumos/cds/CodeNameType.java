@@ -21,37 +21,13 @@
 package org.acumos.cds;
 
 /**
- * This enum defines Acumos artifact type codes.
- * 
- * @deprecated Use
- *             {@link org.acumos.cds.client.ICommonDataServiceRestClient#getCodeNamePairs(CodeNameType)}
+ * Provides a constant for every code-name value set.
  */
-public enum ArtifactTypeCode {
+public enum CodeNameType {
 
-	BP("BLUEPRINT FILE"), //
-	CD("CDUMP FILE"), //
-	DI("DOCKER IMAGE"), //
-	DS("DATA SOURCE"), //
-	MD("METADATA"), //
-	MH("MODEL-H2O"), //
-	MI("MODEL IMAGE"), //
-	MR("MODEL-R"), //
-	MS("MODEL-SCIKIT"), //
-	MT("MODEL-TENSORFLOW"), //
-	TE("TOSCA TEMPLATE"), //
-	TG("TOSCA Generator Input File"), //
-	TS("TOSCA SCHEMA"), //
-	TT("TOSCA TRANSLATE"), //
-	PJ("PROTOBUF FILE");
-
-	private String typeName;
-
-	private ArtifactTypeCode(final String typeName) {
-		this.typeName = typeName;
-	}
-
-	public String getTypeName() {
-		return typeName;
-	}
+	ACCESS_TYPE, ARTIFACT_TYPE, DEPLOYMENT_STATUS, LOGIN_PROVIDER, //
+	MESSAGE_SEVERITY, MODEL_TYPE, NOTIFICATION_DELIVERY_MECHANISM, //
+	PEER_STATUS, STEP_STATUS, STEP_TYPE, SUBSCRIPTION_SCOPE, TOOLKIT_TYPE, //
+	VALIDATION_STATUS, VALIDATION_TYPE;
 
 }

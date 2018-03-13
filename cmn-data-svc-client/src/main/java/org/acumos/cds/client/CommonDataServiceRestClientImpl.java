@@ -29,9 +29,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.acumos.cds.CCDSConstants;
+import org.acumos.cds.CodeNameType;
 import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
+import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
 import org.acumos.cds.domain.MLPLoginProvider;
@@ -299,6 +301,16 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		logger.debug("getVersion: uri {}", uri);
 		ResponseEntity<SuccessTransport> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<SuccessTransport>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public List<MLPCodeNamePair> getCodeNamePairs(CodeNameType type) {
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.PAIR_PATH, type.name() }, null, null);
+		logger.debug("getCodeNamePairs: uri {}", uri);
+		ResponseEntity<List<MLPCodeNamePair>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<MLPCodeNamePair>>() {
 				});
 		return response.getBody();
 	}

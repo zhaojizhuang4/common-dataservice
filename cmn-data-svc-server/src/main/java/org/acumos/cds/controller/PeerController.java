@@ -26,11 +26,8 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.CCDSConstants;
-import org.acumos.cds.PeerStatusCode;
-import org.acumos.cds.SubscriptionScopeCode;
-import org.acumos.cds.ValidationStatusCode;
+import org.acumos.cds.CodeNameType;
 import org.acumos.cds.domain.MLPPeer;
 import org.acumos.cds.domain.MLPPeerSubscription;
 import org.acumos.cds.repository.PeerRepository;
@@ -162,8 +159,8 @@ public class PeerController extends AbstractController {
 				}
 			}
 			// Validate enum codes
-			PeerStatusCode.valueOf(peer.getStatusCode());
-			ValidationStatusCode.valueOf(peer.getValidationStatusCode());
+			super.validateCode(peer.getStatusCode(), CodeNameType.PEER_STATUS);
+			super.validateCode(peer.getValidationStatusCode(), CodeNameType.VALIDATION_STATUS);
 			// Create a new row
 			result = peerRepository.save(peer);
 			response.setStatus(HttpServletResponse.SC_CREATED);
@@ -201,8 +198,8 @@ public class PeerController extends AbstractController {
 		MLPTransportModel result = null;
 		try {
 			// Validate enum codes
-			PeerStatusCode.valueOf(peer.getStatusCode());
-			ValidationStatusCode.valueOf(peer.getValidationStatusCode());
+			super.validateCode(peer.getStatusCode(), CodeNameType.PEER_STATUS);
+			super.validateCode(peer.getValidationStatusCode(), CodeNameType.VALIDATION_STATUS);
 			// Use the path-parameter id; don't trust the one in the object
 			peer.setPeerId(peerId);
 			// Update the existing row
@@ -307,8 +304,8 @@ public class PeerController extends AbstractController {
 		Object result;
 		try {
 			// Validate enum codes
-			AccessTypeCode.valueOf(peerSub.getAccessType());
-			SubscriptionScopeCode.valueOf(peerSub.getScopeType());
+			super.validateCode(peerSub.getAccessType(), CodeNameType.ACCESS_TYPE);
+			super.validateCode(peerSub.getScopeType(), CodeNameType.SUBSCRIPTION_SCOPE);
 			// Null out any existing ID to get an auto-generated ID
 			peerSub.setSubId(null);
 			// Create a new row
@@ -350,8 +347,8 @@ public class PeerController extends AbstractController {
 		MLPTransportModel result = null;
 		try {
 			// Validate enum codes
-			AccessTypeCode.valueOf(peerSub.getAccessType());
-			SubscriptionScopeCode.valueOf(peerSub.getScopeType());
+			super.validateCode(peerSub.getAccessType(), CodeNameType.ACCESS_TYPE);
+			super.validateCode(peerSub.getScopeType(), CodeNameType.SUBSCRIPTION_SCOPE);
 			// Use the path-parameter id; don't trust the one in the object
 			peerSub.setSubId(subId);
 			// Update the existing row

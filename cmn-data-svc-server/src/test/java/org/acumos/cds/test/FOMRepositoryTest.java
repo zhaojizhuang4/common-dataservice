@@ -22,9 +22,6 @@ package org.acumos.cds.test;
 import java.util.Date;
 import java.util.List;
 
-import org.acumos.cds.AccessTypeCode;
-import org.acumos.cds.ArtifactTypeCode;
-import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactFOM;
 import org.acumos.cds.domain.MLPSolRevArtMap;
@@ -97,8 +94,8 @@ public class FOMRepositoryTest {
 			logger.info("Created user {}", cu);
 
 			cs = new MLPSolution("sol name", cu.getUserId(), true);
-			cs.setAccessTypeCode(AccessTypeCode.PR.name());
-			cs.setValidationStatusCode(ValidationStatusCode.NV.name());
+			cs.setAccessTypeCode("PR");
+			cs.setValidationStatusCode("NV");
 			cs = solutionRepository.save(cs);
 			Assert.assertNotNull("Solution ID", cs.getSolutionId());
 
@@ -107,7 +104,7 @@ public class FOMRepositoryTest {
 			Assert.assertNotNull("Revision ID", cr.getRevisionId());
 			logger.info("Created solution revision {}", cr.getRevisionId());
 
-			ca = new MLPArtifact("version", ArtifactTypeCode.BP.name(), "name", "uri", cu.getUserId(), 1);
+			ca = new MLPArtifact("version", "BP", "name", "uri", cu.getUserId(), 1);
 			ca = artifactRepository.save(ca);
 			Assert.assertNotNull(ca.getArtifactId());
 			logger.info("Created artifact {}", ca);
@@ -124,8 +121,8 @@ public class FOMRepositoryTest {
 
 		// Find by modified date
 
-		String[] accTypes = new String[] { AccessTypeCode.PR.name() };
-		String[] valCodes = new String[] { ValidationStatusCode.NV.name() };
+		String[] accTypes = new String[] { "PR" };
+		String[] valCodes = new String[] { "NV" };
 		Date modifiedDate = new Date();
 		modifiedDate.setTime(modifiedDate.getTime() - 60 * 1000);
 

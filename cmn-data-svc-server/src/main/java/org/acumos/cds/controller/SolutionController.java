@@ -27,13 +27,8 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.CCDSConstants;
-import org.acumos.cds.DeploymentStatusCode;
-import org.acumos.cds.ModelTypeCode;
-import org.acumos.cds.ToolkitTypeCode;
-import org.acumos.cds.ValidationStatusCode;
-import org.acumos.cds.ValidationTypeCode;
+import org.acumos.cds.CodeNameType;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPSolRevArtMap;
 import org.acumos.cds.domain.MLPSolTagMap;
@@ -398,13 +393,13 @@ public class SolutionController extends AbstractController {
 		try {
 			// Validate enum codes
 			if (solution.getAccessTypeCode() != null)
-				AccessTypeCode.valueOf(solution.getAccessTypeCode());
+				super.validateCode(solution.getAccessTypeCode(), CodeNameType.ACCESS_TYPE);
 			if (solution.getModelTypeCode() != null)
-				ModelTypeCode.valueOf(solution.getModelTypeCode());
+				super.validateCode(solution.getModelTypeCode(), CodeNameType.MODEL_TYPE);
 			if (solution.getToolkitTypeCode() != null)
-				ToolkitTypeCode.valueOf(solution.getToolkitTypeCode());
+				super.validateCode(solution.getToolkitTypeCode(), CodeNameType.TOOLKIT_TYPE);
 			if (solution.getValidationStatusCode() != null)
-				ValidationStatusCode.valueOf(solution.getValidationStatusCode());
+				super.validateCode(solution.getValidationStatusCode(), CodeNameType.VALIDATION_STATUS);
 			String id = solution.getSolutionId();
 			if (id != null) {
 				UUID.fromString(id);
@@ -459,13 +454,13 @@ public class SolutionController extends AbstractController {
 		try {
 			// Validate enum codes
 			if (solution.getAccessTypeCode() != null)
-				AccessTypeCode.valueOf(solution.getAccessTypeCode());
+				super.validateCode(solution.getAccessTypeCode(), CodeNameType.ACCESS_TYPE);
 			if (solution.getModelTypeCode() != null)
-				ModelTypeCode.valueOf(solution.getModelTypeCode());
+				super.validateCode(solution.getModelTypeCode(), CodeNameType.MODEL_TYPE);
 			if (solution.getToolkitTypeCode() != null)
-				ToolkitTypeCode.valueOf(solution.getToolkitTypeCode());
+				super.validateCode(solution.getToolkitTypeCode(), CodeNameType.TOOLKIT_TYPE);
 			if (solution.getValidationStatusCode() != null)
-				ValidationStatusCode.valueOf(solution.getValidationStatusCode());
+				super.validateCode(solution.getValidationStatusCode(), CodeNameType.VALIDATION_STATUS);
 			// Use the path-parameter id; don't trust the one in the object
 			solution.setSolutionId(solutionId);
 			// Discard any stats object; updates don't happen via this interface
@@ -1289,8 +1284,9 @@ public class SolutionController extends AbstractController {
 		try {
 			// Validate enum codes
 			if (sv.getValidationStatusCode() != null)
-				ValidationStatusCode.valueOf(sv.getValidationStatusCode());
-			ValidationTypeCode.valueOf(sv.getValidationTypeCode());
+				super.validateCode(sv.getValidationStatusCode(), CodeNameType.VALIDATION_STATUS);
+			// type is required
+			super.validateCode(sv.getValidationTypeCode(), CodeNameType.VALIDATION_TYPE);
 			// Use path IDs
 			sv.setSolutionId(solutionId);
 			sv.setRevisionId(revisionId);
@@ -1341,8 +1337,9 @@ public class SolutionController extends AbstractController {
 		try {
 			// Validate enum codes
 			if (sv.getValidationStatusCode() != null)
-				ValidationStatusCode.valueOf(sv.getValidationStatusCode());
-			ValidationTypeCode.valueOf(sv.getValidationTypeCode());
+				super.validateCode(sv.getValidationStatusCode(), CodeNameType.VALIDATION_STATUS);
+			// type is required
+			super.validateCode(sv.getValidationTypeCode(), CodeNameType.VALIDATION_TYPE);
 			// Use path IDs
 			sv.setSolutionId(solutionId);
 			sv.setRevisionId(revisionId);
@@ -1480,8 +1477,8 @@ public class SolutionController extends AbstractController {
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + sd.getUserId(), null);
 		}
 		try {
-			// Validate enum codes
-			DeploymentStatusCode.valueOf(sd.getDeploymentStatusCode());
+			// Validate enum code
+			super.validateCode(sd.getDeploymentStatusCode(), CodeNameType.DEPLOYMENT_STATUS);
 			// Validate ID if present
 			String id = sd.getDeploymentId();
 			if (id != null) {

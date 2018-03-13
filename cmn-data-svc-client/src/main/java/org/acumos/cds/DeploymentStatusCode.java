@@ -22,6 +22,9 @@ package org.acumos.cds;
 
 /**
  * This enum defines Acumos deployment status codes.
+ * 
+ * @deprecated Use
+ *             {@link org.acumos.cds.client.ICommonDataServiceRestClient#getCodeNamePairs(CodeNameType)}
  */
 public enum DeploymentStatusCode {
 	DP("Deployed"), //

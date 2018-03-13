@@ -38,6 +38,7 @@ import org.junit.Test;
 /**
  * This increases coverage.
  */
+@SuppressWarnings("deprecation")
 public class EnumTest {
 
 	@Test

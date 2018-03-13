@@ -26,6 +26,7 @@ Maven Nexus repository. The server is deployed as a Docker image to a Docker reg
 Version 1.14.2, 15 March 2018
 ----------------------------
 
+* Refactor code-name value sets to use properties (ACUMOS-376)
 * Add Swagger annotations to required fields in domain models (ACUMOS-399)
 * Requires database schema version 1.14
 

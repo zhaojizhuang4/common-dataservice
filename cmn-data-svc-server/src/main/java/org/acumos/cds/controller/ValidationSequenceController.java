@@ -23,7 +23,7 @@ package org.acumos.cds.controller;
 import javax.servlet.http.HttpServletResponse;
 
 import org.acumos.cds.CCDSConstants;
-import org.acumos.cds.ValidationTypeCode;
+import org.acumos.cds.CodeNameType;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationSequence.ValidationSequencePK;
 import org.acumos.cds.repository.ValidationSequenceRepository;
@@ -88,8 +88,8 @@ public class ValidationSequenceController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "createValidationSequence: received object: {} ", valSeq);
 		Object result;
 		try {
-			// Validate enum codes
-			ValidationTypeCode.valueOf(valTypeCode);
+			// Validate enum code
+			super.validateCode(valTypeCode, CodeNameType.VALIDATION_TYPE);
 			// Use path parameters
 			valSeq.setSequence(sequence);
 			valSeq.setValTypeCode(valTypeCode);

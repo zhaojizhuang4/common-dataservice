@@ -29,9 +29,7 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
 
 import org.acumos.cds.CCDSConstants;
-import org.acumos.cds.LoginProviderCode;
-import org.acumos.cds.MessageSeverityCode;
-import org.acumos.cds.NotificationDeliveryMechanismCode;
+import org.acumos.cds.CodeNameType;
 import org.acumos.cds.domain.MLPNotifUserMap;
 import org.acumos.cds.domain.MLPPasswordChangeRequest;
 import org.acumos.cds.domain.MLPRole;
@@ -697,8 +695,8 @@ public class UserController extends AbstractController {
 		}
 		Object result;
 		try {
-			// Validate enum codes
-			LoginProviderCode.valueOf(ulp.getProviderCode());
+			// Validate enum code
+			super.validateCode(ulp.getProviderCode(), CodeNameType.LOGIN_PROVIDER);
 			// Use path IDs
 			ulp.setUserId(userId);
 			ulp.setProviderCode(providerCode);
@@ -754,8 +752,8 @@ public class UserController extends AbstractController {
 		}
 		MLPTransportModel result = null;
 		try {
-			// Validate enum codes
-			LoginProviderCode.valueOf(ulp.getProviderCode());
+			// Validate enum code
+			super.validateCode(ulp.getProviderCode(), CodeNameType.LOGIN_PROVIDER);
 			// Use path IDs
 			ulp.setUserId(userId);
 			ulp.setProviderCode(providerCode);
@@ -1069,8 +1067,8 @@ public class UserController extends AbstractController {
 		Object result;
 		try {
 			// Validate enum codes
-			MessageSeverityCode.valueOf(usrNotifPref.getMsgSeverityCode());
-			NotificationDeliveryMechanismCode.valueOf(usrNotifPref.getNotfDelvMechCode());
+			super.validateCode(usrNotifPref.getMsgSeverityCode(), CodeNameType.MESSAGE_SEVERITY);
+			super.validateCode(usrNotifPref.getNotfDelvMechCode(), CodeNameType.NOTIFICATION_DELIVERY_MECHANISM);
 			// Create a new row
 			result = notificationPreferenceRepository.save(usrNotifPref);
 			response.setStatus(HttpServletResponse.SC_CREATED);
@@ -1111,8 +1109,8 @@ public class UserController extends AbstractController {
 		MLPTransportModel result = null;
 		try {
 			// Validate enum codes
-			MessageSeverityCode.valueOf(usrNotifPref.getMsgSeverityCode());
-			NotificationDeliveryMechanismCode.valueOf(usrNotifPref.getNotfDelvMechCode());
+			super.validateCode(usrNotifPref.getMsgSeverityCode(), CodeNameType.MESSAGE_SEVERITY);
+			super.validateCode(usrNotifPref.getNotfDelvMechCode(), CodeNameType.NOTIFICATION_DELIVERY_MECHANISM);
 			// Use the path-parameter id; don't trust the one in the object
 			usrNotifPref.setUserNotifPrefId(userNotifPrefId);
 			// Update the existing row

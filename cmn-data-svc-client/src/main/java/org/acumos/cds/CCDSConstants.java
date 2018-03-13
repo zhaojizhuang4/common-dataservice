@@ -67,8 +67,10 @@ public abstract class CCDSConstants {
 	public static final String VAL_TYPE_PATH = "valtype";
 
 	// Code-name pairs
-	public static final String ACCESS_PATH = "access";
 	public static final String CODE_PATH = "code";
+	public static final String PAIR_PATH = "pair";
+	// deprecated
+	public static final String ACCESS_PATH = "access";
 	public static final String LOGIN_PROVIDER_PATH = "logprov";
 	public static final String MODEL_PATH = "model";
 	public static final String NOTIFICATION_MECH_PATH = "notifmech";

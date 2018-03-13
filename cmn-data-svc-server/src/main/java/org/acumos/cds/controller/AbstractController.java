@@ -29,7 +29,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.acumos.cds.CodeNameType;
+import org.acumos.cds.service.CodeNameService;
 import org.acumos.cds.util.EELFLoggerDelegate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,6 +43,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public abstract class AbstractController {
 
 	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(AbstractController.class);
+
+	@Autowired
+	private CodeNameService codeNameService;
 
 	protected static final String NO_ENTRY_WITH_ID = "No entry with ID ";
 
@@ -190,6 +196,23 @@ public abstract class AbstractController {
 				break;
 		}
 		return bestMatch;
+	}
+
+	/**
+	 * Validates the specified code against the specified type
+	 * 
+	 * @param code
+	 *            Code value
+	 * @param type
+	 *            Value set name
+	 * @throws IllegalArgumentException
+	 *             if the code is null or not recognized
+	 */
+	protected void validateCode(String code, CodeNameType type) {
+		if (code == null)
+			throw new IllegalArgumentException("Unexpected null for CodeNameType " + type.name());
+		if (!codeNameService.validateCode(code, type))
+			throw new IllegalArgumentException("Unexpected code " + code + " for CodeNameType " + type.name());
 	}
 
 }

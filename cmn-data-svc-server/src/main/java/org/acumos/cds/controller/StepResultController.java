@@ -25,8 +25,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.acumos.cds.CCDSConstants;
-import org.acumos.cds.StepStatusCode;
-import org.acumos.cds.StepTypeCode;
+import org.acumos.cds.CodeNameType;
 import org.acumos.cds.domain.MLPStepResult;
 import org.acumos.cds.repository.StepResultRepository;
 import org.acumos.cds.service.StepResultSearchService;
@@ -140,8 +139,8 @@ public class StepResultController extends AbstractController {
 		Object result;
 		try {
 			// Validate enum codes
-			StepTypeCode.valueOf(stepResult.getStepCode());
-			StepStatusCode.valueOf(stepResult.getStatusCode());
+			super.validateCode(stepResult.getStepCode(), CodeNameType.STEP_TYPE);
+			super.validateCode(stepResult.getStatusCode(), CodeNameType.STEP_STATUS);
 			// Create a new row
 			result = stepResultRepository.save(stepResult);
 			response.setStatus(HttpServletResponse.SC_CREATED);
@@ -181,8 +180,8 @@ public class StepResultController extends AbstractController {
 		MLPTransportModel result = null;
 		try {
 			// Validate enum codes
-			StepTypeCode.valueOf(stepResult.getStepCode());
-			StepStatusCode.valueOf(stepResult.getStatusCode());
+			super.validateCode(stepResult.getStepCode(), CodeNameType.STEP_TYPE);
+			super.validateCode(stepResult.getStatusCode(), CodeNameType.STEP_STATUS);
 			// Use the path-parameter id; don't trust the one in the object
 			stepResult.setStepResultId(stepResultId);
 			// Update the existing row

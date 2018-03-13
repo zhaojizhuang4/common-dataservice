@@ -38,11 +38,11 @@ public class MLPPasswordChangeRequest implements MLPEntity, Serializable {
 	private static final long serialVersionUID = 1993219468733216332L;
 
 	@Size(max = 50)
-	@ApiModelProperty(required = true)
+	@ApiModelProperty(required = true, value = "Old password in clear text", example = "LongKeysAreHardToCrack54321")
 	private String oldLoginPass;
 
 	@Size(max = 50)
-	@ApiModelProperty(required = true)
+	@ApiModelProperty(required = true, value = "New password in clear text", example = "LongKeysAreHardToCrack12345")
 	private String newLoginPass;
 
 	/**

@@ -31,6 +31,7 @@ import java.util.UUID;
 
 import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.ArtifactTypeCode;
+import org.acumos.cds.CodeNameType;
 import org.acumos.cds.DeploymentStatusCode;
 import org.acumos.cds.LoginProviderCode;
 import org.acumos.cds.MessageSeverityCode;
@@ -48,6 +49,7 @@ import org.acumos.cds.client.ICommonDataServiceRestClient;
 import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
+import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
 import org.acumos.cds.domain.MLPLoginProvider;
@@ -231,6 +233,13 @@ public class CdsControllerTest {
 
 	@Test
 	public void getCodeValueConstants() throws Exception {
+		
+		for (CodeNameType type : CodeNameType.values()) {
+			List<MLPCodeNamePair> list = client.getCodeNamePairs(type);
+			logger.info("testCodeNameService: type {} -> values {}", type, list);
+			Assert.assertFalse(list.isEmpty());
+		}
+
 		List<MLPAccessType> act = client.getAccessTypes();
 		Assert.assertTrue(act.size() > 0);
 		for (MLPAccessType c : act)

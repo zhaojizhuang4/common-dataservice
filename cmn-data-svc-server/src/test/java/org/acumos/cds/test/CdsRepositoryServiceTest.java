@@ -31,6 +31,7 @@ import javax.validation.ConstraintViolationException;
 
 import org.acumos.cds.AccessTypeCode;
 import org.acumos.cds.ArtifactTypeCode;
+import org.acumos.cds.CodeNameType;
 import org.acumos.cds.LoginProviderCode;
 import org.acumos.cds.MessageSeverityCode;
 import org.acumos.cds.ModelTypeCode;
@@ -42,6 +43,7 @@ import org.acumos.cds.SubscriptionScopeCode;
 import org.acumos.cds.ToolkitTypeCode;
 import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.domain.MLPArtifact;
+import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPNotifUserMap;
 import org.acumos.cds.domain.MLPNotification;
@@ -104,6 +106,7 @@ import org.acumos.cds.repository.UserNotificationPreferenceRepository;
 import org.acumos.cds.repository.UserRepository;
 import org.acumos.cds.repository.UserRoleMapRepository;
 import org.acumos.cds.service.ArtifactSearchService;
+import org.acumos.cds.service.CodeNameService;
 import org.acumos.cds.service.PeerSearchService;
 import org.acumos.cds.service.RoleSearchService;
 import org.acumos.cds.service.SolutionSearchService;
@@ -125,6 +128,7 @@ import org.springframework.transaction.TransactionSystemException;
  * Tests the repository and service classes that provide access to the database.
  * Relies on the provided application.properties with Derby configuration.
  */
+@SuppressWarnings("deprecation")
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class CdsRepositoryServiceTest {
@@ -203,6 +207,8 @@ public class CdsRepositoryServiceTest {
 	private PeerSolAccMapRepository peerSolAccMapRepository;
 	@Autowired
 	private PeerPeerAccMapRepository peerPeerAccMapRepository;
+	@Autowired
+	private CodeNameService codeNameService;
 
 	@Test
 	public void testingRepositories() throws Exception {
@@ -1277,4 +1283,12 @@ public class CdsRepositoryServiceTest {
 		logger.error(EELFLoggerDelegate.applicationLogger, "An error message", new Exception());
 	}
 
+	@Test
+	public void testCodeNameService() {
+		for (CodeNameType type : CodeNameType.values()) {
+			List<MLPCodeNamePair> list = codeNameService.getCodeNamePairs(type);
+			logger.info("testCodeNameService: type {} -> values {}", type, list);
+			Assert.assertFalse(list.isEmpty());
+		}
+	}
 }
