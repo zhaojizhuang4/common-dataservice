@@ -34,6 +34,8 @@ import javax.validation.constraints.Size;
 
 import org.acumos.cds.domain.MLPUserLoginProvider.UserLoginProviderPK;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for user information obtained from a social login provider.
  * 
@@ -104,25 +106,27 @@ public class MLPUserLoginProvider extends MLPTimestampedEntity implements Serial
 	@Id
 	@Column(name = "USER_ID", nullable = false, columnDefinition = "CHAR(36)")
 	@NotNull(message = "UserId cannot be null")
+	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String userId;
 
-	/**
-	 * This code is defined by {@link org.acumos.cds.LoginProviderCode}
-	 */
 	@Id
-	@Column(name = "PROVIDER_CD", updatable = false, nullable = false, columnDefinition = "CHAR(2)")
+	@Column(name = "PROVIDER_CD", nullable = false, updatable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "ProviderCode cannot be null")
 	@Size(max = 2)
+	@ApiModelProperty(required = true, example = "GH")
 	private String providerCode;
 
 	@Id
 	@Column(name = "PROVIDER_USER_ID", nullable = false, columnDefinition = "VARCHAR(256)")
 	@NotNull(message = "ProviderUserId cannot be null")
 	@Size(max = 256)
+	@ApiModelProperty(required = true)
 	private String providerUserId;
 
 	@Column(name = "RANK", nullable = false, columnDefinition = "SMALLINT")
 	@NotNull(message = "Rank cannot be null")
+	@ApiModelProperty(required = true)
 	private Integer rank;
 
 	@Column(name = "DISPLAY_NAME", columnDefinition = "VARCHAR(256)")
@@ -144,6 +148,7 @@ public class MLPUserLoginProvider extends MLPTimestampedEntity implements Serial
 	@Column(name = "ACCESS_TOKEN", nullable = false, columnDefinition = "VARCHAR(256)")
 	@NotNull(message = "AccessToken cannot be null")
 	@Size(max = 256)
+	@ApiModelProperty(required = true)
 	private String accessToken;
 
 	@Column(name = "REFRESH_TOKEN", columnDefinition = "VARCHAR(256)")

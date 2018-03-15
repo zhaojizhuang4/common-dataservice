@@ -32,6 +32,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * A thread of comments. A thread is bound to a single solution revision.
  */
@@ -44,16 +46,20 @@ public class MLPThread implements MLPEntity, Serializable {
 	@Id
 	@GeneratedValue(generator = "customUseOrGenerate")
 	@GenericGenerator(name = "customUseOrGenerate", strategy = "org.acumos.cds.util.UseExistingOrNewUUIDGenerator")
-	@Column(name = "THREAD_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = "THREAD_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	// Users MAY submit an ID; readOnly annotation must NOT be used
+	@ApiModelProperty(value = "UUID; omit for system-generated value", example="12345678-abcd-90ab-cdef-1234567890ab")
 	private String threadId;
 
 	@Column(name = "SOLUTION_ID", nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String solutionId;
 
 	@Column(name = "REVISION_ID", nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String revisionId;
 
 	@Column(name = "TITLE", columnDefinition = "VARCHAR(100)")

@@ -33,6 +33,8 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for a row in the peer group - solution group mapping table. This is in
  * lieu of many-to-one annotations.
@@ -102,18 +104,23 @@ public class MLPPeerSolAccMap implements MLPEntity, Serializable {
 	}
 
 	@Id
-	@Column(name = MLPPeerSolAccMap.PEER_GROUP_ID_COL_NAME, updatable = false, nullable = false, columnDefinition = "INT")
+	@Column(name = MLPPeerSolAccMap.PEER_GROUP_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "INT")
+	@ApiModelProperty(required = true, value = "Peer group ID", example = "1")
 	private Long peerGroupId;
 
 	@Id
-	@Column(name = MLPPeerSolAccMap.SOL_GROUP_ID_COL_NAME, updatable = false, nullable = false, columnDefinition = "INT")
+	@Column(name = MLPPeerSolAccMap.SOL_GROUP_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "INT")
+	@ApiModelProperty(required = true, value = "Solution group ID", example = "1")
 	private Long solutionGroupId;
 
 	@Column(name = "GRANTED_YN", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'N'")
+	@ApiModelProperty(required = true)
 	private boolean granted;
 
 	@CreationTimestamp
 	@Column(name = "CREATED_DATE", nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
+	// REST clients should not send this property
+	@ApiModelProperty(readOnly = true)
 	private Date created;
 
 	/**

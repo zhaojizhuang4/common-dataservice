@@ -35,6 +35,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for solution download, which includes artifactID.
  */
@@ -49,26 +51,32 @@ public class MLPSolutionDownload implements MLPEntity, Serializable {
 	// appropriately in the database, which in MySQL requires "AUTO_INCREMENT".
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "DOWNLOAD_ID", updatable = false, nullable = false, columnDefinition = "INT")
+	@Column(name = "DOWNLOAD_ID", nullable = false, updatable = false, columnDefinition = "INT")
+	@ApiModelProperty(readOnly = true, value = "Generated")
 	private Long downloadId;
 
-	@Column(name = "SOLUTION_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = "SOLUTION_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@NotNull(message = "SolutionID cannot be null")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String solutionId;
 
-	@Column(name = "ARTIFACT_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = "ARTIFACT_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@NotNull(message = "ArtifactID cannot be null")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String artifactId;
 
-	@Column(name = "USER_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = "USER_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@NotNull(message = "UserId cannot be null")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String userId;
 
 	@CreationTimestamp
 	@Column(name = "DOWNLOAD_DATE", nullable = false, updatable = false)
+	// REST clients should not send this property
+	@ApiModelProperty(readOnly = true)
 	private Date downloadDate;
 
 	/**

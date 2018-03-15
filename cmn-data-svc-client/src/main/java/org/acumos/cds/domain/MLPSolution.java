@@ -35,6 +35,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Solution entity with complex mappings for tags and web stats. Inherits all
  * simple field mappings from the abstract superclass.
@@ -48,6 +50,7 @@ public class MLPSolution extends MLPAbstractSolution implements Serializable {
 	@Column(name = OWNER_ID_COL_NAME, nullable = false, columnDefinition = "CHAR(36)")
 	@NotNull(message = "OwnerId cannot be null")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "User ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String ownerId;
 
 	/**
@@ -56,6 +59,7 @@ public class MLPSolution extends MLPAbstractSolution implements Serializable {
 	 */
 	@Column(name = "SOURCE_ID", columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "Peer ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String sourceId;
 
 	/**
@@ -92,6 +96,8 @@ public class MLPSolution extends MLPAbstractSolution implements Serializable {
 	 */
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = MLPSolutionWeb.SOL_ID_COL_NAME)
+	// Swagger fails to recognize readOnly on complex objects
+	@ApiModelProperty(readOnly = true, value = "Stats are read-only")
 	private MLPSolutionWeb webStats;
 
 	/**

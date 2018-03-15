@@ -34,6 +34,8 @@ import javax.validation.constraints.Size;
 
 import org.acumos.cds.domain.MLPSolutionRating.SolutionRatingPK;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for a solution rating.
  */
@@ -92,19 +94,22 @@ public class MLPSolutionRating extends MLPTimestampedEntity implements Serializa
 	}
 
 	@Id
-	@Column(name = "SOLUTION_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = "SOLUTION_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@NotNull(message = "SolutionID cannot be null")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String solutionId;
 
 	@Id
 	@Column(name = "USER_ID", nullable = false, columnDefinition = "CHAR(36)")
 	@NotNull(message = "UserId cannot be null")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String userId;
 
 	@Column(name = "RATING", nullable = false, columnDefinition = "SMALLINT")
 	@NotNull(message = "Rating cannot be null")
+	@ApiModelProperty(required = true, example = "1")
 	private Integer rating;
 
 	@Column(name = "TEXT_REVIEW", columnDefinition = "VARCHAR(1024)")

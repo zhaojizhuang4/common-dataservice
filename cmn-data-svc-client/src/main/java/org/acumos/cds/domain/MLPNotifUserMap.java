@@ -34,6 +34,8 @@ import javax.validation.constraints.Size;
 
 import org.acumos.cds.domain.MLPNotifUserMap.NotifUserMapPK;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for a row in the notification-user mapping table. This is in lieu of a
  * many-to-one annotation on the user object
@@ -91,17 +93,20 @@ public class MLPNotifUserMap implements MLPEntity, Serializable {
 	private static final long serialVersionUID = 1904416594943304721L;
 
 	@Id
-	@Column(name = "NOTIFICATION_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = "NOTIFICATION_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String notificationId;
 
 	@Id
-	@Column(name = "USER_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = "USER_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String userId;
 
 	// No auto-update behaviors here
 	@Column(name = "VIEWED_DATE")
+	@ApiModelProperty(value = "Millisec since the Epoch", example = "1521202458867")
 	private Date viewed;
 
 	public MLPNotifUserMap() {

@@ -25,21 +25,24 @@ import java.util.Objects;
 
 import javax.validation.constraints.Size;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
- * Model for the change request when the client uses the update-password
- * endpoint. The client will pass this request to the server which contains both
- * the old password and the new password. The old password in the request must
- * match with the current password in the database in order for the server to
- * proceed the change. This is NOT an entity because there is no table of change
- * requests.
+ * Model for the change-password request. The client passes this request with
+ * both the old password and the new password. The old password in the request
+ * must match with the current password in the database in order for the server
+ * to proceed the change. This is NOT an entity because there is no table of
+ * change requests.
  */
 public class MLPPasswordChangeRequest implements MLPEntity, Serializable {
 	private static final long serialVersionUID = 1993219468733216332L;
 
 	@Size(max = 50)
+	@ApiModelProperty(required = true)
 	private String oldLoginPass;
 
 	@Size(max = 50)
+	@ApiModelProperty(required = true)
 	private String newLoginPass;
 
 	/**
@@ -53,9 +56,9 @@ public class MLPPasswordChangeRequest implements MLPEntity, Serializable {
 	 * Convenience constructor
 	 * 
 	 * @param oldLoginPass
-	 *            Old password cleartext
+	 *            Old password clear text
 	 * @param newLoginPass
-	 *            New password cleartext
+	 *            New password clear text
 	 */
 	public MLPPasswordChangeRequest(String oldLoginPass, String newLoginPass) {
 		if (oldLoginPass == null || newLoginPass == null)

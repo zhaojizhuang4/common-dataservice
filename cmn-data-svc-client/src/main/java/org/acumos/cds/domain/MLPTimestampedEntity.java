@@ -28,6 +28,8 @@ import javax.persistence.MappedSuperclass;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Defines createdDate and modifiedDate fields, getters and setters to avoid
  * code repetitions.
@@ -38,11 +40,15 @@ import org.hibernate.annotations.UpdateTimestamp;
 public abstract class MLPTimestampedEntity implements MLPEntity {
 
 	@CreationTimestamp
-	@Column(name = "CREATED_DATE", nullable = false, updatable = false)
+	@Column(name = "CREATED_DATE", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT '0000-00-00 00:00:00'")
+	// REST clients should not send this property
+	@ApiModelProperty(readOnly = true, value = "Set by system")
 	private Date created;
 
 	@UpdateTimestamp
-	@Column(name = "MODIFIED_DATE", nullable = false)
+	@Column(name = "MODIFIED_DATE", nullable = false, columnDefinition = "TIMESTAMP")
+	// REST clients should not send this property
+	@ApiModelProperty(readOnly = true, value = "Set by system")
 	private Date modified;
 
 	public MLPTimestampedEntity() {

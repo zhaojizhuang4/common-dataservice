@@ -28,6 +28,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Solution revision entity with basic mappings for solution, owner and source.
  * Inherits all simple field mappings from the abstract superclass.
@@ -40,11 +42,13 @@ public class MLPSolutionRevision extends MLPAbstractSolutionRevision implements 
 
 	@Column(name = SOL_ID_COL_NAME, nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String solutionId;
 
 	@Column(name = "OWNER_ID", nullable = false, columnDefinition = "CHAR(36)")
 	@NotNull(message = "OwnerId cannot be null")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "User ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String ownerId;
 
 	/**
@@ -53,6 +57,7 @@ public class MLPSolutionRevision extends MLPAbstractSolutionRevision implements 
 	 */
 	@Column(name = "SOURCE_ID", columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(value = "Peer ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String sourceId;
 
 	/**

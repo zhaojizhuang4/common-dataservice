@@ -32,6 +32,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for a peer subscription.
  */
@@ -46,39 +48,38 @@ public class MLPPeerSubscription extends MLPTimestampedEntity implements Seriali
 	// appropriately in the database, which in MySQL requires "AUTO_INCREMENT".
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "SUB_ID", updatable = false, nullable = false, columnDefinition = "INT")
+	@Column(name = "SUB_ID", nullable = false, updatable = false, columnDefinition = "INT")
+	@ApiModelProperty(readOnly = true, value = "Generated")
 	private Long subId;
 
 	@Column(name = "PEER_ID", nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String peerId;
 
 	@Column(name = "OWNER_ID", nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "User ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String ownerId;
 
-	/**
-	 * This code is defined by {@link org.acumos.cds.SubscriptionScopeCode}
-	 */
 	@Column(name = "SCOPE_TYPE", nullable = false, columnDefinition = "CHAR(2)")
 	@Size(max = 2)
+	@ApiModelProperty(required = true, value = "Subscription scope code", example = "RF")
 	private String scopeType;
 
-	/**
-	 * This code is defined by {@link org.acumos.cds.AccessTypeCode}
-	 */
 	@Column(name = "ACCESS_TYPE", nullable = false, columnDefinition = "CHAR(2)")
 	@Size(max = 2)
+	@ApiModelProperty(required = true, value = "Access type code", example = "PB")
 	private String accessType;
 
-	// JSON
 	@Column(name = "SELECTOR", columnDefinition = "VARCHAR(1024)")
 	@Size(max = 1024)
+	@ApiModelProperty(value = "JSON", example = "{ \"tag\" : \"value\" }")
 	private String selector;
 
-	// JSON
 	@Column(name = "OPTIONS", columnDefinition = "VARCHAR(1024)")
 	@Size(max = 1024)
+	@ApiModelProperty(value = "JSON", example = "{ \"tag\" : \"value\" }")
 	private String options;
 
 	@Column(name = "REFRESH_INTERVAL", columnDefinition = "INT")
@@ -88,6 +89,7 @@ public class MLPPeerSubscription extends MLPTimestampedEntity implements Seriali
 	private Long maxArtifactSize;
 
 	@Column(name = "PROCESSED_DATE", columnDefinition = "TIMESTAMP")
+	@ApiModelProperty(value = "Millisec since the Epoch", example = "1521202458867")
 	private Date processed;
 
 	/**

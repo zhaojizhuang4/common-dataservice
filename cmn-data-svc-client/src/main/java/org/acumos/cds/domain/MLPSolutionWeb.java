@@ -33,12 +33,16 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.Type;
 
 /**
- * Model for solution website metadata. In a one:one relationship with solution.
- * The relationship is mapped via annotations on MLPSolution (unidirectional).
+ * Model for solution website metadata, which transports descriptive statistics
+ * recorded on the server to the client. Never used for update from the client,
+ * so there are no Swagger API annotations on this class.
  * 
- * The separation was made to distinguish updates ON a solution made by the
- * owner (e.g., description) from updates ABOUT a solution made by the system
- * (e.g., downloads or views).
+ * In a one:one relationship with solution. The relationship is mapped via
+ * annotations on MLPSolution (unidirectional).
+ * 
+ * These stats were separated out of the solution entity to distinguish updates
+ * ON a solution made by the owner (e.g., description) from updates ABOUT a
+ * solution made by the system (e.g., downloads or views).
  */
 @Entity
 @Table(name = "C_SOLUTION_WEB")

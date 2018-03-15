@@ -34,8 +34,11 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
- * Model for a row in the solution group - solution mapping table.
+ * Model for a row in the solution group - solution ID mapping table that
+ * defines a solution group's members.
  */
 @Entity
 @IdClass(MLPSolGrpMemMap.SolGrpMemMapPK.class)
@@ -99,16 +102,20 @@ public class MLPSolGrpMemMap implements MLPEntity, Serializable {
 	}
 
 	@Id
-	@Column(name = MLPSolGrpMemMap.GRP_ID_COL_NAME, updatable = false, nullable = false, columnDefinition = "INT")
+	@Column(name = MLPSolGrpMemMap.GRP_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "INT")
+	@ApiModelProperty(required = true, value = "Solution group ID", example = "1")
 	private Long groupId;
 
 	@Id
-	@Column(name = MLPSolGrpMemMap.SOL_ID_COL_NAME, updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = MLPSolGrpMemMap.SOL_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String solutionId;
 
 	@CreationTimestamp
 	@Column(name = "CREATED_DATE", nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
+	// REST clients should not send this property
+	@ApiModelProperty(readOnly = true)
 	private Date created;
 
 	/**

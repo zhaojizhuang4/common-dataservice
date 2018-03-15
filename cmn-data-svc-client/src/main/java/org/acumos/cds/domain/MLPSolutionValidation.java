@@ -34,6 +34,8 @@ import javax.validation.constraints.Size;
 
 import org.acumos.cds.domain.MLPSolutionValidation.SolutionValidationPK;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for a solution validation detail.
  */
@@ -99,42 +101,38 @@ public class MLPSolutionValidation extends MLPTimestampedEntity implements Seria
 	}
 
 	@Id
-	@Column(name = "SOLUTION_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = "SOLUTION_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@NotNull(message = "SolutionID cannot be null")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String solutionId;
 
 	@Id
 	@Column(name = "REVISION_ID", nullable = false, columnDefinition = "CHAR(36)")
 	@NotNull(message = "RevisionID cannot be null")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String revisionId;
 
 	@Id
 	@Column(name = "TASK_ID", nullable = false, columnDefinition = "CHAR(36)")
 	@NotNull(message = "TaskID cannot be null")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String taskId;
 
-	/**
-	 * This code is defined by {@link org.acumos.cds.ValidationTypeCode}
-	 */
 	@Column(name = "VAL_TYPE_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@Size(max = 2)
+	@ApiModelProperty(required = true, example = "LC")
 	private String validationTypeCode;
 
-	/**
-	 * This code is defined by {@link org.acumos.cds.ValidationStatusCode}
-	 */
 	@Column(name = "VAL_STATUS_CD", columnDefinition = "CHAR(2)")
 	@Size(max = 2)
 	private String validationStatusCode;
 
-	/**
-	 * JSON expected
-	 */
 	@Column(name = "DETAIL", columnDefinition = "VARCHAR(8192)")
 	@Size(max = 8192)
+	@ApiModelProperty(value = "JSON", example = "{ \"tag\" : \"value\" }")
 	private String detail;
 
 	/**

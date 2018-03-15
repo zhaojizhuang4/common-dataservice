@@ -20,6 +20,9 @@
 -- FROM version 1.14.x TO version 1.13.x.
 -- No database is specified to allow flexible deployment!
 
+-- 61
+ALTER TABLE C_STEP_RESULT 
+  ALTER COLUMN START_DATE DROP DEFAULT;
 -- 60
 ALTER TABLE C_PEER_PEER_ACC_MAP 
   ALTER COLUMN CREATED_DATE DROP DEFAULT;

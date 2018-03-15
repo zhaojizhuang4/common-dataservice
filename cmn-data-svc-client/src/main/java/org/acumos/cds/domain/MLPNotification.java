@@ -34,6 +34,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for a notification, a message to users about a system activity. Valid
  * (active) in the date range start..end.
@@ -49,24 +51,26 @@ public class MLPNotification extends MLPTimestampedEntity implements Serializabl
 	@Id
 	@GeneratedValue(generator = "customUseOrGenerate")
 	@GenericGenerator(name = "customUseOrGenerate", strategy = "org.acumos.cds.util.UseExistingOrNewUUIDGenerator")
-	@Column(name = "NOTIFICATION_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = "NOTIFICATION_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
+	@Size(max = 36)
+	// Users MAY submit an ID; readOnly annotation must NOT be used
+	@ApiModelProperty(value = "UUID; omit for system-generated value", example="12345678-abcd-90ab-cdef-1234567890ab")
 	private String notificationId;
 
 	@Column(name = "TITLE", nullable = false, columnDefinition = "VARCHAR(100)")
 	@NotNull(message = "Title cannot be null")
 	@Size(max = 100)
+	@ApiModelProperty(required = true, example = "Notification subject")
 	private String title;
 
 	@Column(name = "MESSAGE", columnDefinition = "VARCHAR(2048)")
 	@Size(max = 2048)
 	private String message;
 
-	/**
-	 * This code is defined by {@link org.acumos.cds.MessageSeverityCode}
-	 */
 	@Column(name = "MSG_SEVERITY_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Message Severity Code cannot be null")
 	@Size(max = 2)
+	@ApiModelProperty(required = true, example = "LO")
 	private String msgSeverityCode;
 
 	@Column(name = "URL", columnDefinition = "VARCHAR(512)")
@@ -74,11 +78,17 @@ public class MLPNotification extends MLPTimestampedEntity implements Serializabl
 	private String url;
 
 	// No auto-update behaviors here
+	// TODO: Column definition is not provided here because in Derby it's
+	// created as TIMESTAMP but for Mariadb the DDL uses Datetime.
 	@Column(name = "START_DATE", nullable = false)
+	@ApiModelProperty(required = true, value = "Millisec since the Epoch", example = "1521202458867")
 	private Date start;
 
 	// No auto-update behaviors here
+	// TODO: Column definition is not provided here because in Derby it's
+	// created as TIMESTAMP but for Mariadb the DDL uses Datetime.
 	@Column(name = "END_DATE", nullable = false)
+	@ApiModelProperty(required = true, value = "Millisec since the Epoch", example = "1521202458867")
 	private Date end;
 
 	/**

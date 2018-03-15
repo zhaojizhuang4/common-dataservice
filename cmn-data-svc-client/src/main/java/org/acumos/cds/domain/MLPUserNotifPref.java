@@ -32,6 +32,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import io.swagger.annotations.ApiModelProperty;
+
 @Entity
 @Table(name = "C_NOTIF_USER_PREF")
 public class MLPUserNotifPref implements MLPEntity, Serializable {
@@ -43,29 +45,26 @@ public class MLPUserNotifPref implements MLPEntity, Serializable {
 	// appropriately in the database, which in MySQL requires "AUTO_INCREMENT".
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "ID", updatable = false, nullable = false, columnDefinition = "INT")
+	@Column(name = "ID", nullable = false, updatable = false, columnDefinition = "INT")
+	@ApiModelProperty(readOnly = true, value = "Generated")
 	private Long userNotifPrefId;
 
-	@Column(name = "USER_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = "USER_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@NotNull(message = "User ID cannot be null")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String userId;
 
-	/**
-	 * This code is defined by
-	 * {@link org.acumos.cds.NotificationDeliveryMechanismCode}
-	 */
 	@Column(name = "NOTIF_DELV_MECH_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Notification delivery mechanism code cannot be null")
 	@Size(max = 2)
+	@ApiModelProperty(required = true, example = "EM")
 	private String notfDelvMechCode;
 
-	/**
-	 * This code is defined by {@link org.acumos.cds.MessageSeverityCode}
-	 */
 	@Column(name = "MSG_SEVERITY_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Message severity code cannot be null")
 	@Size(max = 2)
+	@ApiModelProperty(required = true, example = "LO")
 	private String msgSeverityCode;
 
 	/**

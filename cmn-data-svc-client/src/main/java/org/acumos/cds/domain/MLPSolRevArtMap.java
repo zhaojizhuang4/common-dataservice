@@ -33,6 +33,8 @@ import javax.validation.constraints.Size;
 
 import org.acumos.cds.domain.MLPSolRevArtMap.SolRevArtMapPK;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for a row in the solution-revision-artifact mapping table. This is in
  * lieu of many-to-one annotations.
@@ -93,13 +95,15 @@ public class MLPSolRevArtMap implements MLPEntity, Serializable {
 	}
 
 	@Id
-	@Column(name = REVISION_ID_COL_NAME, updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = REVISION_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String revisionId;
 
 	@Id
-	@Column(name = ARTIFACT_ID_COL_NAME, updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = ARTIFACT_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String artifactId;
 
 	public MLPSolRevArtMap() {

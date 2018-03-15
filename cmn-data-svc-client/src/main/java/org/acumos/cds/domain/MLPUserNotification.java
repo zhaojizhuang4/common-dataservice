@@ -25,7 +25,8 @@ import java.util.Objects;
 
 /**
  * A user notification object has all the notification fields plus a "viewed"
- * date stamp. Does not map directly to a table; carries result of a HQL join.
+ * date stamp. This is a transport model, to carry results of a HQL join out to
+ * client, not an entity.
  */
 public class MLPUserNotification extends MLPNotification {
 

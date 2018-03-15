@@ -33,6 +33,8 @@ import javax.validation.constraints.Size;
 
 import org.acumos.cds.domain.MLPSolUserAccMap.SolUserAccessMapPK;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for a row in the solution-user-access mapping table.
  */
@@ -88,13 +90,15 @@ public class MLPSolUserAccMap implements MLPEntity, Serializable {
 	}
 
 	@Id
-	@Column(name = "SOLUTION_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = "SOLUTION_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String solutionId;
 
 	@Id
-	@Column(name = "USER_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = "USER_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String userId;
 
 	public MLPSolUserAccMap() {

@@ -33,6 +33,8 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for a row in the peer group - peer group mapping table.
  */
@@ -100,15 +102,19 @@ public class MLPPeerPeerAccMap implements MLPEntity, Serializable {
 	}
 
 	@Id
-	@Column(name = MLPPeerPeerAccMap.PRINCIPAL_GROUP_ID_COL_NAME, updatable = false, nullable = false, columnDefinition = "INT")
+	@Column(name = MLPPeerPeerAccMap.PRINCIPAL_GROUP_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "INT")
+	@ApiModelProperty(required = true, value = "Principal peer group ID", example = "1")
 	private Long principalPeerGroupId;
 
 	@Id
-	@Column(name = MLPPeerPeerAccMap.RESOURCE_GROUP_ID_COL_NAME, updatable = false, nullable = false, columnDefinition = "INT")
+	@Column(name = MLPPeerPeerAccMap.RESOURCE_GROUP_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "INT")
+	@ApiModelProperty(required = true, value = "Resource peer group ID", example = "2")
 	private Long resourcePeerGroupId;
 
 	@CreationTimestamp
 	@Column(name = "CREATED_DATE", nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
+	// REST clients should not send this property
+	@ApiModelProperty(readOnly = true)
 	private Date created;
 
 	/**

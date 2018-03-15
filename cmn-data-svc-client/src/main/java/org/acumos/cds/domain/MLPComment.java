@@ -32,6 +32,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * A comment in a thread.
  */
@@ -44,24 +46,30 @@ public class MLPComment extends MLPTimestampedEntity implements Serializable {
 	@Id
 	@GeneratedValue(generator = "customUseOrGenerate")
 	@GenericGenerator(name = "customUseOrGenerate", strategy = "org.acumos.cds.util.UseExistingOrNewUUIDGenerator")
-	@Column(name = "COMMENT_ID", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = "COMMENT_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	// Users MAY submit an ID; readOnly annotation must NOT be used
+	@ApiModelProperty(value = "UUID; omit for system-generated value", example="12345678-abcd-90ab-cdef-1234567890ab")
 	private String commentId;
 
 	@Column(name = "THREAD_ID", nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String threadId;
 
 	@Column(name = "PARENT_ID", columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(value = "Parent comment ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String parentId;
 
 	@Column(name = "USER_ID", nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String userId;
 
 	@Column(name = "TEXT", nullable = false, columnDefinition = "VARCHAR(8192)")
 	@Size(max = 8192)
+	@ApiModelProperty(required = true, example = "The comment text.")
 	private String text;
 
 	/**

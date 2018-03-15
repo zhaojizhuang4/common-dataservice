@@ -34,6 +34,8 @@ import javax.validation.constraints.Size;
 
 import org.acumos.cds.domain.MLPValidationSequence.ValidationSequencePK;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for a validation sequence. This table specifies the required validation
  * steps and their order.
@@ -100,15 +102,14 @@ public class MLPValidationSequence extends MLPTimestampedEntity implements Seria
 	@Id
 	@Column(name = "SEQ", nullable = false, columnDefinition = "SMALLINT")
 	@NotNull(message = "Sequence cannot be null")
+	@ApiModelProperty(required = true)
 	private Integer sequence;
 
-	/**
-	 * This code is defined by {@link org.acumos.cds.ValidationTypeCode}
-	 */
 	@Id
-	@Column(name = "VAL_TYPE_CD", updatable = false, nullable = false, columnDefinition = "CHAR(2)")
+	@Column(name = "VAL_TYPE_CD", nullable = false, updatable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Validation type code cannot be null")
 	@Size(max = 2)
+	@ApiModelProperty(required = true, example = "TA")
 	private String valTypeCode;
 
 	public MLPValidationSequence() {

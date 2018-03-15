@@ -33,6 +33,8 @@ import javax.validation.constraints.Size;
 
 import org.acumos.cds.domain.MLPSolTagMap.SolTagMapPK;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for a row in the solution-tag mapping table. This is in lieu of
  * many-to-one annotations.
@@ -99,13 +101,15 @@ public class MLPSolTagMap implements MLPEntity, Serializable {
 	}
 
 	@Id
-	@Column(name = MLPSolTagMap.SOL_ID_COL_NAME, updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+	@Column(name = MLPSolTagMap.SOL_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String solutionId;
 
 	@Id
-	@Column(name = MLPSolTagMap.TAG_COL_NAME, updatable = false, nullable = false, columnDefinition = "VARCHAR(32)")
+	@Column(name = MLPSolTagMap.TAG_COL_NAME, nullable = false, updatable = false, columnDefinition = "VARCHAR(32)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, example = "Tag1")
 	private String tag;
 
 	/**

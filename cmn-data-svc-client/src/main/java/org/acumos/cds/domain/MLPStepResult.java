@@ -33,7 +33,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.CreationTimestamp;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Model for a step result
@@ -49,60 +49,63 @@ public class MLPStepResult implements MLPEntity, Serializable {
 	// appropriately in the database, which in MySQL requires "AUTO_INCREMENT".
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "ID", updatable = false, nullable = false, columnDefinition = "INT")
+	@Column(name = "ID", nullable = false, updatable = false, columnDefinition = "INT")
+	@ApiModelProperty(readOnly = true, value = "Generated")
 	private Long stepResultId;
 
 	@Column(name = "TRACKING_ID", updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String trackingId;
 
-	/**
-	 * This code is defined by {@link org.acumos.cds.StepTypeCode}
-	 */
 	@Column(name = "STEP_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Step code cannot be null")
 	@Size(max = 2)
+	@ApiModelProperty(required = true, example = "OB")
 	private String stepCode;
 
 	@Column(name = "SOLUTION_ID", columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String solutionId;
 
 	@Column(name = "REVISION_ID", columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String revisionId;
 
 	@Column(name = "ARTIFACT_ID", columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String artifactId;
 
 	@Column(name = "USER_ID", columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String userId;
 
 	@Column(name = "NAME", nullable = false, columnDefinition = "VARCHAR(100)")
 	@NotNull(message = "Step name cannot be null")
 	@Size(max = 100)
+	@ApiModelProperty(required = true, example = "Step name")
 	private String name;
 
-	/**
-	 * This code is defined by {@link org.acumos.cds.StepStatusCode}
-	 */
 	@Column(name = "STATUS_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Status code cannot be null")
 	@Size(max = 2)
+	@ApiModelProperty(required = true, example = "SU")
 	private String statusCode;
 
 	@Column(name = "RESULT", columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
 	private String result;
 
-	@CreationTimestamp
 	@Column(name = "START_DATE", nullable = false, updatable = false)
+	@ApiModelProperty(required = true, value = "Millisec since the Epoch", example = "1521202458867")
 	private Date startDate;
 
-	@CreationTimestamp
-	@Column(name = "END_DATE", updatable = false)
+	@Column(name = "END_DATE")
+	@ApiModelProperty(value = "Millisec since the Epoch", example = "1521202458867")
 	private Date endDate;
 
 	/**

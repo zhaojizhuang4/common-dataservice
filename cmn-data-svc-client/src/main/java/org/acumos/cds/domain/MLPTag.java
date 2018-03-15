@@ -29,6 +29,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Tags have only a name.
  * 
@@ -42,8 +44,9 @@ public class MLPTag implements MLPEntity, Serializable {
 	private static final long serialVersionUID = -288462280366502647L;
 
 	@Id
-	@Column(name = "TAG", updatable = false, nullable = false, columnDefinition = "VARCHAR(32)")
+	@Column(name = "TAG", nullable = false, updatable = false, columnDefinition = "VARCHAR(32)")
 	@Size(max = 32)
+	@ApiModelProperty(required = true, example = "Classification")
 	private String tag;
 
 	/**
