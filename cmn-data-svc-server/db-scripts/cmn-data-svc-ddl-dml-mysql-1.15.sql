@@ -440,19 +440,12 @@ CREATE TABLE C_PEER_PEER_ACC_MAP (
 # Base role
 INSERT INTO C_ROLE (ROLE_ID, NAME, ACTIVE_YN) VALUES ('12345678-abcd-90ab-cdef-1234567890ab', 'MLP System User', 'Y');
 
-# Base config
+# Default configuration of Portal/Marketplace features.
+# Unfortunately JSON does not allow embedded newlines.
 INSERT INTO C_SITE_CONFIG (CONFIG_KEY, CONFIG_VAL) VALUES (
   'site_config',
-  '{"fields":[
-    {"type":"text","name":"siteInstanceName","label":"siteInstanceName","required":"true","data":"Acumos"},
-    {"type":"file","name":"headerLogo","label":"Headerlogo","data":{"lastModified":1510831880727,"lastModifiedDate":"2017-11-16T11:31:20.727Z","name":"acumos_logo_white.png","size":3657,"type":"image/png"}},
-    {"type":"file","name":"footerLogo","label":"Footerlogo","data":{"lastModified":1510831874776,"lastModifiedDate":"2017-11-16T11:31:14.776Z","name":"footer_logo.png","size":3127,"type":"image/png"}},
-    {"type":"heading","name":"ConnectionConfig","label":"ConnectionConfig","required":"true","subFields":[
-      {"type":"text","name":"socketTimeout","label":"socketTimeout","required":"true","data":"300"},
-      {"type":"text","name":"connectionTimeout","label":"connectionTimeout","required":"true","data":"10"}
-    ]},
-    {"type":"select","name":"enableOnBoarding","label":"EnableOnboarding","options":[{"name":"Enabled"},{"name":"Disabled"}],"required":true,"data":{"name":"Enabled"}}
-  ]}');
+  '{"fields":[ {"type":"text","name":"siteInstanceName","label":"siteInstanceName","required":"true","data":"Acumos"}, {"type":"file","name":"headerLogo","label":"Headerlogo","data":{"lastModified":1510831880727,"lastModifiedDate":"2017-11-16T11:31:20.727Z","name":"acumos_logo_white.png","size":3657,"type":"image/png"}}, {"type":"file","name":"footerLogo","label":"Footerlogo","data":{"lastModified":1510831874776,"lastModifiedDate":"2017-11-16T11:31:14.776Z","name":"footer_logo.png","size":3127,"type":"image/png"}}, {"type":"heading","name":"ConnectionConfig","label":"ConnectionConfig","required":"true","subFields":[ {"type":"text","name":"socketTimeout","label":"socketTimeout","required":"true","data":"300"}, {"type":"text","name":"connectionTimeout","label":"connectionTimeout","required":"true","data":"10"} ]}, {"type":"select","name":"enableOnBoarding","label":"EnableOnboarding","options":[{"name":"Enabled"},{"name":"Disabled"}],"required":true,"data":{"name":"Enabled"}}, {"type":"textarea","name":"validationText","label":"validationText","required":"false","data":"test"}, {"type":"select","name":"EnableDCAE","label":"EnableDCAE","options":[{"name":"Enabled"},{"name":"Disabled"}],"required":true,"data":{"name":"Enabled"}}]}'
+);
 
 # Initial user, role setups for admin
 INSERT INTO C_USER (USER_ID, LOGIN_NAME, LOGIN_HASH) VALUES ('12345678-abcd-90ab-cdef-1234567890ab', 'admin', '$2a$10$nogCM69/Vc0rEsZbHXlEm.nxSdGuD88Kd6NlW6fnKJz3AIz0PdOwa');

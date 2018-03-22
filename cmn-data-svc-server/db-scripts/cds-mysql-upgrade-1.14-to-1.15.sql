@@ -50,3 +50,7 @@ END;
 -- 6
 ALTER TABLE C_SOLUTION
   DROP COLUMN VALIDATION_STATUS_CD;
+-- 7
+UPDATE C_SITE_CONFIG set CONFIG_VAL = 
+  '{"fields":[ {"type":"text","name":"siteInstanceName","label":"siteInstanceName","required":"true","data":"Acumos"}, {"type":"file","name":"headerLogo","label":"Headerlogo","data":{"lastModified":1510831880727,"lastModifiedDate":"2017-11-16T11:31:20.727Z","name":"acumos_logo_white.png","size":3657,"type":"image/png"}}, {"type":"file","name":"footerLogo","label":"Footerlogo","data":{"lastModified":1510831874776,"lastModifiedDate":"2017-11-16T11:31:14.776Z","name":"footer_logo.png","size":3127,"type":"image/png"}}, {"type":"heading","name":"ConnectionConfig","label":"ConnectionConfig","required":"true","subFields":[ {"type":"text","name":"socketTimeout","label":"socketTimeout","required":"true","data":"300"}, {"type":"text","name":"connectionTimeout","label":"connectionTimeout","required":"true","data":"10"} ]}, {"type":"select","name":"enableOnBoarding","label":"EnableOnboarding","options":[{"name":"Enabled"},{"name":"Disabled"}],"required":true,"data":{"name":"Enabled"}}, {"type":"textarea","name":"validationText","label":"validationText","required":"false","data":"test"}, {"type":"select","name":"EnableDCAE","label":"EnableDCAE","options":[{"name":"Enabled"},{"name":"Disabled"}],"required":true,"data":{"name":"Enabled"}}]}'
+  WHERE CONFIG_KEY='site_config';
