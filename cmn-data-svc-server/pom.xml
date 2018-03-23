@@ -21,7 +21,7 @@
 		<start-class>org.acumos.cds.CdsApplication</start-class>
 		<!-- Client jar is in nexus repo -->
 		<client.version>${project.version}</client.version>
-		<springfox.version>2.8.0</springfox.version>
+		<springfox.version>2.7.0</springfox.version>
 		<!-- Supplied by Jenkins -->
 		<build.number>${env.BUILD_NUMBER}</build.number>
 		<!-- Not supplied to all jobs; e.g., Javadoc -->
@@ -256,7 +256,7 @@
 								</assembly>
 								<cmd>
 									<!-- CDATA prevents Eclipse formatter from breaking line -->
-									<shell><![CDATA[java -Xms128m -Xmx512m -Djava.security.egd=file:/dev/./urandom -jar /maven/${project.artifactId}-${project.version}.${project.packaging}]]></shell>
+									<shell><![CDATA[cd /maven; java -Xms128m -Xmx512m -Djava.security.egd=file:/dev/./urandom -jar ${project.artifactId}-${project.version}.${project.packaging}]]></shell>
 								</cmd>
 							</build>
 						</image>
