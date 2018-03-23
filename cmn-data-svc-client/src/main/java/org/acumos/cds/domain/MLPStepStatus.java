@@ -27,6 +27,7 @@ import java.io.Serializable;
  * 
  * @deprecated Use {@link org.acumos.cds.StepStatusCode}
  */
+@Deprecated
 public class MLPStepStatus extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = -8342728048884890038L;

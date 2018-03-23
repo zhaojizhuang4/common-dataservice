@@ -27,6 +27,7 @@ import java.io.Serializable;
  * 
  * @deprecated Use {@link org.acumos.cds.LoginProviderCode}
  */
+@Deprecated
 public class MLPLoginProvider extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = -1405595448809901709L;

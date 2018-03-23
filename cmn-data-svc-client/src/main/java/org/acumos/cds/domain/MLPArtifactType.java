@@ -27,6 +27,7 @@ import java.io.Serializable;
  * 
  * @deprecated Use {@link org.acumos.cds.ArtifactTypeCode}
  */
+@Deprecated
 public class MLPArtifactType extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = -967589730503293850L;

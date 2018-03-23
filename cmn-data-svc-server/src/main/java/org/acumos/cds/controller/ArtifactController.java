@@ -53,9 +53,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * Answers REST requests to get, add, update and delete artifacts.
- * 
- * https://stackoverflow.com/questions/942951/rest-api-error-return-good-practices
+ * Answers REST requests to get, search, create, update and delete artifacts.
  */
 @Controller
 @RequestMapping(value = "/" + CCDSConstants.ARTIFACT_PATH, produces = CCDSConstants.APPLICATION_JSON)
@@ -64,11 +62,11 @@ public class ArtifactController extends AbstractController {
 	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(ArtifactController.class);
 
 	@Autowired
+	private ArtifactRepository artifactRepository;
+	@Autowired
 	private ArtifactSearchService artifactService;
 	@Autowired
 	private SolutionRevisionRepository solutionRevisionRepository;
-	@Autowired
-	private ArtifactRepository artifactRepository;
 
 	/**
 	 * @return SuccessTransport object
@@ -165,12 +163,13 @@ public class ArtifactController extends AbstractController {
 	 *            Path parameter with row ID
 	 * @param response
 	 *            HttpServletResponse
-	 * @return An artifact if found, an error otherwise.
+	 * @return A list of revisions, possibly empty
 	 */
 	@ApiOperation(value = "Gets the solution revisions that use the specified artifact ID.", response = MLPSolutionRevision.class, responseContainer = "List")
 	@RequestMapping(value = "/{artifactId}/" + CCDSConstants.REVISION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getRevisionsForArtifact(@PathVariable("artifactId") String artifactId, HttpServletResponse response) {
+		// Validate the artifact ID because an empty result is ambiguous.
 		MLPArtifact da = artifactRepository.findOne(artifactId);
 		if (da == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -232,7 +231,7 @@ public class ArtifactController extends AbstractController {
 	public Object updateArtifact(@PathVariable("artifactId") String artifactId, @RequestBody MLPArtifact artifact,
 			HttpServletResponse response) {
 		logger.debug(EELFLoggerDelegate.debugLogger, "update: received {} ", artifact);
-		// Get the existing one
+		// Check for existing because the Hibernate save() method doesn't distinguish
 		MLPArtifact existing = artifactRepository.findOne(artifactId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

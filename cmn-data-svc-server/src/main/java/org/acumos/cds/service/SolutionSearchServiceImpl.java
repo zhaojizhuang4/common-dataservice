@@ -30,6 +30,7 @@ import javax.transaction.Transactional;
 import org.acumos.cds.domain.MLPSolution;
 import org.acumos.cds.domain.MLPSolutionFOM;
 import org.acumos.cds.util.EELFLoggerDelegate;
+import org.hibernate.AssertionFailure;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
@@ -134,16 +135,18 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 		// Get a page of results
 		List<MLPSolutionFOM> items = criteria.list();
+		// This detects programmer errors
 		if (items.isEmpty())
-			throw new RuntimeException("findPortalSolutions: unexpected empty result");
+			throw new AssertionFailure("findPortalSolutions: unexpected empty result");
 
+		// Convert from FOM to plain
 		List<MLPSolution> solutions = new ArrayList<>();
-		for (Object item : items) {
+		for (Object item : items)
 			if (item instanceof MLPSolutionFOM)
 				solutions.add(((MLPSolutionFOM) item).toMLPSolution());
 			else
 				logger.error(EELFLoggerDelegate.errorLogger, "Unexpected type: {} ", item.getClass().getName());
-		}
+
 		logger.debug(EELFLoggerDelegate.debugLogger, "findPortalSolutions: result size={}", solutions.size());
 		return new PageImpl<>(solutions, pageable, count);
 	}
@@ -163,8 +166,8 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		if (validationStatusCode != null && validationStatusCode.length > 0)
 			criteria.add(Restrictions.in(revAlias + ".validationStatusCode", validationStatusCode));
 
-		// Construct a disjunction to find any updated item;
-		// unfortunately this requires hardcoded field names
+		// Construct a disjunction to find any updated item.
+		// Unfortunately this requires hard-coded field names
 		Criterion solModified = Restrictions.ge("modified", date);
 		Criterion revModified = Restrictions.ge(revAlias + ".modified", date);
 		Criterion artModified = Restrictions.ge(artAlias + ".modified", date);
@@ -189,16 +192,18 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 		// Get a page of results
 		List items = criteria.list();
+		// This detects programmer errors
 		if (items.isEmpty())
-			throw new RuntimeException("findSolutionsByModifiedDate: unexpected empty result");
+			throw new AssertionFailure("findSolutionsByModifiedDate: unexpected empty result");
 
+		// Convert from FOM to plain
 		List<MLPSolution> solutions = new ArrayList<>();
-		for (Object item : items) {
+		for (Object item : items)
 			if (item instanceof MLPSolutionFOM)
 				solutions.add(((MLPSolutionFOM) item).toMLPSolution());
 			else
 				logger.error(EELFLoggerDelegate.errorLogger, "Unexpected type: {} ", item.getClass().getName());
-		}
+
 		logger.debug(EELFLoggerDelegate.debugLogger, "findSolutionsByModifiedDate: result size={}", solutions.size());
 		return new PageImpl<>(solutions, pageable, count);
 	}

@@ -47,8 +47,9 @@ public class MLPSiteConfig extends MLPTimestampedEntity implements Serializable 
 	@ApiModelProperty(required = true, value = "Unique key", example = "site_config_key_1")
 	private String configKey;
 
+	// JSON
 	@Column(name = "CONFIG_VAL", nullable = false, columnDefinition = "VARCHAR(8192)")
-	@ApiModelProperty(required = true, value = "Site configuration value")
+	@ApiModelProperty(required = true, value = "JSON", example = "{ \"tag\" : \"value\" }")
 	@Size(max = 8192)
 	private String configValue;
 

@@ -75,42 +75,4 @@ public class MLPCodeNamePair implements MLPEntity {
 		return this.getClass().getName() + "[code=" + code + ", name=" + name + "]";
 	}
 
-	// For backward compatibility
-
-	/**
-	 * @deprecated use {@link #getCode()}
-	 * @return the code
-	 */
-	@Deprecated
-	public String getTypeCode() {
-		return getCode();
-	}
-
-	/**
-	 * @deprecated use {@link #getName()}
-	 * @return the name
-	 */
-	@Deprecated
-	public String getTypeName() {
-		return getName();
-	}
-
-	/**
-	 * @deprecated use {@link #getCode()}
-	 * @return the code
-	 */
-	@Deprecated
-	public String getStatusCode() {
-		return getCode();
-	}
-
-	/**
-	 * @deprecated use {@link #getName()}
-	 * @return the name
-	 */
-	@Deprecated
-	public String getStatusName() {
-		return getName();
-	}
-
 }

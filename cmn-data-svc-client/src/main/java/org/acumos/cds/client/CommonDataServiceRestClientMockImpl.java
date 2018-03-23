@@ -78,6 +78,8 @@ import org.acumos.cds.domain.MLPValidationType;
 import org.acumos.cds.transport.RestPageRequest;
 import org.acumos.cds.transport.RestPageResponse;
 import org.acumos.cds.transport.SuccessTransport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -87,6 +89,8 @@ import org.springframework.web.client.RestTemplate;
  */
 @SuppressWarnings("deprecation")
 public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRestClient {
+
+	private static Logger logger = LoggerFactory.getLogger(CommonDataServiceRestClientMockImpl.class);
 
 	public static ICommonDataServiceRestClient getInstance(String webapiUrl, String user, String pass) {
 		return new CommonDataServiceRestClientMockImpl(webapiUrl, user, pass);
@@ -207,6 +211,8 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	 */
 	public CommonDataServiceRestClientMockImpl() {
 
+		logger.info("Ctor 1");
+
 		MLPPeer mlpPeer = new MLPPeer();
 		mlpPeer.setApiUrl("http://peer-api");
 		mlpPeer.setContact1("Contact1");
@@ -237,11 +243,13 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 
 	public CommonDataServiceRestClientMockImpl(final String webapiUrl, final String user, final String pass) {
 		this();
+		logger.info("Ctor 2: webapiUrl=" + webapiUrl + ", user=" + user + ", pass=" + pass);
 	}
 
 	public CommonDataServiceRestClientMockImpl(final String webapiUrl, final RestTemplate restTemplate) {
 		this();
 		this.restTemplate = restTemplate;
+		logger.info("Ctor 3: webapiUrl=" + webapiUrl);
 	}
 
 	protected RestTemplate getRestTemplate() {
@@ -267,6 +275,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Deprecated
 	@Override
 	public List<MLPAccessType> getAccessTypes() {
 		List<MLPAccessType> list = new ArrayList<>();
@@ -276,6 +285,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Deprecated
 	@Override
 	public List<MLPArtifactType> getArtifactTypes() {
 		List<MLPArtifactType> list = new ArrayList<>();
@@ -285,6 +295,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Deprecated
 	@Override
 	public List<MLPLoginProvider> getLoginProviders() {
 		List<MLPLoginProvider> list = new ArrayList<>();
@@ -294,6 +305,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Deprecated
 	@Override
 	public List<MLPModelType> getModelTypes() {
 		List<MLPModelType> list = new ArrayList<>();
@@ -303,6 +315,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Deprecated
 	@Override
 	public List<MLPStepStatus> getStepStatuses() {
 		List<MLPStepStatus> list = new ArrayList<>();
@@ -312,6 +325,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Deprecated
 	@Override
 	public List<MLPStepType> getStepTypes() {
 		List<MLPStepType> list = new ArrayList<>();
@@ -321,6 +335,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Deprecated
 	@Override
 	public List<MLPToolkitType> getToolkitTypes() {
 		List<MLPToolkitType> list = new ArrayList<>();
@@ -330,6 +345,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Deprecated
 	@Override
 	public List<MLPValidationStatus> getValidationStatuses() {
 		List<MLPValidationStatus> list = new ArrayList<>();
@@ -339,6 +355,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Deprecated
 	@Override
 	public List<MLPValidationType> getValidationTypes() {
 		List<MLPValidationType> list = new ArrayList<>();
@@ -348,6 +365,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	/** @deprecated Use {@link #getCodeNamePairs(CodeNameType)} */
+	@Deprecated
 	@Override
 	public List<MLPDeploymentStatus> getDeploymentStatuses() {
 		List<MLPDeploymentStatus> list = new ArrayList<>();

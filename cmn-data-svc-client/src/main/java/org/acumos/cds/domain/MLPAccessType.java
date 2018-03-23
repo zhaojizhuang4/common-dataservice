@@ -27,6 +27,7 @@ import java.io.Serializable;
  * 
  * @deprecated Use {@link org.acumos.cds.AccessTypeCode}
  */
+@Deprecated
 public class MLPAccessType extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = -3836564419430582350L;

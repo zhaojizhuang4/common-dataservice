@@ -27,6 +27,7 @@ import java.io.Serializable;
  * 
  * @deprecated Use {@link org.acumos.cds.ToolkitTypeCode}
  */
+@Deprecated
 public class MLPToolkitType extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = 5460589849770121899L;

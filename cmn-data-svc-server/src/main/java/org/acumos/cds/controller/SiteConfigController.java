@@ -75,7 +75,7 @@ public class SiteConfigController extends AbstractController {
 	}
 
 	/**
-	 * @param sc
+	 * @param siteConfig
 	 *            SiteConfig model
 	 * @param response
 	 *            HttpServletResponse
@@ -84,23 +84,23 @@ public class SiteConfigController extends AbstractController {
 	@ApiOperation(value = "Creates a new site configuration.", response = MLPSiteConfig.class)
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
-	public Object createSiteConfig(@RequestBody MLPSiteConfig sc, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "createSiteConfig: received object: {} ", sc);
-		if (siteConfigRepository.findOne(sc.getConfigKey()) != null) {
+	public Object createSiteConfig(@RequestBody MLPSiteConfig siteConfig, HttpServletResponse response) {
+		logger.debug(EELFLoggerDelegate.debugLogger, "createSiteConfig: received object: {} ", siteConfig);
+		if (siteConfigRepository.findOne(siteConfig.getConfigKey()) != null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Key exists: " + sc.getConfigKey(), null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Key exists: " + siteConfig.getConfigKey(), null);
 		}
 		// UserID is optional
-		if (sc.getUserId() != null && userRepository.findOne(sc.getUserId()) == null) {
+		if (siteConfig.getUserId() != null && userRepository.findOne(siteConfig.getUserId()) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + sc.getUserId(), null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + siteConfig.getUserId(), null);
 		}
 		Object result;
 		try {
-			result = siteConfigRepository.save(sc);
+			result = siteConfigRepository.save(siteConfig);
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			// This is a hack to create the location path.
-			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.CONFIG_PATH + "/" + sc.getConfigKey());
+			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.CONFIG_PATH + "/" + siteConfig.getConfigKey());
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "createSiteConfig", cve.toString());
@@ -113,7 +113,7 @@ public class SiteConfigController extends AbstractController {
 	/**
 	 * @param configKey
 	 *            config key
-	 * @param sc
+	 * @param siteConfig
 	 *            SiteConfig model
 	 * @param response
 	 *            HttpServletResponse
@@ -122,9 +122,9 @@ public class SiteConfigController extends AbstractController {
 	@ApiOperation(value = "Updates a site configuration.", response = SuccessTransport.class)
 	@RequestMapping(value = "/{configKey}", method = RequestMethod.PUT)
 	@ResponseBody
-	public Object updateSiteConfig(@PathVariable("configKey") String configKey, @RequestBody MLPSiteConfig sc,
+	public Object updateSiteConfig(@PathVariable("configKey") String configKey, @RequestBody MLPSiteConfig siteConfig,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "updateSiteConfig: received {} ", sc);
+		logger.debug(EELFLoggerDelegate.debugLogger, "updateSiteConfig: received {} ", siteConfig);
 		// Get the existing one
 		MLPSiteConfig existing = siteConfigRepository.findOne(configKey);
 		if (existing == null) {
@@ -134,8 +134,8 @@ public class SiteConfigController extends AbstractController {
 		MLPTransportModel result = null;
 		try {
 			// Use the path-parameter id; don't trust the one in the object
-			sc.setConfigKey(configKey);
-			siteConfigRepository.save(sc);
+			siteConfig.setConfigKey(configKey);
+			siteConfigRepository.save(siteConfig);
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);

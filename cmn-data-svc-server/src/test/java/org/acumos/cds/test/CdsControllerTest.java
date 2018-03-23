@@ -348,9 +348,11 @@ public class CdsControllerTest {
 			cu = client.createUser(cu);
 			Assert.assertNotNull(cu.getUserId());
 			Assert.assertNotNull(cu.getCreated());
-			Assert.assertEquals(cu.getCreated(), cu.getModified());
+			Assert.assertNotNull(cu.getModified());
+			// assertEquals occasionally fails - this allows for millisecond differences
+			Assert.assertTrue(Math.abs(cu.getCreated().getTime() - cu.getModified().getTime()) < 3);
 			Assert.assertEquals(cu.getLastLogin(), lastLogin);
-			// Password must not come back as JSON
+			// Password must not come back in response
 			Assert.assertNull(cu.getLoginHash());
 			logger.info("Created user {}", cu);
 

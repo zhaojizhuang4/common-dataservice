@@ -78,7 +78,7 @@ public class ClientMethodTest {
 	@SuppressWarnings("deprecation")
 	@Test
 	public void coverClientEnumMethods() {
-		final String uri = "http://invalidhost:51243";
+		final String uri = "http://localhost:51243";
 		ICommonDataServiceRestClient client = CommonDataServiceRestClientImpl.getInstance(uri, "user", "pass");
 		client = CommonDataServiceRestClientImpl.getInstance(uri, new RestTemplate());
 
@@ -162,7 +162,7 @@ public class ClientMethodTest {
 			logger.info("Ctor failed as expected: {}", ex.toString());
 		}
 
-		ICommonDataServiceRestClient client = CommonDataServiceRestClientImpl.getInstance("http://invalidhost:51243",
+		ICommonDataServiceRestClient client = CommonDataServiceRestClientImpl.getInstance("http://localhost:51243",
 				"user", "pass");
 
 		try {

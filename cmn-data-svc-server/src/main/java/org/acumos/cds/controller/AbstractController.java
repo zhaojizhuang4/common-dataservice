@@ -188,8 +188,8 @@ public abstract class AbstractController {
 			if (ex instanceof javax.validation.ConstraintViolationException
 					|| ex instanceof org.hibernate.exception.ConstraintViolationException)
 				bestMatch = ex;
-			// Don't stop here, go as far back as possible
 
+			// Go as far up the stack as possible
 			if (ex.getCause() instanceof Exception)
 				ex = (Exception) ex.getCause();
 			else

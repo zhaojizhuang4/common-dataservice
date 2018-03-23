@@ -27,6 +27,7 @@ import java.io.Serializable;
  * 
  * @deprecated Use {@link org.acumos.cds.ValidationTypeCode}
  */
+@Deprecated
 public class MLPValidationType extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = 8328530594985179307L;

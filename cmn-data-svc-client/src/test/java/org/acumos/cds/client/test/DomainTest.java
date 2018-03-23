@@ -1411,9 +1411,6 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertFalse(m.equals(new Object()));
 		Assert.assertTrue(m.equals(m));
 		Assert.assertNotNull(m.hashCode());
-		Assert.assertNotNull(m.getStatusCode());
-		Assert.assertNotNull(m.getTypeCode());
-		Assert.assertNotNull(m.getTypeName());
 		logger.info(m.toString());
 		try {
 			String n = null;

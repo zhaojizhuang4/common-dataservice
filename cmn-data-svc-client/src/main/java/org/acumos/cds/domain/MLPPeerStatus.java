@@ -27,6 +27,7 @@ import java.io.Serializable;
  * 
  * @deprecated Use {@link org.acumos.cds.PeerStatusCode}
  */
+@Deprecated
 public class MLPPeerStatus extends MLPCodeNamePair implements Serializable {
 
 	private static final long serialVersionUID = 5341647455351536720L;
