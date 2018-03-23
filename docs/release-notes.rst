@@ -27,6 +27,7 @@ Version 1.15.0, 23 March 2018
 -----------------------------
 
 * Move acccess type code attribute from Solution to Solution Revision entity (ACUMOS-196)
+* Add unique constraints for name columns; e.g., role name (ACUMOS-435)
 * Add fields to site_config table entry (ACUMOS-486)
 * Requires database schema version 1.15
 

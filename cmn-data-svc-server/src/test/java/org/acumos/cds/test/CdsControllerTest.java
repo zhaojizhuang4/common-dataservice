@@ -229,7 +229,7 @@ public class CdsControllerTest {
 
 	@Test
 	public void getCodeValueConstants() throws Exception {
-		
+
 		for (CodeNameType type : CodeNameType.values()) {
 			List<MLPCodeNamePair> list = client.getCodeNamePairs(type);
 			logger.info("testCodeNameService: type {} -> values {}", type, list);
@@ -1530,7 +1530,8 @@ public class CdsControllerTest {
 		pg1.setDescription("some description");
 		client.updatePeerGroup(pg1);
 
-		MLPPeerGroup pg2 = new MLPPeerGroup("peer group 2");
+		String peerGrpName = "peer group 2";
+		MLPPeerGroup pg2 = new MLPPeerGroup(peerGrpName);
 		pg2 = client.createPeerGroup(pg2);
 		Assert.assertNotNull(pg2.getGroupId());
 		logger.info("Created peer group " + pg2.getGroupId());
@@ -1538,7 +1539,8 @@ public class CdsControllerTest {
 		RestPageResponse<MLPPeerGroup> peerGroups = client.getPeerGroups(new RestPageRequest(0, 5));
 		Assert.assertTrue(peerGroups != null && peerGroups.getNumberOfElements() > 0);
 
-		MLPSolutionGroup sg = new MLPSolutionGroup("solution group");
+		String solGrpName = "solution group";
+		MLPSolutionGroup sg = new MLPSolutionGroup(solGrpName);
 		sg = client.createSolutionGroup(sg);
 		Assert.assertNotNull(sg.getGroupId());
 		logger.info("Created solution group " + sg.getGroupId());
@@ -1603,7 +1605,7 @@ public class CdsControllerTest {
 			logger.info("getSolutionsInGroup failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			MLPSolutionGroup sgx = new MLPSolutionGroup("solution group");
+			MLPSolutionGroup sgx = new MLPSolutionGroup(solGrpName);
 			sgx.setGroupId(999L);
 			client.updateSolutionGroup(sgx);
 			throw new Exception("Unexpected success");
@@ -1618,6 +1620,16 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("updatePeerGroup failed as expected: {}", ex.getResponseBodyAsString());
 		}
+
+		try {
+			MLPPeerGroup pgAnother = new MLPPeerGroup(peerGrpName);
+			client.createPeerGroup(pgAnother);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create peer group failed due to duplicate group name as expected: {}",
+					ex.getResponseBodyAsString());
+		}
+
 		try {
 			client.createPeerGroup(new MLPPeerGroup());
 			throw new Exception("Unexpected success");
@@ -1644,6 +1656,15 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create solution group failed as expected: {}", ex.getResponseBodyAsString());
 		}
+
+		try {
+			client.createSolutionGroup(new MLPSolutionGroup(solGrpName));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create solution group failed due to duplicate group name as expected: {}",
+					ex.getResponseBodyAsString());
+		}
+
 		try {
 			MLPSolutionGroup sg2 = new MLPSolutionGroup();
 			sg2.setGroupId(1L);
@@ -1907,14 +1928,25 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("addUsersInRole failed on bad role as expected {}", ex.getResponseBodyAsString());
 		}
+		String roleNm = "some name";
 		// Supposed to succeed
-		MLPRole cr = client.createRole(new MLPRole("some name", true));
+		MLPRole cr = client.createRole(new MLPRole(roleNm, true));
 		try {
 			client.addUsersInRole(users, cr.getRoleId());
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("addUsersInRole failed on empty list as expected {}", ex.getResponseBodyAsString());
 		}
+		
+		try {
+			MLPRole roleAnother = new MLPRole(roleNm, true);
+			client.createRole(roleAnother);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create role failed due to duplicate role name as expected: {}",
+					ex.getResponseBodyAsString());
+		}
+		
 		users.add("bogusUser");
 		try {
 			client.addUsersInRole(users, cr.getRoleId());
