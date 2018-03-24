@@ -68,6 +68,7 @@ public abstract class CCDSConstants {
 
 	// Code-name pairs
 	public static final String CODE_PATH = "code";
+	public static final String NAME_PATH = "name";
 	public static final String PAIR_PATH = "pair";
 	// deprecated
 	public static final String ACCESS_PATH = "access";

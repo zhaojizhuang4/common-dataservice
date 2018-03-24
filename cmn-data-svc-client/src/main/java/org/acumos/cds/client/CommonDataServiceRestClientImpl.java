@@ -235,18 +235,18 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	 * Builds URI by adding specified path segments and query parameters to the base
 	 * URL. Converts an array of values to a series of parameters with the same
 	 * name; e.g., "find foo in list [a,b]" becomes request parameters
-	 * "foo=a&foo=b".
+	 * "foo=a&amp;foo=b".
 	 * 
 	 * @param path
 	 *            Array of path segments
 	 * @param queryParams
 	 *            key-value pairs; ignored if null or empty. Gives special treatment
 	 *            to Date-type values, Array values, and null values inside arrays.
-	 * @param restPageRequest
+	 * @param pageRequest
 	 *            page, size and sort specification; ignored if null.
-	 * @return
+	 * @return URI with the specified path segments and query parameters
 	 */
-	private URI buildUri(final String[] path, final Map<String, Object> queryParams, RestPageRequest pageRequest) {
+	protected URI buildUri(final String[] path, final Map<String, Object> queryParams, RestPageRequest pageRequest) {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(this.baseUrl);
 		for (int p = 0; p < path.length; ++p)
 			builder.pathSegment(path[p]);
@@ -306,8 +306,18 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public List<MLPCodeNamePair> getCodeNamePairs(CodeNameType type) {
-		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.PAIR_PATH, type.name() }, null, null);
+	public List<String> getValueSetNames() {
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.PAIR_PATH }, null, null);
+		logger.debug("getValueSetNames: uri {}", uri);
+		ResponseEntity<List<String>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<String>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public List<MLPCodeNamePair> getCodeNamePairs(CodeNameType valueSetName) {
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.PAIR_PATH, valueSetName.name() }, null, null);
 		logger.debug("getCodeNamePairs: uri {}", uri);
 		ResponseEntity<List<MLPCodeNamePair>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPCodeNamePair>>() {

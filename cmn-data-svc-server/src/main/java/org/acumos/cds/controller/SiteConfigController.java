@@ -88,12 +88,14 @@ public class SiteConfigController extends AbstractController {
 		logger.debug(EELFLoggerDelegate.debugLogger, "createSiteConfig: received object: {} ", siteConfig);
 		if (siteConfigRepository.findOne(siteConfig.getConfigKey()) != null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Key exists: " + siteConfig.getConfigKey(), null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Key exists: " + siteConfig.getConfigKey(),
+					null);
 		}
 		// UserID is optional
 		if (siteConfig.getUserId() != null && userRepository.findOne(siteConfig.getUserId()) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + siteConfig.getUserId(), null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + siteConfig.getUserId(),
+					null);
 		}
 		Object result;
 		try {

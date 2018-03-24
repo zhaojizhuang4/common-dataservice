@@ -20,6 +20,9 @@
 
 package org.acumos.cds.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.acumos.cds.CCDSConstants;
@@ -51,25 +54,39 @@ public class CodeTableController extends AbstractController {
 	private CodeNameService codeNameService;
 
 	/**
-	 * @param typeName
-	 *            Name of an field in {@link org.acumos.cds.CodeNameType}
+	 * @return List of value set names that can be supplied to
+	 *         {@link #getCodeNamePairs(String, HttpServletResponse)}
+	 */
+	@ApiOperation(value = "Gets the list of value set names.", response = String.class, responseContainer = "List")
+	@RequestMapping(value = "/" + CCDSConstants.PAIR_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> getValueSetNames() {
+		List<String> list = new ArrayList<>();
+		for (CodeNameType cn : CodeNameType.values())
+			list.add(cn.name());
+		return list;
+	}
+
+	/**
+	 * @param valueSetName
+	 *            Name of a field in enum {@link org.acumos.cds.CodeNameType}
 	 * @param response
 	 *            HttpServletResponse
 	 * @return List of MLPCodeNamePair objects for the specified value set.
 	 */
-	@ApiOperation(value = "Gets the list of code-name pairs for the specified value set name.", response = MLPCodeNamePair.class, responseContainer = "List")
-	@RequestMapping(value = "/" + CCDSConstants.PAIR_PATH + "/{type}", method = RequestMethod.GET)
+	@ApiOperation(value = "Gets the list of code-name pairs for the specified value set.", response = MLPCodeNamePair.class, responseContainer = "List")
+	@RequestMapping(value = "/" + CCDSConstants.PAIR_PATH + "/{name}", method = RequestMethod.GET)
 	@ResponseBody
-	public Object getCodeNamePairs(@PathVariable(CCDSConstants.TYPE_PATH) String typeName,
+	public Object getCodeNamePairs(@PathVariable(CCDSConstants.NAME_PATH) String valueSetName,
 			HttpServletResponse response) {
 		CodeNameType type;
 		try {
-			type = CodeNameType.valueOf(typeName);
+			type = CodeNameType.valueOf(valueSetName);
 			return codeNameService.getCodeNamePairs(type);
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "getCodeNamePairs", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Unexpected value set name " + typeName);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Unexpected value set name " + valueSetName);
 		}
 	}
 
