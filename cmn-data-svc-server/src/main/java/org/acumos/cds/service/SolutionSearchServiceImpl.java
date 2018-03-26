@@ -30,10 +30,13 @@ import javax.transaction.Transactional;
 import org.acumos.cds.domain.MLPSolution;
 import org.acumos.cds.domain.MLPSolutionFOM;
 import org.acumos.cds.util.EELFLoggerDelegate;
+import org.hibernate.AssertionFailure;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +47,22 @@ import org.springframework.stereotype.Service;
 
 /**
  * Hibernate-assisted methods to search solutions.
+ * <P>
+ * These two aspects must be observed to get pagination working as expected:
+ * <OL>
+ * <LI>For all to-many mappings, force use of separate select instead of left
+ * outer join. This is far less efficient due to repeated trips to the database.
+ * </LI>
+ * <LI>Specify an unambiguous ordering. This at least is cheap, just add
+ * order-by the ID field.</LI>
+ * </OL>
+ * I'm not the only one who has fought Hibernate to get paginated search results:
+ * <PRE>
+ * https://stackoverflow.com/questions/300491/how-to-get-distinct-results-in-hibernate-with-joins-and-row-based-limiting-pagi
+ * https://stackoverflow.com/questions/9418268/hibernate-distinct-results-with-pagination
+ * https://stackoverflow.com/questions/11038234/pagination-with-hibernate-criteria-and-distinct-root-entity
+ * https://stackoverflow.com/questions/42910271/duplicate-records-with-hibernate-joins-and-pagination
+ * </PRE>
  */
 @Service("solutionSearchService")
 @Transactional
@@ -61,6 +80,11 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 
+		// Adjust fetch mode on tags to block Hibernate from using left outer join,
+		// which builds a cross product that contains duplicate rows.
+		// This is a horrid violation of information hiding.
+		criteria.setFetchMode("tags", FetchMode.SELECT);
+
 		// Count the total rows
 		criteria.setProjection(Projections.rowCount());
 		Long count = (Long) criteria.uniqueResult();
@@ -69,9 +93,13 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 		// Reset the count criteria; add pagination and sort
 		criteria.setProjection(null);
-		// Want unique set; cross product yields multiple rows with same solution
+		// This should not do any harm; had problems elsewhere without
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		// Add pagination and sort
 		super.applyPageableCriteria(criteria, pageable);
+		// Fallback order on a unique field. Without this the pagination
+		// yields odd results; e.g., request 10 items but only get 8.
+		criteria.addOrder(Order.asc("solutionId"));
 
 		// Get a page of results and send it back with the total available
 		List<MLPSolution> items = criteria.list();
@@ -95,6 +123,11 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class);
 
+		// Adjust fetch mode to block Hibernate from using left outer join,
+		// which builds a cross product that contains duplicate rows.
+		// This is a horrid violation of information hiding.
+		criteria.setFetchMode("tags", FetchMode.SELECT);
+
 		// Always check active status
 		criteria.add(Restrictions.eq("active", active));
 
@@ -117,7 +150,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			tagCriteria.add(Restrictions.in("tag", tags));
 		}
 
-		// Count the total rows
+		// Count the total rows. This does NOT run the left outer joins for tags etc.
 		criteria.setProjection(Projections.rowCount());
 		Long count = (Long) criteria.uniqueResult();
 		if (count == 0)
@@ -125,26 +158,46 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 		// Reset the count criteria; add pagination and sort
 		criteria.setProjection(null);
-		// Want unique set; cross product yields multiple rows with same solution
+		// This should not do any harm; had problems elsewhere without
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		// Add pagination and sort
 		super.applyPageableCriteria(criteria, pageable);
+		// Fallback order on a unique field. Without this the pagination
+		// yields odd results; e.g., request 10 items but only get 8.
+		criteria.addOrder(Order.asc("solutionId"));
 
 		// Get a page of results
 		List<MLPSolution> items = criteria.list();
+		// This detects programmer errors
+		if (items.isEmpty())
+			throw new AssertionFailure("findPortalSolutions: unexpected empty result");
 		logger.debug(EELFLoggerDelegate.debugLogger, "findPortalSolutions: result size={}", items.size());
 		return new PageImpl<>(items, pageable, count);
 	}
 
+	/*
+	 * Uses the full object mapping (FOM) version of the Solution class.
+	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public Page<MLPSolution> findSolutionsByModifiedDate(boolean active, String[] accessTypeCode,
 			String[] validationStatusCode, Date date, Pageable pageable) {
 
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
+
 		final String revAlias = "revs";
 		final String artAlias = "arts";
+		// Revisions is the field name in solution model
 		criteria.createAlias("revisions", revAlias);
+		// Artifacts is the field name in revision model
 		criteria.createAlias(revAlias + ".artifacts", artAlias);
+
+		// Adjust fetch mode to block Hibernate from using left outer join,
+		// which builds a cross product that contains duplicate rows.
+		// This is a horrid violation of information hiding.
+		criteria.setFetchMode("tags", FetchMode.SELECT);
+		criteria.setFetchMode("revisions", FetchMode.SELECT);
+		criteria.setFetchMode(revAlias + ".artifacts", FetchMode.SELECT);
 
 		criteria.add(Restrictions.eq("active", active));
 		if (accessTypeCode != null && accessTypeCode.length > 0)
@@ -171,10 +224,13 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 		// Remove the count projections
 		criteria.setProjection(null);
-		// Want unique set; cross product yields multiple rows with same solution
+		// This should not do any harm; had problems elsewhere without
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		// Add pagination and sort
 		super.applyPageableCriteria(criteria, pageable);
+		// Fallback order on a unique field. Without this the pagination
+		// yields odd results; e.g., request 10 items but only get 8.
+		criteria.addOrder(Order.asc("solutionId"));
 
 		// Get a page of results
 		List items = criteria.list();
@@ -183,12 +239,13 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		logger.debug(EELFLoggerDelegate.debugLogger, "findSolutionsByModifiedDate: result size={}", items.size());
 
 		List<MLPSolution> solutions = new ArrayList<>();
-		for (Object item : items) {
+		for (Object item : items)
 			if (item instanceof MLPSolutionFOM)
 				solutions.add(((MLPSolutionFOM) item).toMLPSolution());
 			else
-				logger.error("Unexpected type: " + item.getClass().getName());
-		}
+				throw new AssertionFailure("Unexpected type: " + item.getClass().getName());
+
+		logger.debug(EELFLoggerDelegate.debugLogger, "findSolutionsByModifiedDate: result size={}", solutions.size());
 		return new PageImpl<>(solutions, pageable, count);
 	}
 

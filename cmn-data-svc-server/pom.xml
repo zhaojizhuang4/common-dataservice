@@ -4,7 +4,7 @@
 	<groupId>org.acumos.common-dataservice</groupId>
 	<artifactId>cmn-data-svc-server</artifactId>
 	<!-- This version number is used to tag the Docker image. -->
-	<version>1.14.2-SNAPSHOT</version>
+	<version>1.14.3-SNAPSHOT</version>
 	<name>Acumos Common Data Service Server</name>
 	<description>Micro service based on Spring-Boot</description>
 	<parent>
@@ -21,7 +21,7 @@
 		<start-class>org.acumos.cds.CdsApplication</start-class>
 		<!-- Client jar is in nexus repo -->
 		<client.version>${project.version}</client.version>
-		<springfox.version>2.8.0</springfox.version>
+		<springfox.version>2.7.0</springfox.version>
 		<!-- Supplied by Jenkins -->
 		<build.number>${env.BUILD_NUMBER}</build.number>
 		<!-- Not supplied to all jobs; e.g., Javadoc -->

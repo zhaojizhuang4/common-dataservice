@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.acumos.common-dataservice</groupId>
 	<artifactId>cmn-data-svc-client</artifactId>
-	<version>1.14.2-SNAPSHOT</version>
+	<version>1.14.3-SNAPSHOT</version>
 	<name>Acumos Common Data Service Client</name>
 	<description>Client library for the Acumos Common Data Service</description>
 	<properties>
@@ -13,7 +13,7 @@
 		<build.number>${env.BUILD_NUMBER}</build.number>
 		<!-- For distributionManagement section -->
 		<acumos.nexus.url>https://nexus.acumos.org</acumos.nexus.url>
-		<springfox.version>2.8.0</springfox.version>
+		<springfox.version>2.7.0</springfox.version>
 		<!-- Begin versions set by spring-boot in POM spring-boot-dependencies -->
 		<hibernate.version>5.0.12.Final</hibernate.version>
 		<hibernate-validator.version>5.3.5.Final</hibernate-validator.version>
