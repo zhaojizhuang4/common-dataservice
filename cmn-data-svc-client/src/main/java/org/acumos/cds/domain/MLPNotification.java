@@ -54,7 +54,7 @@ public class MLPNotification extends MLPTimestampedEntity implements Serializabl
 	@Column(name = "NOTIFICATION_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
 	// Users MAY submit an ID; readOnly annotation must NOT be used
-	@ApiModelProperty(value = "UUID; omit for system-generated value", example="12345678-abcd-90ab-cdef-1234567890ab")
+	@ApiModelProperty(value = "UUID; omit for system-generated value", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String notificationId;
 
 	@Column(name = "TITLE", nullable = false, columnDefinition = "VARCHAR(100)")

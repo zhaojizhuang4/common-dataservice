@@ -196,6 +196,22 @@ public interface ICommonDataServiceRestClient {
 	List<MLPStepType> getStepTypes();
 
 	/**
+	 * Gets the list of code-name value-set names.
+	 * 
+	 * @return List of names
+	 */
+	List<String> getValueSetNames();
+
+	/**
+	 * Gets the list of code-name pair entries for the specified value set.
+	 * 
+	 * @param valueSetName
+	 *            Value set name
+	 * @return List of code-name pairs
+	 */
+	List<MLPCodeNamePair> getCodeNamePairs(CodeNameType valueSetName);
+
+	/**
 	 * Gets count of solutions.
 	 * 
 	 * @return Count of solutions.
@@ -1923,14 +1939,5 @@ public interface ICommonDataServiceRestClient {
 	 * @return User Notification Preference object
 	 */
 	MLPUserNotifPref getUserNotificationPreference(Long usrNotifPrefId);
-
-	/**
-	 * Gets the list of code-name pair entries for the specified value set.
-	 * 
-	 * @param type
-	 *            Value set name
-	 * @return List of code-name pairs
-	 */
-	List<MLPCodeNamePair> getCodeNamePairs(CodeNameType type);
 
 }

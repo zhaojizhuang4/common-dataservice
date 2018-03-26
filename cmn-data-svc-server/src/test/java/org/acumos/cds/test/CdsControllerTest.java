@@ -233,7 +233,12 @@ public class CdsControllerTest {
 
 	@Test
 	public void getCodeValueConstants() throws Exception {
-		
+
+		List<String> valueSetNames = client.getValueSetNames();
+		Assert.assertEquals(valueSetNames.size(), CodeNameType.values().length);
+		for (String vsName : valueSetNames)
+			CodeNameType.valueOf(vsName);
+
 		for (CodeNameType type : CodeNameType.values()) {
 			List<MLPCodeNamePair> list = client.getCodeNamePairs(type);
 			logger.info("testCodeNameService: type {} -> values {}", type, list);

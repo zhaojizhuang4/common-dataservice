@@ -1403,8 +1403,8 @@ public class SolutionController extends AbstractController {
 	@ResponseBody
 	public Object getSolutionDeployments(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, Pageable pageRequest, HttpServletResponse response) {
-		Page<MLPSolutionDeployment> da = solutionDeploymentRepository.findBySolutionIdAndRevisionId(solutionId, revisionId,
-				pageRequest);
+		Page<MLPSolutionDeployment> da = solutionDeploymentRepository.findBySolutionIdAndRevisionId(solutionId,
+				revisionId, pageRequest);
 		if (da == null || !da.iterator().hasNext()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,

@@ -201,6 +201,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private RestPageResponse<MLPSolution> solutionsByDate;
 	private MLPStepResult stepResultById;
 	private List<MLPCodeNamePair> pairs;
+	private List<String> valueSetNames;
 
 	/**
 	 * No-argument constructor.
@@ -344,6 +345,24 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		for (StepTypeCode a : StepTypeCode.values())
 			list.add(new MLPStepType(a.name(), a.getStepName()));
 		return list;
+	}
+
+	public void setValueSetNames(List<String> names) {
+		this.valueSetNames = names;
+	}
+
+	@Override
+	public List<String> getValueSetNames() {
+		return valueSetNames;
+	}
+
+	public void setCodeNamePairs(List<MLPCodeNamePair> pairs) {
+		this.pairs = pairs;
+	}
+
+	@Override
+	public List<MLPCodeNamePair> getCodeNamePairs(CodeNameType type) {
+		return pairs;
 	}
 
 	public void setSolutionCount(Long solutionCount) {
@@ -1606,15 +1625,6 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	@Override
 	public List<MLPPeer> getPeerAccess(String peerId) {
 		return peerAccessList;
-	}
-
-	public void setCodeNamePairs(List<MLPCodeNamePair> pairs) {
-		this.pairs = pairs;
-	}
-	
-	@Override
-	public List<MLPCodeNamePair> getCodeNamePairs(CodeNameType type) {
-		return pairs;
 	}
 
 }
