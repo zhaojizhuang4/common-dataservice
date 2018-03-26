@@ -64,9 +64,9 @@ public class SwaggerConfiguration {
 						+ " All service endpoints require basic HTTP authentication.", // description
 				version == null ? "version not available" : version, // version
 				"Terms of service", // TOS
-				new Contact("Acumos Data Model Team", // name
-						"https://acumos.org/to-be-determined", // URL
-						"cds.someday@acumos.org"), // email
+				new Contact("Acumos Common Data Service Team", // name
+						"http://acumos.readthedocs.io/en/latest/submodules/common-dataservice/docs/", // URL
+						"info@acumos.org"), // email
 				"Apache 2.0", // License
 				"https://www.apache.org/licenses/LICENSE-2.0", // License URL
 				new ArrayList<VendorExtension>()); // vendor extensions

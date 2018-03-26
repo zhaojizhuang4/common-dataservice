@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
@@ -51,15 +50,21 @@ public class MLPArtifactFOM extends MLPAbstractArtifact implements Serializable 
 
 	/**
 	 * An artifact has one owner. Unidirectional mapping
+	 * 
+	 * Use default LAZY fetch. This is only used for searching (never fetched, never
+	 * serialized as JSON).
 	 */
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne
 	@JoinColumn(name = "OWNER_ID", nullable = false, columnDefinition = "CHAR(36)")
 	private MLPUser owner;
 
 	/**
 	 * An artifact can participate in many revisions. Bidirectional mapping
+	 * 
+	 * Use default LAZY fetch. This is only used for searching (never fetched, never
+	 * serialized as JSON).
 	 */
-	@ManyToMany(mappedBy = "artifacts", fetch = FetchType.EAGER)
+	@ManyToMany(mappedBy = "artifacts")
 	private Set<MLPSolutionRevisionFOM> revisions = new HashSet<>();
 
 	public MLPUser getOwner() {
