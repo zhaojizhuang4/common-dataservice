@@ -306,16 +306,6 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public List<MLPCodeNamePair> getCodeNamePairs(CodeNameType type) {
-		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.PAIR_PATH, type.name() }, null, null);
-		logger.debug("getCodeNamePairs: uri {}", uri);
-		ResponseEntity<List<MLPCodeNamePair>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<MLPCodeNamePair>>() {
-				});
-		return response.getBody();
-	}
-
-	@Override
 	@Deprecated
 	public List<MLPAccessType> getAccessTypes() {
 		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.ACCESS_PATH, CCDSConstants.TYPE_PATH },
@@ -433,6 +423,26 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		logger.debug("getStepTypes: uri {}", uri);
 		ResponseEntity<List<MLPStepType>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPStepType>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public List<String> getValueSetNames() {
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.PAIR_PATH }, null, null);
+		logger.debug("getValueSetNames: uri {}", uri);
+		ResponseEntity<List<String>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<String>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public List<MLPCodeNamePair> getCodeNamePairs(CodeNameType type) {
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.PAIR_PATH, type.name() }, null, null);
+		logger.debug("getCodeNamePairs: uri {}", uri);
+		ResponseEntity<List<MLPCodeNamePair>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<MLPCodeNamePair>>() {
 				});
 		return response.getBody();
 	}
