@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -53,30 +52,42 @@ public class MLPSolutionRevisionFOM extends MLPAbstractSolutionRevision implemen
 
 	/**
 	 * A revision belongs to one solution. Bidirectional mapping
+	 * 
+	 * Use default LAZY fetch. This is only used for searching (never fetched, never
+	 * serialized as JSON).
 	 */
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne
 	@JoinColumn(name = SOL_ID_COL_NAME, nullable = false, columnDefinition = "CHAR(36)")
 	private MLPSolutionFOM solution;
 
 	/**
 	 * A revision has one owner. Unidirectional mapping
+	 * 
+	 * Use default LAZY fetch. This is only used for searching (never fetched, never
+	 * serialized as JSON).
 	 */
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne
 	@JoinColumn(name = "OWNER_ID", nullable = false, columnDefinition = "CHAR(36)")
 	private MLPUser owner;
 
 	/**
 	 * A revision has zero or one source peer. Unidirectional mapping
+	 * 
+	 * Use default LAZY fetch. This is only used for searching (never fetched, never
+	 * serialized as JSON).
 	 */
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne
 	@JoinColumn(name = "SOURCE_ID", columnDefinition = "CHAR(36)")
 	private MLPPeer source;
 
 	/**
 	 * A revision may have many artifacts. A two-column mapping table connects them.
 	 * Bidirectional mapping.
+	 * 
+	 * Use default LAZY fetch. This is only used for searching (never fetched, never
+	 * serialized as JSON).
 	 */
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany
 	@JoinTable(name = MLPSolRevArtMap.TABLE_NAME, //
 			joinColumns = { @JoinColumn(name = MLPSolRevArtMap.REVISION_ID_COL_NAME) }, //
 			inverseJoinColumns = { @JoinColumn(name = MLPSolRevArtMap.ARTIFACT_ID_COL_NAME) } //

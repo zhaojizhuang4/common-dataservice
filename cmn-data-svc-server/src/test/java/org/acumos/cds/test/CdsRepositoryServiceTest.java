@@ -424,10 +424,14 @@ public class CdsRepositoryServiceTest {
 			Map<String, String> solParms = new HashMap<>();
 			solParms.put("name", solName);
 			solParms.put("description", solDesc);
+			// Limit to one result, which helps detect Hibernate issues
+			// of creating a cross-product when it should not
 			Page<MLPSolution> searchSols = solutionSearchService.findSolutions(solParms, false,
-					new PageRequest(0, 5, null));
+					new PageRequest(0, 1, null));
 			// Ensure a single result; had a bug with dupes due to tags
-			Assert.assertTrue(searchSols.getContent().size() == 1);
+			Assert.assertEquals(searchSols.getContent().size(), 1);
+			// Ensure both tags were retrieved
+			Assert.assertEquals(searchSols.getContent().get(0).getTags().size(), 2);
 
 			// Search with a list of values
 			Map<String, Object> solListParms = new HashMap<>();

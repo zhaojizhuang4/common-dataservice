@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -53,23 +52,32 @@ public class MLPSolutionFOM extends MLPAbstractSolution implements Serializable 
 
 	/**
 	 * A solution has exactly one owner. Unidirectional mapping.
+	 * 
+	 * Use default LAZY fetch. This is only used for searching (never fetched, never
+	 * serialized as JSON).
 	 */
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne
 	@JoinColumn(name = "OWNER_ID", nullable = false, columnDefinition = "CHAR(36)")
 	private MLPUser owner;
 
 	/**
 	 * A solution has zero or one source peer. Unidirectional mapping.
+	 * 
+	 * Use default LAZY fetch. This is only used for searching (never fetched, never
+	 * serialized as JSON).
 	 */
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne
 	@JoinColumn(name = "SOURCE_ID", columnDefinition = "CHAR(36)")
 	private MLPPeer source;
 
 	/**
 	 * A solution may have many solution revisions. The solution revision entity has
 	 * the solutionId field. Bidirectional mapping.
+	 * 
+	 * Use default LAZY fetch. This is only used for searching (never fetched, never
+	 * serialized as JSON).
 	 */
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "solution") // field in MLPSolutionRevision
+	@OneToMany(mappedBy = "solution") // field in MLPSolutionRevision
 	private Set<MLPSolutionRevisionFOM> revisions = new HashSet<>(0);
 
 	/**
@@ -78,12 +86,15 @@ public class MLPSolutionFOM extends MLPAbstractSolution implements Serializable 
 	 * 
 	 * Unidirectional relationship - the MLPTag object is not annotated.
 	 * 
+	 * Use default LAZY fetch. This is only used for searching (never fetched, never
+	 * serialized as JSON).
+	 * 
 	 * This does NOT use cascade; e.g., "cascade = { CascadeType.ALL }". With that
 	 * annotation, use of an EXISTING tag when creating a solution yields a SQL
 	 * constraint-violation error, Hibernate attempts to insert a duplicate row to
 	 * the join table, also see https://hibernate.atlassian.net/browse/HHH-6776
 	 */
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany
 	@JoinTable(name = MLPSolTagMap.TABLE_NAME, //
 			joinColumns = { @JoinColumn(name = MLPSolTagMap.SOL_ID_COL_NAME) }, //
 			inverseJoinColumns = { @JoinColumn(name = MLPSolTagMap.TAG_COL_NAME) })
@@ -99,11 +110,14 @@ public class MLPSolutionFOM extends MLPAbstractSolution implements Serializable 
 	 * Without annotation and a setter on the MLPSolutionWeb object there's no way
 	 * to create a solution.
 	 * 
+	 * Use default LAZY fetch. This is only used for searching (never fetched, never
+	 * serialized as JSON).
+	 * 
 	 * This does NOT use cascade; e.g., "cascade = { CascadeType.ALL }". Tests WITH
 	 * that annotation revealed no problems, but the controller does not accept
 	 * updates to the web stats via the solution object, so there is no need.
 	 */
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne
 	@JoinColumn(name = MLPSolutionWeb.SOL_ID_COL_NAME)
 	private MLPSolutionWeb webStats;
 
