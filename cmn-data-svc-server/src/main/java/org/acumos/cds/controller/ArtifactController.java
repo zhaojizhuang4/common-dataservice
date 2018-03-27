@@ -74,7 +74,7 @@ public class ArtifactController extends AbstractController {
 	@ApiOperation(value = "Gets the count of artifacts.", response = CountTransport.class)
 	@RequestMapping(value = "/" + CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public CountTransport getCount() {
+	public CountTransport getArtifactCount() {
 		Long count = artifactRepository.count();
 		return new CountTransport(count);
 	}
@@ -88,7 +88,7 @@ public class ArtifactController extends AbstractController {
 	@ApiOperation(value = "Gets a page of artifacts, optionally sorted on fields.", response = MLPArtifact.class, responseContainer = "Page")
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	public Page<MLPArtifact> getPage(Pageable pageRequest) {
+	public Page<MLPArtifact> getArtifacts(Pageable pageRequest) {
 		return artifactRepository.findAll(pageRequest);
 	}
 

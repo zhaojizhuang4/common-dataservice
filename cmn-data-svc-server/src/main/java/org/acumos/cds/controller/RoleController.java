@@ -76,7 +76,7 @@ public class RoleController extends AbstractController {
 	@ApiOperation(value = "Gets the count of roles.", response = CountTransport.class)
 	@RequestMapping(value = CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public CountTransport getCount() {
+	public CountTransport getRoleCount() {
 		Long count = roleRepository.count();
 		return new CountTransport(count);
 	}

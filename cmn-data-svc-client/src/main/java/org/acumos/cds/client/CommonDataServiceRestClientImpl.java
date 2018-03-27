@@ -317,7 +317,8 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public List<MLPCodeNamePair> getCodeNamePairs(CodeNameType valueSetName) {
-		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.PAIR_PATH, valueSetName.name() }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.CODE_PATH, CCDSConstants.PAIR_PATH, valueSetName.name() }, null,
+				null);
 		logger.debug("getCodeNamePairs: uri {}", uri);
 		ResponseEntity<List<MLPCodeNamePair>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<MLPCodeNamePair>>() {

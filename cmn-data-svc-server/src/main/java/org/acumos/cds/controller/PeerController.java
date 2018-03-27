@@ -79,7 +79,7 @@ public class PeerController extends AbstractController {
 	@ApiOperation(value = "Gets a page of peers, optionally sorted on fields.", response = MLPPeer.class, responseContainer = "Page")
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	public Page<MLPPeer> getPageOfPeers(Pageable pageable) {
+	public Page<MLPPeer> getPeers(Pageable pageable) {
 		return peerRepository.findAll(pageable);
 	}
 

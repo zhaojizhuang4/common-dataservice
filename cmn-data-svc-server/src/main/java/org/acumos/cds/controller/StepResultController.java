@@ -68,7 +68,7 @@ public class StepResultController extends AbstractController {
 	@ApiOperation(value = "Gets a page of step results, optionally sorted on fields.", response = MLPStepResult.class, responseContainer = "Page")
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	public Page<MLPStepResult> getPage(Pageable pageRequest) {
+	public Page<MLPStepResult> getStepResults(Pageable pageRequest) {
 		return stepResultRepository.findAll(pageRequest);
 	}
 

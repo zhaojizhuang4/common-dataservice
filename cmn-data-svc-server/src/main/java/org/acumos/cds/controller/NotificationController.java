@@ -67,7 +67,7 @@ public class NotificationController extends AbstractController {
 	@ApiOperation(value = "Gets the count of notifications.", response = CountTransport.class)
 	@RequestMapping(value = "/" + CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public CountTransport getCount() {
+	public CountTransport getNotificationCount() {
 		Long count = notificationRepository.count();
 		logger.debug(EELFLoggerDelegate.debugLogger, "getNotificationCount: result is {} ", count);
 		return new CountTransport(count);

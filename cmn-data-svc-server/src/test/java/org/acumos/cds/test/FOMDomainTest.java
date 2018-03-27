@@ -22,41 +22,25 @@ package org.acumos.cds.test;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactFOM;
 import org.acumos.cds.domain.MLPPeer;
-import org.acumos.cds.domain.MLPSolution;
 import org.acumos.cds.domain.MLPSolutionFOM;
-import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPSolutionRevisionFOM;
 import org.acumos.cds.domain.MLPUser;
-import org.hibernate.SessionFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Tests getters and setters of server-side domain (model) classes.
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
 public class FOMDomainTest {
 
 	private static Logger logger = LoggerFactory.getLogger(FOMDomainTest.class);
-
-	@Autowired
-	private SessionFactory sessionFactory;
 
 	// Values for properties
 	final long time = new Date().getTime();
@@ -212,31 +196,6 @@ public class FOMDomainTest {
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
 		logger.info(m.toMLPSolutionRevision().toString());
-	}
-
-	/**
-	 * Tests for annotation errors in the FOM classes
-	 */
-	@Test
-	@SuppressWarnings("rawtypes")
-	public void testFomVsSimple() {
-		List sol = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class).list();
-		logger.info("Found sol fom count: {}", sol.size());
-		List solPlain = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class).list();
-		logger.info("Found sol plain count: {} ", solPlain.size());
-		Assert.assertEquals("solutions", sol.size(), solPlain.size());
-
-		List rev = sessionFactory.getCurrentSession().createCriteria(MLPSolutionRevisionFOM.class).list();
-		logger.info("Found rev fom count: {}", rev.size());
-		List revPlain = sessionFactory.getCurrentSession().createCriteria(MLPSolutionRevision.class).list();
-		logger.info("Found rev plain count: {}", revPlain.size());
-		Assert.assertEquals("revisions", rev.size(), revPlain.size());
-
-		List art = sessionFactory.getCurrentSession().createCriteria(MLPArtifactFOM.class).list();
-		logger.info("Found art fom count: {}", art.size());
-		List artPlain = sessionFactory.getCurrentSession().createCriteria(MLPArtifact.class).list();
-		logger.info("Found art plain count: {}", artPlain.size());
-		Assert.assertEquals("artifact", art.size(), artPlain.size());
 	}
 
 }

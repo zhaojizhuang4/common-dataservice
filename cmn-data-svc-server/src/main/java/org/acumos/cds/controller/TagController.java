@@ -61,7 +61,7 @@ public class TagController extends AbstractController {
 	@ApiOperation(value = "Gets a page of tags, optionally sorted.", response = MLPTag.class, responseContainer = "Page")
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	public Page<MLPTag> getPage(Pageable pageable) {
+	public Page<MLPTag> getTags(Pageable pageable) {
 		return tagRepository.findAll(pageable);
 	}
 

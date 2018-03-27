@@ -61,6 +61,7 @@ public class BasicSequenceDemo {
 			cu.setLoginHash("user_pass");
 			cu.setFirstName("First Name");
 			cu.setLastName("Last Name");
+			cu.setEmail(cu.getLoginName() + "@nowhere.com");
 			cu = client.createUser(cu);
 			logger.info("Created user {}", cu);
 
