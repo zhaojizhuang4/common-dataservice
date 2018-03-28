@@ -222,6 +222,7 @@ public class CdsRepositoryServiceTest {
 			final String lastName = "TestLast";
 			final String loginName = "test_user" + Long.toString(new Date().getTime());
 			final String loginPass = "test_pass3";
+			cu.setEmail("testRepouser1@abc.com");
 			cu.setFirstName(firstName);
 			cu.setLastName(lastName);
 			cu.setLoginName(loginName);
@@ -698,6 +699,7 @@ public class CdsRepositoryServiceTest {
 			final String lastName = "TestLast";
 			final String loginName = "test_user" + Long.toString(new Date().getTime());
 			final String loginPass = "test_pass";
+			cu.setEmail("testcreateSolArtRepouser@abc.com");
 			cu.setFirstName(firstName);
 			cu.setLastName(lastName);
 			cu.setLoginName(loginName);
@@ -989,6 +991,7 @@ public class CdsRepositoryServiceTest {
 			cu.setActive(true);
 			final String loginName = "test_user_" + Long.toString(new Date().getTime());
 			cu.setLoginName(loginName);
+			cu.setEmail("testrolefnrepouser@abc.com");
 			cu = userRepository.save(cu);
 			Assert.assertNotNull(cu.getUserId());
 
@@ -1044,6 +1047,7 @@ public class CdsRepositoryServiceTest {
 			MLPUser cu = new MLPUser();
 			final String loginName = "notif_" + Long.toString(new Date().getTime());
 			cu.setLoginName(loginName);
+			cu.setEmail("testnotificationuser@abc.com");
 			cu = userRepository.save(cu);
 			Assert.assertNotNull(cu.getUserId());
 
@@ -1092,6 +1096,7 @@ public class CdsRepositoryServiceTest {
 			MLPUser cu = new MLPUser();
 			final String loginName = "notif_" + Long.toString(new Date().getTime());
 			cu.setLoginName(loginName);
+			cu.setEmail("testusernotifprefrepouser@abc.com");
 			cu = userRepository.save(cu);
 			Assert.assertNotNull(cu.getUserId());
 
@@ -1176,6 +1181,7 @@ public class CdsRepositoryServiceTest {
 		// Need a user to create a solution
 		MLPUser cu = null;
 		cu = new MLPUser();
+		cu.setEmail("testpeersolgrprepouser@abc.com");
 		cu.setActive(true);
 		final String loginName = "test_user_" + Long.toString(new Date().getTime());
 		cu.setLoginName(loginName);

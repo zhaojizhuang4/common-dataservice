@@ -1205,7 +1205,7 @@ public class DomainTest extends AbstractModelTest {
 
 	@Test
 	public void testMLPUser() {
-		MLPUser m = new MLPUser(s1, b1);
+		MLPUser m = new MLPUser(s1, s10, b1);
 		m = new MLPUser();
 		m.setActive(b1);
 		m.setAuthToken(s1);
@@ -1231,10 +1231,16 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertNotNull(m.hashCode());
 		logger.info(m.toString());
 		try {
-			new MLPUser(null, true);
+			new MLPUser(null, null, true);
 			Assert.assertTrue("Unexpected success", false);
 		} catch (IllegalArgumentException iae) {
-			// null arg is rejected
+			// null login name is rejected
+		}
+		try {
+			new MLPUser(s1, null, true);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null email is rejected
 		}
 	}
 

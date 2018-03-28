@@ -75,7 +75,7 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	@Size(max = 50)
 	private String orgName;
 
-	@Column(name = "EMAIL", unique = true, columnDefinition = "VARCHAR(50)")
+	@Column(name = "EMAIL", nullable = false, unique = true, columnDefinition = "VARCHAR(50)")
 	@Size(max = 50)
 	private String email;
 
@@ -133,13 +133,16 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	 * 
 	 * @param loginName
 	 *            user name
+	 * @param email
+	 *            email address
 	 * @param active
 	 *            boolean flag
 	 */
-	public MLPUser(String loginName, boolean active) {
-		if (loginName == null)
+	public MLPUser(String loginName, String email, boolean active) {
+		if (loginName == null || email == null)
 			throw new IllegalArgumentException("Null not permitted");
 		this.loginName = loginName;
+		this.email = email;
 		this.active = active;
 	}
 

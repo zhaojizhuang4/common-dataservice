@@ -148,6 +148,7 @@ public class CdsControllerTest {
 			MLPUser cu = new MLPUser();
 			cu.setLoginName("user_login" + new Random().nextInt());
 			cu.setLoginHash("user_pass");
+			cu.setEmail("basissqedemuser@abc.com");
 			cu.setFirstName("First Name");
 			cu.setLastName("Last Name");
 			cu = client.createUser(cu);
@@ -279,6 +280,7 @@ public class CdsControllerTest {
 			MLPUser cu = new MLPUser();
 			cu.setLoginName("user_login");
 			cu.setLoginHash("user_pass");
+			cu.setEmail("testusrloginprvderuser@abc.com");
 			cu.setFirstName("First Name");
 			cu.setLastName("Last Name");
 			cu = client.createUser(cu);
@@ -322,6 +324,7 @@ public class CdsControllerTest {
 			final String loginPass = "test_client_pass";
 			cu.setLoginName(loginName);
 			cu.setLoginHash(loginPass);
+			cu.setEmail("createSolArtuser@abc.com");
 			final String firstName = "test_" + unique;
 			cu.setFirstName(firstName);
 			final String lastName = "name create-sol-arts";
@@ -839,6 +842,7 @@ public class CdsControllerTest {
 			final String loginPass = "test_client_pass";
 			cu.setLoginName(loginName);
 			cu.setLoginHash(loginPass);
+			cu.setEmail("testrolefnuser@abc.com");
 			final String firstName = "test_" + unique;
 			cu.setFirstName(firstName);
 			final String lastName = "test-role-fn";
@@ -972,6 +976,7 @@ public class CdsControllerTest {
 			MLPUser cu = new MLPUser();
 			final String loginName = "notif_" + Long.toString(new Date().getTime());
 			cu.setLoginName(loginName);
+			cu.setEmail("testnotifuser@abc.com");
 			cu = client.createUser(cu);
 			Assert.assertNotNull(cu.getUserId());
 
@@ -1036,6 +1041,7 @@ public class CdsControllerTest {
 		try {
 			final String loginName = "notif_" + Long.toString(new Date().getTime());
 			cu.setLoginName(loginName);
+			cu.setEmail("testusrnotifprefuser.com");
 			cu = client.createUser(cu);
 			Assert.assertNotNull(cu.getUserId());
 
@@ -1273,7 +1279,7 @@ public class CdsControllerTest {
 
 	@Test
 	public void testThreadsComments() throws Exception {
-		MLPUser cu = new MLPUser("commentUser", true);
+		MLPUser cu = new MLPUser("commentUser", "coomment@abc.com", true);
 		cu = client.createUser(cu);
 		Assert.assertNotNull(cu.getUserId());
 
@@ -1495,6 +1501,7 @@ public class CdsControllerTest {
 		cu.setActive(true);
 		final String loginName = "test_user_" + Long.toString(new Date().getTime());
 		cu.setLoginName(loginName);
+		cu.setEmail("testpeersolgrpuser@abc.com");
 		cu = client.createUser(cu);
 		Assert.assertNotNull("User ID", cu.getUserId());
 		logger.info("Created user " + cu.getUserId());
@@ -1810,7 +1817,7 @@ public class CdsControllerTest {
 		}
 		// Value too long
 		try {
-			client.createUser(new MLPUser(s64, true));
+			client.createUser(new MLPUser(s64, "testloginnamelength@abc.com", true));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create user failed on constraint as expected: {}", ex.getResponseBodyAsString());
@@ -1818,7 +1825,7 @@ public class CdsControllerTest {
 		// This one is supposed to work
 		final String loginName = "user-" + Long.toString(new Date().getTime());
 		final String sillyGoose = "sillygoose";
-		cu = new MLPUser(loginName, true);
+		cu = new MLPUser(loginName, "gooduser@abc.com", true);
 		cu.setLoginHash(sillyGoose);
 		cu = client.createUser(cu);
 		try {

@@ -20,6 +20,8 @@
 -- FROM version 1.15.x TO version 1.14.x.
 -- No database is specified to allow flexible deployment!
 
+-- 11
+ALTER TABLE C_USER MODIFY COLUMN EMAIL VARCHAR(100);
 -- 10
 ALTER TABLE C_SOLUTION_GROUP
   DROP INDEX C_SOLUTION_GROUP_C_NAME;

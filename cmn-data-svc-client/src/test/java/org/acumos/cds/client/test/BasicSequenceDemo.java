@@ -57,7 +57,7 @@ public class BasicSequenceDemo {
 				password);
 
 		try {
-			MLPUser cu = new MLPUser("user_login1", true);
+			MLPUser cu = new MLPUser("user_login1", "login1user@abc.com", true);
 			cu.setLoginHash("user_pass");
 			cu.setFirstName("First Name");
 			cu.setLastName("Last Name");

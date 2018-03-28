@@ -85,7 +85,7 @@ public class FOMRepositoryTest {
 			// Create entities for query
 
 			final String loginName = "user_" + Long.toString(new Date().getTime());
-			cu = new MLPUser(loginName, true);
+			cu = new MLPUser(loginName, "entitytestuser@abc.com", true);
 			cu = userRepository.save(cu);
 			Assert.assertNotNull(cu.getUserId());
 			logger.info("Created user {}", cu);
