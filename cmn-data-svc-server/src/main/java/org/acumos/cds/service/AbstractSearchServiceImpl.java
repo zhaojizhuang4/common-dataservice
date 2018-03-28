@@ -114,19 +114,42 @@ public abstract class AbstractSearchServiceImpl {
 	 *            Pageable
 	 */
 	protected void applyPageableCriteria(Criteria criteria, Pageable pageable) {
+		applyFirstMaxCriteria(criteria, pageable);
+		if (pageable.getSort() != null)
+			applySortCriteria(criteria, pageable);
+	}
+
+	/**
+	 * Adds first row and page size criteria to the criteria.
+	 * 
+	 * @param criteria
+	 *            Criteria
+	 * @param pageable
+	 *            Pageable
+	 */
+	protected void applyFirstMaxCriteria(Criteria criteria, Pageable pageable) {
 		criteria.setFirstResult(pageable.getOffset());
 		criteria.setMaxResults(pageable.getPageSize());
-		if (pageable.getSort() != null) {
-			Iterator<Sort.Order> orderIter = pageable.getSort().iterator();
-			while (orderIter.hasNext()) {
-				Sort.Order sortOrder = orderIter.next();
-				Order order;
-				if (sortOrder.isAscending())
-					order = Order.asc(sortOrder.getProperty());
-				else
-					order = Order.desc(sortOrder.getProperty());
-				criteria.addOrder(order);
-			}
+	}
+
+	/**
+	 * Adds sort criteria to the criteria.
+	 * 
+	 * @param criteria
+	 *            Criteria
+	 * @param pageable
+	 *            Pageable
+	 */
+	protected void applySortCriteria(Criteria criteria, Pageable pageable) {
+		Iterator<Sort.Order> orderIter = pageable.getSort().iterator();
+		while (orderIter.hasNext()) {
+			Sort.Order sortOrder = orderIter.next();
+			Order order;
+			if (sortOrder.isAscending())
+				order = Order.asc(sortOrder.getProperty());
+			else
+				order = Order.desc(sortOrder.getProperty());
+			criteria.addOrder(order);
 		}
 	}
 

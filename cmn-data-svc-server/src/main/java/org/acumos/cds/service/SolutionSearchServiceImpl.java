@@ -56,7 +56,9 @@ import org.springframework.stereotype.Service;
  * <LI>Specify an unambiguous ordering. This at least is cheap, just add
  * order-by the ID field.</LI>
  * </OL>
- * I'm not the only one who has fought Hibernate to get paginated search results:
+ * I'm not the only one who has fought Hibernate to get paginated search
+ * results:
+ * 
  * <PRE>
  * https://stackoverflow.com/questions/300491/how-to-get-distinct-results-in-hibernate-with-joins-and-row-based-limiting-pagi
  * https://stackoverflow.com/questions/9418268/hibernate-distinct-results-with-pagination
@@ -73,6 +75,10 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 	@Autowired
 	private SessionFactory sessionFactory;
 
+	private final String revAlias = "revs";
+	private final String artAlias = "arts";
+	private final String solutionId = "solutionId";
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public Page<MLPSolution> findSolutions(Map<String, ? extends Object> queryParameters, boolean isOr,
@@ -82,7 +88,6 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 		// Adjust fetch mode on tags to block Hibernate from using left outer join,
 		// which builds a cross product that contains duplicate rows.
-		// This is a horrid violation of information hiding.
 		criteria.setFetchMode("tags", FetchMode.SELECT);
 
 		// Count the total rows
@@ -125,7 +130,6 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 		// Adjust fetch mode to block Hibernate from using left outer join,
 		// which builds a cross product that contains duplicate rows.
-		// This is a horrid violation of information hiding.
 		criteria.setFetchMode("tags", FetchMode.SELECT);
 
 		// Always check active status
@@ -175,38 +179,74 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		return new PageImpl<>(items, pageable, count);
 	}
 
+	/**
+	 * Runs a query on the SolutionFOM entity, returns a page after converting
+	 * objects to plain solution.
+	 * 
+	 * @param criteria
+	 *            Criteria to evaluate
+	 * @param pageable
+	 *            Page and sort criteria
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	private Page<MLPSolution> runSolutionFomQuery(Criteria criteria, Pageable pageable) {
+
+		// Include user's sort request
+		if (pageable.getSort() != null)
+			super.applySortCriteria(criteria, pageable);
+		// Add order on a unique field. Without this the pagination
+		// can yield odd results; e.g., request 10 items but only get 8.
+		criteria.addOrder(Order.asc(solutionId));
+		// Hibernate should coalesce the results, yielding only solutions
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+		// Getting the complete result could be brutally expensive.
+		List foms = criteria.list();
+		if (foms.isEmpty() || foms.size() < pageable.getOffset())
+			return new PageImpl<>(new ArrayList<>(), pageable, 0);
+
+		// Get a page of FOM solutions and convert each to plain solution
+		List<MLPSolution> items = new ArrayList<>();
+		int lastItemInPage = pageable.getOffset() + pageable.getPageSize();
+		int limit = lastItemInPage < foms.size() ? lastItemInPage : foms.size();
+		for (int i = pageable.getOffset(); i < limit; ++i) {
+			Object o = foms.get(i);
+			if (o instanceof MLPSolutionFOM)
+				items.add(((MLPSolutionFOM) o).toMLPSolution());
+			else
+				throw new AssertionFailure("Unexpected type: " + o.getClass().getName());
+		}
+
+		return new PageImpl<>(items, pageable, foms.size());
+	}
+
 	/*
+	 * This query checks properties of the solution (access type) AND properties of
+	 * associated entities (modified date), which requires an inner join and yields
+	 * a large cross product that Hibernate will coalesce. Because of the joins it's
+	 * unsafe to apply limit parameters at the database. Therefore this method
+	 * fetches the full result from the database then reduces the result size here,
+	 * which is inefficient.
+	 * 
 	 * Uses the full object mapping (FOM) version of the Solution class.
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
 	public Page<MLPSolution> findSolutionsByModifiedDate(boolean active, String[] accessTypeCode,
 			String[] validationStatusCode, Date date, Pageable pageable) {
 
+		// build the query using FOM to access child attributes
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
-
-		final String revAlias = "revs";
-		final String artAlias = "arts";
-		// Revisions is the field name in solution model
 		criteria.createAlias("revisions", revAlias);
-		// Artifacts is the field name in revision model
 		criteria.createAlias(revAlias + ".artifacts", artAlias);
-
-		// Adjust fetch mode to block Hibernate from using left outer join,
-		// which builds a cross product that contains duplicate rows.
-		// This is a horrid violation of information hiding.
-		criteria.setFetchMode("tags", FetchMode.SELECT);
-		criteria.setFetchMode("revisions", FetchMode.SELECT);
-		criteria.setFetchMode(revAlias + ".artifacts", FetchMode.SELECT);
-
+		criteria.createAlias(revAlias + ".solution", "sol");
 		criteria.add(Restrictions.eq("active", active));
 		if (accessTypeCode != null && accessTypeCode.length > 0)
-			criteria.add(buildEqualsListCriterion("accessTypeCode", accessTypeCode));
+			criteria.add(Restrictions.in("accessTypeCode", accessTypeCode));
 		if (validationStatusCode != null && validationStatusCode.length > 0)
-			criteria.add(buildEqualsListCriterion("validationStatusCode", validationStatusCode));
-
-		// Construct a disjunction to find any updated item;
-		// unfortunately this requires hardcoded field names
+			criteria.add(Restrictions.in("validationStatusCode", validationStatusCode));
+		// Construct a disjunction to find any updated item.
+		// Unfortunately this requires hard-coded field names
 		Criterion solModified = Restrictions.ge("modified", date);
 		Criterion revModified = Restrictions.ge(revAlias + ".modified", date);
 		Criterion artModified = Restrictions.ge(artAlias + ".modified", date);
@@ -216,37 +256,10 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		itemModifiedAfter.add(artModified);
 		criteria.add(itemModifiedAfter);
 
-		// Count the total rows
-		criteria.setProjection(Projections.rowCount());
-		Long count = (Long) criteria.uniqueResult();
-		if (count == 0)
-			return new PageImpl<>(new ArrayList<>(), pageable, count);
-
-		// Remove the count projections
-		criteria.setProjection(null);
-		// This should not do any harm; had problems elsewhere without
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		// Add pagination and sort
-		super.applyPageableCriteria(criteria, pageable);
-		// Fallback order on a unique field. Without this the pagination
-		// yields odd results; e.g., request 10 items but only get 8.
-		criteria.addOrder(Order.asc("solutionId"));
-
-		// Get a page of results
-		List items = criteria.list();
-		if (items.isEmpty())
-			throw new RuntimeException("findSolutionsByModifiedDate: unexpected empty result");
-		logger.debug(EELFLoggerDelegate.debugLogger, "findSolutionsByModifiedDate: result size={}", items.size());
-
-		List<MLPSolution> solutions = new ArrayList<>();
-		for (Object item : items)
-			if (item instanceof MLPSolutionFOM)
-				solutions.add(((MLPSolutionFOM) item).toMLPSolution());
-			else
-				throw new AssertionFailure("Unexpected type: " + item.getClass().getName());
-
-		logger.debug(EELFLoggerDelegate.debugLogger, "findSolutionsByModifiedDate: result size={}", solutions.size());
-		return new PageImpl<>(solutions, pageable, count);
+		Page<MLPSolution> result = runSolutionFomQuery(criteria, pageable);
+		logger.debug(EELFLoggerDelegate.debugLogger, "findSolutionsByModifiedDate: result size={}",
+				result.getNumberOfElements());
+		return result;
 	}
 
 }
