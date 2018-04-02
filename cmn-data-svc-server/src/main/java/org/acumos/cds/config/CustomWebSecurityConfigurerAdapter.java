@@ -21,24 +21,29 @@
 package org.acumos.cds.config;
 
 import org.acumos.cds.CCDSConstants;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 
 /**
- * Spring 4 security requires a CSRF token on POST/PUT/DELETE requests.
+ * Spring 4 security requires a CSRF token on POST/PUT/DELETE requests.  But
+ * this server has no web pages where a CSRF token would be sent, so disable.
  * 
- * Disable CSRF; turn on basic HTTP auth; attempt to exclude a few resources
- * from Spring security.
+ * Use basic HTTP auth, but exclude the health check from Spring security.
  * 
+ * With credit to:
  * http://ryanjbaxter.com/2015/01/06/securing-rest-apis-with-spring-boot/
  */
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
+	private static final String REALM_NAME = "Acumos-CDS";
+	
 	/**
 	 * Open access to the documentation.
 	 */
@@ -52,10 +57,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeRequests() //
-				.antMatchers("/" + CCDSConstants.HEALTHCHECK_PATH).permitAll()
-				.antMatchers("/" + CCDSConstants.VERSION_PATH).permitAll().antMatchers("/**").authenticated().and()
-				.httpBasic();
+		http.csrf().disable() //
+				.authorizeRequests() //
+				.antMatchers("/" + CCDSConstants.HEALTHCHECK_PATH).permitAll() //
+				.antMatchers("/" + CCDSConstants.VERSION_PATH).permitAll() //
+				.antMatchers("/**").authenticated() //
+				.and().httpBasic().realmName(REALM_NAME).authenticationEntryPoint(getBasicAuthEntryPoint());
+	}
+	
+	@Bean
+	public BasicAuthenticationEntryPoint getBasicAuthEntryPoint() {
+		BasicAuthenticationEntryPoint baep = new CustomBasicAuthenticationEntryPoint();
+		baep.setRealmName(REALM_NAME);
+		return baep;
 	}
 
 }

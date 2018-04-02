@@ -46,7 +46,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConfigurationProperties(prefix = "codeName")
-public class CodeNameConfiguration {
+public class CodeNameProperties {
 
 	private Map<String, String> accessType;
 	private Map<String, String> artifactType;

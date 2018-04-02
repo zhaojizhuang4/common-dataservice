@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.acumos.cds.CodeNameType;
-import org.acumos.cds.config.CodeNameConfiguration;
+import org.acumos.cds.config.CodeNameProperties;
 import org.acumos.cds.domain.MLPCodeNamePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 public class CodeNameServiceImpl implements CodeNameService {
 
 	@Autowired
-	private CodeNameConfiguration codeNameConfig;
+	private CodeNameProperties codeNameProps;
 
 	/**
 	 * Translates a value set name into a set of pairs.
@@ -45,33 +45,33 @@ public class CodeNameServiceImpl implements CodeNameService {
 	private Map<String, String> getPairs(CodeNameType type) {
 		switch (type) {
 		case ACCESS_TYPE:
-			return codeNameConfig.getAccessType();
+			return codeNameProps.getAccessType();
 		case ARTIFACT_TYPE:
-			return codeNameConfig.getArtifactType();
+			return codeNameProps.getArtifactType();
 		case DEPLOYMENT_STATUS:
-			return codeNameConfig.getDeploymentStatus();
+			return codeNameProps.getDeploymentStatus();
 		case LOGIN_PROVIDER:
-			return codeNameConfig.getLoginProvider();
+			return codeNameProps.getLoginProvider();
 		case MESSAGE_SEVERITY:
-			return codeNameConfig.getMessageSeverity();
+			return codeNameProps.getMessageSeverity();
 		case MODEL_TYPE:
-			return codeNameConfig.getModelType();
+			return codeNameProps.getModelType();
 		case NOTIFICATION_DELIVERY_MECHANISM:
-			return codeNameConfig.getNotificationDeliveryMechanism();
+			return codeNameProps.getNotificationDeliveryMechanism();
 		case PEER_STATUS:
-			return codeNameConfig.getPeerStatus();
+			return codeNameProps.getPeerStatus();
 		case STEP_STATUS:
-			return codeNameConfig.getStepStatus();
+			return codeNameProps.getStepStatus();
 		case STEP_TYPE:
-			return codeNameConfig.getStepType();
+			return codeNameProps.getStepType();
 		case SUBSCRIPTION_SCOPE:
-			return codeNameConfig.getSubscriptionScope();
+			return codeNameProps.getSubscriptionScope();
 		case TOOLKIT_TYPE:
-			return codeNameConfig.getToolkitType();
+			return codeNameProps.getToolkitType();
 		case VALIDATION_STATUS:
-			return codeNameConfig.getValidationStatus();
+			return codeNameProps.getValidationStatus();
 		case VALIDATION_TYPE:
-			return codeNameConfig.getValidationType();
+			return codeNameProps.getValidationType();
 		}
 		throw new IllegalArgumentException("unimplemented case for type " + type.name());
 	}
