@@ -149,9 +149,11 @@ public class UserController extends AbstractController {
 		boolean passwordMatches = user != null //
 				&& BCrypt.checkpw(login.getPass(), user.getLoginHash());
 		if (user == null || !passwordMatches) {
+			logger.info(EELFLoggerDelegate.auditLogger, "login: No match for credentials for {}", login.getName());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No match for credentials", null);
 		} else {
+			logger.info(EELFLoggerDelegate.auditLogger, "login: Successful login of {}", user.getLoginName());
 			// detach from Hibernate and wipe hash
 			entityManager.detach(user);
 			user.setLoginHash(null);
@@ -392,10 +394,13 @@ public class UserController extends AbstractController {
 			if (bothNull || notNullAndMatch) {
 				String pwHash = BCrypt.hashpw(changeRequest.getNewLoginPass(), BCrypt.gensalt());
 				existingUser.setLoginHash(pwHash);
+				logger.info(EELFLoggerDelegate.auditLogger, "updatePassword: Successful change of password for user {}", existingUser.getLoginName());
 			} else {
 				// no match
+				String passwdNoMatch = "The old password did not match"; 
+				logger.info(EELFLoggerDelegate.auditLogger, "updatePassword: {} for user {}", passwdNoMatch, existingUser.getLoginName());
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "The old password did not match", null);
+				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, passwdNoMatch, null);
 			}
 			userRepository.save(existingUser);
 			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
