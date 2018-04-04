@@ -20,7 +20,8 @@
 Developer Guide for the Common Data Service Server
 ==================================================
 
-This microservice provides common data services to components in the Acumos machine-learning platform. It is built using the Spring-Boot platform.
+This microservice provides common data services to components in the Acumos machine-learning platform. 
+It is built using the Spring-Boot platform. This document primarily offers guidance for server developers.
 
 Supported Methods and Objects
 -----------------------------
@@ -34,6 +35,9 @@ consult the server's configuration for the exact port number (e.g., "8080") and 
 Building and Packaging
 ----------------------
 
+As of this writing the build (continuous integration) process is fully automated in the Linux Foundation system
+using Gerrit and Jenkins.  This section describes how to perform local builds for development and testing.
+
 Prerequisites
 ~~~~~~~~~~~~~
 
@@ -41,7 +45,7 @@ The build machine needs the following:
 
 1. Java version 1.8
 2. Maven version 3
-3. Connectivity to Maven Central (for most jars)
+3. Connectivity to Maven Central to download required jars
 
 Use maven to build and package the service into a single "fat" jar using this command::
 
@@ -50,7 +54,7 @@ Use maven to build and package the service into a single "fat" jar using this co
 Development and Local Testing
 -----------------------------
 
-This section provides information for developing and testing the server locally; e.g., on a personal machine.
+This section provides information for developing and testing the server locally.
 
 Testing with an in-memory database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -61,7 +65,8 @@ Testing with an external database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A properties file "application-mariadb.properties" is provided that configures the server to use an
-external MariaDB database running on the local host at port 3306.  Launch the test like this::
+external MariaDB database running on the local host at port 3306.  Direct Spring-Boot to use that 
+properties file during a test with this invocation::
 
     mvn -Dspring.config.name=application-mariadb test
     
@@ -78,7 +83,7 @@ The server can be configured to use a different external database as follows:
 Launching
 ~~~~~~~~~
 
-Launch the microservice for development and testing like this::
+Launch the server for development and testing like this::
 
      mvn clean spring-boot:run
 
@@ -95,28 +100,27 @@ assuming that the application is packaged into a docker container for deployment
 Prerequisites
 ~~~~~~~~~~~~~
 
-1. Java version 1.8 in the runtime environment (e.g., docker container)
-2. A Mariadb or Mysql database with the required tables; instructions are shown below
-3. The username/password combination to access the database
-4. A valid configuration with database coordinates.
+    1. Java version 1.8 in the runtime environment; i.e., installed in the docker container
+    2. A Mariadb or Mysql database with the required tables; instructions are shown below
+    3. The username/password combination to access the database
+    4. A valid configuration with database coordinates.
 
 Configuring the system
 ~~~~~~~~~~~~~~~~~~~~~~
 
 First the database must be created or upgraded, depending on the situation,
-using scripts in the "db-scripts" directory.  Please note the version number is
-represented here as "N.N" or "M.M".
+using scripts in the "db-scripts" directory.  Please note version numbers are
+mostly written here as "M.N" because actual version numbers change regularly.
 
 - cmn-data-svc-user-mysql.sql: This file is a TEMPLATE can be used to
   create a Mysql/MariaDB database, to create a user, and to grant the
   user permission on the database.  The values in CAPITALS shown in
   the file must be adjusted for each use.
-- cmn-data-svc-ddl-dml-mysql-N-N.sql: This file has the data-definition and
+- cmn-data-svc-ddl-dml-mysql-M-N.sql: This file has the data-definition and
   data-modeling language statements that create new tables and
   populate them.
-- cds-mysql-upgrade-N.N-to-M.M.sql: If an existing system must be upgraded
-  instead of creating a new one, this file has the data-definition and data-modeling 
-  language statements to modify an existing database.
+- cds-mysql-upgrade-M.N-to-M.N+1.sql: If an existing system needs to be upgraded,
+  these files have the required SQL statements to perform the upgrade.
 
 Next, configuration parameters must be specified.  A template with
 default values can be found in the top level of this project named
@@ -132,17 +136,17 @@ required entries::
     spring.datasource.password = some-password
     spring.jpa.database-platform=org.hibernate.dialect.DerbyTenSevenDialect
 
-The HTTP server's username and password are configured in the
-properties file.  Only one username/password is used to secure the
-REST endpoint. The default entries for the server are shown here::
+The HTTP server's username and password are configured in the properties file.  
+Only one username/password is used to secure the REST endpoint. 
+The default entries for the server are shown here::
 
     security.user.name=ccds_client
     security.user.password=(encrypted)
 
-At runtime in production deployments, instead of using a configuration file,
-all configuration properties should be supplied using a block of JSON in an
-environment variable called SPRING\_APPLICATION\_JSON. This can easily be done
-in a docker-compose configuration file.  For example::
+At runtime in production deployments, in addition to using a configuration file,
+environment-specific configuration properties should be supplied using a block of 
+JSON in an environment variable called SPRING\_APPLICATION\_JSON. This can easily 
+be done in a docker-compose configuration file.  For example::
 
       SPRING_APPLICATION_JSON: '{
           "server" : {
@@ -174,10 +178,32 @@ in a docker-compose configuration file.  For example::
           }
      }'
 
+Defining Code-Name Value Sets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The application properties file defines all restricted value sets, which are code-name pairs.
+For example, the access type for a solution may take on the value "PB" (public).
+
+These value sets can be changed by modifying the properties file.  Each entry has a code and
+an associated name.  Continuing with the same example, the complete access type value set 
+is defined by the following configuration entries::
+
+    codeName.accessType.OR=Organization
+    codeName.accessType.PB=Public
+    codeName.accessType.PR=Private
+    codeName.accessType.RS=Restricted
+
+Perform these steps to define a new value set:
+
+    1. Extend the Java class CodeNameType in the client project
+    2. Extend the Java class CodeNameProperties in the server project
+    3. Add appropriate entries to the properties file.
+
 Generating Encrypted Passwords
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Clear-text passwords are prohibited in many deployment environments. Use the following commands to generate an encrypted password for the database and the service.
+Clear-text passwords are prohibited in many deployment environments. 
+Use the following commands to generate an encrypted password for the database and the service.
 
 1. Download the jar, for example using wget::
 
@@ -211,6 +237,8 @@ start the application with the following command::
 Quickstart Version Upgrade
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+This documents the steps required to upgrade an installation to a new(er) version.
+
 1. Create a new database. If needed, create a new user and grant access to the database for the new user.  Example commands to do this are in script "cmn-data-svc-basemysql.sql" and are something like this::
 
     % sudo mysql
@@ -218,7 +246,7 @@ Quickstart Version Upgrade
     > create user 'CDS_USER'@'%' identified by 'CDS_PASS';
     > grant all on cds1140m.* to 'CDS_USER'@'%';
 
-2. Populate the new database with the contents of the previous one.  For example, if working on the Mysql/Mariadb database server the command is something like the following, depending on system configuration and user privileges::
+2. Migrate the old database to the new database.  For example, if working on the Mysql/Mariadb database server the command is something like the following, depending on system configuration and user privileges::
 
     sudo mysqldump cds1130m | sudo mysql cds1140m
 
@@ -232,7 +260,7 @@ Quickstart Version Upgrade
 
 5. Use an appropriate docker-compose start script (varies by environment) to start the new image, for example::
 
-    docker-compose up -d common-dataservice-NNN
+    docker-compose up -d common-dataservice-1140
 
 Troubleshooting
 ---------------
