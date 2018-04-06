@@ -345,16 +345,41 @@ public class CdsControllerTest {
 			Assert.assertNull(cu.getLoginHash());
 			logger.info("Created user {}", cu);
 
+			MLPUser inactiveUser = new MLPUser("loginNameBogus", "email@address.org", false);
+			inactiveUser.setLoginHash("cleartext");
+			inactiveUser = client.createUser(inactiveUser);
+			Assert.assertNotNull(inactiveUser.getUserId());
+
 			RestPageResponse<MLPUser> users = client.getUsers(rp);
 			Assert.assertTrue(users.getNumberOfElements() > 0);
 			for (MLPUser u : users.getContent())
 				logger.info("Fetched user: " + u);
 
-			// Login
 			MLPUser loggedIn = client.loginUser(loginName, loginPass);
 			Assert.assertNotNull(loggedIn);
 			logger.info("Logged in successfully, password expires {}", loggedIn.getLoginPassExpire());
 			Assert.assertArrayEquals(fakePicture, loggedIn.getPicture());
+
+			// Ensure inactive user cannot login
+			try {
+				client.loginUser(inactiveUser.getLoginName(), "some password");
+				throw new Exception("Unexpected login of inactive user");
+			} catch (HttpStatusCodeException ex) {
+				logger.info("Login of inactive user failed as expected");
+			}
+
+			MLPPasswordChangeRequest req = new MLPPasswordChangeRequest(loginPass, "HardToRemember");
+			client.updatePassword(cu, req);
+			logger.info("Password changed successfully");
+
+			// Ensure inactive user cannot change password
+			try {
+				MLPPasswordChangeRequest inactiveChangeReq = new MLPPasswordChangeRequest("old", "new");
+				client.updatePassword(inactiveUser, inactiveChangeReq);
+				throw new Exception("Unexpected update passwd of inactive user");
+			} catch (HttpStatusCodeException ex) {
+				logger.info("Update passwd of inactive user failed as expected");
+			}
 
 			// First an empty result
 			HashMap<String, Object> userRestr = new HashMap<>();
@@ -815,6 +840,7 @@ public class CdsControllerTest {
 				client.deletePeer(pr.getPeerId());
 				client.deleteUserLoginProvider(clp);
 				client.deleteUser(cu.getUserId());
+				client.deleteUser(inactiveUser.getUserId());
 
 				try {
 					MLPSolution deleted = client.getSolution(cs.getSolutionId());
@@ -852,11 +878,6 @@ public class CdsControllerTest {
 			cu = client.createUser(cu);
 			Assert.assertNotNull(cu.getUserId());
 			logger.info("Created user with ID {}", cu.getUserId());
-
-			logger.info("Creating a password change request");
-			MLPPasswordChangeRequest req = new MLPPasswordChangeRequest(loginPass, "HardToRemember");
-			client.updatePassword(cu, req);
-			logger.info("Password changed successfully");
 
 			MLPRole cr = new MLPRole();
 			cr.setName("something or the other");

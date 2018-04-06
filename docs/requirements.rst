@@ -1110,7 +1110,8 @@ Standard CRUD operations plus the following:
 * Get a page of users from the complete set, optionally sorted on one or more attributes
 * Get a page of users using partial ("like") value match on the first, middle, last or login name attributes, optionally sorted on one or more attributes
 * Search for users using exact value match on one or more attributes, either all (conjunction-and) or one (disjunction-or)
-* Check user credentials - the login operation. Match login name/email address as user, password as password. Returns user object if found; signals bad request if no match is found.
+* Check user credentials - the login operation. Match login name/email address as user, password as password. Returns user object if found and active; signals bad request if user is not found, user is not active or password does not match.
+* Change user password -  find user by ID and update password if user is active and old password matches. Signals bad request if user is not found, user is not active or old password does not match.
 
 Operations on user login providers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

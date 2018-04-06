@@ -659,13 +659,14 @@ public interface ICommonDataServiceRestClient {
 			RestPageRequest pageRequest);
 
 	/**
-	 * Searches for user with the specified credentials.
+	 * Checks credentials for the specified active user. Throws an exception if the
+	 * user is not found, is not active or the password does not match.
 	 * 
 	 * @param name
-	 *            loginname OR email address; both fields are checked
+	 *            login name or email address; both attributes are checked
 	 * @param pass
 	 *            clear-text password
-	 * @return User object if a match is found
+	 * @return User object if a match for an active user is found.
 	 */
 	MLPUser loginUser(String name, String pass);
 
@@ -1300,13 +1301,14 @@ public interface ICommonDataServiceRestClient {
 	void dropSolutionUserAccess(String solutionId, String userId);
 
 	/**
-	 * Updates the password for the specified user. Throws an exception if the old
-	 * password does not match.
+	 * Updates the password for the specified active user. Throws an exception if
+	 * the old password does not match or the user is not active.
 	 * 
 	 * @param user
 	 *            User object
 	 * @param changeRequest
-	 *            Old and new passwords
+	 *            Old and new passwords. Old password may be null, new password must
+	 *            not be present.
 	 */
 	void updatePassword(MLPUser user, MLPPasswordChangeRequest changeRequest);
 

@@ -135,7 +135,7 @@ public class UserController extends AbstractController {
 	 *            HttpServletResponse
 	 * @return A user if found, an error otherwise.
 	 */
-	@ApiOperation(value = "Checks the specified credentials.  The supplied login name is matched against the user's login name and email fields.  Returns the user object if found; bad request if no match is found.", response = MLPUser.class)
+	@ApiOperation(value = "Checks the specified credentials.  Searches both login name and email fields for the specified name.  Returns the user object if an active user exists with the specified credentials; answers bad request if no match is found.", response = MLPUser.class)
 	@RequestMapping(value = "/" + CCDSConstants.LOGIN_PATH, method = RequestMethod.POST)
 	@ResponseBody
 	public Object login(@RequestBody LoginTransport login, HttpServletResponse response) {
@@ -144,20 +144,75 @@ public class UserController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing login name and/or password");
 		}
-		Object result;
 		MLPUser user = userRepository.findByLoginOrEmail(login.getName());
-		boolean passwordMatches = user != null //
-				&& BCrypt.checkpw(login.getPass(), user.getLoginHash());
-		if (user == null || !passwordMatches) {
-			logger.info(EELFLoggerDelegate.auditLogger, "login: No match for credentials for {}", login.getName());
+		if (user == null || !user.isActive()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "No match for credentials", null);
-		} else {
-			logger.info(EELFLoggerDelegate.auditLogger, "login: Successful login of {}", user.getLoginName());
-			// detach from Hibernate and wipe hash
-			entityManager.detach(user);
-			user.setLoginHash(null);
-			result = user;
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+					"Failed to find active user " + login.getName());
+		}
+		if (!BCrypt.checkpw(login.getPass(), user.getLoginHash())) {
+			final String msg = "Failed to authenticate user";
+			logger.info(EELFLoggerDelegate.auditLogger, "login: {}: {}", msg, login.getName());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, msg, null);
+		}
+		logger.info(EELFLoggerDelegate.auditLogger, "login: authenticated user {}", user.getLoginName());
+		// detach from Hibernate and wipe hash
+		entityManager.detach(user);
+		user.setLoginHash(null);
+		return user;
+	}
+
+	/**
+	 * @param userId
+	 *            Path parameter with the row ID
+	 * @param changeRequest
+	 *            contains old and new password
+	 * @param response
+	 *            HttpServletResponse
+	 * @return Transport model with success or failure
+	 */
+	@ApiOperation(value = "Sets the user's password to the new value if the user exists, is active, and the old password matches.", response = SuccessTransport.class)
+	@RequestMapping(value = "/{userId}/" + CCDSConstants.CHPASS_PATH, method = RequestMethod.PUT)
+	@ResponseBody
+	public MLPTransportModel updatePassword(@PathVariable("userId") String userId,
+			@RequestBody MLPPasswordChangeRequest changeRequest, HttpServletResponse response) {
+		// Existing password may be null, but reject empty new password
+		if (changeRequest.getNewLoginPass() == null || changeRequest.getNewLoginPass().length() == 0) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing or null new password", null);
+		}
+		// Get the existing user
+		MLPUser user = userRepository.findOne(userId);
+		if (user == null || !user.isActive()) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+					"Failed to find active user with ID " + userId, null);
+		}
+		MLPTransportModel result = null;
+		try {
+			final boolean bothNull = user.getLoginHash() == null && changeRequest.getOldLoginPass() == null;
+			final boolean notNullAndMatch = user.getLoginHash() != null && changeRequest.getOldLoginPass() != null
+					&& BCrypt.checkpw(changeRequest.getOldLoginPass(), user.getLoginHash());
+			if (bothNull || notNullAndMatch) {
+				logger.info(EELFLoggerDelegate.auditLogger, "updatePassword: Change password for user {}",
+						user.getLoginName());
+				final String pwHash = BCrypt.hashpw(changeRequest.getNewLoginPass(), BCrypt.gensalt());
+				user.setLoginHash(pwHash);
+				userRepository.save(user);
+				result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			} else {
+				final String notMatched = "The old password did not match";
+				logger.info(EELFLoggerDelegate.auditLogger, "updatePassword: {} for user {}", notMatched,
+						user.getLoginName());
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, notMatched, null);
+			}
+		} catch (Exception ex) {
+			final String msg = "updatePassword failed";
+			logger.error(EELFLoggerDelegate.errorLogger, msg, ex);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			result = new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg, ex);
 		}
 		return result;
 	}
@@ -354,60 +409,6 @@ public class UserController extends AbstractController {
 			logger.warn(EELFLoggerDelegate.errorLogger, "updateUser", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateUser failed", cve);
-		}
-		return result;
-	}
-
-	/**
-	 * @param userId
-	 *            Path parameter with the row ID
-	 * @param changeRequest
-	 *            contains old and new password
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
-	 */
-	@ApiOperation(value = "Sets the user's password to the new value if the old value matches.", response = SuccessTransport.class)
-	@RequestMapping(value = "/{userId}/" + CCDSConstants.CHPASS_PATH, method = RequestMethod.PUT)
-	@ResponseBody
-	public Object updatePassword(@PathVariable("userId") String userId,
-			@RequestBody MLPPasswordChangeRequest changeRequest, HttpServletResponse response) {
-		// Do not log the old/new password values!
-		logger.debug(EELFLoggerDelegate.debugLogger, "updatePassword: received request for user {}", userId);
-		// Get the existing user
-		MLPUser existingUser = userRepository.findOne(userId);
-		if (existingUser == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
-		}
-		// Reject empty passwords
-		if (changeRequest.getNewLoginPass() == null || changeRequest.getNewLoginPass().length() == 0) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Cannot set the password to empty", null);
-		}
-		MLPTransportModel result = null;
-		try {
-			final boolean bothNull = existingUser.getLoginHash() == null && changeRequest.getOldLoginPass() == null;
-			final boolean notNullAndMatch = existingUser.getLoginHash() != null
-					&& changeRequest.getOldLoginPass() != null
-					&& BCrypt.checkpw(changeRequest.getOldLoginPass(), existingUser.getLoginHash());
-			if (bothNull || notNullAndMatch) {
-				String pwHash = BCrypt.hashpw(changeRequest.getNewLoginPass(), BCrypt.gensalt());
-				existingUser.setLoginHash(pwHash);
-				logger.info(EELFLoggerDelegate.auditLogger, "updatePassword: Successful change of password for user {}", existingUser.getLoginName());
-			} else {
-				// no match
-				String passwdNoMatch = "The old password did not match"; 
-				logger.info(EELFLoggerDelegate.auditLogger, "updatePassword: {} for user {}", passwdNoMatch, existingUser.getLoginName());
-				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, passwdNoMatch, null);
-			}
-			userRepository.save(existingUser);
-			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
-		} catch (Exception ex) {
-			logger.error(EELFLoggerDelegate.errorLogger, "updatePassword failed", ex);
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			result = new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "updatePassword failed", ex);
 		}
 		return result;
 	}
