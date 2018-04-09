@@ -27,6 +27,7 @@ Version 1.15.0, 6 April 2018
 ----------------------------
 
 * Move the acccess-type and validation-status attributes from Solution to Solution Revision entity (ACUMOS-196)
+* Revise field labels in site_config table entry (ACUMOS-346)
 * Add unique constraints for name columns; e.g., role name (ACUMOS-435)
 * Add fields to site_config table entry (ACUMOS-486)
 * Search solutions returns unexpectedly few results (ACUMOS-529)
