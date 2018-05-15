@@ -20,6 +20,9 @@
 
 package org.acumos.cds.controller;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Date;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.acumos.cds.CCDSConstants;
@@ -64,7 +67,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/" + CCDSConstants.GROUP_PATH)
 public class GroupPeerSolutionController extends AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(GroupPeerSolutionController.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private PeerRepository peerRepository;
@@ -93,7 +96,10 @@ public class GroupPeerSolutionController extends AbstractController {
 	@RequestMapping(value = CCDSConstants.PEER_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPPeerGroup> getPeerGroups(Pageable pageRequest) {
-		return peerGroupRepository.findAll(pageRequest);
+		Date beginDate = new Date();
+		Page<MLPPeerGroup> result = peerGroupRepository.findAll(pageRequest);
+		logger.audit(beginDate, "getPeerGroups {}", pageRequest);
+		return result;
 	}
 
 	/**
@@ -107,17 +113,17 @@ public class GroupPeerSolutionController extends AbstractController {
 	@RequestMapping(value = CCDSConstants.PEER_PATH, method = RequestMethod.POST)
 	@ResponseBody
 	public Object createPeerGroup(@RequestBody MLPPeerGroup group, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "createPeerGroup: group {}", group);
-		Object result;
+		Date beginDate = new Date();
 		try {
-			result = peerGroupRepository.save(group);
+			MLPPeerGroup result = peerGroupRepository.save(group);
+			logger.audit(beginDate, "createPeerGroup: group {}", group);
+			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "createPeerGroup", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createPeerGroup failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createPeerGroup failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -134,27 +140,27 @@ public class GroupPeerSolutionController extends AbstractController {
 	@ResponseBody
 	public Object updatePeerGroup(@PathVariable("groupId") Long groupId, @RequestBody MLPPeerGroup group,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "updatePeerGroup: received object {} ", group);
+		Date beginDate = new Date();
 		// Get the existing one
 		MLPPeerGroup existing = peerGroupRepository.findOne(groupId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + groupId, null);
 		}
-		MLPTransportModel result = null;
 		try {
 			// Use the path-parameter id; don't trust the one in the object
 			group.setGroupId(groupId);
 			// Update the existing row
 			peerGroupRepository.save(group);
-			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			Object result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			logger.audit(beginDate, "updatePeerGroup groupId {}", groupId);
+			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "updatePeerGroup", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updatePeerGroup failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updatePeerGroup failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -168,9 +174,10 @@ public class GroupPeerSolutionController extends AbstractController {
 	@RequestMapping(value = "/{groupId}/" + CCDSConstants.PEER_PATH, method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deletePeerGroup(@PathVariable("groupId") Long groupId, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "deletePeerGroup: ID {}", groupId);
+		Date beginDate = new Date();
 		try {
 			peerGroupRepository.delete(groupId);
+			logger.audit(beginDate, "deletePeerGroup groupId {}", groupId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
@@ -195,11 +202,14 @@ public class GroupPeerSolutionController extends AbstractController {
 	@ResponseBody
 	public Object getPeersInGroup(@PathVariable("groupId") Long groupId, Pageable pageRequest,
 			HttpServletResponse response) {
+		Date beginDate = new Date();
 		if (peerGroupRepository.findOne(groupId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + groupId, null);
 		}
-		return peerGroupMemMapRepository.findPeersByGroupId(groupId, pageRequest);
+		Object result = peerGroupMemMapRepository.findPeersByGroupId(groupId, pageRequest);
+		logger.audit(beginDate, "getPeersInGroup groupId {}", groupId);
+		return result;
 	}
 
 	/**
@@ -218,7 +228,7 @@ public class GroupPeerSolutionController extends AbstractController {
 	@ResponseBody
 	public Object addPeerToGroup(@PathVariable("groupId") Long groupId, @PathVariable("peerId") String peerId,
 			@RequestBody MLPPeerGrpMemMap map, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "addPeerToGroup: groupId {} peerId {}", groupId, peerId);
+		Date beginDate = new Date();
 		if (peerRepository.findOne(peerId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerId, null);
@@ -231,6 +241,7 @@ public class GroupPeerSolutionController extends AbstractController {
 		map.setGroupId(groupId);
 		map.setPeerId(peerId);
 		peerGroupMemMapRepository.save(map);
+		logger.audit(beginDate, "addPeerToGroup groupId {} peerId {}", groupId, peerId);
 		return new SuccessTransport(HttpServletResponse.SC_OK, null);
 	}
 
@@ -249,13 +260,14 @@ public class GroupPeerSolutionController extends AbstractController {
 	@ResponseBody
 	public Object dropPeerFromGroup(@PathVariable("groupId") Long groupId, @PathVariable("peerId") String peerId,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "dropPeerFromGroup: groupId {} peerId {}", groupId, peerId);
+		Date beginDate = new Date();
 		MLPPeerGrpMemMap.PeerGrpMemMapPK pk = new MLPPeerGrpMemMap.PeerGrpMemMapPK(groupId, peerId);
 		if (peerGroupMemMapRepository.findOne(pk) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + groupId, null);
 		}
 		peerGroupMemMapRepository.delete(pk);
+		logger.audit(beginDate, "dropPeerFromGroup groupId {} peerId {}", groupId, peerId);
 		return new SuccessTransport(HttpServletResponse.SC_OK, null);
 	}
 
@@ -269,7 +281,10 @@ public class GroupPeerSolutionController extends AbstractController {
 	@RequestMapping(value = CCDSConstants.SOLUTION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPSolutionGroup> getSolutionGroups(Pageable pageRequest) {
-		return solutionGroupRepository.findAll(pageRequest);
+		Date beginDate = new Date();
+		Page<MLPSolutionGroup> result = solutionGroupRepository.findAll(pageRequest);
+		logger.audit(beginDate, "getSolutionGroups {}", pageRequest);
+		return result;
 	}
 
 	/**
@@ -283,17 +298,17 @@ public class GroupPeerSolutionController extends AbstractController {
 	@RequestMapping(value = CCDSConstants.SOLUTION_PATH, method = RequestMethod.POST)
 	@ResponseBody
 	public Object createSolutionGroup(@RequestBody MLPSolutionGroup group, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "createSolutionGroup: group {}", group);
-		Object result;
+		Date beginDate = new Date();
 		try {
-			result = solutionGroupRepository.save(group);
+			Object result = solutionGroupRepository.save(group);
+			logger.audit(beginDate, "createSolutionGroup groupId {}", group.getGroupId());
+			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "createSolutionGroup", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createSolutionGroup failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createSolutionGroup failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -310,27 +325,27 @@ public class GroupPeerSolutionController extends AbstractController {
 	@ResponseBody
 	public Object updateSolutionGroup(@PathVariable("groupId") Long groupId, @RequestBody MLPSolutionGroup group,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "updateSolutionGroup: received object {} ", group);
+		Date beginDate = new Date();
 		// Get the existing one
 		MLPSolutionGroup existing = solutionGroupRepository.findOne(groupId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "NO_ENTRY_WITH_ID " + groupId, null);
 		}
-		MLPTransportModel result = null;
 		try {
 			// Use the path-parameter id; don't trust the one in the object
 			group.setGroupId(groupId);
 			// Update the existing row
 			solutionGroupRepository.save(group);
-			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			Object result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			logger.audit(beginDate, "updateSolutionGroup groupId {}", groupId);
+			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "updateSolutionGroup", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateSolutionGroup failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateSolutionGroup failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -344,9 +359,11 @@ public class GroupPeerSolutionController extends AbstractController {
 	@RequestMapping(value = "/{groupId}/" + CCDSConstants.SOLUTION_PATH, method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteSolutionGroup(@PathVariable("groupId") Long groupId, HttpServletResponse response) {
+		Date beginDate = new Date();
 		logger.debug(EELFLoggerDelegate.debugLogger, "deleteSolutionGroup: ID {}", groupId);
 		try {
 			solutionGroupRepository.delete(groupId);
+			logger.audit(beginDate, "deleteSolutionGroup groupId {}", groupId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
@@ -371,11 +388,14 @@ public class GroupPeerSolutionController extends AbstractController {
 	@ResponseBody
 	public Object getSolutionsInGroup(@PathVariable("groupId") Long groupId, Pageable pageRequest,
 			HttpServletResponse response) {
+		Date beginDate = new Date();
 		if (solutionGroupRepository.findOne(groupId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + groupId, null);
 		}
-		return solGroupMemMapRepository.findSolutionsByGroupId(groupId, pageRequest);
+		Object result = solGroupMemMapRepository.findSolutionsByGroupId(groupId, pageRequest);
+		logger.audit(beginDate, "getSolutionsInGroup groupId {}", groupId);
+		return result;
 	}
 
 	/**
@@ -395,7 +415,7 @@ public class GroupPeerSolutionController extends AbstractController {
 	public Object addSolutionToGroup(@PathVariable("groupId") Long groupId,
 			@PathVariable("solutionId") String solutionId, @RequestBody MLPSolGrpMemMap map,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "addSolutionToGroup: map {}", map);
+		Date beginDate = new Date();
 		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
@@ -409,6 +429,7 @@ public class GroupPeerSolutionController extends AbstractController {
 			map.setGroupId(groupId);
 			map.setSolutionId(solutionId);
 			solGroupMemMapRepository.save(map);
+			logger.audit(beginDate, "addSolutionToGroup groupId {} solutionId {}", groupId, solutionId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
@@ -434,11 +455,11 @@ public class GroupPeerSolutionController extends AbstractController {
 	@ResponseBody
 	public Object dropSolutionFromGroup(@PathVariable("groupId") Long groupId,
 			@PathVariable("solutionId") String solutionId, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "dropSolutionFromGroup: groupId {} solutionId {}", groupId,
-				solutionId);
+		Date beginDate = new Date();
 		try {
 			MLPSolGrpMemMap.SolGrpMemMapPK pk = new MLPSolGrpMemMap.SolGrpMemMapPK(groupId, solutionId);
 			solGroupMemMapRepository.delete(pk);
+			logger.audit(beginDate, "dropSolutionFromGroup groupId {} solutionId {}", groupId, solutionId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
@@ -458,7 +479,10 @@ public class GroupPeerSolutionController extends AbstractController {
 	@RequestMapping(value = CCDSConstants.PEER_PATH + "/" + CCDSConstants.SOLUTION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPPeerSolAccMap> getPeerSolutionGroupMaps(Pageable pageRequest) {
-		return peerSolAccMapRepository.findAll(pageRequest);
+		Date beginDate = new Date();
+		Page<MLPPeerSolAccMap> result = peerSolAccMapRepository.findAll(pageRequest);
+		logger.audit(beginDate, "getPeerSolutionGroupMaps request {}", pageRequest);
+		return result;
 	}
 
 	/**
@@ -480,8 +504,7 @@ public class GroupPeerSolutionController extends AbstractController {
 	public Object mapPeerSolutionGroups(@PathVariable("peerGroupId") Long peerGroupId,
 			@PathVariable("solutionGroupId") Long solutionGroupId, @RequestBody MLPPeerSolAccMap map,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "mapPeerSolutionGroups: peerGroupId {} solutionGroupId {}",
-				peerGroupId, solutionGroupId);
+		Date beginDate = new Date();
 		if (peerGroupRepository.findOne(peerGroupId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerGroupId, null);
@@ -495,6 +518,8 @@ public class GroupPeerSolutionController extends AbstractController {
 			map.setPeerGroupId(peerGroupId);
 			map.setSolutionGroupId(solutionGroupId);
 			peerSolAccMapRepository.save(map);
+			logger.audit(beginDate, "mapPeerSolutionGroups: peerGroupId {} solutionGroupId {}", peerGroupId,
+					solutionGroupId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
@@ -520,11 +545,12 @@ public class GroupPeerSolutionController extends AbstractController {
 	@ResponseBody
 	public Object unmapPeerSolutionGroups(@PathVariable("peerGroupId") Long peerGroupId,
 			@PathVariable("solutionGroupId") Long solutionGroupId, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "unmapPeerSolutionGroups: peerGroupId {} solutionGroupId {}",
-				peerGroupId, solutionGroupId);
+		Date beginDate = new Date();
 		try {
 			MLPPeerSolAccMap.PeerSolAccMapPK pk = new MLPPeerSolAccMap.PeerSolAccMapPK(peerGroupId, solutionGroupId);
 			peerSolAccMapRepository.delete(pk);
+			logger.audit(beginDate, "unmapPeerSolutionGroups: peerGroupId {} solutionGroupId {}", peerGroupId,
+					solutionGroupId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
@@ -553,8 +579,7 @@ public class GroupPeerSolutionController extends AbstractController {
 	public Object mapPeerPeerGroups(@PathVariable("principalGroupId") Long principalGroupId,
 			@PathVariable("resourceGroupId") Long resourceGroupId, @RequestBody MLPPeerPeerAccMap map,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "mapPeerPeerGroups: principal {} resource {}", principalGroupId,
-				resourceGroupId);
+		Date beginDate = new Date();
 		if (peerGroupRepository.findOne(principalGroupId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + principalGroupId, null);
@@ -572,6 +597,7 @@ public class GroupPeerSolutionController extends AbstractController {
 			map.setPrincipalPeerGroupId(principalGroupId);
 			map.setResourcePeerGroupId(resourceGroupId);
 			peerPeerAccMapRepository.save(map);
+			logger.audit(beginDate, "mapPeerPeerGroups: principal {} resource {}", principalGroupId, resourceGroupId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
@@ -597,12 +623,13 @@ public class GroupPeerSolutionController extends AbstractController {
 	@ResponseBody
 	public Object unmapPeerPeerGroups(@PathVariable("principalGroupId") Long principalGroupId,
 			@PathVariable("resourceGroupId") Long resourceGroupId, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "unmapPeerSolutionGroups: principalGroupId {} resourceGroupId {}",
-				principalGroupId, resourceGroupId);
+		Date beginDate = new Date();
 		try {
 			MLPPeerPeerAccMap.PeerPeerAccMapPK pk = new MLPPeerPeerAccMap.PeerPeerAccMapPK(principalGroupId,
 					resourceGroupId);
 			peerPeerAccMapRepository.delete(pk);
+			logger.audit(beginDate, "unmapPeerSolutionGroups: principalGroupId {} resourceGroupId {}", principalGroupId,
+					resourceGroupId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
@@ -629,8 +656,7 @@ public class GroupPeerSolutionController extends AbstractController {
 	@ResponseBody
 	public Object checkPeerSolutionAccess(@PathVariable("peerId") String peerId,
 			@PathVariable("solutionId") String solutionId, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "checkPeerSolutionAccess: peerId {} solutionId {}", peerId,
-				solutionId);
+		Date beginDate = new Date();
 		if (peerRepository.findOne(peerId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerId, null);
@@ -640,6 +666,7 @@ public class GroupPeerSolutionController extends AbstractController {
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
 		long count = peerSolAccMapRepository.checkPeerSolutionAccess(peerId, solutionId);
+		logger.audit(beginDate, "checkPeerSolutionAccess: peerId {} solutionId {}", peerId, solutionId);
 		return new CountTransport(count);
 	}
 
@@ -656,12 +683,14 @@ public class GroupPeerSolutionController extends AbstractController {
 			+ CCDSConstants.ACCESS_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getPeerAccessList(@PathVariable("peerId") String peerId, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "getPeerAccessList: peerId {}", peerId);
+		Date beginDate = new Date();
 		if (peerRepository.findOne(peerId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerId, null);
 		}
-		return peerPeerAccMapRepository.findAccessPeers(peerId);
+		Object result = peerPeerAccMapRepository.findAccessPeers(peerId);
+		logger.audit(beginDate, "getPeerAccessList: peerId {}", peerId);
+		return result;
 	}
 
 }

@@ -20,6 +20,7 @@
 
 package org.acumos.cds.service;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ArtifactSearchServiceImpl extends AbstractSearchServiceImpl implements ArtifactSearchService {
 
-	private final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(ArtifactSearchServiceImpl.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private SessionFactory sessionFactory;

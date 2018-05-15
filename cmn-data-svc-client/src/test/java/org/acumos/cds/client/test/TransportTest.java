@@ -20,6 +20,7 @@
 
 package org.acumos.cds.client.test;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +44,7 @@ import org.springframework.data.domain.PageRequest;
  */
 public class TransportTest extends AbstractModelTest {
 
-	private static Logger logger = LoggerFactory.getLogger(TransportTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Test
 	public void testCountTransport() {

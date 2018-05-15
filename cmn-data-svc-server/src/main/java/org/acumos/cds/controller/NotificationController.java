@@ -20,6 +20,8 @@
 
 package org.acumos.cds.controller;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
@@ -56,7 +58,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/" + CCDSConstants.NOTIFICATION_PATH)
 public class NotificationController extends AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(NotificationController.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private NotificationRepository notificationRepository;
@@ -68,8 +70,9 @@ public class NotificationController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public CountTransport getNotificationCount() {
+		Date beginDate = new Date();
 		Long count = notificationRepository.count();
-		logger.debug(EELFLoggerDelegate.debugLogger, "getNotificationCount: result is {} ", count);
+		logger.audit(beginDate, "getNotificationCount");
 		return new CountTransport(count);
 	}
 
@@ -83,7 +86,10 @@ public class NotificationController extends AbstractController {
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPNotification> getNotifications(Pageable pageable) {
-		return notificationRepository.findAll(pageable);
+		Date beginDate = new Date();
+		Page<MLPNotification> result = notificationRepository.findAll(pageable);
+		logger.audit(beginDate, "getNotifications: request {} ", pageable);
+		return result;
 	}
 
 	/**
@@ -98,34 +104,33 @@ public class NotificationController extends AbstractController {
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createNotification(@RequestBody MLPNotification notif, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "create: received {} ", notif);
-		Object result;
+		Date beginDate = new Date();
 		try {
 			String id = notif.getNotificationId();
 			if (id != null) {
 				UUID.fromString(id);
 				if (notificationRepository.findOne(id) != null) {
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "ID exists: " + id);
-					return result;
+					return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "ID exists: " + id);
 				}
 			}
 			// Create a new row
-			result = notificationRepository.save(notif);
+			Object result = notificationRepository.save(notif);
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			// This is a hack to create the location path.
 			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.NOTIFICATION_PATH + "/" + notif.getNotificationId());
+			logger.audit(beginDate, "createNotification: notificationID {} ", notif.getNotificationId());
+			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "createNotification", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createNotification failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createNotification failed", cve);
 		}
-		return result;
 	}
 
 	/**
-	 * @param rowId
+	 * @param notifId
 	 *            Path parameter with the row ID
 	 * @param notif
 	 *            Notification to be updated
@@ -136,33 +141,32 @@ public class NotificationController extends AbstractController {
 	@ApiOperation(value = "Updates a notification.", response = SuccessTransport.class)
 	@RequestMapping(value = "/{notificationId}", method = RequestMethod.PUT)
 	@ResponseBody
-	public Object updateNotification(@PathVariable("notificationId") String rowId, @RequestBody MLPNotification notif,
+	public Object updateNotification(@PathVariable("notificationId") String notifId, @RequestBody MLPNotification notif,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "update: received object {} ", notif);
+		Date beginDate = new Date();
 		// Get the existing one
-		MLPNotification existing = notificationRepository.findOne(rowId);
+		MLPNotification existing = notificationRepository.findOne(notifId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + rowId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + notifId, null);
 		}
-		MLPTransportModel result = null;
 		try {
 			// Use the path-parameter id; don't trust the one in the object
-			notif.setNotificationId(rowId);
+			notif.setNotificationId(notifId);
 			// Update the existing row
 			notificationRepository.save(notif);
-			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			logger.audit(beginDate, "updateNotification: notifId {} ", notifId);
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "updateNotification", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateNotification failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateNotification failed", cve);
 		}
-		return result;
 	}
 
 	/**
-	 * @param rowId
+	 * @param notifId
 	 *            Path parameter that identifies the instance
 	 * @param response
 	 *            HttpServletResponse
@@ -171,10 +175,12 @@ public class NotificationController extends AbstractController {
 	@ApiOperation(value = "Deletes a notification.", response = SuccessTransport.class)
 	@RequestMapping(value = "/{notificationId}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public MLPTransportModel deleteNotification(@PathVariable("notificationId") String rowId,
+	public MLPTransportModel deleteNotification(@PathVariable("notificationId") String notifId,
 			HttpServletResponse response) {
+		Date beginDate = new Date();
 		try {
-			notificationRepository.delete(rowId);
+			notificationRepository.delete(notifId);
+			logger.audit(beginDate, "deleteNotification: notifId {} ", notifId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error

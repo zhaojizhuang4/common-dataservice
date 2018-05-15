@@ -19,6 +19,7 @@
  */
 package org.acumos.cds.test;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Date;
 
 import org.acumos.cds.domain.MLPArtifact;
@@ -46,7 +47,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class FOMAnnotationTest {
 
-	private final static EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(FOMAnnotationTest.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private ArtifactRepository artifactRepository;

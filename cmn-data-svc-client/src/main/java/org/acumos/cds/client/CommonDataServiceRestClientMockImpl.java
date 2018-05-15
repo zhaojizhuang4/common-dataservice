@@ -20,6 +20,7 @@
 
 package org.acumos.cds.client;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -90,7 +91,7 @@ import org.springframework.web.client.RestTemplate;
 @SuppressWarnings("deprecation")
 public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRestClient {
 
-	private static Logger logger = LoggerFactory.getLogger(CommonDataServiceRestClientMockImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	public static ICommonDataServiceRestClient getInstance(String webapiUrl, String user, String pass) {
 		return new CommonDataServiceRestClientMockImpl(webapiUrl, user, pass);
@@ -206,6 +207,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private MLPStepResult stepResultById;
 	private List<MLPCodeNamePair> pairs;
 	private List<String> valueSetNames;
+	private String requestId;
 
 	/**
 	 * No-argument constructor.
@@ -1653,6 +1655,12 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	@Override
 	public List<MLPPeer> getPeerAccess(String peerId) {
 		return peerAccessList;
+	}
+
+	@Override
+	public void setRequestId(String requestId) {
+		this.requestId = requestId;
+		logger.info("set request id {}", this.requestId);
 	}
 
 }

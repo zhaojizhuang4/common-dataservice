@@ -20,6 +20,7 @@
 
 package org.acumos.cds.service;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class StepResultSearchServiceImpl extends AbstractSearchServiceImpl implements StepResultSearchService {
 
-	private final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(StepResultSearchServiceImpl.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private SessionFactory sessionFactory;

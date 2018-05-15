@@ -1932,4 +1932,14 @@ public interface ICommonDataServiceRestClient {
 	 */
 	MLPUserNotifPref getUserNotificationPreference(Long usrNotifPrefId);
 
+	/**
+	 * Sets the request ID to use in a header on every request to the server. If no
+	 * request ID is set, or if this method is called with null, the implementation
+	 * must generate a new ID for each request.
+	 * 
+	 * @param requestId
+	 *            A request identifier
+	 */
+	void setRequestId(String requestId);
+
 }

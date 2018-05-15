@@ -20,6 +20,7 @@
 
 package org.acumos.cds.test;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -111,7 +112,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 @SuppressWarnings("deprecation")
 public class CdsControllerTest {
 
-	private static Logger logger = LoggerFactory.getLogger(CdsControllerTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	// Defined in the default application.properties file
 	private final String hostname = "localhost";
@@ -1937,23 +1938,36 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Drop role failed on bad role as expected {}", ex.getResponseBodyAsString());
 		}
-		List<String> users = new ArrayList<>();
+		List<String> emptyList = new ArrayList<>();
 		try {
-			client.addUsersInRole(users, "bogusRole");
+			client.addUsersInRole(emptyList, "bogusRole");
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("addUsersInRole failed on bad role as expected {}", ex.getResponseBodyAsString());
 		}
+
 		String roleNm = "some name";
 		// Supposed to succeed
 		MLPRole cr = client.createRole(new MLPRole(roleNm, true));
 		try {
-			client.addUsersInRole(users, cr.getRoleId());
+			client.createRole(cr);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create role failed on dupe as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			cr.setName(s64 + s64);
+			client.updateRole(cr);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Update role failed on constraint as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.addUsersInRole(emptyList, cr.getRoleId());
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("addUsersInRole failed on empty list as expected {}", ex.getResponseBodyAsString());
 		}
-
 		try {
 			MLPRole roleAnother = new MLPRole(roleNm, true);
 			client.createRole(roleAnother);
@@ -1962,6 +1976,7 @@ public class CdsControllerTest {
 			logger.info("Create role failed due to duplicate role name as expected: {}", ex.getResponseBodyAsString());
 		}
 
+		List<String> users = new ArrayList<>();
 		users.add("bogusUser");
 		try {
 			client.addUsersInRole(users, cr.getRoleId());
@@ -1984,6 +1999,114 @@ public class CdsControllerTest {
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("addUsersInRole failed on already-in-role as expected {}", ex.getResponseBodyAsString());
+		}
+		MLPRole crCustomId = new MLPRole();
+		crCustomId.setRoleId(UUID.randomUUID().toString());
+		try {
+			client.getRole(crCustomId.getRoleId());
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Get missing role failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.deleteRole(crCustomId.getRoleId());
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Delete  missing role failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createRole(crCustomId);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create role failed on missing name as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.updateRole(crCustomId);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Update missing role failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			HashMap<String, Object> roleRestr = new HashMap<>();
+			client.searchRoles(roleRestr, false, new RestPageRequest(0, 1));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Search role failed on empty as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			HashMap<String, Object> roleRestr = new HashMap<>();
+			roleRestr.put("bogus", "value");
+			client.searchRoles(roleRestr, false, new RestPageRequest(0, 1));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Search role failed on bogus as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.getRoleFunctions("bogus");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Get role functions failed on invalid role as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.getRoleFunction("bogusRole", "bogusFn");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Get role function failed on invalid role as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createRoleFunction(new MLPRoleFunction("roleId", "name"));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create role fn failed on bad role as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createRoleFunction(new MLPRoleFunction(cr.getRoleId(), s64 + s64));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create role fn failed on constraint as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.deleteRoleFunction("roleId", "name");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Delete role fn failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		// Supposed to work
+		MLPRoleFunction rf = client.createRoleFunction(new MLPRoleFunction(cr.getRoleId(), "otherRoleFuncName"));
+		try {
+			rf.setName(s64 + s64);
+			client.updateRoleFunction(rf);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Update role fn failed on constraint as expected: {}", ex.getResponseBodyAsString());
+		}
+		String rfId = rf.getRoleFunctionId();
+		try {
+			rf.setRoleFunctionId("bogus");
+			client.updateRoleFunction(rf);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create role fn failed on bad role fn id as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			rf.setRoleId("bogus");
+			client.updateRoleFunction(rf);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create role fn failed on bad role as expected: {}", ex.getResponseBodyAsString());
+		}
+		rf.setRoleId(cr.getRoleId());
+		rf.setRoleFunctionId(rfId);
+
+		// Clean up the role stuff so subsequent Mariadb tests succeed without recreating schema.
+		try {
+			client.dropUsersInRole(users, cr.getRoleId());
+			client.deleteRoleFunction(cr.getRoleId(), rf.getRoleFunctionId());
+			client.deleteRole(cr.getRoleId());
+			rf = null;
+			cr = null;
+		} catch (HttpStatusCodeException ex) {
+			// Print server error
+			logger.error(ex.getResponseBodyAsString());
+			throw ex;
 		}
 
 		try {
@@ -2899,113 +3022,6 @@ public class CdsControllerTest {
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search peers failed on bad field as expected: {}", ex.getResponseBodyAsString());
-		}
-
-		MLPRole crCustomId = new MLPRole();
-		crCustomId.setRoleId(UUID.randomUUID().toString());
-		try {
-			client.getRole(crCustomId.getRoleId());
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Get missing role failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.deleteRole(crCustomId.getRoleId());
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Delete  missing role failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.createRole(crCustomId);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Create role failed on missing name as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.updateRole(crCustomId);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Update missing role failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			HashMap<String, Object> roleRestr = new HashMap<>();
-			client.searchRoles(roleRestr, false, new RestPageRequest(0, 1));
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Search role failed on empty as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			HashMap<String, Object> roleRestr = new HashMap<>();
-			roleRestr.put("bogus", "value");
-			client.searchRoles(roleRestr, false, new RestPageRequest(0, 1));
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Search role failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.getRoleFunctions("bogus");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Get role functions failed on invalid role as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.getRoleFunction("bogusRole", "bogusFn");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Get role function failed on invalid role as expected: {}", ex.getResponseBodyAsString());
-		}
-
-		try {
-			client.createRole(cr);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Create role failed on dupe as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			cr.setName(s64 + s64);
-			client.updateRole(cr);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Update role failed on constraint as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.createRoleFunction(new MLPRoleFunction("roleId", "name"));
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Create role fn failed on bad role as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.createRoleFunction(new MLPRoleFunction(cr.getRoleId(), s64 + s64));
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Create role fn failed on constraint as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.deleteRoleFunction("roleId", "name");
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Delete role fn failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		// Supposed to work
-		MLPRoleFunction rf = client.createRoleFunction(new MLPRoleFunction(cr.getRoleId(), "otherRoleFuncName"));
-		try {
-			rf.setName(s64 + s64);
-			client.updateRoleFunction(rf);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Update role fn failed on constraint as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			rf.setRoleFunctionId("bogus");
-			client.updateRoleFunction(rf);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Create role fn failed on bad role fn id as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			rf.setRoleId("bogus");
-			client.updateRoleFunction(rf);
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Create role fn failed on bad role as expected: {}", ex.getResponseBodyAsString());
 		}
 
 		try {
