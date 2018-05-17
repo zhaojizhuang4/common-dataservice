@@ -274,5 +274,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<!-- No distributionManagement section, jars are not deployed -->
 </project>

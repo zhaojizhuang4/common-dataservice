@@ -20,6 +20,10 @@
 -- FROM version 1.15.x TO version 1.14.x.
 -- No database is specified to allow flexible deployment!
 
+-- 14 and 13
+DROP TABLE C_HISTORY;
+-- 12
+ALTER TABLE C_USER MODIFY COLUMN PICTURE BLOB;
 -- 11
 ALTER TABLE C_USER MODIFY COLUMN EMAIL VARCHAR(100);
 -- 10

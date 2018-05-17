@@ -115,8 +115,15 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	@ApiModelProperty(value = "Millisec since the Epoch", example = "1521202458867")
 	private Date lastLogin;
 
-	/* Jackson handles base64 encoding. MEDIUMBLOB in MariaDB. */
-	@Column(name = "PICTURE", length = 2000000, columnDefinition = "BLOB")
+	/**
+	 * Derby BLOB type allows 2GB. Mysql/Mariadb BLOB type only allows 64KB, that's
+	 * too small. But Derby fails to create the table if type LONGBLOB is specified
+	 * here. With no columDefinition attribute Derby generates a table AND Spring
+	 * validates the MariaDB schema if the column is created as LONGBLOB.
+	 * 
+	 * Jackson handles base64 encoding.
+	 */
+	@Column(name = "PICTURE", length = 2000000 /* DO NOT USE: columnDefinition = "BLOB" */)
 	@Lob
 	private Byte[] picture;
 
