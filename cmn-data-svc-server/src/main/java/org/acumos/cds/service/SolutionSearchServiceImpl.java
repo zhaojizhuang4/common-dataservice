@@ -20,6 +20,7 @@
 
 package org.acumos.cds.service;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -71,7 +72,7 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl implements SolutionSearchService {
 
-	private final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(SolutionSearchServiceImpl.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private SessionFactory sessionFactory;

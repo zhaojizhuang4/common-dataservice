@@ -66,7 +66,7 @@ public class SwaggerConfiguration {
 				"Terms of service", // TOS
 				new Contact("Acumos Common Data Service Team", // name
 						"http://acumos.readthedocs.io/en/latest/submodules/common-dataservice/docs/", // URL
-						"info@acumos.org"), // email
+						"no-reply@acumos.org"), // email
 				"Apache 2.0", // License
 				"https://www.apache.org/licenses/LICENSE-2.0", // License URL
 				new ArrayList<VendorExtension>()); // vendor extensions

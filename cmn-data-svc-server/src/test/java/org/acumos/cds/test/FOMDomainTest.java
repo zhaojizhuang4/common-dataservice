@@ -20,6 +20,7 @@
 
 package org.acumos.cds.test;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FOMDomainTest {
 
-	private static Logger logger = LoggerFactory.getLogger(FOMDomainTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	// Values for properties
 	final long time = new Date().getTime();

@@ -20,6 +20,7 @@
 
 package org.acumos.cds.client.test;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -66,7 +67,7 @@ import org.springframework.web.client.RestTemplate;
  */
 public class ClientMethodTest {
 
-	private static Logger logger = LoggerFactory.getLogger(ClientMethodTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	static class TrivialRestClientImplSubclass extends CommonDataServiceRestClientImpl {
 		public TrivialRestClientImplSubclass(String webapiUrl, String user, String pass) {

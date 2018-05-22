@@ -18,29 +18,34 @@
  * ===============LICENSE_END=========================================================
  */
 
-package org.acumos.cds.config;
+ package org.acumos.cds.config;
 
-import java.lang.invoke.MethodHandles;
-
-import org.acumos.cds.util.EELFLoggerDelegate;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
- * Runs when Spring-Boot starts.
+ * Adds logging handler interceptor.
+ * <BR>
+ * http://www.devgrok.com/2017/04/adding-mdc-headers-to-every-spring-mvc.html
  */
-@Component
-public class ContextRefreshedListener implements ApplicationListener<ContextRefreshedEvent> {
+@Configuration
+public class BeanConfiguration {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
-
-	@Value("${spring.datasource.url}")
-	private String dbUrl;
-
-	@Override
-	public void onApplicationEvent(ContextRefreshedEvent event) {
-		logger.info("onApplicationEvent: Spring-Boot context refreshed using data source URL {}", dbUrl);
+	@Bean
+	public LoggingHandlerInterceptor loggingHandlerInterceptor() {
+		return new LoggingHandlerInterceptor();
 	}
+
+	@Bean
+	public WebMvcConfigurerAdapter webConfigurer() {
+		return new WebMvcConfigurerAdapter() {
+			@Override
+			public void addInterceptors(InterceptorRegistry registry) {
+				registry.addInterceptor(loggingHandlerInterceptor());
+			}
+		};
+	}
+
 }

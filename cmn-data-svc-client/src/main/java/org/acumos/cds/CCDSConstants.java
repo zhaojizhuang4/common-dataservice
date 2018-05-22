@@ -28,6 +28,8 @@ public abstract class CCDSConstants {
 	// Seems like this should available somewhere
 	public static final String APPLICATION_JSON = "application/json";
 
+	public static final String X_REQUEST_ID = "X-Request-ID";
+
 	public static final String JUNCTION_QUERY_PARAM = "_j";
 
 	// For error page

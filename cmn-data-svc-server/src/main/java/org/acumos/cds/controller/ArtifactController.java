@@ -20,6 +20,8 @@
 
 package org.acumos.cds.controller;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -59,7 +61,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping(value = "/" + CCDSConstants.ARTIFACT_PATH, produces = CCDSConstants.APPLICATION_JSON)
 public class ArtifactController extends AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(ArtifactController.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private ArtifactRepository artifactRepository;
@@ -75,12 +77,13 @@ public class ArtifactController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public CountTransport getArtifactCount() {
+		Date beginDate = new Date();
 		Long count = artifactRepository.count();
+		logger.audit(beginDate, "getArtifactCount");
 		return new CountTransport(count);
 	}
 
 	/**
-	 * 
 	 * @param pageRequest
 	 *            Page and sort criteria
 	 * @return List of artifacts, for serialization as JSON
@@ -89,7 +92,10 @@ public class ArtifactController extends AbstractController {
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPArtifact> getArtifacts(Pageable pageRequest) {
-		return artifactRepository.findAll(pageRequest);
+		Date beginDate = new Date();
+		Page<MLPArtifact> page = artifactRepository.findAll(pageRequest);
+		logger.audit(beginDate, "getArtifacts pageRequest {}", pageRequest);
+		return page;
 	}
 
 	/**
@@ -103,7 +109,10 @@ public class ArtifactController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.LIKE_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPArtifact> like(@RequestParam(CCDSConstants.TERM_PATH) String term, Pageable pageRequest) {
-		return artifactRepository.findBySearchTerm(term, pageRequest);
+		Date beginDate = new Date();
+		Iterable<MLPArtifact> i = artifactRepository.findBySearchTerm(term, pageRequest);
+		logger.audit(beginDate, "like pageRequest {}", pageRequest);
+		return i;
 	}
 
 	/**
@@ -121,6 +130,7 @@ public class ArtifactController extends AbstractController {
 	@ResponseBody
 	public Object searchArtifacts(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
 			HttpServletResponse response) {
+		Date beginDate = new Date();
 		cleanPageableParameters(queryParameters);
 		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
 		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
@@ -130,7 +140,9 @@ public class ArtifactController extends AbstractController {
 		}
 		try {
 			Map<String, Object> convertedQryParm = convertQueryParameters(MLPArtifact.class, queryParameters);
-			return artifactService.findArtifacts(convertedQryParm, isOr, pageRequest);
+			Object result = artifactService.findArtifacts(convertedQryParm, isOr, pageRequest);
+			logger.audit(beginDate, "searchArtifacts query {}", queryParameters);
+			return result;
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "searchArtifacts", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -150,7 +162,9 @@ public class ArtifactController extends AbstractController {
 	@RequestMapping(value = "/{artifactId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getArtifact(@PathVariable("artifactId") String artifactId, HttpServletResponse response) {
+		Date beginDate = new Date();
 		MLPArtifact da = artifactRepository.findOne(artifactId);
+		logger.audit(beginDate, "getArtifact ID {}", artifactId);
 		if (da == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + artifactId, null);
@@ -169,13 +183,16 @@ public class ArtifactController extends AbstractController {
 	@RequestMapping(value = "/{artifactId}/" + CCDSConstants.REVISION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getRevisionsForArtifact(@PathVariable("artifactId") String artifactId, HttpServletResponse response) {
+		Date beginDate = new Date();
 		// Validate the artifact ID because an empty result is ambiguous.
 		MLPArtifact da = artifactRepository.findOne(artifactId);
 		if (da == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + artifactId, null);
 		}
-		return solutionRevisionRepository.findByArtifactId(artifactId);
+		Object result = solutionRevisionRepository.findByArtifactId(artifactId);
+		logger.audit(beginDate, "getRevisionsForArtifact ID {}", artifactId);
+		return result;
 	}
 
 	/**
@@ -190,30 +207,29 @@ public class ArtifactController extends AbstractController {
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createArtifact(@RequestBody MLPArtifact artifact, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "createArtifact: received {} ", artifact);
-		Object result;
+		Date beginDate = new Date();
 		try {
 			String id = artifact.getArtifactId();
 			if (id != null) {
 				UUID.fromString(id);
 				if (artifactRepository.findOne(id) != null) {
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "ID exists: " + id);
-					return result;
+					return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "ID exists: " + id);
 				}
 			}
 			// Create a new row
-			result = artifactRepository.save(artifact);
+			Object result = artifactRepository.save(artifact);
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			// This is a hack to create the location path.
 			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.ARTIFACT_PATH + "/" + artifact.getArtifactId());
+			logger.audit(beginDate, "createArtifact ID {}", artifact.getArtifactId());
+			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "createArtifact", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createArtifact failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createArtifact failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -230,27 +246,27 @@ public class ArtifactController extends AbstractController {
 	@ResponseBody
 	public Object updateArtifact(@PathVariable("artifactId") String artifactId, @RequestBody MLPArtifact artifact,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "update: received {} ", artifact);
+		Date beginDate = new Date();
 		// Check for existing because the Hibernate save() method doesn't distinguish
 		MLPArtifact existing = artifactRepository.findOne(artifactId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + artifactId, null);
 		}
-		MLPTransportModel result = null;
 		try {
 			// Use the path-parameter id; don't trust the one in the object
 			artifact.setArtifactId(artifactId);
 			// Update the existing row
 			artifactRepository.save(artifact);
-			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			Object result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			logger.audit(beginDate, "updateArtifact ID {}", artifactId);
+			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "updateArtifact", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateArtifact failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateArtifact failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -266,8 +282,10 @@ public class ArtifactController extends AbstractController {
 	@ResponseBody
 	public MLPTransportModel deleteArtifact(@PathVariable("artifactId") String artifactId,
 			HttpServletResponse response) {
+		Date beginDate = new Date();
 		try {
 			artifactRepository.delete(artifactId);
+			logger.audit(beginDate, "deleteArtifact ID {}", artifactId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error

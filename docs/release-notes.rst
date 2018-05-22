@@ -26,6 +26,7 @@ Maven Nexus repository. The server is deployed as a Docker image to a Docker reg
 Version 1.15.1, 18 May 2018
 ---------------------------
 
+* Call audit logger in controller methods (ACUMOS-625)
 * Add artifact type code LG - Log File (ACUMOS-765)
 * Define C_USER table PICTURE column as type LONGBLOB (ACUMOS-888)
 * Requires database schema version 1.15

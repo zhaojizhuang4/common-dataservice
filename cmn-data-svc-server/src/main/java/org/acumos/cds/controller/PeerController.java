@@ -20,6 +20,8 @@
 
 package org.acumos.cds.controller;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -61,7 +63,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/" + CCDSConstants.PEER_PATH)
 public class PeerController extends AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(PeerController.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private PeerRepository peerRepository;
@@ -80,7 +82,10 @@ public class PeerController extends AbstractController {
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPPeer> getPeers(Pageable pageable) {
-		return peerRepository.findAll(pageable);
+		Date beginDate = new Date();
+		Page<MLPPeer> result = peerRepository.findAll(pageable);
+		logger.audit(beginDate, "getPeers {}", pageable);
+		return result;
 	}
 
 	/**
@@ -98,6 +103,7 @@ public class PeerController extends AbstractController {
 	@ResponseBody
 	public Object searchPeers(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageable,
 			HttpServletResponse response) {
+		Date beginDate = new Date();
 		cleanPageableParameters(queryParameters);
 		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
 		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
@@ -107,7 +113,9 @@ public class PeerController extends AbstractController {
 		}
 		try {
 			Map<String, Object> convertedQryParm = convertQueryParameters(MLPPeer.class, queryParameters);
-			return peerSearchService.findPeers(convertedQryParm, isOr, pageable);
+			Object result = peerSearchService.findPeers(convertedQryParm, isOr, pageable);
+			logger.audit(beginDate, "searchPeers {}", queryParameters);
+			return result;
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "searchPeers failed", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -127,11 +135,13 @@ public class PeerController extends AbstractController {
 	@RequestMapping(value = "/{peerId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getPeer(@PathVariable("peerId") String peerId, HttpServletResponse response) {
+		Date beginDate = new Date();
 		MLPPeer peer = peerRepository.findOne(peerId);
 		if (peer == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerId, null);
 		}
+		logger.audit(beginDate, "getPeer peerId {}", peerId);
 		return peer;
 	}
 
@@ -146,33 +156,33 @@ public class PeerController extends AbstractController {
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createPeer(@RequestBody MLPPeer peer, HttpServletResponse response) {
+		Date beginDate = new Date();
 		logger.debug(EELFLoggerDelegate.debugLogger, "postPeer: received object: {} ", peer);
-		Object result;
 		try {
 			String id = peer.getPeerId();
 			if (id != null) {
 				UUID.fromString(id);
 				if (peerRepository.findOne(id) != null) {
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "ID exists: " + id);
-					return result;
+					return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "ID exists: " + id);
 				}
 			}
 			// Validate enum codes
 			super.validateCode(peer.getStatusCode(), CodeNameType.PEER_STATUS);
 			super.validateCode(peer.getValidationStatusCode(), CodeNameType.VALIDATION_STATUS);
 			// Create a new row
-			result = peerRepository.save(peer);
+			Object result = peerRepository.save(peer);
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			// This is a hack to create the location path.
 			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.PEER_PATH + "/" + peer.getPeerId());
+			logger.audit(beginDate, "createPeer peerId {}", peer.getPeerId());
+			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "createPeer", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createPeer failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createPeer failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -189,13 +199,12 @@ public class PeerController extends AbstractController {
 	@ResponseBody
 	public Object updatePeer(@PathVariable("peerId") String peerId, @RequestBody MLPPeer peer,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "updatePeer: received {} ", peer);
+		Date beginDate = new Date();
 		// Get the existing one
 		if (peerRepository.findOne(peerId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerId, null);
 		}
-		MLPTransportModel result = null;
 		try {
 			// Validate enum codes
 			super.validateCode(peer.getStatusCode(), CodeNameType.PEER_STATUS);
@@ -204,14 +213,15 @@ public class PeerController extends AbstractController {
 			peer.setPeerId(peerId);
 			// Update the existing row
 			peerRepository.save(peer);
-			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			Object result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			logger.audit(beginDate, "updatePeer peerId {}", peerId);
+			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "updatePeer", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updatePeer failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updatePeer failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -229,11 +239,13 @@ public class PeerController extends AbstractController {
 	@RequestMapping(value = "/{peerId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deletePeer(@PathVariable("peerId") String peerId, HttpServletResponse response) {
+		Date beginDate = new Date();
 		try {
 			Iterable<MLPPeerSubscription> subs = peerSubRepository.findByPeerId(peerId);
 			if (subs != null)
 				peerSubRepository.delete(subs);
 			peerRepository.delete(peerId);
+			logger.audit(beginDate, "deletePeer peerId {}", peerId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
@@ -258,12 +270,15 @@ public class PeerController extends AbstractController {
 	@RequestMapping(value = "/{peerId}/" + CCDSConstants.SUBSCRIPTION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getPeerSubs(@PathVariable("peerId") String peerId, Pageable pageable, HttpServletResponse response) {
+		Date beginDate = new Date();
 		// Get the existing one
 		if (peerRepository.findOne(peerId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerId, null);
 		}
-		return peerSubRepository.findByPeerId(peerId);
+		Object result = peerSubRepository.findByPeerId(peerId);
+		logger.audit(beginDate, "getPeerSubs peerId {}", peerId);
+		return result;
 	}
 
 	/**
@@ -277,11 +292,13 @@ public class PeerController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.SUBSCRIPTION_PATH + "/{subId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getPeerSub(@PathVariable("subId") Long subId, HttpServletResponse response) {
+		Date beginDate = new Date();
 		MLPPeerSubscription peerSub = peerSubRepository.findOne(subId);
 		if (peerSub == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + subId, null);
 		}
+		logger.audit(beginDate, "getPeerSub subId {}", peerSub.getSubId());
 		return peerSub;
 	}
 
@@ -296,12 +313,12 @@ public class PeerController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.SUBSCRIPTION_PATH, method = RequestMethod.POST)
 	@ResponseBody
 	public Object createPeerSub(@RequestBody MLPPeerSubscription peerSub, HttpServletResponse response) {
+		Date beginDate = new Date();
 		logger.debug(EELFLoggerDelegate.debugLogger, "createPeerSub: received object: {} ", peerSub);
 		if (peerRepository.findOne(peerSub.getPeerId()) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerSub.getPeerId(), null);
 		}
-		Object result;
 		try {
 			// Validate enum codes
 			super.validateCode(peerSub.getAccessType(), CodeNameType.ACCESS_TYPE);
@@ -309,18 +326,19 @@ public class PeerController extends AbstractController {
 			// Null out any existing ID to get an auto-generated ID
 			peerSub.setSubId(null);
 			// Create a new row
-			result = peerSubRepository.save(peerSub);
+			Object result = peerSubRepository.save(peerSub);
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			// This is a hack to create the location path.
 			response.setHeader(HttpHeaders.LOCATION,
 					CCDSConstants.PEER_PATH + "/" + CCDSConstants.SUBSCRIPTION_PATH + "/" + peerSub.getSubId());
+			logger.audit(beginDate, "createPeerSub subId {}", peerSub.getSubId());
+			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "createPeerSub", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createPeerSub failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createPeerSub failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -337,6 +355,7 @@ public class PeerController extends AbstractController {
 	@ResponseBody
 	public Object updatePeerSub(@PathVariable("subId") Long subId, @RequestBody MLPPeerSubscription peerSub,
 			HttpServletResponse response) {
+		Date beginDate = new Date();
 		logger.debug(EELFLoggerDelegate.debugLogger, "updatePeerSub: received {} ", peerSub);
 		// Get the existing one
 		MLPPeerSubscription existingPeerSub = peerSubRepository.findOne(subId);
@@ -344,7 +363,6 @@ public class PeerController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + subId, null);
 		}
-		MLPTransportModel result = null;
 		try {
 			// Validate enum codes
 			super.validateCode(peerSub.getAccessType(), CodeNameType.ACCESS_TYPE);
@@ -353,14 +371,15 @@ public class PeerController extends AbstractController {
 			peerSub.setSubId(subId);
 			// Update the existing row
 			peerSubRepository.save(peerSub);
-			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			Object result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			logger.audit(beginDate, "updatePeerSub subId {}", subId);
+			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "updatePeerSub", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updatePeerSub failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updatePeerSub failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -374,8 +393,10 @@ public class PeerController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.SUBSCRIPTION_PATH + "/{subId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deletePeerSub(@PathVariable("subId") Long subId, HttpServletResponse response) {
+		Date beginDate = new Date();
 		try {
 			peerSubRepository.delete(subId);
+			logger.audit(beginDate, "deletePeerSub subId {}", subId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error

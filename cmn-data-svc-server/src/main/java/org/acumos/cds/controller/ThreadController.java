@@ -20,6 +20,8 @@
 
 package org.acumos.cds.controller;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
@@ -55,7 +57,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/" + CCDSConstants.THREAD_PATH)
 public class ThreadController extends AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(ThreadController.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private CommentRepository commentRepository;
@@ -71,7 +73,9 @@ public class ThreadController extends AbstractController {
 	@RequestMapping(value = CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public CountTransport getThreadCount() {
+		Date beginDate = new Date();
 		Long count = threadRepository.count();
+		logger.audit(beginDate, "getThreadCount");
 		return new CountTransport(count);
 	}
 
@@ -84,7 +88,10 @@ public class ThreadController extends AbstractController {
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPThread> getThreads(Pageable pageable) {
-		return threadRepository.findAll(pageable);
+		Date beginDate = new Date();
+		Page<MLPThread> result = threadRepository.findAll(pageable);
+		logger.audit(beginDate, "getThreads {}", pageable);
+		return result;
 	}
 
 	/**
@@ -102,7 +109,10 @@ public class ThreadController extends AbstractController {
 	@ResponseBody
 	public Page<MLPThread> getSolutionRevisionThreads(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, Pageable pageable) {
-		return threadRepository.findBySolutionIdAndRevisionId(solutionId, revisionId, pageable);
+		Date beginDate = new Date();
+		Page<MLPThread> result = threadRepository.findBySolutionIdAndRevisionId(solutionId, revisionId, pageable);
+		logger.audit(beginDate, "getSolutionRevisionThreads: solutionId {} revisionId {}", solutionId, revisionId);
+		return result;
 	}
 
 	/**
@@ -116,11 +126,13 @@ public class ThreadController extends AbstractController {
 	@RequestMapping(value = "{threadId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getThread(@PathVariable("threadId") String threadId, HttpServletResponse response) {
+		Date beginDate = new Date();
 		MLPThread thread = threadRepository.findOne(threadId);
 		if (thread == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + threadId, null);
 		}
+		logger.audit(beginDate, "getThread: threadId {}", threadId);
 		return thread;
 	}
 
@@ -135,8 +147,7 @@ public class ThreadController extends AbstractController {
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createThread(@RequestBody MLPThread thread, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "createThread: thread {}", thread);
-		Object result;
+		Date beginDate = new Date();
 		try {
 			String id = thread.getThreadId();
 			if (id != null) {
@@ -151,14 +162,14 @@ public class ThreadController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			// This is a hack to create the location path.
 			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.THREAD_PATH + "/" + newThread.getThreadId());
-			result = newThread;
+			logger.audit(beginDate, "createThread: threadId {}", newThread.getThreadId());
+			return newThread;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "createThread", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createThread failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createThread failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -175,26 +186,25 @@ public class ThreadController extends AbstractController {
 	@ResponseBody
 	public Object updateThread(@PathVariable("threadId") String threadId, @RequestBody MLPThread thread,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "updateThread: received {} ", thread);
+		Date beginDate = new Date();
 		// Get the existing one
 		MLPThread existing = threadRepository.findOne(threadId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + threadId, null);
 		}
-		MLPTransportModel result = null;
 		try {
 			// Use the path-parameter id; don't trust the one in the object
 			thread.setThreadId(threadId);
 			threadRepository.save(thread);
-			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			logger.audit(beginDate, "updateThread: threadId {}", threadId);
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "updateThread", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateThread failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateThread failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -208,10 +218,12 @@ public class ThreadController extends AbstractController {
 	@RequestMapping(value = "{threadId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteThread(@PathVariable("threadId") String threadId, HttpServletResponse response) {
+		Date beginDate = new Date();
 		try {
 			// cascade the delete
 			commentRepository.deleteByThreadId(threadId);
 			threadRepository.delete(threadId);
+			logger.audit(beginDate, "deleteThread: threadId {}", threadId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
@@ -231,7 +243,9 @@ public class ThreadController extends AbstractController {
 			+ CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public CountTransport getCommentCount(@PathVariable("threadId") String threadId) {
+		Date beginDate = new Date();
 		Long count = commentRepository.countThreadComments(threadId);
+		logger.audit(beginDate, "getCommentCount: threadId {}", threadId);
 		return new CountTransport(count);
 	}
 
@@ -250,12 +264,15 @@ public class ThreadController extends AbstractController {
 	@ResponseBody
 	public Object getThreadComments(@PathVariable("threadId") String threadId, Pageable pageable,
 			HttpServletResponse response) {
+		Date beginDate = new Date();
 		MLPThread thread = threadRepository.findOne(threadId);
 		if (thread == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + threadId, null);
 		}
-		return commentRepository.findByThreadId(threadId, pageable);
+		Object result = commentRepository.findByThreadId(threadId, pageable);
+		logger.audit(beginDate, "getThreadComments: threadId {}", threadId);
+		return result;
 	}
 
 	/**
@@ -274,7 +291,10 @@ public class ThreadController extends AbstractController {
 	@ResponseBody
 	public Page<MLPComment> getSolutionRevisionComments(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, Pageable pageable) {
-		return commentRepository.findBySolutionIdAndRevisionId(solutionId, revisionId, pageable);
+		Date beginDate = new Date();
+		Page<MLPComment> result = commentRepository.findBySolutionIdAndRevisionId(solutionId, revisionId, pageable);
+		logger.audit(beginDate, "getSolutionRevisionComments: solutionId {} revisionId {}", solutionId, revisionId);
+		return result;
 	}
 
 	/**
@@ -291,11 +311,13 @@ public class ThreadController extends AbstractController {
 	@ResponseBody
 	public Object getComment(@PathVariable("threadId") String threadId, @PathVariable("commentId") String commentId,
 			HttpServletResponse response) {
+		Date beginDate = new Date();
 		MLPComment comment = commentRepository.findOne(commentId);
 		if (comment == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + commentId, null);
 		}
+		logger.audit(beginDate, "getComment: threadId {} commentId {}", threadId, commentId);
 		return comment;
 	}
 
@@ -313,8 +335,7 @@ public class ThreadController extends AbstractController {
 	@ResponseBody
 	public Object createComment(@PathVariable("threadId") String threadId, @RequestBody MLPComment comment,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "createComment: comment {}", comment);
-		Object result;
+		Date beginDate = new Date();
 		try {
 			String id = comment.getCommentId();
 			if (id != null) {
@@ -341,21 +362,21 @@ public class ThreadController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			// This is a hack to create the location path.
 			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.COMMENT_PATH + "/" + newComment.getCommentId());
-			result = newComment;
+			logger.audit(beginDate, "createComment: threadId {} commentId {}", threadId, newComment.getCommentId());
+			return newComment;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "createComment", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createComment failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createComment failed", cve);
 		}
-		return result;
 	}
 
 	/**
 	 * @param threadId
-	 *            Thread ID
+	 *            Thread ID. Not used, comment ID is sufficient.
 	 * @param commentId
-	 *            Path parameter with the row ID
+	 *            Path parameter with the comment ID
 	 * @param comment
 	 *            data to be updated
 	 * @param response
@@ -367,7 +388,7 @@ public class ThreadController extends AbstractController {
 	@ResponseBody
 	public Object updateComment(@PathVariable("threadId") String threadId, @PathVariable("commentId") String commentId,
 			@RequestBody MLPComment comment, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "updateComment: received {} ", comment);
+		Date beginDate = new Date();
 		// Get the existing one
 		MLPComment existing = commentRepository.findOne(commentId);
 		if (existing == null) {
@@ -386,26 +407,25 @@ public class ThreadController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + comment.getUserId());
 		}
-		MLPTransportModel result = null;
 		try {
 			// Use the path-parameter id; don't trust the one in the object
 			comment.setCommentId(commentId);
 			commentRepository.save(comment);
-			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			logger.audit(beginDate, "updateComment: threadId {} commentId {}", threadId, commentId);
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "updateComment", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateComment failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateComment failed", cve);
 		}
-		return result;
 	}
 
 	/**
 	 * @param threadId
-	 *            Thread ID
+	 *            Thread ID. Not used, comment ID is sufficient.
 	 * @param commentId
-	 *            Path parameter that identifies the instance
+	 *            Path parameter with the comment ID
 	 * @param response
 	 *            HttpServletResponse
 	 * @return Solution that maps String to Object, for serialization as JSON
@@ -415,8 +435,10 @@ public class ThreadController extends AbstractController {
 	@ResponseBody
 	public MLPTransportModel deleteComment(@PathVariable("threadId") String threadId,
 			@PathVariable("commentId") String commentId, HttpServletResponse response) {
+		Date beginDate = new Date();
 		try {
 			commentRepository.delete(commentId);
+			logger.audit(beginDate, "deleteComment: threadId {} commentId {}", threadId, commentId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error

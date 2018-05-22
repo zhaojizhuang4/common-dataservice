@@ -20,6 +20,8 @@
 
 package org.acumos.cds.controller;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -61,7 +63,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/" + CCDSConstants.ROLE_PATH)
 public class RoleController extends AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(RoleController.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private RoleRepository roleRepository;
@@ -77,7 +79,9 @@ public class RoleController extends AbstractController {
 	@RequestMapping(value = CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public CountTransport getRoleCount() {
+		Date beginDate = new Date();
 		Long count = roleRepository.count();
+		logger.audit(beginDate, "getRoleCount");
 		return new CountTransport(count);
 	}
 
@@ -90,7 +94,10 @@ public class RoleController extends AbstractController {
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPRole> getRoles(Pageable pageable) {
-		return roleRepository.findAll(pageable);
+		Date beginDate = new Date();
+		Page<MLPRole> result = roleRepository.findAll(pageable);
+		logger.audit(beginDate, "getRoles query {}", pageable);
+		return result;
 	}
 
 	/**
@@ -108,6 +115,7 @@ public class RoleController extends AbstractController {
 	@ResponseBody
 	public Object searchRoles(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
 			HttpServletResponse response) {
+		Date beginDate = new Date();
 		cleanPageableParameters(queryParameters);
 		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
 		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
@@ -117,7 +125,9 @@ public class RoleController extends AbstractController {
 		}
 		try {
 			Map<String, Object> convertedQryParm = convertQueryParameters(MLPRole.class, queryParameters);
-			return roleSearchService.findRoles(convertedQryParm, isOr, pageRequest);
+			Object result = roleSearchService.findRoles(convertedQryParm, isOr, pageRequest);
+			logger.audit(beginDate, "searchRoles query {}", queryParameters);
+			return result;
 		} catch (Exception ex) {
 			logger.warn(EELFLoggerDelegate.errorLogger, "searchRoles failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -127,7 +137,7 @@ public class RoleController extends AbstractController {
 	}
 
 	/**
-	 * @param rowId
+	 * @param roleId
 	 *            Path parameter with row ID
 	 * @param response
 	 *            HttpServletResponse
@@ -136,12 +146,14 @@ public class RoleController extends AbstractController {
 	@ApiOperation(value = "Gets the role for the specified ID.", response = MLPRole.class)
 	@RequestMapping(value = "/{roleId}", method = RequestMethod.GET)
 	@ResponseBody
-	public Object getRole(@PathVariable("roleId") String rowId, HttpServletResponse response) {
-		MLPRole da = roleRepository.findOne(rowId);
+	public Object getRole(@PathVariable("roleId") String roleId, HttpServletResponse response) {
+		Date beginDate = new Date();
+		MLPRole da = roleRepository.findOne(roleId);
 		if (da == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + rowId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
 		}
+		logger.audit(beginDate, "getRole roleId {}", roleId);
 		return da;
 	}
 
@@ -157,34 +169,33 @@ public class RoleController extends AbstractController {
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createRole(@RequestBody MLPRole role, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "create: received {} ", role);
-		Object result;
+		Date beginDate = new Date();
 		try {
 			String id = role.getRoleId();
 			if (id != null) {
 				UUID.fromString(id);
 				if (roleRepository.findOne(id) != null) {
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "ID exists: " + id);
-					return result;
+					return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "ID exists: " + id);
 				}
 			}
 			// Create a new row
-			result = roleRepository.save(role);
+			Object result = roleRepository.save(role);
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			// This is a hack to create the location path.
 			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.ROLE_PATH + "/" + role.getRoleId());
+			logger.audit(beginDate, "createRole roleId {}", role.getRoleId());
+			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "createRole", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createRole failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createRole failed", cve);
 		}
-		return result;
 	}
 
 	/**
-	 * @param rowId
+	 * @param roleId
 	 *            Path parameter with the row ID
 	 * @param role
 	 *            Role to be updated
@@ -195,29 +206,28 @@ public class RoleController extends AbstractController {
 	@ApiOperation(value = "Updates a role.", response = SuccessTransport.class)
 	@RequestMapping(value = "/{roleId}", method = RequestMethod.PUT)
 	@ResponseBody
-	public Object updateRole(@PathVariable("roleId") String rowId, @RequestBody MLPRole role,
+	public Object updateRole(@PathVariable("roleId") String roleId, @RequestBody MLPRole role,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "updateRole: received object {} ", role);
+		Date beginDate = new Date();
 		// Get the existing one
-		MLPRole existing = roleRepository.findOne(rowId);
+		MLPRole existing = roleRepository.findOne(roleId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + rowId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
 		}
-		MLPTransportModel result = null;
 		try {
 			// Use the path-parameter id; don't trust the one in the object
-			role.setRoleId(rowId);
+			role.setRoleId(roleId);
 			// Update the existing row
 			roleRepository.save(role);
-			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			logger.audit(beginDate, "updateRole roleId {}", roleId);
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "updateRole", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateRole failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateRole failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -231,11 +241,13 @@ public class RoleController extends AbstractController {
 	@RequestMapping(value = "/{roleId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteRole(@PathVariable("roleId") String roleId, HttpServletResponse response) {
+		Date beginDate = new Date();
 		try {
 			Iterable<MLPRoleFunction> fns = roleFunctionRepository.findByRoleId(roleId);
 			if (fns != null)
 				roleFunctionRepository.delete(fns);
 			roleRepository.delete(roleId);
+			logger.audit(beginDate, "deleteRole roleId {}", roleId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
@@ -257,11 +269,14 @@ public class RoleController extends AbstractController {
 	@RequestMapping(value = "/{roleId}/" + CCDSConstants.FUNCTION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getListOfRoleFunc(@PathVariable("roleId") String roleId, HttpServletResponse response) {
+		Date beginDate = new Date();
 		if (roleRepository.findOne(roleId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
 		}
-		return roleFunctionRepository.findByRoleId(roleId);
+		Object result = roleFunctionRepository.findByRoleId(roleId);
+		logger.audit(beginDate, "getListOfRoleFunc roleId {}", roleId);
+		return result;
 	}
 
 	/**
@@ -278,11 +293,13 @@ public class RoleController extends AbstractController {
 	@ResponseBody
 	public Object getRoleFunc(@PathVariable("roleId") String roleId, @PathVariable("functionId") String functionId,
 			HttpServletResponse response) {
+		Date beginDate = new Date();
 		MLPRoleFunction rf = roleFunctionRepository.findOne(functionId);
 		if (rf == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + functionId, null);
 		}
+		logger.audit(beginDate, "getRoleFunc roleId {} functionId {}", roleId, functionId);
 		return rf;
 	}
 
@@ -300,7 +317,7 @@ public class RoleController extends AbstractController {
 	@ResponseBody
 	public Object createRoleFunc(@PathVariable("roleId") String roleId, @RequestBody MLPRoleFunction roleFunction,
 			HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "createRoleFunc: role ID {}", roleId);
+		Date beginDate = new Date();
 		if (roleRepository.findOne(roleId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
@@ -313,6 +330,7 @@ public class RoleController extends AbstractController {
 			roleFunction.setRoleId(roleId);
 			// Create a new row
 			result = roleFunctionRepository.save(roleFunction);
+			logger.audit(beginDate, "createRoleFunc roleId {} functionId {}", roleId, roleFunction.getRoleFunctionId());
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "createRoleFunc", cve.toString());
@@ -338,7 +356,7 @@ public class RoleController extends AbstractController {
 	@ResponseBody
 	public Object updateRoleFunc(@PathVariable("roleId") String roleId, @PathVariable("functionId") String functionId,
 			@RequestBody MLPRoleFunction roleFunction, HttpServletResponse response) {
-		logger.debug(EELFLoggerDelegate.debugLogger, "updateRoleFunc: role ID {}, function ID {}", roleId, functionId);
+		Date beginDate = new Date();
 		if (roleRepository.findOne(roleId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
@@ -347,21 +365,20 @@ public class RoleController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + functionId, null);
 		}
-		Object result;
 		try {
 			// Use the validated values
 			roleFunction.setRoleFunctionId(functionId);
 			roleFunction.setRoleId(roleId);
 			// Update
 			roleFunctionRepository.save(roleFunction);
-			result = new SuccessTransport(HttpServletResponse.SC_OK, null);
+			logger.audit(beginDate, "updateRoleFunc roleId {} functionId {}", roleId, functionId);
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn(EELFLoggerDelegate.errorLogger, "updateRoleFunc", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateRoleFunc failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateRoleFunc failed", cve);
 		}
-		return result;
 	}
 
 	/**
@@ -379,8 +396,10 @@ public class RoleController extends AbstractController {
 	@ResponseBody
 	public MLPTransportModel deleteRoleFunc(@PathVariable("roleId") String roleId,
 			@PathVariable("functionId") String functionId, HttpServletResponse response) {
+		Date beginDate = new Date();
 		try {
 			roleFunctionRepository.delete(functionId);
+			logger.audit(beginDate, "deleteRoleFunc roleId {} funcId {}", roleId, functionId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error

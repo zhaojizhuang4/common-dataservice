@@ -20,6 +20,9 @@
 
 package org.acumos.cds.controller;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Date;
+
 import org.acumos.cds.CCDSConstants;
 import org.acumos.cds.CdsApplication;
 import org.acumos.cds.repository.ArtifactRepository;
@@ -41,7 +44,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping(value = "/", produces = CCDSConstants.APPLICATION_JSON)
 public class HealthcheckController extends AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(HealthcheckController.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private ArtifactRepository artifactRepository;
@@ -53,8 +56,9 @@ public class HealthcheckController extends AbstractController {
 	@RequestMapping(value = CCDSConstants.HEALTHCHECK_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public MLPTransportModel getHealth() {
+		Date beginDate = new Date();
 		long count = artifactRepository.count();
-		logger.debug("getHealth: count is {}", count);
+		logger.audit(beginDate, "getHealth");
 		return new SuccessTransport(200, "database reports artifact count is " + count);
 	}
 
@@ -66,10 +70,12 @@ public class HealthcheckController extends AbstractController {
 	@RequestMapping(value = CCDSConstants.VERSION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public MLPTransportModel getVersion() {
+		Date beginDate = new Date();
 		String className = this.getClass().getSimpleName() + ".class";
 		String classPath = this.getClass().getResource(className).toString();
 		String version = classPath.startsWith("jar") ? CdsApplication.class.getPackage().getImplementationVersion()
 				: "no version, classpath is not jar";
+		logger.audit(beginDate, "getVersion");
 		return new SuccessTransport(200, version);
 	}
 

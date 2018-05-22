@@ -20,6 +20,8 @@
 
 package org.acumos.cds.client.test;
 
+import java.lang.invoke.MethodHandles;
+
 import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
@@ -78,7 +80,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("deprecation")
 public class DomainTest extends AbstractModelTest {
 
-	private static Logger logger = LoggerFactory.getLogger(DomainTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	private void checkMLPArtifact(MLPArtifact m) {
 		Assert.assertEquals(s1, m.getArtifactId());

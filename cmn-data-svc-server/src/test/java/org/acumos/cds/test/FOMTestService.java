@@ -20,6 +20,7 @@
 
 package org.acumos.cds.test;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -43,7 +44,7 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class FOMTestService {
 
-	private final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(FOMTestService.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private SessionFactory sessionFactory;

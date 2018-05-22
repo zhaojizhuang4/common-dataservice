@@ -20,6 +20,8 @@
 
 package org.acumos.cds.config;
 
+import java.lang.invoke.MethodHandles;
+
 import javax.sql.DataSource;
 
 import org.acumos.cds.util.EELFLoggerDelegate;
@@ -34,7 +36,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommonDataServiceDataSource {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(CommonDataServiceDataSource.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Value("${spring.database.driver.classname}")
 	private String dbDriverClassName;

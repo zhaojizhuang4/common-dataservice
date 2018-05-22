@@ -20,23 +20,23 @@
 
 package org.acumos.cds.util;
 
-import static com.att.eelf.configuration.Configuration.MDC_SERVER_FQDN;
-import static com.att.eelf.configuration.Configuration.MDC_SERVER_IP_ADDRESS;
-import static com.att.eelf.configuration.Configuration.MDC_SERVICE_INSTANCE_ID;
-
 import java.net.InetAddress;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.slf4j.MDC;
 
+import com.att.eelf.configuration.Configuration;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import com.att.eelf.configuration.SLF4jWrapper;
 
 /**
- * Extends the EELF logger so the output includes the CLASS NAME, which the base
- * implementation does not provide by default. Example usage:
+ * Extends the EELF logger (which extends the SLF4j logger) so the output
+ * includes the CLASS NAME. Example usage:
  * 
  * <pre>
  * private final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MyClass.class);
@@ -53,21 +53,21 @@ import com.att.eelf.configuration.SLF4jWrapper;
  * </pre>
  *
  */
-public class EELFLoggerDelegate extends SLF4jWrapper implements EELFLogger {
+public class EELFLoggerDelegate extends SLF4jWrapper {
 
-	public static final EELFLogger errorLogger = EELFManager.getInstance().getErrorLogger();
 	public static final EELFLogger applicationLogger = EELFManager.getInstance().getApplicationLogger();
-	public static final EELFLogger debugLogger = EELFManager.getInstance().getDebugLogger();
-	// Usage of the audit and metrics loggers is required in certain environments
 	public static final EELFLogger auditLogger = EELFManager.getInstance().getAuditLogger();
+	public static final EELFLogger debugLogger = EELFManager.getInstance().getDebugLogger();
+	public static final EELFLogger errorLogger = EELFManager.getInstance().getErrorLogger();
 	public static final EELFLogger metricsLogger = EELFManager.getInstance().getMetricsLogger();
 
+	/* This parameter must appear in the pattern defined in logback.xml */
 	private static final String MDC_CLASS_NAME = "ClassName";
-	private String className;
-	private static ConcurrentMap<String, EELFLoggerDelegate> classMap = new ConcurrentHashMap<>();
+	private static final ConcurrentMap<String, EELFLoggerDelegate> classMap = new ConcurrentHashMap<>();
+	private final String className;
 
 	/**
-	 * Builds an instance for the specified class.
+	 * Gets a logger for the specified class.
 	 * 
 	 * @param className
 	 *            Class name
@@ -342,27 +342,87 @@ public class EELFLoggerDelegate extends SLF4jWrapper implements EELFLogger {
 	}
 
 	/**
-	 * Initializes the logger context.
+	 * Initializes the logger context and logs a message to all logs.
 	 */
 	public void init() {
 		setGlobalLoggingContext();
-		final String msg = "############################ Logging is started. ############################";
+		final String msg = "EELFLoggerDelegate initialized";
 		info(applicationLogger, msg);
+		info(auditLogger, msg);
 		error(errorLogger, msg);
 		debug(debugLogger, msg);
 	}
 
 	/**
-	 * Loads all the default logging fields into the MDC context.
+	 * Puts server host name and numeric address into the MDC context for the CURRENT THREAD ONLY.
 	 */
-	private void setGlobalLoggingContext() {
-		MDC.put(MDC_SERVICE_INSTANCE_ID, "");
+	public void setGlobalLoggingContext() {
 		try {
-			MDC.put(MDC_SERVER_FQDN, InetAddress.getLocalHost().getHostName());
-			MDC.put(MDC_SERVER_IP_ADDRESS, InetAddress.getLocalHost().getHostAddress());
+			MDC.put(Configuration.MDC_SERVER_FQDN, InetAddress.getLocalHost().getHostName());
+			MDC.put(Configuration.MDC_SERVER_IP_ADDRESS, InetAddress.getLocalHost().getHostAddress());
 		} catch (Exception e) {
 			error(errorLogger, "setGlobalLoggingContext failed", e);
 		}
+	}
+
+	/**
+	 * Logs a message at level INFO to the audit logger. Sets the class name and
+	 * date values using MDC parameters, then removes them after calling the logger.
+	 * 
+	 * Must convert the timestamp here because MDC requires String values.
+	 * 
+	 * @param beginTs
+	 *            Instant when the operation began, logged as UTC in ISO8601 format;
+	 *            required
+	 * @param endTs
+	 *            Instant when the operation ended, logged as UTC in ISO8601 format;
+	 *            required
+	 * @param message
+	 *            Message to log; required
+	 * @param arguments
+	 *            Arguments to interpolate into message; optional
+	 */
+	public void audit(Instant beginTs, Instant endTs, String message,
+			Object... arguments) {
+		MDC.put(MDC_CLASS_NAME, className);
+		MDC.put(Configuration.MDC_BEGIN_TIMESTAMP, beginTs.atZone(ZoneOffset.UTC).toString());
+		MDC.put(Configuration.MDC_END_TIMESTAMP, endTs.atZone(ZoneOffset.UTC).toString());
+		auditLogger.info(message, arguments);
+		MDC.remove(MDC_CLASS_NAME);
+		MDC.remove(Configuration.MDC_BEGIN_TIMESTAMP);
+		MDC.remove(Configuration.MDC_END_TIMESTAMP);
+	}
+
+	/**
+	 * Convenience method that calls
+	 * {@link #audit(Instant, Instant, String, Object...)} with the
+	 * current time for the endTs parameter, and nulls for the remote client info.
+	 * 
+	 * @param beginTs
+	 *            Point in time when the operation began
+	 * @param message
+	 *            Message to log
+	 * @param arguments
+	 *            Arguments to interpolate into message (optional)
+	 */
+	public void audit(Instant beginTs, String message, Object... arguments) {
+		audit(beginTs, Instant.now(), message, arguments);
+	}
+
+	/**
+	 * Convenience method that converts Date to Instant then calls
+	 * {@link #audit(Instant, Instant, String, Object...)} with the current time for the
+	 * endTs parameter.
+	 * 
+	 * @param beginDate
+	 *            Point in time when the operation began
+	 * @param message
+	 *            Message to log
+	 * @param arguments
+	 *            Arguments to interpolate into message (optional)
+	 */
+	public void audit(Date beginDate, String message, Object... arguments) {
+		audit(Instant.ofEpochMilli(beginDate.getTime()), Instant.now(), message, arguments);
 	}
 
 }

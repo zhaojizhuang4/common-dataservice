@@ -20,6 +20,8 @@
 
 package org.acumos.cds.client;
 
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -27,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.acumos.cds.CCDSConstants;
 import org.acumos.cds.CodeNameType;
@@ -91,7 +94,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -114,10 +121,70 @@ import org.springframework.web.util.UriComponentsBuilder;
 @SuppressWarnings("deprecation")
 public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestClient {
 
-	private static Logger logger = LoggerFactory.getLogger(CommonDataServiceRestClientImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	private final String baseUrl;
 	private final RestTemplate restTemplate;
+	private String requestId;
+
+	/**
+	 * Intercepts requests sent via the RestTemplate used in this implementation.
+	 */
+	private class CDSClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
+		/**
+		 * Adds headers with values set by user:
+		 * <UL>
+		 * <LI> X-Request-ID with user value; adds a generated value if no value is set.
+		 * </UL>
+		 */
+		@Override
+		public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
+				throws IOException {
+			request.getHeaders().add(CCDSConstants.X_REQUEST_ID, requestId == null ? generateRequestId() : requestId);
+			return execution.execute(request, body);
+		}
+
+		private final Random random = new Random();
+
+		/**
+		 * Generates a request ID. <BR>
+		 * https://blog.bandwidth.com/a-recipe-for-adding-correlation-ids-in-java-microservices/
+		 * 
+		 * @return Base-62 encoded random long value.
+		 */
+		private String generateRequestId() {
+			long randomNum = random.nextLong();
+			return encodeBase62(randomNum);
+		}
+
+		private final String base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+		/**
+		 * Encodes the given Long in base 62. <BR>
+		 * https://blog.bandwidth.com/a-recipe-for-adding-correlation-ids-in-java-microservices/
+		 * 
+		 * @param n
+		 *            Number to encode
+		 * @return Long encoded as base 62
+		 */
+		private String encodeBase62(long n) {
+			StringBuilder builder = new StringBuilder();
+			// NOTE: Appending builds a reverse encoded string. The most significant value
+			// is at the end of the string. You could prepend(insert) but appending
+			// is slightly better performance and order doesn't matter here.
+			// perform the first selection using unsigned ops to get negative
+			// numbers down into positive signed range.
+			long index = Long.remainderUnsigned(n, 62);
+			builder.append(base62Chars.charAt((int) index));
+			n = Long.divideUnsigned(n, 62);
+			// now the long is unsigned, can just do regular math ops
+			while (n > 0) {
+				builder.append(base62Chars.charAt((int) (n % 62)));
+				n /= 62;
+			}
+			return builder.toString();
+		}
+	}
 
 	/**
 	 * Creates an instance to access the remote endpoint using the specified
@@ -166,6 +233,8 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		// Put the factory in the template
 		restTemplate = new RestTemplate();
 		restTemplate.setRequestFactory(requestFactory);
+		// Add request interceptor
+		restTemplate.getInterceptors().add(new CDSClientHttpRequestInterceptor());
 	}
 
 	/**
@@ -2068,6 +2137,11 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 				new ParameterizedTypeReference<List<MLPPeer>>() {
 				});
 		return response.getBody();
+	}
+
+	@Override
+	public void setRequestId(String requestId) {
+		this.requestId = requestId;
 	}
 
 }

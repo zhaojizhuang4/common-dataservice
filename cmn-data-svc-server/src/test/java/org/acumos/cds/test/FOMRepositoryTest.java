@@ -19,6 +19,7 @@
  */
 package org.acumos.cds.test;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Date;
 import java.util.List;
 
@@ -52,7 +53,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class FOMRepositoryTest {
 
-	private final static EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(FOMRepositoryTest.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private ArtifactRepository artifactRepository;

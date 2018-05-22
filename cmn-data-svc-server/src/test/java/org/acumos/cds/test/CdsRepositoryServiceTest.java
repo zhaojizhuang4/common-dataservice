@@ -20,6 +20,7 @@
 
 package org.acumos.cds.test;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -132,7 +133,7 @@ import org.springframework.transaction.TransactionSystemException;
 @SpringBootTest
 public class CdsRepositoryServiceTest {
 
-	private final static EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(CdsRepositoryServiceTest.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private ArtifactRepository artifactRepository;
@@ -233,7 +234,8 @@ public class CdsRepositoryServiceTest {
 			Assert.assertNotNull(cu.getUserId());
 			Assert.assertNotNull(cu.getCreated());
 			Assert.assertNotNull(cu.getModified());
-			Assert.assertEquals(cu.getCreated(), cu.getModified());
+			// Created and modified timestamps may be milliseconds apart
+			Assert.assertTrue(Math.abs(cu.getCreated().getTime() - cu.getModified().getTime()) < 5);
 			logger.info("Created user {}", cu);
 			// Update
 			cu.setAuthToken("JWT is Greek to me");

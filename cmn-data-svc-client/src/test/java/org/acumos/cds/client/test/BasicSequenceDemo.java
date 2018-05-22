@@ -20,6 +20,7 @@
 
 package org.acumos.cds.client.test;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +42,7 @@ import org.springframework.web.client.HttpStatusCodeException;
  */
 public class BasicSequenceDemo {
 
-	private static Logger logger = LoggerFactory.getLogger(BasicSequenceDemo.class);
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	private static String hostname = "localhost";
 	private static final String contextPath = "/ccds";

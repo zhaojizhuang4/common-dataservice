@@ -21,6 +21,7 @@
 package org.acumos.cds;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 import org.acumos.cds.util.EELFLoggerDelegate;
 import org.springframework.boot.SpringApplication;
@@ -38,7 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootApplication
 public class CdsApplication implements ApplicationContextAware {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(CdsApplication.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	public static final String CONFIG_ENV_VAR_NAME = "SPRING_APPLICATION_JSON";
 

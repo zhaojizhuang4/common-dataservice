@@ -21,6 +21,7 @@
 package org.acumos.cds.config;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,8 +37,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationEn
  */
 public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate
-			.getLogger(CustomBasicAuthenticationEntryPoint.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	/**
 	 * Confusing name, this method is called for a request that resulted in an

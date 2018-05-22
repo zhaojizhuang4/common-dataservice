@@ -20,6 +20,7 @@
 
 package org.acumos.cds.service;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,7 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class RoleSearchServiceImpl extends AbstractSearchServiceImpl implements RoleSearchService {
 
-	private final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(RoleSearchServiceImpl.class);
+	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private SessionFactory sessionFactory;
