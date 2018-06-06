@@ -22,6 +22,7 @@ package org.acumos.cds.service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +54,8 @@ public class ArtifactSearchServiceImpl extends AbstractSearchServiceImpl impleme
 	@Override
 	public Page<MLPArtifact> findArtifacts(Map<String, ? extends Object> queryParameters, boolean isOr,
 			Pageable pageable) {
+
+		Date beginDate = new Date();
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPArtifact.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 
@@ -69,7 +72,7 @@ public class ArtifactSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 		// Get a page of results and send it back with the total available
 		List<MLPArtifact> items = criteria.list();
-		logger.debug(EELFLoggerDelegate.debugLogger, "getArtifacts: result size={}", items.size());
+		logger.audit(beginDate, "getArtifacts: result size={}", items.size());
 		return new PageImpl<>(items, pageable, count);
 	}
 

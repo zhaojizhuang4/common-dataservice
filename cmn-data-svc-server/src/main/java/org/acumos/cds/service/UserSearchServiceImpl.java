@@ -22,6 +22,7 @@ package org.acumos.cds.service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +54,8 @@ public class UserSearchServiceImpl extends AbstractSearchServiceImpl implements 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Page<MLPUser> findUsers(Map<String, ? extends Object> queryParameters, boolean isOr, Pageable pageable) {
+
+		Date beginDate = new Date();
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPUser.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 
@@ -69,7 +72,7 @@ public class UserSearchServiceImpl extends AbstractSearchServiceImpl implements 
 
 		// Get a page of results and send it back with the total available
 		List<MLPUser> items = criteria.list();
-		logger.debug(EELFLoggerDelegate.debugLogger, "getUsers: result size={}", items.size());
+		logger.audit(beginDate, "getUsers: result size={}", items.size());
 		return new PageImpl<>(items, pageable, count);
 	}
 

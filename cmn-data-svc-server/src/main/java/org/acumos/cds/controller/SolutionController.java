@@ -302,7 +302,7 @@ public class SolutionController extends AbstractController {
 	}
 
 	/**
-	 * Dynamic query.
+	 * Supports a dynamic query by user on Portal screen.
 	 * 
 	 * @param queryParameters
 	 *            Field names-value pairs, see below for names. Some values can be

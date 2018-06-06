@@ -27,6 +27,7 @@ Version 1.15.2, 6 June 2018
 ---------------------------
 
 * Add toolkit type codes CO, SP (ACUMOS-1013)
+* Repair findPortalSolutions API behavior on untagged solutions (ACUMOS-1045)
 * Requires database schema version 1.15
 
 Version 1.15.1, 18 May 2018

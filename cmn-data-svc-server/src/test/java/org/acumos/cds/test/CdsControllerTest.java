@@ -541,27 +541,21 @@ public class CdsControllerTest {
 			RestPageResponse<MLPTag> tags = client.getTags(new RestPageRequest(0, 100));
 			Assert.assertTrue(tags.getNumberOfElements() > 0);
 
-			MLPSolution cs = new MLPSolution();
-			cs.setName("solution name");
-			cs.setOwnerId(cu.getUserId());
-			cs.setProvider("Big Data Org");
+			MLPSolution cs = new MLPSolution("solution name", cu.getUserId(), true);
+			cs.setProvider("Tagged solution org");
 			cs.setModelTypeCode(ModelTypeCode.CL.name());
 			cs.setToolkitTypeCode(ToolkitTypeCode.CP.name());
-			cs.setActive(true);
 			cs.getTags().add(tag1);
 			cs = client.createSolution(cs);
 			Assert.assertNotNull(cs.getSolutionId());
 			Assert.assertFalse(cs.getTags().isEmpty());
 			logger.info("Created public solution {}", cs);
 
-			// private to organization
-			MLPSolution csOrg = new MLPSolution();
-			csOrg.setName("solution organization");
-			csOrg.setOwnerId(cu.getUserId());
-			csOrg.setProvider("Sol Org");
+			// no tags
+			MLPSolution csOrg = new MLPSolution("solution organization", cu.getUserId(), true);
+			csOrg.setProvider("Untagged solution org");
 			csOrg.setModelTypeCode(ModelTypeCode.DS.name());
 			csOrg.setToolkitTypeCode(ToolkitTypeCode.SK.name());
-			csOrg.setActive(true);
 			csOrg = client.createSolution(csOrg);
 			Assert.assertNotNull(csOrg.getSolutionId());
 			logger.info("Created org solution {}", cs);
@@ -642,11 +636,20 @@ public class CdsControllerTest {
 			Assert.assertNotNull(cr.getRevisionId());
 			logger.info("Created solution revision {}", cr.getRevisionId());
 
+			MLPSolutionRevision crOrg = new MLPSolutionRevision(csOrg.getSolutionId(), "1.0R", cu.getUserId(), //
+					AccessTypeCode.PR.name(), ValidationStatusCode.NV.name());
+			crOrg = client.createSolutionRevision(crOrg);
+			Assert.assertNotNull(crOrg.getRevisionId());
+			logger.info("Created solution revision {}", cr.getRevisionId());
+
 			cr.setDescription("Some description");
 			client.updateSolutionRevision(cr);
 
-			logger.info("Adding artifact to revision");
+			logger.info("Adding artifact to revision 1");
 			client.addSolutionRevisionArtifact(cs.getSolutionId(), cr.getRevisionId(), ca.getArtifactId());
+
+			logger.info("Adding artifact to revision 2");
+			client.addSolutionRevisionArtifact(csOrg.getSolutionId(), crOrg.getRevisionId(), ca.getArtifactId());
 
 			logger.info("Querying for revisions by solution");
 			List<MLPSolutionRevision> revs = client.getSolutionRevisions(new String[] { s.getSolutionId() });
@@ -675,14 +678,21 @@ public class CdsControllerTest {
 			logger.info("Inactive PB solution count {}", inactiveSolList.getNumberOfElements());
 
 			// Portal dynamic search
+			logger.info("Querying for any solutions via flexible i/f");
+			RestPageResponse<MLPSolution> portalAnyMatches = client.findPortalSolutions(null, null, true, null, null,
+					null, null, null, new RestPageRequest(0, 5));
+			Assert.assertTrue(portalAnyMatches != null && portalAnyMatches.getNumberOfElements() > 1);
+
+			logger.info("Querying for valid tag on solutions via flexible i/f");
 			String[] searchTags = new String[] { tagName1 };
 			RestPageResponse<MLPSolution> portalTagMatches = client.findPortalSolutions(null, null, true, null, null,
-					null, null, searchTags, new RestPageRequest(0, 1));
+					null, null, searchTags, new RestPageRequest(0, 5));
 			Assert.assertTrue(portalTagMatches != null && portalTagMatches.getNumberOfElements() > 0);
 
+			logger.info("Querying for bogus tag on solutions via flexible i/f");
 			String[] bogusTags = new String[] { "bogus" };
 			RestPageResponse<MLPSolution> portalTagNoMatches = client.findPortalSolutions(null, null, true, null, null,
-					null, null, bogusTags, new RestPageRequest(0, 1));
+					null, null, bogusTags, new RestPageRequest(0, 5));
 			Assert.assertTrue(portalTagNoMatches != null && portalTagNoMatches.getNumberOfElements() == 0);
 
 			String[] nameKw = null;
