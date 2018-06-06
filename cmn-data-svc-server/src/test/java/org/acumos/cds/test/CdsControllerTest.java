@@ -530,15 +530,12 @@ public class CdsControllerTest {
 			RestPageResponse<MLPTag> tags = client.getTags(new RestPageRequest(0, 100));
 			Assert.assertTrue(tags.getNumberOfElements() > 0);
 
-			MLPSolution cs = new MLPSolution();
-			cs.setName("solution name");
-			cs.setOwnerId(cu.getUserId());
+			MLPSolution cs = new MLPSolution("solution name", cu.getUserId(), true);
 			cs.setValidationStatusCode(ValidationStatusCode.PS.name());
-			cs.setProvider("Big Data Org");
+			cs.setProvider("Tagged solution org");
 			cs.setAccessTypeCode(AccessTypeCode.PB.name());
 			cs.setModelTypeCode(ModelTypeCode.CL.name());
 			cs.setToolkitTypeCode(ToolkitTypeCode.CP.name());
-			cs.setActive(true);
 			cs.getTags().add(tag1);
 			cs = client.createSolution(cs);
 			Assert.assertNotNull(cs.getSolutionId());
@@ -546,15 +543,12 @@ public class CdsControllerTest {
 			logger.info("Created public solution {}", cs);
 
 			// private to organization
-			MLPSolution csOrg = new MLPSolution();
-			csOrg.setName("solution organization");
-			csOrg.setOwnerId(cu.getUserId());
+			MLPSolution csOrg = new MLPSolution("solution organization", cu.getUserId(), true);
 			csOrg.setValidationStatusCode(ValidationStatusCode.PS.name());
-			csOrg.setProvider("Sol Org");
+			cs.setProvider("Untagged solution org");
 			csOrg.setAccessTypeCode(AccessTypeCode.OR.name());
 			csOrg.setModelTypeCode(ModelTypeCode.DS.name());
 			csOrg.setToolkitTypeCode(ToolkitTypeCode.SK.name());
-			csOrg.setActive(true);
 			csOrg = client.createSolution(csOrg);
 			Assert.assertNotNull(csOrg.getSolutionId());
 			logger.info("Created org solution {}", cs);
@@ -636,18 +630,25 @@ public class CdsControllerTest {
 			Assert.assertTrue(sl2 != null && sl2.getNumberOfElements() > 0);
 
 			// Portal dynamic search
+			logger.info("Querying for active solutions via dynamic i/f");
+			RestPageResponse<MLPSolution> portalAnyMatches = client.findPortalSolutions(null, null, true, null, null,
+					null, null, null, new RestPageRequest(0, 5));
+			Assert.assertTrue(portalAnyMatches != null && portalAnyMatches.getNumberOfElements() > 1);
+
+			logger.info("Querying for valid tag on solutions via dynamic i/f");
 			String[] searchTags = new String[] { tagName1 };
 			RestPageResponse<MLPSolution> portalTagMatches = client.findPortalSolutions(null, null, true, null, null,
-					null, null, searchTags, new RestPageRequest(0, 1));
+					null, null, searchTags, new RestPageRequest(0, 5));
 			Assert.assertTrue(portalTagMatches != null && portalTagMatches.getNumberOfElements() > 0);
 
+			logger.info("Querying for invalid tag on solutions via dynamic i/f");
 			String[] bogusTags = new String[] { "bogus" };
 			RestPageResponse<MLPSolution> portalTagNoMatches = client.findPortalSolutions(null, null, true, null, null,
-					null, null, bogusTags, new RestPageRequest(0, 1));
+					null, null, bogusTags, new RestPageRequest(0, 5));
 			Assert.assertTrue(portalTagNoMatches != null && portalTagNoMatches.getNumberOfElements() == 0);
 
 			RestPageResponse<MLPSolution> portalInactiveMatches = client.findPortalSolutions(null, null, false, null,
-					null, null, null, null, new RestPageRequest(0, 1));
+					null, null, null, null, new RestPageRequest(0, 5));
 			Assert.assertTrue(portalInactiveMatches != null && portalInactiveMatches.getNumberOfElements() > 0);
 
 			String[] nameKw = null;
