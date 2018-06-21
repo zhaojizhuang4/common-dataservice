@@ -4,13 +4,13 @@
 	<groupId>org.acumos.common-dataservice</groupId>
 	<artifactId>cmn-data-svc-server</artifactId>
 	<!-- This version number is used to tag the Docker image. -->
-	<version>1.15.2-SNAPSHOT</version>
+	<version>1.15.3-SNAPSHOT</version>
 	<name>Acumos Common Data Service Server</name>
 	<description>Micro service based on Spring-Boot</description>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.10.RELEASE</version>
+		<version>1.5.14.RELEASE</version>
 		<!-- silence warning about parent relative path -->
 		<relativePath />
 	</parent>

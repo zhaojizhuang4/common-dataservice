@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.acumos.common-dataservice</groupId>
 	<artifactId>cmn-data-svc-client</artifactId>
-	<version>1.15.2-SNAPSHOT</version>
+	<version>1.15.3-SNAPSHOT</version>
 	<name>Acumos Common Data Service Client</name>
 	<description>Client library for the Acumos Common Data Service</description>
 	<properties>
@@ -12,17 +12,18 @@
 		<!-- Supplied by Jenkins -->
 		<build.number>${env.BUILD_NUMBER}</build.number>
 		<springfox.version>2.7.0</springfox.version>
-		<!-- Begin versions set by spring-boot in POM spring-boot-dependencies -->
+		<!-- Begin extract of POM file spring-boot-dependencies -->
 		<hibernate.version>5.0.12.Final</hibernate.version>
-		<hibernate-validator.version>5.3.5.Final</hibernate-validator.version>
-		<httpcomponents.version>4.5.3</httpcomponents.version>
-		<jackson.version>2.8.10</jackson.version>
+		<hibernate-validator.version>5.3.6.Final</hibernate-validator.version>
+		<httpclient.version>4.5.5</httpclient.version>
+		<jackson.version>2.8.11</jackson.version>
 		<javax-validation.version>1.1.0.Final</javax-validation.version>
 		<slf4j.version>1.7.25</slf4j.version>
-		<spring.version>4.3.11.RELEASE</spring.version>
-		<spring-data-jpa.version>1.11.7.RELEASE</spring-data-jpa.version>
-		<spring-data-commons.version>1.13.7.RELEASE</spring-data-commons.version>
-		<!-- End versions set by spring-boot in POM spring-boot-dependencies -->
+		<spring.version>4.3.18.RELEASE</spring.version>
+		<!-- End extract of POM file spring-boot-dependencies -->
+		<!-- These versions come from spring-data-releasetrain.version -->
+		<spring-data-jpa.version>1.11.13.RELEASE</spring-data-jpa.version>
+		<spring-data-commons.version>1.13.13.RELEASE</spring-data-commons.version>
 	</properties>
 	<!-- No repositories section. Only needs Maven central, aka public. -->
 	<dependencies>
@@ -71,7 +72,7 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>${httpcomponents.version}</version>
+			<version>${httpclient.version}</version>
 		</dependency>
 		<!-- JPA annotations -->
 		<dependency>
