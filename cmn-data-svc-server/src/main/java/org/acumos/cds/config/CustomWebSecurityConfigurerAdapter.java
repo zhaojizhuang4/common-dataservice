@@ -30,8 +30,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 
 /**
- * Spring 4 security requires a CSRF token on POST/PUT/DELETE requests.  But
- * this server has no web pages where a CSRF token would be sent, so disable.
+ * Spring 4 security requires a CSRF token on POST/PUT/DELETE requests. But this
+ * server has no web pages where a CSRF token would be sent, so disable.
  * 
  * Use basic HTTP auth, but exclude the health check from Spring security.
  * 
@@ -43,7 +43,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationEn
 public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
 	private static final String REALM_NAME = "Acumos-CDS";
-	
+
 	/**
 	 * Open access to the documentation.
 	 */
@@ -64,7 +64,7 @@ public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAda
 				.antMatchers("/**").authenticated() //
 				.and().httpBasic().realmName(REALM_NAME).authenticationEntryPoint(getBasicAuthEntryPoint());
 	}
-	
+
 	@Bean
 	public BasicAuthenticationEntryPoint getBasicAuthEntryPoint() {
 		BasicAuthenticationEntryPoint baep = new CustomBasicAuthenticationEntryPoint();

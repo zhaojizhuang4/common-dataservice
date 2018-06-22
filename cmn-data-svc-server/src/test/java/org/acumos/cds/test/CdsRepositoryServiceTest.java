@@ -45,6 +45,7 @@ import org.acumos.cds.ValidationStatusCode;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
+import org.acumos.cds.domain.MLPCompSolMap;
 import org.acumos.cds.domain.MLPNotifUserMap;
 import org.acumos.cds.domain.MLPNotification;
 import org.acumos.cds.domain.MLPPeer;
@@ -77,6 +78,7 @@ import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPUserRoleMap;
 import org.acumos.cds.repository.ArtifactRepository;
 import org.acumos.cds.repository.CommentRepository;
+import org.acumos.cds.repository.CompSolMapRepository;
 import org.acumos.cds.repository.NotifUserMapRepository;
 import org.acumos.cds.repository.NotificationRepository;
 import org.acumos.cds.repository.PeerGroupRepository;
@@ -139,6 +141,8 @@ public class CdsRepositoryServiceTest {
 	private ArtifactRepository artifactRepository;
 	@Autowired
 	private CommentRepository commentRepository;
+	@Autowired
+	private CompSolMapRepository compSolMapRepository;
 	@Autowired
 	private NotificationRepository notificationRepository;
 	@Autowired
@@ -626,6 +630,18 @@ public class CdsRepositoryServiceTest {
 
 			commentRepository.delete(mc.getCommentId());
 			threadRepository.delete(thread.getThreadId());
+
+			// Composite solution support was added very late
+			MLPCompSolMap compSolMap = new MLPCompSolMap(cs.getSolutionId(), cs.getSolutionId());
+			logger.info("Created comp sol map {}", compSolMap.toString());
+			compSolMapRepository.save(compSolMap);
+			Iterable<MLPCompSolMap> parents = compSolMapRepository.findByParentId(cs.getSolutionId());
+			Assert.assertTrue(parents != null && parents.iterator().hasNext());
+			compSolMap = parents.iterator().next();
+			logger.info("Comp sol map child is {}", compSolMap.getChildId());
+			MLPCompSolMap.CompSolMapPK compSolMapKey = new MLPCompSolMap.CompSolMapPK(cs.getSolutionId(),
+					cs.getSolutionId());
+			compSolMapRepository.delete(compSolMapKey);
 
 			if (cleanup) {
 				logger.info("Removing newly added entities");

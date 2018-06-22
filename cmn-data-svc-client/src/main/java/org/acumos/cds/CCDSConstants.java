@@ -67,6 +67,7 @@ public abstract class CCDSConstants {
 	public static final String DATE_PATH = "date";
 	public static final String VAL_SEQ_PATH = "valseq";
 	public static final String VAL_TYPE_PATH = "valtype";
+	public static final String COMP_PATH = "comp";
 
 	// Code-name pairs
 	public static final String CODE_PATH = "code";

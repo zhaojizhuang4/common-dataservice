@@ -510,6 +510,12 @@ public class MockClientTest {
 		client.setPeerAccess(peerAccessList);
 		Assert.assertTrue(peerAccessList == client.getPeerAccess("peerId"));
 
+		List<String> members = new ArrayList<>();
+		client.setCompositeSolutionMembers(members);
+		Assert.assertTrue(members == client.getCompositeSolutionMembers("id"));
+		client.addCompositeSolutionMember("id1", "id2");
+		client.dropCompositeSolutionMember("id1", "id2");
+
 	}
 
 }

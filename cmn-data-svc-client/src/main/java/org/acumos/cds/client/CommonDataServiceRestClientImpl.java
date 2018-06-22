@@ -134,7 +134,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		/**
 		 * Adds headers with values set by user:
 		 * <UL>
-		 * <LI> X-Request-ID with user value; adds a generated value if no value is set.
+		 * <LI>X-Request-ID with user value; adds a generated value if no value is set.
 		 * </UL>
 		 */
 		@Override
@@ -2142,6 +2142,32 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	@Override
 	public void setRequestId(String requestId) {
 		this.requestId = requestId;
+	}
+
+	@Override
+	public List<String> getCompositeSolutionMembers(String parentId) {
+		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, parentId, CCDSConstants.COMP_PATH }, null, null);
+		logger.debug("getCompositeSolutionMembers: uri {}", uri);
+		ResponseEntity<List<String>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<String>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public void addCompositeSolutionMember(String parentId, String childId) {
+		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, parentId, CCDSConstants.COMP_PATH, childId },
+				null, null);
+		logger.debug("addCompositeSolutionMember: uri {}", uri);
+		restTemplate.postForLocation(uri, null);
+	}
+
+	@Override
+	public void dropCompositeSolutionMember(String parentId, String childId) {
+		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, parentId, CCDSConstants.COMP_PATH, childId },
+				null, null);
+		logger.debug("dropCompositeSolutionMember: uri {}", uri);
+		restTemplate.delete(uri);
 	}
 
 }

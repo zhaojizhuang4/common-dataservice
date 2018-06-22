@@ -27,6 +27,7 @@ import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
 import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
+import org.acumos.cds.domain.MLPCompSolMap;
 import org.acumos.cds.domain.MLPDeploymentStatus;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPModelType;
@@ -158,6 +159,40 @@ public class DomainTest extends AbstractModelTest {
 		} catch (IllegalArgumentException iae) {
 			// null arg is rejected
 		}
+	}
+
+	private void checkMLPCompSolMap(MLPCompSolMap m) {
+		Assert.assertEquals(s1, m.getParentId());
+		Assert.assertEquals(s2, m.getChildId());
+	}
+
+	@Test
+	public void testMLPCompSolMap() {
+		MLPCompSolMap m = new MLPCompSolMap(s1, s1);
+		m = new MLPCompSolMap();
+		m.setParentId(s1);
+		m.setChildId(s2);
+		checkMLPCompSolMap(m);
+		m = new MLPCompSolMap(m);
+		checkMLPCompSolMap(m);
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		try {
+			new MLPCompSolMap(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
+		logger.info(m.toString());
+		MLPCompSolMap.CompSolMapPK pk = new MLPCompSolMap.CompSolMapPK();
+		pk = new MLPCompSolMap.CompSolMapPK(s1, s2);
+		Assert.assertFalse(pk.equals(null));
+		Assert.assertFalse(pk.equals(new Object()));
+		Assert.assertTrue(pk.equals(pk));
+		Assert.assertFalse(pk.hashCode() == 0);
+		logger.info(pk.toString());
 	}
 
 	private void checkMLPNotification(MLPNotification m) {

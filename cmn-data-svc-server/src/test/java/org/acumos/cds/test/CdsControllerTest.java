@@ -832,6 +832,14 @@ public class CdsControllerTest {
 			for (MLPSolutionRevision r : revs)
 				logger.info("\tRevision: {}", r);
 
+			// Composite solution support was added very late
+			client.addCompositeSolutionMember(cs.getSolutionId(), csOrg.getSolutionId());
+			List<String> kids = client.getCompositeSolutionMembers(cs.getSolutionId());
+			Assert.assertTrue(kids != null && kids.size() == 1);
+			client.dropCompositeSolutionMember(cs.getSolutionId(), csOrg.getSolutionId());
+			kids = client.getCompositeSolutionMembers(cs.getSolutionId());
+			Assert.assertTrue(kids != null && kids.size() == 0);
+
 			if (cleanup) {
 				logger.info("Deleting newly created instances");
 				client.dropSolutionTag(cs.getSolutionId(), tagName1);
@@ -2106,7 +2114,8 @@ public class CdsControllerTest {
 		rf.setRoleId(cr.getRoleId());
 		rf.setRoleFunctionId(rfId);
 
-		// Clean up the role stuff so subsequent Mariadb tests succeed without recreating schema.
+		// Clean up the role stuff so subsequent Mariadb tests succeed without
+		// recreating schema.
 		try {
 			client.dropUsersInRole(users, cr.getRoleId());
 			client.deleteRoleFunction(cr.getRoleId(), rf.getRoleFunctionId());

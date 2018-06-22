@@ -1942,4 +1942,33 @@ public interface ICommonDataServiceRestClient {
 	 */
 	void setRequestId(String requestId);
 
+	/**
+	 * Gets the member solution IDs in the specified composite solution.
+	 * 
+	 * @param parentId
+	 *            parent solution ID.
+	 * @return List of child solution IDs
+	 */
+	List<String> getCompositeSolutionMembers(String parentId);
+
+	/**
+	 * Adds the specified member to the specified composite solution.
+	 * 
+	 * @param parentId
+	 *            parent solution ID.
+	 * @param childId
+	 *            child solution ID
+	 */
+	void addCompositeSolutionMember(String parentId, String childId);
+
+	/**
+	 * Removes the specified member from the specified composite solution.
+	 * 
+	 * @param parentId
+	 *            parent solution ID.
+	 * @param childId
+	 *            child solution ID
+	 */
+	void dropCompositeSolutionMember(String parentId, String childId);
+
 }

@@ -354,7 +354,8 @@ public class EELFLoggerDelegate extends SLF4jWrapper {
 	}
 
 	/**
-	 * Puts server host name and numeric address into the MDC context for the CURRENT THREAD ONLY.
+	 * Puts server host name and numeric address into the MDC context for the
+	 * CURRENT THREAD ONLY.
 	 */
 	public void setGlobalLoggingContext() {
 		try {
@@ -382,8 +383,7 @@ public class EELFLoggerDelegate extends SLF4jWrapper {
 	 * @param arguments
 	 *            Arguments to interpolate into message; optional
 	 */
-	public void audit(Instant beginTs, Instant endTs, String message,
-			Object... arguments) {
+	public void audit(Instant beginTs, Instant endTs, String message, Object... arguments) {
 		MDC.put(MDC_CLASS_NAME, className);
 		MDC.put(Configuration.MDC_BEGIN_TIMESTAMP, beginTs.atZone(ZoneOffset.UTC).toString());
 		MDC.put(Configuration.MDC_END_TIMESTAMP, endTs.atZone(ZoneOffset.UTC).toString());
@@ -395,8 +395,8 @@ public class EELFLoggerDelegate extends SLF4jWrapper {
 
 	/**
 	 * Convenience method that calls
-	 * {@link #audit(Instant, Instant, String, Object...)} with the
-	 * current time for the endTs parameter, and nulls for the remote client info.
+	 * {@link #audit(Instant, Instant, String, Object...)} with the current time for
+	 * the endTs parameter, and nulls for the remote client info.
 	 * 
 	 * @param beginTs
 	 *            Point in time when the operation began
@@ -411,8 +411,8 @@ public class EELFLoggerDelegate extends SLF4jWrapper {
 
 	/**
 	 * Convenience method that converts Date to Instant then calls
-	 * {@link #audit(Instant, Instant, String, Object...)} with the current time for the
-	 * endTs parameter.
+	 * {@link #audit(Instant, Instant, String, Object...)} with the current time for
+	 * the endTs parameter.
 	 * 
 	 * @param beginDate
 	 *            Point in time when the operation began

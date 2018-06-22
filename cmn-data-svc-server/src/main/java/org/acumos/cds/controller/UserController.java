@@ -629,7 +629,8 @@ public class UserController extends AbstractController {
 			else
 				userRoleMapRepository.delete(new MLPUserRoleMap.UserRoleMapPK(userId, roleId));
 		}
-		logger.audit(beginDate, "addOrDropUsersInRole: role {} users {}", roleId, String.join(", ", usersRoleRequest.getUserIds()));
+		logger.audit(beginDate, "addOrDropUsersInRole: role {} users {}", roleId,
+				String.join(", ", usersRoleRequest.getUserIds()));
 		return new SuccessTransport(HttpServletResponse.SC_OK, null);
 	}
 
@@ -1112,7 +1113,8 @@ public class UserController extends AbstractController {
 			// This is a hack to create the location path.
 			response.setHeader(HttpHeaders.LOCATION,
 					CCDSConstants.USER_PATH + "/" + CCDSConstants.NOTIFICATION_PREF_PATH);
-			logger.audit(beginDate, "createUserNotificationPreference: userNotifPrefId {}", usrNotifPref.getUserNotifPrefId());
+			logger.audit(beginDate, "createUserNotificationPreference: userNotifPrefId {}",
+					usrNotifPref.getUserNotifPrefId());
 			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);

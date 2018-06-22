@@ -21,8 +21,10 @@
 package org.acumos.cds.controller;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.acumos.cds.CCDSConstants;
 import org.acumos.cds.CodeNameType;
 import org.acumos.cds.domain.MLPArtifact;
+import org.acumos.cds.domain.MLPCompSolMap;
 import org.acumos.cds.domain.MLPSolRevArtMap;
 import org.acumos.cds.domain.MLPSolTagMap;
 import org.acumos.cds.domain.MLPSolUserAccMap;
@@ -47,6 +50,7 @@ import org.acumos.cds.domain.MLPSolutionWeb;
 import org.acumos.cds.domain.MLPTag;
 import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.repository.ArtifactRepository;
+import org.acumos.cds.repository.CompSolMapRepository;
 import org.acumos.cds.repository.SolRevArtMapRepository;
 import org.acumos.cds.repository.SolTagMapRepository;
 import org.acumos.cds.repository.SolUserAccMapRepository;
@@ -96,6 +100,8 @@ public class SolutionController extends AbstractController {
 	@Autowired
 	private ArtifactRepository artifactRepository;
 	@Autowired
+	private CompSolMapRepository compSolMapRepository;
+	@Autowired
 	private SolRevArtMapRepository solRevArtMapRepository;
 	@Autowired
 	private SolTagMapRepository solTagMapRepository;
@@ -116,7 +122,7 @@ public class SolutionController extends AbstractController {
 	@Autowired
 	private SolutionSearchService solutionSearchService;
 	@Autowired
-	private TagRepository solutionTagRepository;
+	private TagRepository tagRepository;
 	@Autowired
 	private SolutionValidationRepository solutionValidationRepository;
 	@Autowired
@@ -232,7 +238,7 @@ public class SolutionController extends AbstractController {
 	public Object findSolutionsByTag(@RequestParam("tag") String tag, Pageable pageRequest,
 			HttpServletResponse response) {
 		Date beginDate = new Date();
-		MLPTag existing = solutionTagRepository.findOne(tag);
+		MLPTag existing = tagRepository.findOne(tag);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + tag, null);
@@ -537,8 +543,8 @@ public class SolutionController extends AbstractController {
 		Date beginDate = new Date();
 		try {
 			// Manually cascade the delete
-			// what about composite solutions?
 			solutionDeploymentRepository.deleteBySolutionId(solutionId);
+			compSolMapRepository.deleteByParentId(solutionId);
 			solTagMapRepository.deleteBySolutionId(solutionId);
 			solutionDownloadRepository.deleteBySolutionId(solutionId);
 			solutionRatingRepository.deleteBySolutionId(solutionId);
@@ -816,7 +822,7 @@ public class SolutionController extends AbstractController {
 	@ResponseBody
 	public Iterable<MLPTag> getTagsForSolution(@PathVariable("solutionId") String solutionId) {
 		Date beginDate = new Date();
-		Iterable<MLPTag> result = solutionTagRepository.findBySolution(solutionId);
+		Iterable<MLPTag> result = tagRepository.findBySolution(solutionId);
 		logger.audit(beginDate, "getTagsForSolution: solutionId {}", solutionId);
 		return result;
 	}
@@ -836,7 +842,7 @@ public class SolutionController extends AbstractController {
 	public Object addTag(@PathVariable("solutionId") String solutionId, @PathVariable("tag") String tag,
 			HttpServletResponse response) {
 		Date beginDate = new Date();
-		if (solutionTagRepository.findOne(tag) == null) {
+		if (tagRepository.findOne(tag) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + tag, null);
 		} else if (solutionRepository.findOne(solutionId) == null) {
@@ -853,7 +859,7 @@ public class SolutionController extends AbstractController {
 	 * @param solutionId
 	 *            solution ID
 	 * @param tag
-	 *            tag to add
+	 *            tag to remove
 	 * @param response
 	 *            HttpServletResponse
 	 * @return Success indicator
@@ -864,7 +870,7 @@ public class SolutionController extends AbstractController {
 	public Object dropTag(@PathVariable("solutionId") String solutionId, @PathVariable("tag") String tag,
 			HttpServletResponse response) {
 		Date beginDate = new Date();
-		if (solutionTagRepository.findOne(tag) == null) {
+		if (tagRepository.findOne(tag) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + tag, null);
 		} else if (solutionRepository.findOne(solutionId) == null) {
@@ -1651,6 +1657,81 @@ public class SolutionController extends AbstractController {
 			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionDeployment failed", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteSolutionDeployment failed", ex);
+		}
+	}
+
+	/**
+	 * @param parentId
+	 *            Parent solution ID
+	 * @return List of child solution IDs
+	 */
+	@ApiOperation(value = "Gets a list of child solution IDs used in the specified composite solution.", response = String.class, responseContainer = "List")
+	@RequestMapping(value = "/{parentId}/" + CCDSConstants.COMP_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public Iterable<String> getCompositeSolutionMembers(@PathVariable("parentId") String parentId) {
+		Date beginDate = new Date();
+		Iterable<MLPCompSolMap> result = compSolMapRepository.findByParentId(parentId);
+		List<String> children = new ArrayList<>();
+		Iterator<MLPCompSolMap> kids = result.iterator();
+		while (kids.hasNext())
+			children.add(kids.next().getChildId());
+		logger.audit(beginDate, "getCompositeSolutionMembers: parentId {}", parentId);
+		return children;
+	}
+
+	/**
+	 * @param parentId
+	 *            parent solution ID
+	 * @param childId
+	 *            child solution ID to add
+	 * @param response
+	 *            HttpServletResponse
+	 * @return Success indicator
+	 */
+	@ApiOperation(value = "Adds a child to the parent composite solution.", response = SuccessTransport.class)
+	@RequestMapping(value = "/{parentId}/" + CCDSConstants.COMP_PATH + "/{childId}", method = RequestMethod.POST)
+	@ResponseBody
+	public Object addCompositeSolutionMember(@PathVariable("parentId") String parentId,
+			@PathVariable("childId") String childId, HttpServletResponse response) {
+		Date beginDate = new Date();
+		if (solutionRepository.findOne(parentId) == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + parentId, null);
+		} else if (solutionRepository.findOne(childId) == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + childId, null);
+		} else {
+			compSolMapRepository.save(new MLPCompSolMap(parentId, childId));
+			logger.audit(beginDate, "addCompositeSolutionMember: parentId {} childId {}", parentId, childId);
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
+		}
+	}
+
+	/**
+	 * @param parentId
+	 *            parent solution ID
+	 * @param childId
+	 *            child solution ID to remove
+	 * @param response
+	 *            HttpServletResponse
+	 * @return Success indicator
+	 */
+	@ApiOperation(value = "Drops a child from the parent composite solution.", response = SuccessTransport.class)
+	@RequestMapping(value = "/{parentId}/" + CCDSConstants.COMP_PATH + "/{childId}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public Object dropCompositeSolutionMember(@PathVariable("parentId") String parentId,
+			@PathVariable("childId") String childId, HttpServletResponse response) {
+		Date beginDate = new Date();
+		if (solutionRepository.findOne(parentId) == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + parentId, null);
+		} else if (solutionRepository.findOne(childId) == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + childId, null);
+		} else {
+			compSolMapRepository.delete(new MLPCompSolMap(parentId, childId));
+			logger.audit(beginDate, "dropCompositeSolutionMember: parentId {} childId {}", parentId, childId);
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		}
 	}
 

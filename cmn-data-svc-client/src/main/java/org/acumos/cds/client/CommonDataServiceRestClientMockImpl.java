@@ -208,6 +208,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private List<MLPCodeNamePair> pairs;
 	private List<String> valueSetNames;
 	private String requestId;
+	private List<String> solutionMembers;
 
 	/**
 	 * No-argument constructor.
@@ -1661,6 +1662,25 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	public void setRequestId(String requestId) {
 		this.requestId = requestId;
 		logger.info("set request id {}", this.requestId);
+	}
+
+	public void setCompositeSolutionMembers(List<String> members) {
+		this.solutionMembers = members;
+	}
+
+	@Override
+	public List<String> getCompositeSolutionMembers(String parentId) {
+		return solutionMembers;
+	}
+
+	@Override
+	public void addCompositeSolutionMember(String parentId, String childId) {
+		// what to mock?
+	}
+
+	@Override
+	public void dropCompositeSolutionMember(String parentId, String childId) {
+		// what to mock?
 	}
 
 }
