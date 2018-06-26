@@ -40,8 +40,13 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @Entity
 @IdClass(SolUserAccessMapPK.class)
-@Table(name = "C_SOL_USER_ACCESS_MAP")
+@Table(name = MLPSolUserAccMap.TABLE_NAME)
 public class MLPSolUserAccMap implements MLPEntity, Serializable {
+
+	// Define constants so names can be reused in many-many annotation.
+	/* package */ static final String TABLE_NAME = "C_SOL_USER_ACCESS_MAP";
+	/* package */ static final String SOL_ID_COL_NAME = "SOLUTION_ID";
+	/* package */ static final String USER_ID_COL_NAME = "USER_ID";
 
 	private static final long serialVersionUID = 8809818075005891800L;
 
@@ -90,13 +95,13 @@ public class MLPSolUserAccMap implements MLPEntity, Serializable {
 	}
 
 	@Id
-	@Column(name = "SOLUTION_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
+	@Column(name = SOL_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
 	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String solutionId;
 
 	@Id
-	@Column(name = "USER_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
+	@Column(name = USER_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
 	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String userId;

@@ -23,11 +23,12 @@ Common Data Service Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
-Version 1.15.3, 22 June 2018
+Version 1.15.3, 27 June 2018
 ----------------------------
 
-* Add client and server methods for composite solution parent-child mapping
-* Update Spring library versions to address CLM vulnerabilities 
+* Add search method to find user's co-owned solutions (ACUMOS-1257)
+* Add methods to manage composite solution parent-child membership
+* Update Spring library versions to address vulnerabilities flagged by CLM 
 * Requires database schema version 1.15
 
 Version 1.15.2, 6 June 2018

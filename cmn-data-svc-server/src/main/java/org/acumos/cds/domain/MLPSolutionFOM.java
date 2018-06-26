@@ -121,6 +121,21 @@ public class MLPSolutionFOM extends MLPAbstractSolution implements Serializable 
 	@JoinColumn(name = MLPSolutionWeb.SOL_ID_COL_NAME)
 	private MLPSolutionWeb webStats;
 
+	/**
+	 * User access assigned to the solution via a join table. Users can be assigned
+	 * to many solutions, so this is a many-many (not one-many) relationship.
+	 * 
+	 * Unidirectional relationship - the MLPUser object is not annotated.
+	 * 
+	 * Use default LAZY fetch. This is only used for searching (never fetched, never
+	 * serialized as JSON).
+	 */
+	@ManyToMany
+	@JoinTable(name = MLPSolUserAccMap.TABLE_NAME, //
+			joinColumns = { @JoinColumn(name = MLPSolUserAccMap.SOL_ID_COL_NAME) }, //
+			inverseJoinColumns = { @JoinColumn(name = MLPSolUserAccMap.USER_ID_COL_NAME) })
+	private Set<MLPUser> accessUsers = new HashSet<>(0);
+
 	public MLPUser getOwner() {
 		return owner;
 	}
@@ -159,6 +174,14 @@ public class MLPSolutionFOM extends MLPAbstractSolution implements Serializable 
 
 	public void setWebStats(MLPSolutionWeb webStats) {
 		this.webStats = webStats;
+	}
+
+	public Set<MLPUser> getAccessUsers() {
+		return accessUsers;
+	}
+
+	public void setAccessUsers(Set<MLPUser> accessUsers) {
+		this.accessUsers = accessUsers;
 	}
 
 	@Override

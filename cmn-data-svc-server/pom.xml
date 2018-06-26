@@ -68,7 +68,8 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<!-- Spring-boot sets the version -->
+			<!-- Override Spring-boot choice of 1.11.1 to avoid security vulnerability -->
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>

@@ -48,7 +48,7 @@ public interface SolutionSearchService {
 	Page<MLPSolution> findSolutions(Map<String, ? extends Object> queryParameters, boolean isOr, Pageable pageable);
 
 	/**
-	 * Gets a page of instances matching all query parameters.
+	 * Gets a page of solutions matching all query parameters.
 	 * 
 	 * @param nameKeywords
 	 *            Searches the name field for the keywords using case-insensitive
@@ -84,6 +84,46 @@ public interface SolutionSearchService {
 	 */
 	Page<MLPSolution> findPortalSolutions(String[] nameKeywords, String[] descriptionKeywords, boolean active,
 			String[] ownerIds, String[] modelTypeCodes, String[] accessTypeCodes, String[] validationStatusCodes,
+			String[] tags, Pageable pageable);
+
+	/**
+	 * Gets a page of user-accessible solutions. This includes the user's own
+	 * private solutions as well as solutions shared with the user via the
+	 * solution-access-map table.
+	 * 
+	 * @param nameKeywords
+	 *            Searches the name field for the keywords using case-insensitive
+	 *            LIKE after surrounding with wildcard '%' characters; ignored if
+	 *            null or empty
+	 * @param descriptionKeywords
+	 *            Searches the description field for the keywords using
+	 *            case-insensitive LIKE after surrounding with wildcard '%'
+	 *            characters; ignored if null or empty
+	 * @param active
+	 *            Active status: true or false; required.
+	 * @param userId
+	 *            ID of the user who owns or has access to the solutions; required.
+	 * @param modelTypeCodes
+	 *            Limits match to solutions with one of the specified values
+	 *            including null (not the 4-character sequence "null"); ignored if
+	 *            null or empty
+	 * @param accessTypeCodes
+	 *            Limits match to solutions containing revisions with one of the
+	 *            specified values including null (not the 4-character sequence
+	 *            "null"); ignored if null or empty
+	 * @param validationStatusCodes
+	 *            Limits match to solutions containing revisions with one of the
+	 *            specified values including null (not the 4-character sequence
+	 *            "null"); ignored if null or empty
+	 * @param tags
+	 *            Limits match to solutions with one of the specified tags; ignored
+	 *            if null or empty
+	 * @param pageable
+	 *            Page and sort info
+	 * @return Page of matches
+	 */
+	public Page<MLPSolution> findUserSolutions(String[] nameKeywords, String[] descriptionKeywords, boolean active,
+			String userId, String[] modelTypeCodes, String[] accessTypeCodes, String[] validationStatusCodes,
 			String[] tags, Pageable pageable);
 
 	/**

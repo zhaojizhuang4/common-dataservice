@@ -444,6 +444,11 @@ public class MockClientTest {
 		Assert.assertTrue(
 				portalSols == client.findPortalSolutions(null, null, true, null, null, null, null, null, pageRequest));
 
+		RestPageResponse<MLPSolution> userPrivSols = new RestPageResponse<>();
+		client.setUserSolutions(userPrivSols);
+		Assert.assertTrue(
+				userPrivSols == client.findUserSolutions(null, null, true, null, null, null, null, null, pageRequest));
+
 		RestPageResponse<MLPSolution> solutionResponse = new RestPageResponse<>();
 		client.setSearchSolutions(solutionResponse);
 		Assert.assertTrue(solutionResponse == client.searchSolutions(queryParameters, isOr, new RestPageRequest()));

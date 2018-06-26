@@ -610,14 +610,45 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 			parms.put(CCDSConstants.SEARCH_ACCESS_TYPES, accessTypeCodes);
 		if (modelTypeCodes != null && modelTypeCodes.length > 0)
 			parms.put(CCDSConstants.SEARCH_MODEL_TYPES, modelTypeCodes);
-		if (tags != null && tags.length > 0)
-			parms.put(CCDSConstants.SEARCH_TAGS, tags);
 		if (validationStatusCodes != null && validationStatusCodes.length > 0)
 			parms.put(CCDSConstants.SEARCH_VAL_STATUSES, validationStatusCodes);
+		if (tags != null && tags.length > 0)
+			parms.put(CCDSConstants.SEARCH_TAGS, tags);
 		URI uri = buildUri(
 				new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH, CCDSConstants.PORTAL_PATH },
 				parms, pageRequest);
 		logger.debug("findPortalSolutions: uri {}", uri);
+		ResponseEntity<RestPageResponse<MLPSolution>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPSolution>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public RestPageResponse<MLPSolution> findUserSolutions(String[] nameKeywords, String[] descriptionKeywords,
+			boolean active, String userId, String[] accessTypeCodes, String[] modelTypeCodes, String[] validationStatusCodes, String[] tags,
+			RestPageRequest pageRequest) {
+		if (userId == null || userId.length() == 0)
+			throw new IllegalArgumentException("userId argument is required");
+		HashMap<String, Object> parms = new HashMap<>();
+		parms.put(CCDSConstants.SEARCH_ACTIVE, active);
+		parms.put(CCDSConstants.SEARCH_OWNERS, userId);
+		if (nameKeywords != null && nameKeywords.length > 0)
+			parms.put(CCDSConstants.SEARCH_NAME, nameKeywords);
+		if (descriptionKeywords != null && descriptionKeywords.length > 0)
+			parms.put(CCDSConstants.SEARCH_DESC, descriptionKeywords);
+		if (accessTypeCodes != null && accessTypeCodes.length > 0)
+			parms.put(CCDSConstants.SEARCH_ACCESS_TYPES, accessTypeCodes);
+		if (modelTypeCodes != null && modelTypeCodes.length > 0)
+			parms.put(CCDSConstants.SEARCH_MODEL_TYPES, modelTypeCodes);
+		if (validationStatusCodes != null && validationStatusCodes.length > 0)
+			parms.put(CCDSConstants.SEARCH_VAL_STATUSES, validationStatusCodes);
+		if (tags != null && tags.length > 0)
+			parms.put(CCDSConstants.SEARCH_TAGS, tags);
+		URI uri = buildUri(
+				new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH, CCDSConstants.USER_PATH }, parms,
+				pageRequest);
+		logger.debug("findUserSolutions: uri {}", uri);
 		ResponseEntity<RestPageResponse<MLPSolution>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<RestPageResponse<MLPSolution>>() {
 				});

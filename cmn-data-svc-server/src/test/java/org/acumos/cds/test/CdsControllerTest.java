@@ -618,17 +618,16 @@ public class CdsControllerTest {
 			Assert.assertTrue(sl2 != null && sl2.getNumberOfElements() > 0);
 
 			// Add user access
-			client.addSolutionUserAccess(cs.getSolutionId(), cu.getUserId());
+			client.addSolutionUserAccess(cs.getSolutionId(), inactiveUser.getUserId());
 
 			// Query two ways
 			List<MLPUser> solUserAccList = client.getSolutionAccessUsers(cs.getSolutionId());
 			Assert.assertTrue(solUserAccList != null && solUserAccList.size() > 0);
 			logger.info("Got users with access to solution {}", cs.getSolutionId());
-			RestPageResponse<MLPSolution> userSolAccList = client.getUserAccessSolutions(cu.getUserId(),
+			RestPageResponse<MLPSolution> userSolAccList = client.getUserAccessSolutions(inactiveUser.getUserId(),
 					new RestPageRequest(0, 1));
 			Assert.assertTrue(userSolAccList != null && userSolAccList.getNumberOfElements() > 0);
 			logger.info("Got solutions accessible by user {}", cu.getUserId());
-			client.dropSolutionUserAccess(cs.getSolutionId(), cu.getUserId());
 
 			MLPSolutionRevision cr = new MLPSolutionRevision(cs.getSolutionId(), "1.0R", cu.getUserId(), //
 					AccessTypeCode.PR.name(), ValidationStatusCode.NV.name());
@@ -694,6 +693,11 @@ public class CdsControllerTest {
 			RestPageResponse<MLPSolution> portalTagNoMatches = client.findPortalSolutions(null, null, true, null, null,
 					null, null, bogusTags, new RestPageRequest(0, 5));
 			Assert.assertTrue(portalTagNoMatches != null && portalTagNoMatches.getNumberOfElements() == 0);
+
+			logger.info("Querying for user solutions via flexible i/f");
+			RestPageResponse<MLPSolution> userSols = client.findUserSolutions(null, null, true, 
+					inactiveUser.getUserId(), null, null, null, null, new RestPageRequest(0, 5));
+			Assert.assertTrue(userSols != null && userSols.getNumberOfElements() > 0);
 
 			String[] nameKw = null;
 			String[] descKw = null;
@@ -845,6 +849,7 @@ public class CdsControllerTest {
 				client.dropSolutionTag(cs.getSolutionId(), tagName1);
 				client.deleteTag(tag1);
 				client.deleteTag(tag2);
+				client.dropSolutionUserAccess(cs.getSolutionId(), inactiveUser.getUserId());
 				// Server SHOULD cascade deletes.
 				client.deleteSolutionRating(ur);
 				client.deleteSolutionValidation(sv);

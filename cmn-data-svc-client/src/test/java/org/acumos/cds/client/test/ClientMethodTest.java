@@ -202,6 +202,12 @@ public class ClientMethodTest {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
 		try {
+			String[] array = new String[] { "I'm a string" };
+			client.findUserSolutions(array, array, true, "user", array, array, array, array, new RestPageRequest(0, 1));
+		} catch (ResourceAccessException ex) {
+			logger.info("Client failed as expected: {}", ex.toString());
+		}
+		try {
 			client.findSolutionsByTag("tag", new RestPageRequest());
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());

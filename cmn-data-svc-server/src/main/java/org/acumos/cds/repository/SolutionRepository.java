@@ -30,6 +30,11 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/**
+ * Defines methods to process queries on specific fields and yield paginated
+ * results. A value must be specified for every field, which is the key
+ * difference from the methods in the solution search service class.
+ */
 public interface SolutionRepository extends JpaRepository<MLPSolution, String>, JpaSpecificationExecutor<MLPSolution> {
 
 	/**

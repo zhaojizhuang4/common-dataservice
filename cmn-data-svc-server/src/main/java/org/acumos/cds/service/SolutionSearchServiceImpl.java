@@ -47,7 +47,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
- * Hibernate-assisted methods to search solutions.
+ * Defines hibernate-assisted methods to search solutions on user-specified
+ * fields and yield paginated results. Any field value can be omitted, which is
+ * the key difference from the methods in the solution repository class.
+ * 
  * <P>
  * These two aspects must be observed to get pagination working as expected:
  * <OL>
@@ -81,6 +84,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 	private final String artAlias = "arts";
 	private final String ownerAlias = "ownr";
 	private final String tagAlias = "tag";
+	private final String accAlias = "acc";
 	private final String solutionId = "solutionId";
 
 	/*
@@ -210,6 +214,59 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		}
 		Page<MLPSolution> result = runSolutionFomQuery(criteria, pageable);
 		logger.audit(beginDate, "findPortalSolutions: result size={}", result.getNumberOfElements());
+		return result;
+	}
+
+	/*
+	 * See comments on {@link #findPortalSolutions(String[], String[], boolean,
+	 * String[], String[], String[], String[], String[], Pageable)}
+	 *
+	 * Baffling problem occurred here:
+	 * 
+	 * Caused by: java.lang.IllegalArgumentException: Can not set java.lang.String
+	 * field org.acumos.cds.domain.MLPUser.userId to java.lang.String
+	 * 
+	 * Which was due to a missing alias for the owner/userId field; i.e., my error,
+	 * not some obscure Hibernate issue.
+	 */
+	@Override
+	public Page<MLPSolution> findUserSolutions(String[] nameKeywords, String[] descKeywords, boolean active,
+			String userId, String[] modelTypeCode, String[] accessTypeCode, String[] validationStatusCode,
+			String[] tags, Pageable pageable) {
+
+		Date beginDate = new Date();
+		// build the query using FOM to access child attributes
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
+		// Find user's own models AND others via access map which requires outer join
+		criteria.createAlias("owner", ownerAlias);
+		Criterion owner = Restrictions.eq(ownerAlias + ".userId", userId);
+		criteria.createAlias("accessUsers", accAlias, org.hibernate.sql.JoinType.LEFT_OUTER_JOIN);
+		Criterion access = Restrictions.eq(accAlias + ".userId", userId);
+		criteria.add(Restrictions.or(owner, access));
+
+		// Attributes on the solution
+		criteria.add(Restrictions.eq("active", active));
+		if (nameKeywords != null && nameKeywords.length > 0)
+			criteria.add(buildLikeListCriterion("name", nameKeywords));
+		if (descKeywords != null && descKeywords.length > 0)
+			criteria.add(buildLikeListCriterion("description", descKeywords));
+		if (modelTypeCode != null && modelTypeCode.length > 0)
+			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode));
+		if ((accessTypeCode != null && accessTypeCode.length > 0)
+				|| (validationStatusCode != null && validationStatusCode.length > 0)) {
+			criteria.createAlias("revisions", revAlias);
+			if (accessTypeCode != null && accessTypeCode.length > 0)
+				criteria.add(buildEqualsListCriterion(revAlias + ".accessTypeCode", accessTypeCode));
+			if (validationStatusCode != null && validationStatusCode.length > 0)
+				criteria.add(buildEqualsListCriterion(revAlias + ".validationStatusCode", validationStatusCode));
+		}
+		if (tags != null && tags.length > 0) {
+			// Tags are optional, so must use outer join
+			criteria.createAlias("tags", tagAlias, org.hibernate.sql.JoinType.LEFT_OUTER_JOIN);
+			criteria.add(Restrictions.in(tagAlias + ".tag", tags));
+		}
+		Page<MLPSolution> result = runSolutionFomQuery(criteria, pageable);
+		logger.audit(beginDate, "findUserSolutions: result size={}", result.getNumberOfElements());
 		return result;
 	}
 
