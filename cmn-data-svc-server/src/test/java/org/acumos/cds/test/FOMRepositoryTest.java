@@ -54,6 +54,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 /**
  * Tests the domain models that have complex mappings.
  */
+@SuppressWarnings("deprecation")
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class FOMRepositoryTest {

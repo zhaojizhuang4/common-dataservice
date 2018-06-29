@@ -210,6 +210,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private String requestId;
 	private List<String> solutionMembers;
 	private RestPageResponse<MLPSolution> userSolutions;
+	private long solutionRevisionCommentCount;
 
 	/**
 	 * No-argument constructor.
@@ -1470,6 +1471,15 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	public RestPageResponse<MLPThread> getSolutionRevisionThreads(String solutionId, String revisionId,
 			RestPageRequest pageRequest) {
 		return this.solutionRevisionThreads;
+	}
+
+	public void setSolutionRevisionCommentCount(long count) {
+		this.solutionRevisionCommentCount = count;
+	}
+
+	@Override
+	public long getSolutionRevisionCommentCount(String solutionId, String revisionId) {
+		return this.solutionRevisionCommentCount;
 	}
 
 	public void setSolutionRevisionComments(RestPageResponse<MLPComment> comments) {

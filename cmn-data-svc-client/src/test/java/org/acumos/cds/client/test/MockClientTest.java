@@ -456,6 +456,8 @@ public class MockClientTest {
 		client.setSolutionRevisionThreads(threads);
 		Assert.assertTrue(threads == client.getSolutionRevisionThreads("id", "id", pageRequest));
 
+		client.setSolutionRevisionCommentCount(1L);
+		Assert.assertTrue(1 == client.getSolutionRevisionCommentCount("id", "id"));
 		client.setSolutionRevisionComments(comments);
 		Assert.assertTrue(comments == client.getSolutionRevisionComments("id", "id", pageRequest));
 

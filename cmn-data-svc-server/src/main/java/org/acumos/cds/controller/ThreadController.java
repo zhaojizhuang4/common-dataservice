@@ -280,12 +280,33 @@ public class ThreadController extends AbstractController {
 	 *            Solution ID
 	 * @param revisionId
 	 *            Revision ID
+	 * @return Count of comments for specified solution and revision, which may
+	 *         include multiple threads
+	 */
+	@ApiOperation(value = "Gets comment count for the solution revision.", response = CountTransport.class)
+	@RequestMapping(value = CCDSConstants.SOLUTION_PATH + "/{solutionId}/" + CCDSConstants.REVISION_PATH
+			+ "/{revisionId}/" + CCDSConstants.COMMENT_PATH + "/"
+			+ CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public CountTransport getSolutionRevisionCommentCount(@PathVariable("solutionId") String solutionId,
+			@PathVariable("revisionId") String revisionId) {
+		Date beginDate = new Date();
+		long result = commentRepository.countSolutionRevisionComments(solutionId, revisionId);
+		logger.audit(beginDate, "getSolutionRevisionCommentCount: solutionId {} revisionId {}", solutionId, revisionId);
+		return new CountTransport(result);
+	}
+
+	/**
+	 * @param solutionId
+	 *            Solution ID
+	 * @param revisionId
+	 *            Revision ID
 	 * @param pageable
 	 *            Sort and page criteria
 	 * @return Page of comments for specified solution and revision, which may
 	 *         include multiple threads
 	 */
-	@ApiOperation(value = "Gets a page of comments for the solution and revision IDs, optionally sorted.", response = MLPThread.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of comments for the solution revision, optionally sorted.", response = MLPThread.class, responseContainer = "Page")
 	@RequestMapping(value = CCDSConstants.SOLUTION_PATH + "/{solutionId}/" + CCDSConstants.REVISION_PATH
 			+ "/{revisionId}/" + CCDSConstants.COMMENT_PATH, method = RequestMethod.GET)
 	@ResponseBody

@@ -23,6 +23,12 @@ Common Data Service Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
+Version 1.15.4, 29 June 2018
+----------------------------
+
+* Add method to get solution revision comment count (ACUMOS-1270)
+* Requires database schema version 1.15
+
 Version 1.15.3, 27 June 2018
 ----------------------------
 

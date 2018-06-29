@@ -311,9 +311,11 @@ public interface ICommonDataServiceRestClient {
 	 *            Keywords to perform "LIKE" search in Description field; ignored if
 	 *            null or empty
 	 * @param active
-	 *            Solution active status; true for active, false for inactive; required.
+	 *            Solution active status; true for active, false for inactive;
+	 *            required.
 	 * @param userId
-	 *            User ID who created a solution or has access to a solution; required.
+	 *            User ID who created a solution or has access to a solution;
+	 *            required.
 	 * @param accessTypeCodes
 	 *            Access type codes; use four-letter sequence "null" to match a null
 	 *            value; ignored if null or empty
@@ -1598,6 +1600,18 @@ public interface ICommonDataServiceRestClient {
 	 * @return One page of comments in the thread, sorted as specified.
 	 */
 	RestPageResponse<MLPComment> getThreadComments(String threadId, RestPageRequest pageRequest);
+
+	/**
+	 * Gets comment count for the specified solution and revision IDs, which may
+	 * include multiple threads.
+	 * 
+	 * @param solutionId
+	 *            Solution ID
+	 * @param revisionId
+	 *            Revision ID
+	 * @return Number of comments for the specified IDs
+	 */
+	long getSolutionRevisionCommentCount(String solutionId, String revisionId);
 
 	/**
 	 * Gets one page of comments for the specified solution and revision IDs, which

@@ -626,8 +626,8 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public RestPageResponse<MLPSolution> findUserSolutions(String[] nameKeywords, String[] descriptionKeywords,
-			boolean active, String userId, String[] accessTypeCodes, String[] modelTypeCodes, String[] validationStatusCodes, String[] tags,
-			RestPageRequest pageRequest) {
+			boolean active, String userId, String[] accessTypeCodes, String[] modelTypeCodes,
+			String[] validationStatusCodes, String[] tags, RestPageRequest pageRequest) {
 		if (userId == null || userId.length() == 0)
 			throw new IllegalArgumentException("userId argument is required");
 		HashMap<String, Object> parms = new HashMap<>();
@@ -1823,6 +1823,19 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 				new ParameterizedTypeReference<RestPageResponse<MLPComment>>() {
 				});
 		return response.getBody();
+	}
+
+	@Override
+	public long getSolutionRevisionCommentCount(String solutionId, String revisionId) {
+		URI uri = buildUri(
+				new String[] { CCDSConstants.THREAD_PATH, CCDSConstants.SOLUTION_PATH, solutionId,
+						CCDSConstants.REVISION_PATH, revisionId, CCDSConstants.COMMENT_PATH, CCDSConstants.COUNT_PATH },
+				null, null);
+		logger.debug("getSolutionRevisionCommentCount: uri {}", uri);
+		ResponseEntity<CountTransport> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<CountTransport>() {
+				});
+		return response.getBody().getCount();
 	}
 
 	@Override

@@ -1427,6 +1427,10 @@ public class CdsControllerTest {
 				new RestPageRequest(0, 1));
 		Assert.assertTrue(threadComments != null && threadComments.hasContent());
 
+		long commentCountById = client.getSolutionRevisionCommentCount(cs.getSolutionId(),
+				cr.getRevisionId());
+		Assert.assertTrue(commentCountById > 0);
+
 		RestPageResponse<MLPComment> commentsById = client.getSolutionRevisionComments(cs.getSolutionId(),
 				cr.getRevisionId(), new RestPageRequest(0, 1));
 		Assert.assertTrue(commentsById != null && commentsById.getNumberOfElements() > 0);

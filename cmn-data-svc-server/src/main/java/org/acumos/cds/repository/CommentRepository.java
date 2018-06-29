@@ -56,6 +56,21 @@ public interface CommentRepository extends PagingAndSortingRepository<MLPComment
 	Page<MLPComment> findByThreadId(String threadId, Pageable pageable);
 
 	/**
+	 * Gets the count of comments for a solution revision.
+	 * 
+	 * @param solutionId
+	 *            Solution ID
+	 * @param revisionId
+	 *            Revision ID
+	 * @return Count of comments on the specified soulution revision
+	 */
+	@Query(value = "SELECT COUNT(c.commentId) FROM MLPComment c, MLPThread t " //
+			+ " where c.threadId =  t.threadId " //
+			+ " and t.solutionId = :solutionId" //
+			+ " and t.revisionId = :revisionId")
+	Long countSolutionRevisionComments(@Param("solutionId") String solutionId, @Param("revisionId") String revisionId);
+
+	/**
 	 * Gets a page of comments with the specified IDs by joining on the thread
 	 * table.
 	 * 
