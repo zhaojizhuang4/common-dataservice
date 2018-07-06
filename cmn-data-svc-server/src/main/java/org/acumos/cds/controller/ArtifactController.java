@@ -144,7 +144,8 @@ public class ArtifactController extends AbstractController {
 			logger.audit(beginDate, "searchArtifacts query {}", queryParameters);
 			return result;
 		} catch (Exception ex) {
-			logger.warn(EELFLoggerDelegate.errorLogger, "searchArtifacts", ex.toString());
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			logger.warn(EELFLoggerDelegate.errorLogger, "searchArtifacts failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchArtifacts failed", ex);
@@ -225,8 +226,9 @@ public class ArtifactController extends AbstractController {
 			logger.audit(beginDate, "createArtifact ID {}", artifact.getArtifactId());
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createArtifact", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createArtifact failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createArtifact failed", cve);
 		}
@@ -262,8 +264,9 @@ public class ArtifactController extends AbstractController {
 			logger.audit(beginDate, "updateArtifact ID {}", artifactId);
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateArtifact", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateArtifact failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateArtifact failed", cve);
 		}
@@ -289,7 +292,7 @@ public class ArtifactController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteArtifact", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteArtifact failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteArtifact failed", ex);
 		}

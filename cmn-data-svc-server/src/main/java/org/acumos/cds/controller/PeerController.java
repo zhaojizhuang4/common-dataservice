@@ -117,7 +117,8 @@ public class PeerController extends AbstractController {
 			logger.audit(beginDate, "searchPeers {}", queryParameters);
 			return result;
 		} catch (Exception ex) {
-			logger.warn(EELFLoggerDelegate.errorLogger, "searchPeers failed", ex.toString());
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			logger.warn(EELFLoggerDelegate.errorLogger, "searchPeers failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchPeers failed", ex);
@@ -178,8 +179,9 @@ public class PeerController extends AbstractController {
 			logger.audit(beginDate, "createPeer peerId {}", peer.getPeerId());
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createPeer", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createPeer failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createPeer failed", cve);
 		}
@@ -217,8 +219,9 @@ public class PeerController extends AbstractController {
 			logger.audit(beginDate, "updatePeer peerId {}", peerId);
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updatePeer", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updatePeer failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updatePeer failed", cve);
 		}
@@ -249,7 +252,7 @@ public class PeerController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deletePeer", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deletePeer failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deletePeer failed", ex);
 		}
@@ -334,8 +337,9 @@ public class PeerController extends AbstractController {
 			logger.audit(beginDate, "createPeerSub subId {}", peerSub.getSubId());
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createPeerSub", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createPeerSub failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createPeerSub failed", cve);
 		}
@@ -375,8 +379,9 @@ public class PeerController extends AbstractController {
 			logger.audit(beginDate, "updatePeerSub subId {}", subId);
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updatePeerSub", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updatePeerSub failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updatePeerSub failed", cve);
 		}
@@ -400,7 +405,7 @@ public class PeerController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deletePeerSub", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deletePeerSub failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deletePeerSub failed", ex);
 		}

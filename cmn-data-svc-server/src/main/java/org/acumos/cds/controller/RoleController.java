@@ -129,7 +129,8 @@ public class RoleController extends AbstractController {
 			logger.audit(beginDate, "searchRoles query {}", queryParameters);
 			return result;
 		} catch (Exception ex) {
-			logger.warn(EELFLoggerDelegate.errorLogger, "searchRoles failed", ex);
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			logger.warn(EELFLoggerDelegate.errorLogger, "searchRoles failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchRoles failed", ex);
@@ -187,8 +188,9 @@ public class RoleController extends AbstractController {
 			logger.audit(beginDate, "createRole roleId {}", role.getRoleId());
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createRole", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createRole failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createRole failed", cve);
 		}
@@ -223,8 +225,9 @@ public class RoleController extends AbstractController {
 			logger.audit(beginDate, "updateRole roleId {}", roleId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateRole", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateRole failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateRole failed", cve);
 		}
@@ -251,7 +254,7 @@ public class RoleController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteRole", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteRole failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteRole failed", ex);
 		}
@@ -332,8 +335,9 @@ public class RoleController extends AbstractController {
 			result = roleFunctionRepository.save(roleFunction);
 			logger.audit(beginDate, "createRoleFunc roleId {} functionId {}", roleId, roleFunction.getRoleFunctionId());
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createRoleFunc", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createRoleFunc failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			result = new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createRoleFunc failed", cve);
 		}
@@ -374,8 +378,9 @@ public class RoleController extends AbstractController {
 			logger.audit(beginDate, "updateRoleFunc roleId {} functionId {}", roleId, functionId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateRoleFunc", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateRoleFunc failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateRoleFunc failed", cve);
 		}
@@ -403,7 +408,7 @@ public class RoleController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteRoleFunc failed", ex.getMessage());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteRoleFunc failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteRoleFunc failed", ex);
 		}

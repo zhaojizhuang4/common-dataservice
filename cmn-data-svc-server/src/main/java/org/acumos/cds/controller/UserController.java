@@ -214,10 +214,10 @@ public class UserController extends AbstractController {
 				return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, notMatched, null);
 			}
 		} catch (Exception ex) {
-			final String msg = "updatePassword failed";
-			logger.error(EELFLoggerDelegate.errorLogger, msg, ex);
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			logger.error(EELFLoggerDelegate.errorLogger, "updatePassword failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg, ex);
+			return new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "updatePassword failed", ex);
 		}
 	}
 
@@ -301,7 +301,7 @@ public class UserController extends AbstractController {
 			logger.audit(beginDate, "searchUsers: query {}", queryParameters);
 			return userPage;
 		} catch (Exception ex) {
-			logger.warn(EELFLoggerDelegate.errorLogger, "searchUsers failed", ex);
+			logger.warn(EELFLoggerDelegate.errorLogger, "searchUsers failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchUsers failed", ex);
@@ -374,7 +374,7 @@ public class UserController extends AbstractController {
 			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createUser", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createUser failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createUser failed", cve);
 		}
@@ -417,7 +417,7 @@ public class UserController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateUser", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateUser failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateUser failed", cve);
 		}
@@ -453,9 +453,8 @@ public class UserController extends AbstractController {
 			logger.audit(beginDate, "deleteUser: userId {}", userId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
-			// e.g., EmptyResultDataAccessException is NOT an internal server
-			// error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteUser failed", ex.toString());
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteUser failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteUser failed", ex);
 		}
@@ -734,8 +733,9 @@ public class UserController extends AbstractController {
 					providerCode, providerUserId);
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createUserLoginProvider", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createUserLoginProvider failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createUserLoginProvider failed", cve);
 		}
@@ -787,8 +787,9 @@ public class UserController extends AbstractController {
 					providerCode, providerUserId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateUserLoginProvider", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateUserLoginProvider failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateUserLoginProvider failed", cve);
 		}
@@ -821,9 +822,8 @@ public class UserController extends AbstractController {
 					providerCode, providerUserId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
-			// e.g., EmptyResultDataAccessException is NOT an internal server
-			// error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteLoginProvider failed", ex.toString());
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteLoginProvider failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteLoginProvider failed", ex);
 		}
@@ -893,10 +893,12 @@ public class UserController extends AbstractController {
 			logger.audit(beginDate, "createSolutionFavorite: solutionId {} userId {}", solutionId, userId);
 			return result;
 		} catch (Exception ex) {
-			logger.error(EELFLoggerDelegate.errorLogger, "createSolutionFavorite failed", ex);
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			Exception cve = findConstraintViolationException(ex);
+			logger.error(EELFLoggerDelegate.errorLogger, "createSolutionFavorite failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-					ex.getCause() != null ? ex.getCause().getMessage() : "createSolutionFavorite failed", ex);
+					ex.getCause() != null ? ex.getCause().getMessage() : "createSolutionFavorite failed", cve);
 		}
 	}
 
@@ -923,9 +925,8 @@ public class UserController extends AbstractController {
 			logger.audit(beginDate, "deleteSolutionFavorite: solutionId {} userId {}", solutionId, userId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
-			// e.g., EmptyResultDataAccessException is NOT an internal server
-			// error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionFavorite failed", ex.toString());
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionFavorite failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteSolutionFavorite failed", ex);
 		}
@@ -1017,10 +1018,12 @@ public class UserController extends AbstractController {
 			logger.audit(beginDate, "updateUserNotification: user {}, notif {}", userId, notificationId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
-			logger.error(EELFLoggerDelegate.errorLogger, "updateUserNotification failed", ex);
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			Exception cve = findConstraintViolationException(ex);
+			logger.error(EELFLoggerDelegate.errorLogger, "updateUserNotification failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-					ex.getCause() != null ? ex.getCause().getMessage() : "updateUserNotification failed", ex);
+					ex.getCause() != null ? ex.getCause().getMessage() : "updateUserNotification failed", cve);
 		}
 	}
 
@@ -1117,8 +1120,9 @@ public class UserController extends AbstractController {
 					usrNotifPref.getUserNotifPrefId());
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createUserNotificationPreference", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createUserNotificationPreference failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createUserNotificationPreference failed",
 					cve);
@@ -1158,8 +1162,9 @@ public class UserController extends AbstractController {
 			logger.audit(beginDate, "updateUserNotificationPreference: userNotifPrefId {} ", userNotifPrefId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateUserNotificationPreference", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateUserNotificationPreference failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateUserNotificationPreference failed",
 					cve);
@@ -1185,7 +1190,8 @@ public class UserController extends AbstractController {
 			logger.audit(beginDate, "deleteUserNotificationPreference: userNotifPrefId {} ", userNotifPrefId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteUserNotificationPreference", ex.toString());
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteUserNotificationPreference failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteUserNotificationPreference failed",
 					ex);

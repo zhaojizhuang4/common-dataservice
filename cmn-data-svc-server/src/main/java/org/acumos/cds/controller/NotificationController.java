@@ -122,8 +122,9 @@ public class NotificationController extends AbstractController {
 			logger.audit(beginDate, "createNotification: notificationID {} ", notif.getNotificationId());
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createNotification", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createNotificatio failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createNotification failed", cve);
 		}
@@ -158,8 +159,9 @@ public class NotificationController extends AbstractController {
 			logger.audit(beginDate, "updateNotification: notifId {} ", notifId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateNotification", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateNotification failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateNotification failed", cve);
 		}
@@ -184,7 +186,7 @@ public class NotificationController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteNotification", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteNotification failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteNotification failed", ex);
 		}

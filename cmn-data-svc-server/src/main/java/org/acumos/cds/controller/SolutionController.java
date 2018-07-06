@@ -300,7 +300,7 @@ public class SolutionController extends AbstractController {
 			logger.audit(beginDate, "searchSolutions: query {}", queryParameters);
 			return result;
 		} catch (Exception ex) {
-			logger.warn(EELFLoggerDelegate.errorLogger, "searchSolutions failed", ex);
+			logger.warn(EELFLoggerDelegate.errorLogger, "searchSolutions failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchSolutions failed", ex);
@@ -343,11 +343,10 @@ public class SolutionController extends AbstractController {
 			logger.audit(beginDate, "findPortalSolutions: query {}", queryParameters);
 			return result;
 		} catch (Exception ex) {
-			String msg = "findPortalSolutions failed";
-			logger.warn(EELFLoggerDelegate.errorLogger, msg, ex);
+			logger.warn(EELFLoggerDelegate.errorLogger, "findPortalSolutions failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
-					ex.getCause() != null ? ex.getCause().getMessage() : msg, ex);
+					ex.getCause() != null ? ex.getCause().getMessage() : "findPortalSolutions failed", ex);
 		}
 	}
 
@@ -390,11 +389,10 @@ public class SolutionController extends AbstractController {
 			logger.audit(beginDate, "findUserSolutions: query {}", queryParameters);
 			return result;
 		} catch (Exception ex) {
-			String msg = "findUserSolutions failed";
-			logger.warn(EELFLoggerDelegate.errorLogger, msg, ex);
+			logger.warn(EELFLoggerDelegate.errorLogger, "findUserSolutions failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
-					ex.getCause() != null ? ex.getCause().getMessage() : msg, ex);
+					ex.getCause() != null ? ex.getCause().getMessage() : "findUserSolutions failed", ex);
 		}
 	}
 
@@ -492,7 +490,7 @@ public class SolutionController extends AbstractController {
 			return persisted;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createSolution", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createSolution failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createSolution failed", cve);
 		}
@@ -534,7 +532,7 @@ public class SolutionController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateSolution", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateSolution failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateSolution failed", cve);
 		}
@@ -566,7 +564,8 @@ public class SolutionController extends AbstractController {
 			logger.audit(beginDate, "incrementViewCount: ID {}", solutionId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
-			logger.error(EELFLoggerDelegate.errorLogger, "incrementViewCount failed", ex);
+			// Should never happen
+			logger.error(EELFLoggerDelegate.errorLogger, "incrementViewCount failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "incrementViewCount failed", ex);
 		}
@@ -616,7 +615,7 @@ public class SolutionController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolution failed", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolution failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteSolution failed", ex);
 		}
@@ -707,7 +706,7 @@ public class SolutionController extends AbstractController {
 			return result;
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createSolutionRevision", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createSolutionRevision failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createSolutionRevision failed", cve);
 		}
@@ -754,7 +753,7 @@ public class SolutionController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateSolutionRevision", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateSolutionRevision failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateSolutionRevision failed", cve);
 		}
@@ -782,7 +781,7 @@ public class SolutionController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionRevision failed", ex.getMessage());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionRevision failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteRevision failed", ex);
 		}
@@ -1005,7 +1004,7 @@ public class SolutionController extends AbstractController {
 					artifactId);
 			return result;
 		} catch (Exception ex) {
-			logger.error(EELFLoggerDelegate.errorLogger, "createSolutionDownload", ex.toString());
+			logger.error(EELFLoggerDelegate.errorLogger, "createSolutionDownload failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					ex.getCause() != null ? ex.getCause().getMessage() : "createSolutionDownload failed", ex);
@@ -1036,7 +1035,7 @@ public class SolutionController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionDownload failed", ex.getMessage());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionDownload failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteSolutionDownload failed", ex);
 		}
@@ -1132,8 +1131,9 @@ public class SolutionController extends AbstractController {
 			logger.audit(beginDate, "createSolutionRating: solutionId {} userId {}", solutionId, userId);
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createSolutionRating", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createSolutionRating failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createSolutionRating failed", cve);
 		}
@@ -1174,8 +1174,9 @@ public class SolutionController extends AbstractController {
 			logger.audit(beginDate, "updateSolutionRating: solutionId {} userId {}", solutionId, userId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateSolutionRating", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateSolutionRating failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateSolutionRating failed", cve);
 		}
@@ -1207,7 +1208,7 @@ public class SolutionController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionRating failed", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionRating failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteSolutionRating failed", ex);
 		}
@@ -1406,8 +1407,9 @@ public class SolutionController extends AbstractController {
 					revisionId, taskId);
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createSolutionValidation", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createSolutionValidation failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createSolutionValidation failed", cve);
 		}
@@ -1456,8 +1458,9 @@ public class SolutionController extends AbstractController {
 					revisionId, taskId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateSolutionValidation", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateSolutionValidation failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateSolutionValidation failed", cve);
 		}
@@ -1490,7 +1493,7 @@ public class SolutionController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionValidation failed", ex.getMessage());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionValidation failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteSolutionValidation failed", ex);
 		}
@@ -1626,10 +1629,11 @@ public class SolutionController extends AbstractController {
 			logger.audit(beginDate, "createSolutionDeployment: solutionId {} revisionId {}", solutionId, revisionId);
 			return result;
 		} catch (Exception ex) {
-			logger.error(EELFLoggerDelegate.errorLogger, "createSolutionDeployment failed", ex);
+			Exception cve = findConstraintViolationException(ex);
+			logger.error(EELFLoggerDelegate.errorLogger, "createSolutionDeployment failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-					ex.getCause() != null ? ex.getCause().getMessage() : "createSolutionDeployment failed", ex);
+					ex.getCause() != null ? ex.getCause().getMessage() : "createSolutionDeployment failed", cve);
 		}
 	}
 
@@ -1669,8 +1673,9 @@ public class SolutionController extends AbstractController {
 					revisionId, deploymentId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateSolutionDeployment", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateSolutionDeployment failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateSolutionDeployment failed", cve);
 		}
@@ -1702,7 +1707,7 @@ public class SolutionController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionDeployment failed", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionDeployment failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteSolutionDeployment failed", ex);
 		}

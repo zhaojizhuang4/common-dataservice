@@ -106,8 +106,9 @@ public class ValidationSequenceController extends AbstractController {
 			logger.audit(beginDate, "createValidationSequence: sequence {} valTypeCode {}", sequence, valTypeCode);
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createValidationSequence", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createValidationSequence failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createValidationSequence failed", cve);
 		}
@@ -137,7 +138,7 @@ public class ValidationSequenceController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteValidationSequence", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteValidationSequence failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteValidationSequence failed", ex);
 		}

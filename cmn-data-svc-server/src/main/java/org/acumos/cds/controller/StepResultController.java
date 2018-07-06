@@ -106,7 +106,7 @@ public class StepResultController extends AbstractController {
 			logger.audit(beginDate, "searchStepResults {}", queryParameters);
 			return result;
 		} catch (Exception ex) {
-			logger.warn(EELFLoggerDelegate.errorLogger, "searchStepResults failed", ex);
+			logger.warn(EELFLoggerDelegate.errorLogger, "searchStepResults failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchStepResults failed", ex);
@@ -158,8 +158,9 @@ public class StepResultController extends AbstractController {
 			logger.audit(beginDate, "createStepResult: stepResultId {}", result.getStepResultId());
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createStepResult", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createStepResult failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createStepResult failed", cve);
 		}
@@ -197,8 +198,9 @@ public class StepResultController extends AbstractController {
 			logger.audit(beginDate, "updateStepResult: stepResultId {}", stepResultId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateStepResult", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateStepResult failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateStepResult failed", cve);
 		}
@@ -223,9 +225,8 @@ public class StepResultController extends AbstractController {
 			logger.audit(beginDate, "deleteStepResult: stepResultId {}", stepResultId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
-			// e.g., EmptyResultDataAccessException is NOT an internal server
-			// error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteStepResult", ex.toString());
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteStepResult failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteStepResult failed", ex);
 		}

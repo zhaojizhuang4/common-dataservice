@@ -111,8 +111,9 @@ public class SiteConfigController extends AbstractController {
 			logger.audit(beginDate, "createSiteConfig key {}", siteConfig.getConfigKey());
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createSiteConfig", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createSiteConfig failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createSiteConfig failed", cve);
 		}
@@ -146,8 +147,9 @@ public class SiteConfigController extends AbstractController {
 			logger.audit(beginDate, "updateSiteConfig key {}", configKey);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateSiteConfig", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateSiteConfig failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateSiteConfig failed", cve);
 		}
@@ -172,7 +174,7 @@ public class SiteConfigController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSiteConfig", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSiteConfig failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteSiteConfig failed", ex);
 		}

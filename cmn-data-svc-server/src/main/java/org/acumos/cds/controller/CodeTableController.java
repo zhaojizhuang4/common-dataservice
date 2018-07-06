@@ -92,7 +92,8 @@ public class CodeTableController extends AbstractController {
 			logger.audit(beginDate, "getCodeNamePairs {}", valueSetName);
 			return result;
 		} catch (Exception ex) {
-			logger.warn(EELFLoggerDelegate.errorLogger, "getCodeNamePairs", ex.toString());
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			logger.warn(EELFLoggerDelegate.errorLogger, "getCodeNamePairs failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Unexpected value set name " + valueSetName);
 		}

@@ -165,8 +165,9 @@ public class ThreadController extends AbstractController {
 			logger.audit(beginDate, "createThread: threadId {}", newThread.getThreadId());
 			return newThread;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createThread", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createThread failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createThread failed", cve);
 		}
@@ -200,8 +201,9 @@ public class ThreadController extends AbstractController {
 			logger.audit(beginDate, "updateThread: threadId {}", threadId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateThread", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateThread failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateThread failed", cve);
 		}
@@ -386,8 +388,9 @@ public class ThreadController extends AbstractController {
 			logger.audit(beginDate, "createComment: threadId {} commentId {}", threadId, newComment.getCommentId());
 			return newComment;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createComment", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createComment failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createComment failed", cve);
 		}
@@ -435,8 +438,9 @@ public class ThreadController extends AbstractController {
 			logger.audit(beginDate, "updateComment: threadId {} commentId {}", threadId, commentId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateComment", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateComment failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateComment failed", cve);
 		}
@@ -463,7 +467,7 @@ public class ThreadController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteComment failed", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteComment failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteComment failed", ex);
 		}

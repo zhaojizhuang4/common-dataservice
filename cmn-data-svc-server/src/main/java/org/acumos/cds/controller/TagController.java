@@ -92,8 +92,9 @@ public class TagController extends AbstractController {
 			logger.audit(beginDate, "createTag: tag {}", tag);
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createTag", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createTag failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createTag failed", cve);
 		}
@@ -117,7 +118,7 @@ public class TagController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteTag", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteTag failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteTag failed", ex);
 		}

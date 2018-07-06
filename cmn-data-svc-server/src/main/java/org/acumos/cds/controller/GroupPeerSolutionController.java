@@ -119,8 +119,9 @@ public class GroupPeerSolutionController extends AbstractController {
 			logger.audit(beginDate, "createPeerGroup: group {}", group);
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createPeerGroup", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createPeerGroup failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createPeerGroup failed", cve);
 		}
@@ -156,8 +157,9 @@ public class GroupPeerSolutionController extends AbstractController {
 			logger.audit(beginDate, "updatePeerGroup groupId {}", groupId);
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updatePeerGroup", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updatePeerGroup failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updatePeerGroup failed", cve);
 		}
@@ -181,7 +183,7 @@ public class GroupPeerSolutionController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deletePeerGroup", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deletePeerGroup failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deletePeerGroup failed", ex);
 		}
@@ -304,8 +306,9 @@ public class GroupPeerSolutionController extends AbstractController {
 			logger.audit(beginDate, "createSolutionGroup groupId {}", group.getGroupId());
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createSolutionGroup", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createSolutionGroup failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createSolutionGroup failed", cve);
 		}
@@ -341,8 +344,9 @@ public class GroupPeerSolutionController extends AbstractController {
 			logger.audit(beginDate, "updateSolutionGroup groupId {}", groupId);
 			return result;
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateSolutionGroup", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "updateSolutionGroup failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateSolutionGroup failed", cve);
 		}
@@ -367,7 +371,7 @@ public class GroupPeerSolutionController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionGroup", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "deleteSolutionGroup failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteSolutionGroup failed", ex);
 		}
@@ -432,8 +436,9 @@ public class GroupPeerSolutionController extends AbstractController {
 			logger.audit(beginDate, "addSolutionToGroup groupId {} solutionId {}", groupId, solutionId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "addSolutionToGroup", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "addSolutionToGroup failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "addSolutionToGroup failed", cve);
 		}
@@ -463,7 +468,7 @@ public class GroupPeerSolutionController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "dropSolutionFromGroup", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "dropSolutionFromGroup failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "dropSolutionFromGroup failed", ex);
 		}
@@ -522,8 +527,9 @@ public class GroupPeerSolutionController extends AbstractController {
 					solutionGroupId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "mapPeerSolutionGroups", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "mapPeerSolutionGroups failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "mapPeerSolutionGroups failed", cve);
 		}
@@ -554,7 +560,7 @@ public class GroupPeerSolutionController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "unmapPeerSolutionGroups", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "unmapPeerSolutionGroups failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "unmapPeerSolutionGroups failed", ex);
 		}
@@ -600,8 +606,9 @@ public class GroupPeerSolutionController extends AbstractController {
 			logger.audit(beginDate, "mapPeerPeerGroups: principal {} resource {}", principalGroupId, resourceGroupId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "mapPeerPeerGroups", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "mapPeerPeerGroups failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "mapPeerPeerGroups failed", cve);
 		}
@@ -633,7 +640,7 @@ public class GroupPeerSolutionController extends AbstractController {
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "unmapPeerPeerGroups", ex.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "unmapPeerPeerGroups failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "unmapPeerPeerGroups failed", ex);
 		}
