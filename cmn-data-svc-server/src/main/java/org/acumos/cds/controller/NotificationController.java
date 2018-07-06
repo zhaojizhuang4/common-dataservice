@@ -124,7 +124,7 @@ public class NotificationController extends AbstractController {
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createNotificatio failed: {}", cve.toString());
+			logger.warn(EELFLoggerDelegate.errorLogger, "createNotification failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createNotification failed", cve);
 		}

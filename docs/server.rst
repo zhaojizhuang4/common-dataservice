@@ -20,7 +20,7 @@
 Developer Guide for the Common Data Service Server
 ==================================================
 
-This microservice provides common data services to components in the Acumos machine-learning platform. 
+This microservice provides common data services to components in the Acumos machine-learning platform.
 It is built using the Spring-Boot platform. This document primarily offers guidance for server developers.
 
 Supported Methods and Objects
@@ -65,19 +65,21 @@ Testing with an external database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A properties file "application-mariadb.properties" is provided that configures the server to use an
-external MariaDB database running on the local host at port 3306.  Direct Spring-Boot to use that 
+external MariaDB database running on the local host at port 3306.  Direct Spring-Boot to use that
 properties file during a test with this invocation::
 
     mvn -Dspring.config.name=application-mariadb test
-    
+
 The server can be configured to use a different external database as follows:
 
     1. Copy the local application.properties file to a new file "application-mydb.properties"
     2. Revise the new "mydb" properties file to have suitable server coordinates and credentials
     3. Ensure the newly configured database server is reachable at the expected port
     4. Check that the database tables have been created and populated
-    5. Launch the test as usual, adding this extra argument to use the alternate properties file::
-    
+    5. Launch the test as usual, adding an extra argument to use the alternate properties file.
+
+This is a sample invocation::
+
     mvn -Dspring.config.name=application-mydb test
 
 Launching
@@ -136,16 +138,16 @@ required entries::
     spring.datasource.password = some-password
     spring.jpa.database-platform=org.hibernate.dialect.DerbyTenSevenDialect
 
-The HTTP server's username and password are configured in the properties file.  
-Only one username/password is used to secure the REST endpoint. 
+The HTTP server's username and password are configured in the properties file.
+Only one username/password is used to secure the REST endpoint.
 The default entries for the server are shown here::
 
     security.user.name=ccds_client
     security.user.password=(encrypted)
 
 At runtime in production deployments, in addition to using a configuration file,
-environment-specific configuration properties should be supplied using a block of 
-JSON in an environment variable called SPRING\_APPLICATION\_JSON. This can easily 
+environment-specific configuration properties should be supplied using a block of
+JSON in an environment variable called SPRING\_APPLICATION\_JSON. This can easily
 be done in a docker-compose configuration file.  For example::
 
       SPRING_APPLICATION_JSON: '{
@@ -185,7 +187,7 @@ The application properties file defines all restricted value sets, which are cod
 For example, the access type for a solution may take on the value "PB" (public).
 
 These value sets can be changed by modifying the properties file.  Each entry has a code and
-an associated name.  Continuing with the same example, the complete access type value set 
+an associated name.  Continuing with the same example, the complete access type value set
 is defined by the following configuration entries::
 
     codeName.accessType.OR=Organization
@@ -202,7 +204,7 @@ Perform these steps to define a new value set:
 Generating Encrypted Passwords
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Clear-text passwords are prohibited in many deployment environments. 
+Clear-text passwords are prohibited in many deployment environments.
 Use the following commands to generate an encrypted password for the database and the service.
 
 1. Download the jar, for example using wget::
@@ -233,7 +235,7 @@ Once the configuration is provided either in an application.properties file or i
 start the application with the following command::
 
     java -Xms128m -Xmx512m -Djava.security.egd=file:/dev/./urandom -jar common-dataservice-N.N.N.jar
-    
+
 Quickstart Version Upgrade
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -252,10 +254,10 @@ This documents the steps required to upgrade an installation to a new(er) versio
 
 3. Upgrade the new database to the latest structure by running the appropriate upgrade script.  For example, the command sequence may be something like this::
 
-    % sudo mysql 
+    % sudo mysql
     > use cds1140m;
     > source cds-mysql-upgrade-1-13-to-1-14.sql;
-    
+
 4. Configure the docker image for the new version.  Assuming that the docker compose is being used, revise the appropriate docker-compose file to have an entry for the new version, using an available network port.
 
 5. Use an appropriate docker-compose start script (varies by environment) to start the new image, for example::
