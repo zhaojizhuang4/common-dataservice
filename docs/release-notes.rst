@@ -64,6 +64,7 @@ Version 1.15.0, 6 April 2018
 * User email attribute should not accept null (ACUMOS-603)
 * Write details about security-related events to the audit log (ACUMOS-618)
 * Check user (in)active status in login and change password methods (ACUMOS-639)
+* Define admin user with well-known username and password for all-in-one install (ACUMOS-388)
 * Requires database schema version 1.15
 
 Version 1.14.5, 6 June 2018
