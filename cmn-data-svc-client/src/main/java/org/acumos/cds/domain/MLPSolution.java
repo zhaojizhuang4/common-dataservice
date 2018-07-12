@@ -47,11 +47,11 @@ public class MLPSolution extends MLPAbstractSolution implements Serializable {
 
 	private static final long serialVersionUID = 745945642089325612L;
 
-	@Column(name = OWNER_ID_COL_NAME, nullable = false, columnDefinition = "CHAR(36)")
-	@NotNull(message = "OwnerId cannot be null")
+	@Column(name = USER_ID_COL_NAME, nullable = false, columnDefinition = "CHAR(36)")
+	@NotNull(message = "UserId cannot be null")
 	@Size(max = 36)
 	@ApiModelProperty(required = true, value = "User ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
-	private String ownerId;
+	private String userId;
 
 	/**
 	 * ID of the peer where this was onboarded; null indicates local. Supports
@@ -113,14 +113,14 @@ public class MLPSolution extends MLPAbstractSolution implements Serializable {
 	 * 
 	 * @param name
 	 *            Solution Name
-	 * @param ownerId
+	 * @param userId
 	 *            User ID of owner
 	 * @param active
 	 *            Boolean flag
 	 */
-	public MLPSolution(String name, String ownerId, boolean active) {
+	public MLPSolution(String name, String userId, boolean active) {
 		super(name, active);
-		this.ownerId = ownerId;
+		this.userId = userId;
 	}
 
 	/**
@@ -131,18 +131,18 @@ public class MLPSolution extends MLPAbstractSolution implements Serializable {
 	 */
 	public MLPSolution(MLPSolution that) {
 		super(that);
-		this.ownerId = that.ownerId;
+		this.userId = that.userId;
 		this.sourceId = that.sourceId;
 		this.tags = that.tags;
 		this.webStats = that.webStats;
 	}
 
-	public String getOwnerId() {
-		return ownerId;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setOwnerId(String ownerId) {
-		this.ownerId = ownerId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getSourceId() {
@@ -198,9 +198,8 @@ public class MLPSolution extends MLPAbstractSolution implements Serializable {
 	@Override
 	public String toString() {
 		return this.getClass().getName() + "[solutionId=" + getSolutionId() + ", name=" + getName() + ", owner="
-				+ ownerId + ", desc=" + getDescription() + ", active=" + isActive() + ", modelTypeCode="
-				+ getModelTypeCode() + ", provider=" + getProvider() + ", created=" + getCreated() + ", modified="
-				+ getModified() + "]";
+				+ userId + ", desc=" + getDescription() + ", active=" + isActive() + ", modelTypeCode="
+				+ getModelTypeCode() + ", created=" + getCreated() + ", modified=" + getModified() + "]";
 	}
 
 }

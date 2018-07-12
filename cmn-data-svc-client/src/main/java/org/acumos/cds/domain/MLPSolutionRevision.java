@@ -42,22 +42,21 @@ public class MLPSolutionRevision extends MLPAbstractSolutionRevision implements 
 
 	@Column(name = SOL_ID_COL_NAME, nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
-	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
+	@ApiModelProperty(required = true, value = "Solution ID (UUID)", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String solutionId;
 
-	@Column(name = "OWNER_ID", nullable = false, columnDefinition = "CHAR(36)")
-	@NotNull(message = "OwnerId cannot be null")
+	@Column(name = "USER_ID", nullable = false, columnDefinition = "CHAR(36)")
+	@NotNull(message = "UserId cannot be null")
 	@Size(max = 36)
-	@ApiModelProperty(required = true, value = "User ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
-	private String ownerId;
+	@ApiModelProperty(required = true, value = "User ID (UUID)", example = "12345678-abcd-90ab-cdef-1234567890ab")
+	private String userId;
 
 	/**
-	 * ID of the peer where this was onboarded; null indicates local. Supports
-	 * federation.
+	 * Supports federation.
 	 */
 	@Column(name = "SOURCE_ID", columnDefinition = "CHAR(36)")
 	@Size(max = 36)
-	@ApiModelProperty(value = "Peer ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
+	@ApiModelProperty(value = "Peer ID where this was on-boarded; null indicates local", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String sourceId;
 
 	/**
@@ -75,20 +74,20 @@ public class MLPSolutionRevision extends MLPAbstractSolutionRevision implements 
 	 *            Solution ID
 	 * @param version
 	 *            User-assigned version string
-	 * @param ownerId
+	 * @param userId
 	 *            User ID
 	 * @param accessTypeCode
 	 *            Access type code
 	 * @param validationStatusCode
 	 *            Validation status code
 	 */
-	public MLPSolutionRevision(String solutionId, String version, String ownerId, String accessTypeCode,
+	public MLPSolutionRevision(String solutionId, String version, String userId, String accessTypeCode,
 			String validationStatusCode) {
 		super(version, accessTypeCode, validationStatusCode);
-		if (solutionId == null || ownerId == null)
+		if (solutionId == null || userId == null)
 			throw new IllegalArgumentException("Null not permitted");
 		this.solutionId = solutionId;
-		this.ownerId = ownerId;
+		this.userId = userId;
 	}
 
 	/**
@@ -99,9 +98,9 @@ public class MLPSolutionRevision extends MLPAbstractSolutionRevision implements 
 	 */
 	public MLPSolutionRevision(MLPSolutionRevision that) {
 		super(that);
-		this.ownerId = that.ownerId;
 		this.solutionId = that.solutionId;
 		this.sourceId = that.sourceId;
+		this.userId = that.userId;
 	}
 
 	public String getSolutionId() {
@@ -112,12 +111,12 @@ public class MLPSolutionRevision extends MLPAbstractSolutionRevision implements 
 		this.solutionId = solutionId;
 	}
 
-	public String getOwnerId() {
-		return ownerId;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setOwnerId(String ownerId) {
-		this.ownerId = ownerId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getSourceId() {
@@ -130,9 +129,9 @@ public class MLPSolutionRevision extends MLPAbstractSolutionRevision implements 
 
 	@Override
 	public String toString() {
-		return this.getClass().getName() + "[revisionId=" + getRevisionId() + ", solutionId=" + solutionId
-				+ ", ownerId=" + ownerId + ", meta=" + getMetadata() + ", version=" + getVersion() + ", accessTypeCode="
-				+ getAccessTypeCode() + ", validationStatusCode=" + getValidationStatusCode() + ", created="
-				+ getCreated() + ", modified=" + getModified() + "]";
+		return this.getClass().getName() + "[revisionId=" + getRevisionId() + ", solutionId=" + solutionId + ", userId="
+				+ userId + ", meta=" + getMetadata() + ", publisher=" + getPublisher() + ", version=" + getVersion()
+				+ ", accessTypeCode=" + getAccessTypeCode() + ", validationStatusCode=" + getValidationStatusCode()
+				+ ", created=" + getCreated() + ", modified=" + getModified() + "]";
 	}
 }

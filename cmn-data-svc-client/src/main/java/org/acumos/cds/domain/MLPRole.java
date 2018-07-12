@@ -62,11 +62,11 @@ public class MLPRole extends MLPTimestampedEntity implements Serializable {
 	@Column(name = "NAME", nullable = false, unique = true, columnDefinition = "VARCHAR(100)")
 	@NotNull(message = "Name cannot be null")
 	@Size(max = 100)
-	@ApiModelProperty(required = true, example = "Role Name")
+	@ApiModelProperty(required = true, value = "Role Name", example = "My role")
 	private String name;
 
 	@Column(name = "ACTIVE_YN", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y'")
-	@ApiModelProperty(required = true)
+	@ApiModelProperty(required = true, value = "Boolean indicator")
 	private boolean active;
 
 	/**

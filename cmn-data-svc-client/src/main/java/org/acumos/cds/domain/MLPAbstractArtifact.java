@@ -35,9 +35,9 @@ import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Base model for an artifact. Maps all simple columns; maps no complex columns
- * that a subclass might want to map in alternate ways. For example the owner
- * column is not mapped here; that is a user ID reference to an MLPUser entity,
- * and could be exposed as a string or as an object via Hibernate magic.
+ * that a subclass might want to map in alternate ways. For example the user
+ * column is not mapped here; that is a reference to an MLPUser entity ID, and
+ * could be exposed as a string or as an object via Hibernate magic.
  */
 @MappedSuperclass
 public class MLPAbstractArtifact extends MLPTimestampedEntity {
@@ -57,34 +57,35 @@ public class MLPAbstractArtifact extends MLPTimestampedEntity {
 	@Column(name = "VERSION", nullable = false, columnDefinition = "VARCHAR(25)")
 	@NotNull(message = "Version cannot be null")
 	@Size(max = 25)
-	@ApiModelProperty(required = true, example = "v1.0")
+	@ApiModelProperty(required = true, value = "Free-text version string", example = "v1.0")
 	private String version;
 
 	@Column(name = "ARTIFACT_TYPE_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "The type code cannot be null")
 	@Size(max = 2)
-	@ApiModelProperty(required = true, example = "MS")
+	@ApiModelProperty(required = true, value = "Valid artifact-type code", example = "MS")
 	private String artifactTypeCode;
 
 	@Column(name = "NAME", nullable = false, columnDefinition = "VARCHAR(100)")
 	@NotNull(message = "Artifact name cannot be null")
 	@Size(max = 100)
-	@ApiModelProperty(required = true, example = "My artifact name")
+	@ApiModelProperty(required = true, value = "Artifact name", example = "My artifact")
 	private String name;
 
 	@Column(name = "DESCRIPTION", columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
+	@ApiModelProperty(value = "Free-text description")
 	private String description;
 
 	@Column(name = "URI", nullable = false, columnDefinition = "VARCHAR(512)")
 	@NotNull(message = "Artifact URI cannot be null")
 	@Size(max = 512)
-	@ApiModelProperty(required = true, example = "http://archive.company.com/artifacts/my_artifact_name")
+	@ApiModelProperty(required = true, value = "Artifact URI", example = "http://archive.company.com/artifacts/my_artifact_name")
 	private String uri;
 
 	@Column(name = "SIZE", nullable = false, columnDefinition = "INT")
 	@NotNull(message = "Size cannot be null")
-	@ApiModelProperty(required = true, value = "Bytes", example = "65536")
+	@ApiModelProperty(required = true, value = "Size in bytes on the disk", example = "65536")
 	private Integer size;
 
 	@Column(name = "METADATA", columnDefinition = "VARCHAR(1024)")

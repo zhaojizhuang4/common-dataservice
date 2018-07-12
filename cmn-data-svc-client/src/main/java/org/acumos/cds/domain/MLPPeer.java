@@ -58,7 +58,7 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	@Column(name = "NAME", nullable = false, columnDefinition = "VARCHAR(50)")
 	@NotNull(message = "name cannot be null")
 	@Size(max = 50)
-	@ApiModelProperty(required = true, example = "My Peer Name")
+	@ApiModelProperty(required = true, value = "Peer name", example = "My Peer Name")
 	private String name;
 
 	/**
@@ -67,45 +67,47 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 	@Column(name = "SUBJECT_NAME", nullable = false, unique = true, columnDefinition = "VARCHAR(100)")
 	@NotNull(message = "subjectName cannot be null")
 	@Size(max = 100)
-	@ApiModelProperty(required = true, example = "peer.company.com")
+	@ApiModelProperty(required = true, value = "Certificate subject name", example = "peer.company.com")
 	private String subjectName;
 
 	@Column(name = "DESCRIPTION", columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
+	@ApiModelProperty(value = "Free-text description")
 	private String description;
 
 	@Column(name = "API_URL", nullable = false, columnDefinition = "VARCHAR(512)")
 	@NotNull(message = "apiUrl cannot be null")
 	@Size(max = 512)
-	@ApiModelProperty(required = true, example = "http://peer.company.com/api")
+	@ApiModelProperty(required = true, value = "URL where peer listens", example = "http://peer.company.com/api")
 	private String apiUrl;
 
 	@Column(name = "WEB_URL", columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
+	@ApiModelProperty(required = true, value = "Web URL")
 	private String webUrl;
 
 	@Column(name = "IS_SELF", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'N'")
 	@NotNull(message = "isSelf cannot be null")
 	@Type(type = "yes_no")
-	@ApiModelProperty(required = true)
+	@ApiModelProperty(required = true, value = "Boolean indicator, true if this entry refers to self")
 	private boolean isSelf;
 
 	@Column(name = "IS_LOCAL", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'N'")
 	@NotNull(message = "isLocal cannot be null")
 	@Type(type = "yes_no")
-	@ApiModelProperty(required = true)
+	@ApiModelProperty(required = true, value = "Boolean indicator")
 	private boolean isLocal;
 
 	@Column(name = "CONTACT1", nullable = false, columnDefinition = "VARCHAR(100)")
 	@NotNull(message = "contact1 cannot be null")
 	@Size(max = 100)
-	@ApiModelProperty(required = true, example = "Sys Admin 212-555-1212")
+	@ApiModelProperty(required = true, value = "Contact information", example = "Sys Admin 212-555-1212")
 	private String contact1;
 
 	@Column(name = "STATUS_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "statusCode cannot be null")
 	@Size(max = 2)
-	@ApiModelProperty(required = true, example = "AC")
+	@ApiModelProperty(required = true, value = "Peer active status code", example = "AC")
 	private String statusCode;
 
 	@Column(name = "VALIDATION_STATUS_CD", nullable = false, columnDefinition = "CHAR(2)")
@@ -332,8 +334,7 @@ public class MLPPeer extends MLPTimestampedEntity implements Serializable {
 
 	/**
 	 * @param validationStatusCode
-	 *            A value obtained by calling
-	 *            {@link org.acumos.cds.ValidationStatusCode#toString()}.
+	 *            The validation status code
 	 */
 	public void setValidationStatusCode(String validationStatusCode) {
 		this.validationStatusCode = validationStatusCode;

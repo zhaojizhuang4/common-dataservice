@@ -20,19 +20,19 @@
 
 package org.acumos.cds.transport;
 
-/**
- * Model for message sent as login request.
- */
-public class LoginTransport implements MLPTransportModel {
+import java.util.Objects;
 
+/**
+ * Trivial model to transport a pair of strings.
+ */
+public class AuthorTransport {
 	private String name;
-	// Password or API token
-	private String pass;
+	private String contact;
 
 	/**
 	 * Builds an empty object.
 	 */
-	public LoginTransport() {
+	public AuthorTransport() {
 		// no-arg constructor
 	}
 
@@ -40,13 +40,13 @@ public class LoginTransport implements MLPTransportModel {
 	 * Builds an object with the specified values.
 	 * 
 	 * @param name
-	 *            Login name
-	 * @param pass
-	 *            Login password or token in clear text.
+	 *            name to transport.
+	 * @param contact
+	 *            contact to transport.
 	 */
-	public LoginTransport(String name, String pass) {
+	public AuthorTransport(String name, String contact) {
 		this.name = name;
-		this.pass = pass;
+		this.contact = contact;
 	}
 
 	public String getName() {
@@ -57,12 +57,27 @@ public class LoginTransport implements MLPTransportModel {
 		this.name = name;
 	}
 
-	public String getPass() {
-		return pass;
+	public String getContact() {
+		return contact;
 	}
 
-	public void setPass(String pass) {
-		this.pass = pass;
+	public void setContact(String contact) {
+		this.contact = contact;
+	}
+
+	@Override
+	public boolean equals(Object that) {
+		if (that == null)
+			return false;
+		if (!(that instanceof AuthorTransport))
+			return false;
+		AuthorTransport thatObj = (AuthorTransport) that;
+		return Objects.equals(name, thatObj.name) && Objects.equals(contact, thatObj.contact);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, contact);
 	}
 
 }

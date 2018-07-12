@@ -57,7 +57,7 @@ public class MLPSolutionFOM extends MLPAbstractSolution implements Serializable 
 	 * serialized as JSON).
 	 */
 	@OneToOne
-	@JoinColumn(name = "OWNER_ID", nullable = false, columnDefinition = "CHAR(36)")
+	@JoinColumn(name = "USER_ID", nullable = false, columnDefinition = "CHAR(36)")
 	private MLPUser owner;
 
 	/**
@@ -188,8 +188,8 @@ public class MLPSolutionFOM extends MLPAbstractSolution implements Serializable 
 	public String toString() {
 		return this.getClass().getName() + "[solutionId=" + getSolutionId() + ", name=" + getName() + ", owner=" + owner
 				+ ", desc=" + getDescription() + ", active=" + isActive() + ", modelTypeCode=" + getModelTypeCode()
-				+ ", provider=" + getProvider() + ", source=" + source + ", revisions=" + revisions + ", created="
-				+ getCreated() + ", modified=" + getModified() + "]";
+				+ ", source=" + source + ", revisions=" + revisions + ", created=" + getCreated() + ", modified="
+				+ getModified() + "]";
 	}
 
 	/**
@@ -204,7 +204,6 @@ public class MLPSolutionFOM extends MLPAbstractSolution implements Serializable 
 		sol.setModified(getModified());
 		sol.setName(getName());
 		sol.setOrigin(getOrigin());
-		sol.setProvider(getProvider());
 		sol.setSolutionId(getSolutionId());
 		if (source != null)
 			sol.setSourceId(source.getPeerId());

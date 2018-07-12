@@ -70,6 +70,9 @@ public interface SolutionRepository extends JpaRepository<MLPSolution, String>, 
 	 * the solution, revision and artifact entities. Returns no results for a
 	 * solution with no revision(s) and/or no artifact(s).
 	 * 
+	 * Uses a nested query because the BLOB column in the solution table cannot be
+	 * used to select a distinct set of rows.
+	 * 
 	 * @param active
 	 *            Solution status; use true to find active solutions, false to find
 	 *            inactive solutions.
@@ -83,7 +86,8 @@ public interface SolutionRepository extends JpaRepository<MLPSolution, String>, 
 	 *            Page and sort criteria
 	 * @return Page of MLPSolution
 	 */
-	@Query(value = "SELECT DISTINCT s FROM MLPSolution s, MLPSolutionRevision r, MLPSolRevArtMap m, MLPArtifact a "
+	@Query(value = "SELECT s FROM MLPSolution s WHERE s.solutionId in "
+			+ " ( SELECT DISTINCT s.solutionId FROM MLPSolution s, MLPSolutionRevision r, MLPSolRevArtMap m, MLPArtifact a "
 			+ " WHERE s.active = :active " //
 			+ "   AND s.solutionId = r.solutionId " //
 			+ "   AND r.revisionId = m.revisionId " //
@@ -93,7 +97,7 @@ public interface SolutionRepository extends JpaRepository<MLPSolution, String>, 
 			+ "   AND " //
 			+ "   ( s.modified >= :theDate " //
 			+ "  OR r.modified >= :theDate " //
-			+ "  OR a.modified >= :theDate ) ")
+			+ "  OR a.modified >= :theDate ) )")
 	Page<MLPSolution> findByModifiedDate(@Param("active") Boolean active,
 			@Param("accessTypeCodes") String[] accessTypeCodes, @Param("valStatusCodes") String[] valStatusCodes,
 			@Param("theDate") Date theDate, Pageable pageRequest);

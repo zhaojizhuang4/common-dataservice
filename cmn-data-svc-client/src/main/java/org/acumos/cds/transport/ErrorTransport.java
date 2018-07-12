@@ -57,7 +57,7 @@ public class ErrorTransport implements MLPTransportModel {
 	 * @param errMsg
 	 *            Explanation
 	 * @param exception
-	 *            Exception that should be reported
+	 *            Exception that should be reported; optional and ignored if null.
 	 */
 	public ErrorTransport(int statusCode, String errMsg, Exception exception) {
 		this.status = statusCode;

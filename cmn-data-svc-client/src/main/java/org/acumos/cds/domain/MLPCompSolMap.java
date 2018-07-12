@@ -98,13 +98,13 @@ public class MLPCompSolMap implements MLPEntity, Serializable {
 	@Id
 	@Column(name = "PARENT_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
-	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
+	@ApiModelProperty(required = true, value = "Composite (parent) solution ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String parentId;
 
 	@Id
 	@Column(name = "CHILD_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
-	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
+	@ApiModelProperty(required = true, value = "Member (child) solution ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String childId;
 
 	/**

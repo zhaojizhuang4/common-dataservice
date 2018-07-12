@@ -96,20 +96,17 @@ public class MLPValidationSequence extends MLPTimestampedEntity implements Seria
 
 	}
 
-	/**
-	 * Sequence of this validation step
-	 */
 	@Id
 	@Column(name = "SEQ", nullable = false, columnDefinition = "SMALLINT")
 	@NotNull(message = "Sequence cannot be null")
-	@ApiModelProperty(required = true)
+	@ApiModelProperty(required = true, value = "Validation step sequence")
 	private Integer sequence;
 
 	@Id
 	@Column(name = "VAL_TYPE_CD", nullable = false, updatable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Validation type code cannot be null")
 	@Size(max = 2)
-	@ApiModelProperty(required = true, example = "TA")
+	@ApiModelProperty(required = true, value = "Validation type code", example = "TA")
 	private String valTypeCode;
 
 	public MLPValidationSequence() {

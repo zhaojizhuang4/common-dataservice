@@ -51,6 +51,7 @@ import org.acumos.cds.domain.MLPPeer;
 import org.acumos.cds.domain.MLPPeerGroup;
 import org.acumos.cds.domain.MLPPeerSolAccMap;
 import org.acumos.cds.domain.MLPPeerSubscription;
+import org.acumos.cds.domain.MLPRevisionDescription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
 import org.acumos.cds.domain.MLPSiteConfig;
@@ -211,6 +212,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private List<String> solutionMembers;
 	private RestPageResponse<MLPSolution> userSolutions;
 	private long solutionRevisionCommentCount;
+	private MLPRevisionDescription description;
 
 	/**
 	 * No-argument constructor.
@@ -701,6 +703,16 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 
 	@Override
 	public MLPUser loginUser(String name, String pass) {
+		return loginUser;
+	}
+
+	@Override
+	public MLPUser loginApiUser(String name, String token) {
+		return loginUser;
+	}
+
+	@Override
+	public MLPUser verifyUser(String name, String token) {
 		return loginUser;
 	}
 
@@ -1437,8 +1449,9 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 
 	@Override
 	public RestPageResponse<MLPSolution> findPortalSolutions(String[] nameKeywords, String[] descriptionKeywords,
-			boolean active, String[] ownerIds, String[] accessTypeCodes, String[] modelTypeCodes,
-			String[] validationStatusCodes, String[] tags, RestPageRequest pageRequest) {
+			boolean active, String[] userIds, String[] accessTypeCodes, String[] modelTypeCodes,
+			String[] validationStatusCodes, String[] tags, String[] authKws, String[] pubKws,
+			RestPageRequest pageRequest) {
 		return this.portalSolutions;
 	}
 
@@ -1448,7 +1461,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 
 	@Override
 	public RestPageResponse<MLPSolution> findUserSolutions(String[] nameKeywords, String[] descriptionKeywords,
-			boolean active, String ownerId, String[] accessTypeCodes, String[] modelTypeCodes,
+			boolean active, String userId, String[] accessTypeCodes, String[] modelTypeCodes,
 			String[] validationStatusCodes, String[] tags, RestPageRequest pageRequest) {
 		return this.userSolutions;
 	}
@@ -1703,6 +1716,30 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	@Override
 	public void dropCompositeSolutionMember(String parentId, String childId) {
 		// what to mock?
+	}
+
+	public void setRevisionDescription(MLPRevisionDescription description) {
+		this.description = description;
+	}
+
+	@Override
+	public MLPRevisionDescription getRevisionDescription(String revisionId, String accessTypeCode) {
+		return this.description;
+	}
+
+	@Override
+	public MLPRevisionDescription createRevisionDescription(MLPRevisionDescription description) {
+		return this.description;
+	}
+
+	@Override
+	public void updateRevisionDescription(MLPRevisionDescription description) {
+		this.description = description;
+	}
+
+	@Override
+	public void deleteRevisionDescription(String revisionId, String accessTypeCode) {
+		// How to mock?
 	}
 
 }

@@ -95,13 +95,13 @@ public class MLPNotifUserMap implements MLPEntity, Serializable {
 	@Id
 	@Column(name = "NOTIFICATION_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
-	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
+	@ApiModelProperty(required = true, value = "Notification ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String notificationId;
 
 	@Id
 	@Column(name = "USER_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
-	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
+	@ApiModelProperty(required = true, value = "User ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String userId;
 
 	// No auto-update behaviors here

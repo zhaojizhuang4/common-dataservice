@@ -54,6 +54,7 @@ import org.acumos.cds.domain.MLPPeerGrpMemMap;
 import org.acumos.cds.domain.MLPPeerPeerAccMap;
 import org.acumos.cds.domain.MLPPeerSolAccMap;
 import org.acumos.cds.domain.MLPPeerSubscription;
+import org.acumos.cds.domain.MLPRevisionDescription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
 import org.acumos.cds.domain.MLPSiteConfig;
@@ -87,6 +88,7 @@ import org.acumos.cds.repository.PeerPeerAccMapRepository;
 import org.acumos.cds.repository.PeerRepository;
 import org.acumos.cds.repository.PeerSolAccMapRepository;
 import org.acumos.cds.repository.PeerSubscriptionRepository;
+import org.acumos.cds.repository.RevisionDescriptionRepository;
 import org.acumos.cds.repository.RoleFunctionRepository;
 import org.acumos.cds.repository.RoleRepository;
 import org.acumos.cds.repository.SiteConfigRepository;
@@ -114,6 +116,7 @@ import org.acumos.cds.service.RoleSearchService;
 import org.acumos.cds.service.SolutionSearchService;
 import org.acumos.cds.service.StepResultSearchService;
 import org.acumos.cds.service.UserSearchService;
+import org.acumos.cds.transport.AuthorTransport;
 import org.acumos.cds.util.EELFLoggerDelegate;
 import org.junit.Assert;
 import org.junit.Test;
@@ -213,6 +216,8 @@ public class CdsRepositoryServiceTest {
 	private PeerPeerAccMapRepository peerPeerAccMapRepository;
 	@Autowired
 	private CodeNameService codeNameService;
+	@Autowired
+	private RevisionDescriptionRepository revisionDescRepository;
 
 	@Test
 	public void testRepositories() throws Exception {
@@ -231,6 +236,8 @@ public class CdsRepositoryServiceTest {
 			cu.setFirstName(firstName);
 			cu.setLastName(lastName);
 			cu.setLoginName(loginName);
+			cu.setLoginFailCount((short) 0);
+			cu.setLoginFailDate(lastLogin);
 			cu.setLoginHash(loginPass);
 			cu.setLoginPassExpire(new Date());
 			cu = userRepository.save(cu);
@@ -392,7 +399,7 @@ public class CdsRepositoryServiceTest {
 			ca.setName("test artifact name");
 			ca.setUri("http://nexus/artifact");
 			ca.setArtifactTypeCode(ArtifactTypeCode.DI.name());
-			ca.setOwnerId(cu.getUserId());
+			ca.setUserId(cu.getUserId());
 			ca.setSize(123);
 			ca = artifactRepository.save(ca);
 			Assert.assertTrue(artifactRepository.count() > 0);
@@ -415,8 +422,7 @@ public class CdsRepositoryServiceTest {
 			cs.setName(solName);
 			cs.setDescription(solDesc);
 			cs.setActive(true);
-			cs.setOwnerId(cu.getUserId());
-			cs.setProvider("Big Data Org");
+			cs.setUserId(cu.getUserId());
 			cs.setModelTypeCode(ModelTypeCode.CL.name());
 			cs.setToolkitTypeCode(ToolkitTypeCode.SK.name());
 			// tags must exist; they are not created here
@@ -449,10 +455,19 @@ public class CdsRepositoryServiceTest {
 
 			MLPSolutionRevision cr = new MLPSolutionRevision(cs.getSolutionId(), "1.0X", cu.getUserId(),
 					AccessTypeCode.PR.name(), ValidationStatusCode.NV.name());
+			cr.setAuthors(new AuthorTransport[] { new AuthorTransport("name1", "contact1"),
+					new AuthorTransport("name2", "contact2") });
 			cr.setDescription("Some description 2");
+			cr.setPublisher("Big Data Org");
 			cr = revisionRepository.save(cr);
 			Assert.assertNotNull("Revision ID", cr.getRevisionId());
 			logger.info("Created solution revision " + cr.getRevisionId());
+
+			MLPRevisionDescription revDesc = new MLPRevisionDescription(cr.getRevisionId(), "PB",
+					"Some bogus description");
+			revDesc = revisionDescRepository.save(revDesc);
+			Assert.assertNotNull(revDesc.getCreated());
+			revisionDescRepository.delete(new MLPRevisionDescription.RevDescPK(cr.getRevisionId(), "PB"));
 
 			logger.info("Adding artifact to revision");
 			solRevArtMapRepository.save(new MLPSolRevArtMap(cr.getRevisionId(), ca.getArtifactId()));
@@ -462,13 +477,15 @@ public class CdsRepositoryServiceTest {
 			String[] solKw = { solName };
 			String[] descKw = { solDesc };
 			boolean active = true;
-			String[] ownerIds = { cu.getUserId() };
+			String[] userIds = { cu.getUserId() };
 			String[] modelTypeCodes = { ModelTypeCode.CL.name() };
 			String[] accTypeCodes = { AccessTypeCode.PR.name() };
 			String[] valStatusCodes = { ValidationStatusCode.NV.name() };
 			String[] searchTags = { solTag1.getTag() };
+			String[] searchAuths = null;
+			String[] searchPubs = { "Data" };
 			Page<MLPSolution> portalSearchResult = solutionSearchService.findPortalSolutions(solKw, descKw, active,
-					ownerIds, modelTypeCodes, accTypeCodes, valStatusCodes, searchTags,
+					userIds, modelTypeCodes, accTypeCodes, valStatusCodes, searchTags, searchAuths, searchPubs,
 					new PageRequest(0, 2, Direction.ASC, "name"));
 			Assert.assertTrue(portalSearchResult != null && portalSearchResult.getNumberOfElements() > 0);
 			logger.info("Found portal solution total " + portalSearchResult.getTotalElements());
@@ -493,6 +510,7 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(revs.iterator().hasNext());
 			for (MLPSolutionRevision r : revs) {
 				logger.info("\tRevision: " + r.toString());
+				Assert.assertTrue(r.getAuthors().length > 0);
 				Iterable<MLPArtifact> arts = artifactRepository.findByRevision(r.getRevisionId());
 				Assert.assertTrue(arts.iterator().hasNext());
 				for (MLPArtifact a : arts)
@@ -756,7 +774,7 @@ public class CdsRepositoryServiceTest {
 			// Create Peer
 			final String peerName = "Peer-" + Long.toString(new Date().getTime());
 			MLPPeer pr = new MLPPeer(peerName, "x." + Long.toString(new Date().getTime()), "http://peer-api", true,
-					true, "", PeerStatusCode.AC.name(), ValidationStatusCode.IP.name());
+					true, "", PeerStatusCode.AC.name(), ValidationStatusCode.NV.name());
 			pr = peerRepository.save(pr);
 			Assert.assertNotNull(pr.getPeerId());
 			Assert.assertNotNull(pr.getCreated());
@@ -772,7 +790,7 @@ public class CdsRepositoryServiceTest {
 			ca.setName("test artifact name");
 			ca.setUri("http://nexus/artifact");
 			ca.setArtifactTypeCode(ArtifactTypeCode.DI.name());
-			ca.setOwnerId(cu.getUserId());
+			ca.setUserId(cu.getUserId());
 			ca.setSize(123);
 			ca = artifactRepository.save(ca);
 			Assert.assertNotNull(ca.getArtifactId());
@@ -786,7 +804,7 @@ public class CdsRepositoryServiceTest {
 			ca2.setName("replicated artifact ");
 			ca2.setUri("http://other.foo");
 			ca2.setArtifactTypeCode(ArtifactTypeCode.CD.toString());
-			ca2.setOwnerId(cu.getUserId());
+			ca2.setUserId(cu.getUserId());
 			ca2.setSize(456);
 			ca2 = artifactRepository.save(ca2);
 			Assert.assertEquals(artId, ca2.getArtifactId());
@@ -804,8 +822,7 @@ public class CdsRepositoryServiceTest {
 			MLPSolution cs = new MLPSolution();
 			cs.setName("solution name");
 			cs.setActive(true);
-			cs.setOwnerId(cu.getUserId());
-			cs.setProvider("Big Data Org");
+			cs.setUserId(cu.getUserId());
 			cs.setModelTypeCode(ModelTypeCode.CL.name());
 			cs.setToolkitTypeCode(ToolkitTypeCode.SK.name());
 			cs = solutionRepository.save(cs);
@@ -851,8 +868,8 @@ public class CdsRepositoryServiceTest {
 			MLPSolution cs2 = new MLPSolution();
 			cs2.setName("solution name");
 			cs2.setActive(true);
-			cs2.setOwnerId(cu.getUserId());
-			cs2.setProvider("Big Data Org");
+			cs2.setUserId(cu.getUserId());
+			cs2.setDescription("Big Data Org");
 			cs2.setModelTypeCode(ModelTypeCode.CL.toString());
 			cs2.setToolkitTypeCode(ToolkitTypeCode.SK.toString());
 			cs2 = solutionRepository.save(cs2);
@@ -861,7 +878,9 @@ public class CdsRepositoryServiceTest {
 
 			MLPSolutionRevision cr = new MLPSolutionRevision(cs.getSolutionId(), "1.0R", cu.getUserId(),
 					AccessTypeCode.PB.name(), ValidationStatusCode.SB.name());
+			cr.setAuthors(new AuthorTransport[] { new AuthorTransport("other name", "other contact") });
 			cr.setDescription("Some description");
+			cr.setPublisher("Big Data Org");
 			cr = revisionRepository.save(cr);
 			Assert.assertNotNull("Revision ID", cr.getRevisionId());
 			logger.info("Adding artifact to revision");

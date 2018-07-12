@@ -60,21 +60,23 @@ public class MLPNotification extends MLPTimestampedEntity implements Serializabl
 	@Column(name = "TITLE", nullable = false, columnDefinition = "VARCHAR(100)")
 	@NotNull(message = "Title cannot be null")
 	@Size(max = 100)
-	@ApiModelProperty(required = true, example = "Notification subject")
+	@ApiModelProperty(required = true, value = "Subject or title", example = "Notification subject")
 	private String title;
 
 	@Column(name = "MESSAGE", columnDefinition = "VARCHAR(2048)")
 	@Size(max = 2048)
+	@ApiModelProperty(value = "Notification body", example = "The task is complete.")
 	private String message;
 
 	@Column(name = "MSG_SEVERITY_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Message Severity Code cannot be null")
 	@Size(max = 2)
-	@ApiModelProperty(required = true, example = "LO")
+	@ApiModelProperty(required = true, value = "Message severity code", example = "LO")
 	private String msgSeverityCode;
 
 	@Column(name = "URL", columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
+	@ApiModelProperty(value = "A URL to view more information", example = "http://my.company.com/more/info")
 	private String url;
 
 	// No auto-update behaviors here

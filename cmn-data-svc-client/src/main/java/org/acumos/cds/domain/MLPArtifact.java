@@ -43,11 +43,11 @@ public class MLPArtifact extends MLPAbstractArtifact implements Serializable {
 
 	private static final long serialVersionUID = 814823907210569812L;
 
-	@Column(name = "OWNER_ID", nullable = false, columnDefinition = "CHAR(36)")
-	@NotNull(message = "OwnerID cannot be null")
+	@Column(name = "USER_ID", nullable = false, columnDefinition = "CHAR(36)")
+	@NotNull(message = "UserID cannot be null")
 	@Size(max = 36)
 	@ApiModelProperty(required = true, value = "User ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
-	private String ownerId;
+	private String userId;
 
 	/**
 	 * No-arg constructor.
@@ -68,16 +68,16 @@ public class MLPArtifact extends MLPAbstractArtifact implements Serializable {
 	 *            Name
 	 * @param uri
 	 *            URI
-	 * @param ownerId
-	 *            User ID for owner
+	 * @param userId
+	 *            User ID
 	 * @param size
 	 *            Length
 	 */
-	public MLPArtifact(String version, String artifactTypeCode, String name, String uri, String ownerId, int size) {
+	public MLPArtifact(String version, String artifactTypeCode, String name, String uri, String userId, int size) {
 		super(version, artifactTypeCode, name, uri, size);
-		if (ownerId == null)
+		if (userId == null)
 			throw new IllegalArgumentException("Null not permitted");
-		this.ownerId = ownerId;
+		this.userId = userId;
 	}
 
 	/**
@@ -88,20 +88,20 @@ public class MLPArtifact extends MLPAbstractArtifact implements Serializable {
 	 */
 	public MLPArtifact(MLPArtifact that) {
 		super(that);
-		this.ownerId = that.ownerId;
+		this.userId = that.userId;
 	}
 
-	public String getOwnerId() {
-		return ownerId;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setOwnerId(String ownerId) {
-		this.ownerId = ownerId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	@Override
 	public String toString() {
-		return this.getClass().getName() + "[artifactId=" + getArtifactId() + ", ownerId=" + ownerId
+		return this.getClass().getName() + "[artifactId=" + getArtifactId() + ", userId=" + userId
 				+ ", artifactTypeCode=" + getArtifactTypeCode() + ", description=" + getDescription() + ", version="
 				+ getVersion() + ", uri=" + getUri() + ", created=" + getCreated() + ", modified=" + getModified()
 				+ "]";

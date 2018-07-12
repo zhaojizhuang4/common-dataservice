@@ -67,14 +67,15 @@ public abstract class CCDSConstants {
 	public static final String DATE_PATH = "date";
 	public static final String VAL_SEQ_PATH = "valseq";
 	public static final String VAL_TYPE_PATH = "valtype";
-	public static final String COMP_PATH = "comp";
+	public static final String COMPOSITE_PATH = "comp";
+	public static final String DESCRIPTION_PATH = "desc";
+	public static final String ACCESS_PATH = "access";
 
 	// Code-name pairs
 	public static final String CODE_PATH = "code";
 	public static final String NAME_PATH = "name";
 	public static final String PAIR_PATH = "pair";
 	// deprecated
-	public static final String ACCESS_PATH = "access";
 	public static final String LOGIN_PROVIDER_PATH = "logprov";
 	public static final String MODEL_PATH = "model";
 	public static final String NOTIFICATION_MECH_PATH = "notifmech";
@@ -91,19 +92,22 @@ public abstract class CCDSConstants {
 	public static final String PORTAL_PATH = "portal";
 	public static final String TERM_PATH = "term";
 	public static final String LOGIN_PATH = "login";
-	public static final String AVERAGE_PATH = "avg";
+	public static final String LOGIN_API_PATH = "loginapi";
+	public static final String VERIFY_PATH = "verify";
 	public static final String CHPASS_PATH = "chgpw";
 
 	// Portal search interface
 	public static final String SEARCH_ACCESS_TYPES = "atc";
 	public static final String SEARCH_ACTIVE = "active";
-	public static final String SEARCH_OWNERS = "owner";
+	public static final String SEARCH_USERS = "user";
 	public static final String SEARCH_DESC = "desc";
 	public static final String SEARCH_MODEL_TYPES = "mtc";
 	public static final String SEARCH_NAME = "name";
 	public static final String SEARCH_TAGS = "tag";
 	public static final String SEARCH_VAL_STATUSES = "vsc";
 	public static final String SEARCH_DATE = "datems";
+	public static final String SEARCH_AUTH = "auth";
+	public static final String SEARCH_PUB = "pub";
 
 	// Sonar wants a private constructor, placed after all fields
 	private CCDSConstants() {

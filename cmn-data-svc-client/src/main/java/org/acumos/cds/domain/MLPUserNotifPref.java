@@ -46,25 +46,25 @@ public class MLPUserNotifPref implements MLPEntity, Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "ID", nullable = false, updatable = false, columnDefinition = "INT")
-	@ApiModelProperty(readOnly = true, value = "Generated")
+	@ApiModelProperty(readOnly = true, value = "Generated record ID")
 	private Long userNotifPrefId;
 
 	@Column(name = "USER_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@NotNull(message = "User ID cannot be null")
 	@Size(max = 36)
-	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
+	@ApiModelProperty(required = true, value = "User ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String userId;
 
 	@Column(name = "NOTIF_DELV_MECH_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Notification delivery mechanism code cannot be null")
 	@Size(max = 2)
-	@ApiModelProperty(required = true, example = "EM")
+	@ApiModelProperty(required = true, value = "Delivery mechanism code valid for this site", example = "EM")
 	private String notfDelvMechCode;
 
 	@Column(name = "MSG_SEVERITY_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Message severity code cannot be null")
 	@Size(max = 2)
-	@ApiModelProperty(required = true, example = "LO")
+	@ApiModelProperty(required = true, value = "Message severity code valid for this site", example = "LO")
 	private String msgSeverityCode;
 
 	/**

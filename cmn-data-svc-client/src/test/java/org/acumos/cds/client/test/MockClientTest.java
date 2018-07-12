@@ -35,6 +35,7 @@ import org.acumos.cds.domain.MLPPeer;
 import org.acumos.cds.domain.MLPPeerGroup;
 import org.acumos.cds.domain.MLPPeerSolAccMap;
 import org.acumos.cds.domain.MLPPeerSubscription;
+import org.acumos.cds.domain.MLPRevisionDescription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
 import org.acumos.cds.domain.MLPSiteConfig;
@@ -209,6 +210,8 @@ public class MockClientTest {
 		MLPUser user = new MLPUser();
 		client.setLoginUser(user);
 		Assert.assertTrue(user == client.loginUser("name", "pass"));
+		Assert.assertTrue(user == client.loginApiUser("name", "pass"));
+		Assert.assertTrue(user == client.verifyUser("name", "pass"));
 
 		client.setUserById(user);
 		Assert.assertTrue(user == client.getUser("id"));
@@ -441,8 +444,8 @@ public class MockClientTest {
 
 		RestPageResponse<MLPSolution> portalSols = new RestPageResponse<>();
 		client.setPortalSolutions(portalSols);
-		Assert.assertTrue(
-				portalSols == client.findPortalSolutions(null, null, true, null, null, null, null, null, pageRequest));
+		Assert.assertTrue(portalSols == client.findPortalSolutions(null, null, true, null, null, null, null, null, null,
+				null, pageRequest));
 
 		RestPageResponse<MLPSolution> userPrivSols = new RestPageResponse<>();
 		client.setUserSolutions(userPrivSols);
@@ -522,6 +525,13 @@ public class MockClientTest {
 		Assert.assertTrue(members == client.getCompositeSolutionMembers("id"));
 		client.addCompositeSolutionMember("id1", "id2");
 		client.dropCompositeSolutionMember("id1", "id2");
+
+		MLPRevisionDescription revDesc = new MLPRevisionDescription();
+		client.setRevisionDescription(revDesc);
+		Assert.assertTrue(revDesc == client.getRevisionDescription("", ""));
+		Assert.assertTrue(revDesc == client.createRevisionDescription(revDesc));
+		client.updateRevisionDescription(revDesc);
+		client.deleteRevisionDescription("", "");
 
 	}
 

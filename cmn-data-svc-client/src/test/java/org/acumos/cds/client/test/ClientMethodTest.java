@@ -71,7 +71,7 @@ public class ClientMethodTest {
 
 	static class TrivialRestClientImplSubclass extends CommonDataServiceRestClientImpl {
 		public TrivialRestClientImplSubclass(String webapiUrl, String user, String pass) {
-			super(webapiUrl, user, pass);
+			super(webapiUrl, user, pass, null);
 			super.getRestTemplate();
 		}
 	}
@@ -196,7 +196,7 @@ public class ClientMethodTest {
 		}
 		try {
 			String[] array = new String[] { "I'm a string" };
-			client.findPortalSolutions(array, array, true, array, array, array, array, array,
+			client.findPortalSolutions(array, array, true, array, array, array, array, array, array, array,
 					new RestPageRequest(0, 1));
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
@@ -389,6 +389,16 @@ public class ClientMethodTest {
 		}
 		try {
 			client.loginUser("name", "pass");
+		} catch (ResourceAccessException ex) {
+			logger.info("Client failed as expected: {}", ex.toString());
+		}
+		try {
+			client.loginApiUser("name", "pass");
+		} catch (ResourceAccessException ex) {
+			logger.info("Client failed as expected: {}", ex.toString());
+		}
+		try {
+			client.verifyUser("name", "pass");
 		} catch (ResourceAccessException ex) {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}

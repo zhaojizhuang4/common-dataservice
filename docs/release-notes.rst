@@ -23,6 +23,20 @@ Common Data Service Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
+Version 1.16.0, 24 July 2018
+----------------------------
+
+* Add column for solution picture; add table for revision description (ACUMOS-1235)
+* Rename ownerId to userId in solution, revision, artifact, peer subscription (ACUMOS-1359)
+* Add authors; move provider in solution to publisher in revision (ACUMOS-1359)
+* Extend findPortalSolutions to search authors and publisher (ACUMOS-1359)
+* Add verification token and expiration date (ACUMOS-1386)
+* Add API token attribute to user entity, add loginApi method (ACUMOS-1424)
+* Add attributes to track failed login attempts (ACUMOS-1442)
+* Enable the admin role in newly created database (ACUMOS-1446)
+* Add support for proxy when getting a CDS client instance
+* Requires database schema version 1.16
+
 Version 1.15.4, 6 July 2018
 ---------------------------
 

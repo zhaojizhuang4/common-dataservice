@@ -55,7 +55,5 @@ public class EnumTest {
 		Assert.assertTrue(ToolkitTypeCode.values().length > 0);
 		Assert.assertTrue(ValidationStatusCode.values().length > 0);
 		Assert.assertTrue(ValidationTypeCode.values().length > 0);
-		Assert.assertTrue(ValidationTypeCode.values().length > 0);
-		Assert.assertTrue(ValidationTypeCode.values().length > 0);
 	}
 }

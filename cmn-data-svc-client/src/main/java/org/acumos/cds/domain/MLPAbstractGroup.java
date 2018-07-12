@@ -53,11 +53,12 @@ public abstract class MLPAbstractGroup extends MLPTimestampedEntity {
 
 	@Column(name = "NAME", nullable = false, unique = true, columnDefinition = "VARCHAR(50)")
 	@Size(max = 50)
-	@ApiModelProperty(required = true, example = "Group name")
+	@ApiModelProperty(required = true, value = "Group name", example = "My group")
 	private String name;
 
 	@Column(name = "DESCRIPTION", columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
+	@ApiModelProperty(value = "Free-text description")
 	private String description;
 
 	public MLPAbstractGroup() {

@@ -20,7 +20,9 @@
 
 package org.acumos.cds.domain;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -29,6 +31,7 @@ import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.acumos.cds.transport.AuthorTransport;
 import org.hibernate.annotations.GenericGenerator;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -36,8 +39,8 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * Base model for a solution revision. Maps all simple columns; maps no complex
  * columns that a subclass might want to map in alternate ways. For example the
- * owner column is not mapped here; that is a user ID reference to an MLPUser
- * entity, and could be exposed as a string or as an object via Hibernate magic.
+ * solution ID column is not mapped here; that is an entity ID, and could be
+ * exposed as a string or as an object via Hibernate.
  */
 @MappedSuperclass
 public abstract class MLPAbstractSolutionRevision extends MLPTimestampedEntity {
@@ -58,10 +61,12 @@ public abstract class MLPAbstractSolutionRevision extends MLPTimestampedEntity {
 	@Column(name = "VERSION", nullable = false, columnDefinition = "VARCHAR(25)")
 	@NotNull(message = "Version cannot be null")
 	@Size(max = 25)
+	@ApiModelProperty(required = true, value = "Free-text version string", example = "v1.0")
 	private String version;
 
 	@Column(name = "DESCRIPTION", columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
+	@ApiModelProperty(value = "Free-text description")
 	private String description;
 
 	@Column(name = "METADATA", columnDefinition = "VARCHAR(1024)")
@@ -69,26 +74,42 @@ public abstract class MLPAbstractSolutionRevision extends MLPTimestampedEntity {
 	private String metadata;
 
 	/**
-	 * URI of the peer that provided this object. Supports federation.
+	 * Supports federation.
 	 */
 	@Column(name = "ORIGIN", columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
+	@ApiModelProperty(value = "URI of the peer that provided this item.", example = "http://acumos.remote.com/a/b/c")
 	private String origin;
 
 	/**
-	 * This code is defined by {@link org.acumos.cds.AccessTypeCode}
+	 * The Access Type Code value set is defined by server-side configuration.
 	 */
 	@Column(name = "ACCESS_TYPE_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Access type code cannot be null")
 	@Size(max = 2)
+	@ApiModelProperty(value = "Access type code that is valid for this site", example = "PB")
 	private String accessTypeCode;
 
 	/**
-	 * This code is defined by {@link org.acumos.cds.ValidationStatusCode}
+	 * The Validation Status Code value set is defined by server-side configuration.
 	 */
 	@Column(name = "VALIDATION_STATUS_CD", nullable = false, columnDefinition = "CHAR(2)")
 	@Size(max = 2)
+	@ApiModelProperty(required = true, value = "Validation status code", example = "NV")
 	private String validationStatusCode;
+
+	/**
+	 * Domain class method formats the text.
+	 */
+	@Column(name = "AUTHORS", columnDefinition = "VARCHAR(1024)")
+	@Size(max = 1024)
+	@ApiModelProperty(value = "Two-column table with author (name, contact) pairs", example = "My name\tMy contact")
+	private String authors;
+
+	@Column(name = "PUBLISHER", columnDefinition = "VARCHAR(64)")
+	@Size(max = 64)
+	@ApiModelProperty(value = "Company or organization name that is the publisher", example = "My company")
+	private String publisher;
 
 	/**
 	 * No-arg constructor
@@ -125,9 +146,11 @@ public abstract class MLPAbstractSolutionRevision extends MLPTimestampedEntity {
 	public MLPAbstractSolutionRevision(MLPAbstractSolutionRevision that) {
 		super(that);
 		this.accessTypeCode = that.accessTypeCode;
+		this.authors = that.authors;
 		this.description = that.description;
 		this.metadata = that.metadata;
 		this.origin = that.origin;
+		this.publisher = that.publisher;
 		this.revisionId = that.revisionId;
 		this.validationStatusCode = that.validationStatusCode;
 		this.version = that.version;
@@ -177,11 +200,6 @@ public abstract class MLPAbstractSolutionRevision extends MLPTimestampedEntity {
 		return accessTypeCode;
 	}
 
-	/**
-	 * @param accessTypeCode
-	 *            A value obtained by calling
-	 *            {@link org.acumos.cds.AccessTypeCode#toString()}.
-	 */
 	public void setAccessTypeCode(String accessTypeCode) {
 		this.accessTypeCode = accessTypeCode;
 	}
@@ -190,13 +208,69 @@ public abstract class MLPAbstractSolutionRevision extends MLPTimestampedEntity {
 		return validationStatusCode;
 	}
 
-	/**
-	 * @param validationStatusCode
-	 *            A value obtained by calling
-	 *            {@link org.acumos.cds.ValidationStatusCode#toString()}.
-	 */
 	public void setValidationStatusCode(String validationStatusCode) {
 		this.validationStatusCode = validationStatusCode;
+	}
+
+	public String getPublisher() {
+		return publisher;
+	}
+
+	public void setPublisher(String publisher) {
+		this.publisher = publisher;
+	}
+
+	/** author row separator character */
+	private static final String AUTHOR_ROW_SEP = "\n";
+	private static final String AUTHOR_ROW_REGEX = "[" + AUTHOR_ROW_SEP + "]";
+	/** author pair separator character */
+	private static final String AUTHOR_PAIR_SEP = "\t";
+	private static final String AUTHOR_PAIR_REGEX = "[" + AUTHOR_PAIR_SEP + "]";
+
+	/**
+	 * Gets the authors. Converts the internal data storage format to a set of
+	 * objects.
+	 * 
+	 * @return Array of author (name, contact) pairs
+	 */
+	public AuthorTransport[] getAuthors() {
+		Set<AuthorTransport> set = new HashSet<>();
+		if (authors != null && authors.length() > 0) {
+			String[] rows = authors.split(AUTHOR_ROW_REGEX);
+			for (String r : rows) {
+				String[] pair = r.split(AUTHOR_PAIR_REGEX);
+				if (pair[0].isEmpty() && pair[1].isEmpty())
+					continue;
+				AuthorTransport a = new AuthorTransport(pair[0], pair[1]);
+				set.add(a);
+			}
+		}
+		AuthorTransport[] result = new AuthorTransport[set.size()];
+		set.toArray(result);
+		return result;
+	}
+
+	/**
+	 * Sets the authors. Converts the set of objects to the internal storage format.
+	 * 
+	 * @param authors
+	 *            Set of author (name, contact) pairs. Must not contain the
+	 *            character {@link #AUTHOR_PAIR_SEP} nor {@link #AUTHOR_ROW_SEP}.
+	 */
+	public void setAuthors(AuthorTransport[] authors) {
+		StringBuilder sb = new StringBuilder();
+		for (AuthorTransport a : authors) {
+			if (a.getName().isEmpty() && a.getContact().isEmpty())
+				continue;
+			if (a.getName().contains(AUTHOR_ROW_SEP) || a.getName().contains(AUTHOR_PAIR_SEP))
+				throw new IllegalArgumentException("Illegal character in name");
+			if (a.getContact().contains(AUTHOR_ROW_SEP) || a.getContact().contains(AUTHOR_PAIR_SEP))
+				throw new IllegalArgumentException("Illegal character in contact");
+			if (sb.length() > 0)
+				sb.append(AUTHOR_ROW_SEP);
+			sb.append(a.getName() + AUTHOR_PAIR_SEP + a.getContact());
+		}
+		this.authors = sb.toString();
 	}
 
 	@Override

@@ -54,7 +54,7 @@ public class MLPComment extends MLPTimestampedEntity implements Serializable {
 
 	@Column(name = "THREAD_ID", nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
-	@ApiModelProperty(required = true, example = "12345678-abcd-90ab-cdef-1234567890ab")
+	@ApiModelProperty(required = true, value = "Generated thread ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String threadId;
 
 	@Column(name = "PARENT_ID", columnDefinition = "CHAR(36)")
@@ -64,12 +64,12 @@ public class MLPComment extends MLPTimestampedEntity implements Serializable {
 
 	@Column(name = "USER_ID", nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
-	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
+	@ApiModelProperty(required = true, value = "User ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String userId;
 
 	@Column(name = "TEXT", nullable = false, columnDefinition = "VARCHAR(8192)")
 	@Size(max = 8192)
-	@ApiModelProperty(required = true, example = "The comment text.")
+	@ApiModelProperty(required = true, value = "The comment text", example = "Best model ever")
 	private String text;
 
 	/**

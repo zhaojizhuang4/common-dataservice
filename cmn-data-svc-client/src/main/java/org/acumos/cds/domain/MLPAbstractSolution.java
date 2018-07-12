@@ -25,6 +25,7 @@ import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -36,15 +37,15 @@ import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Base model for a solution. Maps all simple columns; maps no complex columns
- * that a subclass might want to map in alternate ways. For example the owner
- * column is not mapped here; that is a user ID reference to an MLPUser entity,
- * and could be exposed as a string or as an object via Hibernate magic.
+ * that a subclass might want to map in alternate ways. For example the user
+ * column is not mapped here; that is a reference to an MLPUser entity ID, and
+ * could be exposed as a string or as an object via Hibernate magic.
  */
 @MappedSuperclass
 public abstract class MLPAbstractSolution extends MLPTimestampedEntity {
 
 	/* package */ static final String TABLE_NAME = "C_SOLUTION";
-	/* package */ static final String OWNER_ID_COL_NAME = "OWNER_ID";
+	/* package */ static final String USER_ID_COL_NAME = "USER_ID";
 
 	@Id
 	@GeneratedValue(generator = "customUseOrGenerate")
@@ -59,38 +60,64 @@ public abstract class MLPAbstractSolution extends MLPTimestampedEntity {
 	@Column(name = "NAME", nullable = false, columnDefinition = "VARCHAR(100)")
 	@NotNull(message = "Name cannot be null")
 	@Size(max = 100)
+	@ApiModelProperty(value = "Solution name", example = "My solution")
 	private String name;
 
 	@Column(name = "DESCRIPTION", columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
+	@ApiModelProperty(value = "Free-text description")
 	private String description;
-
-	@Column(name = "PROVIDER", columnDefinition = "VARCHAR(64)")
-	@Size(max = 64)
-	private String provider;
 
 	@Column(name = "METADATA", columnDefinition = "VARCHAR(1024)")
 	@Size(max = 1024)
 	private String metadata;
 
+	/**
+	 * Inactive means deleted.
+	 */
 	@Column(name = "ACTIVE_YN", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y'")
 	@Type(type = "yes_no")
+	@ApiModelProperty(required = true, value = "Boolean indicator")
 	private boolean active;
 
+	/**
+	 * The valid value set is defined by server-side configuration.
+	 */
 	@Column(name = "MODEL_TYPE_CD", columnDefinition = "CHAR(2)")
 	@Size(max = 2)
+	@ApiModelProperty(value = "Model type code", example = "CL")
 	private String modelTypeCode;
 
+	/**
+	 * The valid value set is defined by server-side configuration.
+	 */
 	@Column(name = "TOOLKIT_TYPE_CD", columnDefinition = "CHAR(2)")
 	@Size(max = 2)
+	@ApiModelProperty(value = "Toolkit type code", example = "SK")
 	private String toolkitTypeCode;
 
 	/**
-	 * URI of the peer that provided this object. Supports federation.
+	 * Supports federation.
 	 */
 	@Column(name = "ORIGIN", columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
+	@ApiModelProperty(value = "URI of the peer that provided this object")
 	private String origin;
+
+	/**
+	 * User-supplied picture to decorate the solution.
+	 * 
+	 * Derby BLOB type allows 2GB. Mysql/Mariadb BLOB type only allows 64KB, that's
+	 * too small. But Derby fails to create the table if type LONGBLOB is specified
+	 * here. With no columDefinition attribute Derby generates a table AND Spring
+	 * validates the MariaDB schema if the column is created as LONGBLOB.
+	 * 
+	 * Jackson handles base64 encoding.
+	 */
+	@Lob
+	@Column(name = "PICTURE", length = 2000000 /* DO NOT USE: columnDefinition = "BLOB" */)
+	@ApiModelProperty(value = "Solution picture as byte array")
+	private Byte[] picture;
 
 	/**
 	 * No-arg constructor
@@ -129,7 +156,7 @@ public abstract class MLPAbstractSolution extends MLPTimestampedEntity {
 		this.modelTypeCode = that.modelTypeCode;
 		this.name = that.name;
 		this.origin = that.origin;
-		this.provider = that.provider;
+		this.picture = that.picture;
 		this.solutionId = that.solutionId;
 		this.toolkitTypeCode = that.toolkitTypeCode;
 	}
@@ -156,14 +183,6 @@ public abstract class MLPAbstractSolution extends MLPTimestampedEntity {
 
 	public void setMetadata(String meta) {
 		this.metadata = meta;
-	}
-
-	public String getProvider() {
-		return provider;
-	}
-
-	public void setProvider(String provider) {
-		this.provider = provider;
 	}
 
 	public String getDescription() {
@@ -216,6 +235,14 @@ public abstract class MLPAbstractSolution extends MLPTimestampedEntity {
 		this.origin = origin;
 	}
 
+	public Byte[] getPicture() {
+		return picture;
+	}
+
+	public void setPicture(Byte[] picture) {
+		this.picture = picture;
+	}
+
 	/**
 	 * The ID field is primary, so defining this method here factors out code.
 	 */
@@ -234,7 +261,7 @@ public abstract class MLPAbstractSolution extends MLPTimestampedEntity {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(solutionId, name, provider, description);
+		return Objects.hash(solutionId, name, description);
 	}
 
 }

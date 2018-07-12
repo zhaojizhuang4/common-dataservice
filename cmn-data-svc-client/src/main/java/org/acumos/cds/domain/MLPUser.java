@@ -39,9 +39,11 @@ import org.hibernate.annotations.Type;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * Model for a user profile. Passwords on the disk are encrypted (data at rest).
- * Passwords entered by a user are sent to the server in the clear (data in
- * flight). This model is used for both purposes.
+ * Model for a user profile.
+ * 
+ * Passwords and tokens on the disk are hashed (data at rest). Passwords and
+ * tokens are sent to the server in the clear (data in flight), then hashed for
+ * comparison to a stored value.
  */
 @Entity
 @Table(name = "C_USER")
@@ -82,13 +84,15 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	@Column(name = "LOGIN_NAME", nullable = false, unique = true, columnDefinition = "VARCHAR(25)")
 	@NotNull(message = "LoginName cannot be null")
 	@Size(max = 25)
-	@ApiModelProperty(required = true)
+	@ApiModelProperty(required = true, value = "Unique short user name")
 	private String loginName;
 
 	/**
-	 * This field models the hash stored on disk. This model is ALSO used to
-	 * transport a clear-text password from client to server. The server blocks this
-	 * field in all responses so the client never sees the hash.
+	 * This field models the password hash stored on disk. It is ALSO used to
+	 * transport clear-text from client to server. The server ignores this field on
+	 * requests if its null; it nulls out this field in all responses.
+	 * 
+	 * Optional because some installations use an external single sign-on system.
 	 * 
 	 * Must NOT use this annotation because it breaks serialization in the client:
 	 * (at-sign)JsonIgnore
@@ -98,22 +102,58 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	@ApiModelProperty(value = "Transports password in clear text", example = "LongKeysAreHardToCrack12345")
 	private String loginHash;
 
+	/**
+	 * Derby lacks DATETIME, so do not specify column definition here.
+	 */
 	@Column(name = "LOGIN_PASS_EXPIRE_DATE")
 	@ApiModelProperty(value = "Millisec since the Epoch", example = "1521202458867")
 	private Date loginPassExpire;
 
+	/**
+	 * Used in early versions both to maintain web session information and as an API
+	 * token.
+	 */
 	@Column(name = "AUTH_TOKEN", columnDefinition = "VARCHAR(4096)")
 	@Size(max = 4096)
+	@ApiModelProperty(value = "Authentication token")
 	private String authToken;
 
 	@Column(name = "ACTIVE_YN", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y'")
 	@Type(type = "yes_no")
-	@ApiModelProperty(required = true)
+	@ApiModelProperty(required = true, value = "Boolean indicator")
 	private boolean active;
 
+	/**
+	 * Date-time of most recent successful login.
+	 * 
+	 * Client sends date-time as long integer, milliseconds since the Epoch. Stored
+	 * as DATETIME in Mariadb, but Derby lacks DATETIME (Spring picks TIMESTAMP), so
+	 * do not specify column definition here.
+	 * 
+	 * Should have used names "LOGIN_DATE" and loginDate.
+	 */
 	@Column(name = "LAST_LOGIN_DATE")
-	@ApiModelProperty(value = "Millisec since the Epoch", example = "1521202458867")
+	@ApiModelProperty(value = "Last login date, sent as millisec since the Epoch", example = "1521202458867")
 	private Date lastLogin;
+
+	/**
+	 * Number of login failures. Should be null after a successful login.
+	 */
+	@Column(name = "LOGIN_FAIL_COUNT", columnDefinition = "SMALLINT")
+	@ApiModelProperty(value = "Login failure count", example = "1")
+	private Short loginFailCount;
+
+	/**
+	 * Date-time of login failure. Should be null after a successful login. Used to
+	 * control the delay before this user can login again with a valid password.
+	 * 
+	 * Client sends date-time as long integer, milliseconds since the Epoch. Stored
+	 * as DATETIME in Mariadb, but Derby lacks DATETIME (Spring picks TIMESTAMP), so
+	 * do not specify column definition here.
+	 */
+	@Column(name = "LOGIN_FAIL_DATE")
+	@ApiModelProperty(value = "Login failure date, sent as millisec since the Epoch", example = "1521202458867")
+	private Date loginFailDate;
 
 	/**
 	 * Derby BLOB type allows 2GB. Mysql/Mariadb BLOB type only allows 64KB, that's
@@ -123,9 +163,37 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	 * 
 	 * Jackson handles base64 encoding.
 	 */
-	@Column(name = "PICTURE", length = 2000000 /* DO NOT USE: columnDefinition = "BLOB" */)
 	@Lob
+	@Column(name = "PICTURE", length = 2000000 /* DO NOT USE: columnDefinition = "BLOB" */)
+	@ApiModelProperty(value = "User profile picture as byte array")
 	private Byte[] picture;
+
+	/**
+	 * This field models the API token hash stored on disk. It is ALSO used to
+	 * transport a clear-text token from client to server.
+	 */
+	@Column(name = "API_TOKEN_HASH", columnDefinition = "VARCHAR(64)")
+	@Size(max = 64)
+	@ApiModelProperty(value = "API token, sent as clear text, never included in response")
+	private String apiTokenHash;
+
+	/**
+	 * This field models the verify token hash stored on disk. It is ALSO used to
+	 * transport a clear-text token from client to server.
+	 */
+	@Column(name = "VERIFY_TOKEN_HASH", columnDefinition = "VARCHAR(64)")
+	@Size(max = 64)
+	@ApiModelProperty(value = "Verification token, sent as clear text, never included in response")
+	private String verifyTokenHash;
+
+	/**
+	 * Client sends date-time as long integer, milliseconds since the Epoch. Stored
+	 * as DATETIME, but Derby lacks DATETIME, so do not specify column definition
+	 * here.
+	 */
+	@Column(name = "VERIFY_EXPIRE_DATE")
+	@ApiModelProperty(value = "Verification token expiration date, sent as millisec since the Epoch", example = "1521202458867")
+	private Date verifyExpiration;
 
 	/**
 	 * No-arg constructor
@@ -162,11 +230,14 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	public MLPUser(MLPUser that) {
 		super(that);
 		this.active = that.active;
+		this.apiTokenHash = that.apiTokenHash;
 		this.authToken = that.authToken;
 		this.email = that.email;
 		this.firstName = that.firstName;
 		this.lastLogin = that.lastLogin;
 		this.lastName = that.lastName;
+		this.loginFailCount = that.loginFailCount;
+		this.loginFailDate = that.loginFailDate;
 		this.loginHash = that.loginHash;
 		this.loginName = that.loginName;
 		this.loginPassExpire = that.loginPassExpire;
@@ -174,6 +245,8 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 		this.orgName = that.orgName;
 		this.picture = that.picture;
 		this.userId = that.userId;
+		this.verifyTokenHash = that.verifyTokenHash;
+		this.verifyExpiration = that.verifyExpiration;
 	}
 
 	public String getUserId() {
@@ -233,7 +306,7 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	}
 
 	/**
-	 * Gets the hash (or possibly a clear-text password if used for client
+	 * Gets the login hash (or possibly a clear-text password if used for client
 	 * transport).
 	 * 
 	 * Must NOT use this annotation because it breaks the path from client to
@@ -246,7 +319,7 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	}
 
 	/**
-	 * Sets the hash.
+	 * Sets the login hash.
 	 * 
 	 * @param hash
 	 *            The hash
@@ -287,12 +360,62 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 		this.lastLogin = lastLogin;
 	}
 
+	public Short getLoginFailCount() {
+		return loginFailCount;
+	}
+
+	public void setLoginFailCount(Short loginFailCount) {
+		this.loginFailCount = loginFailCount;
+	}
+
+	public Date getLoginFailDate() {
+		return loginFailDate;
+	}
+
+	public void setLoginFailDate(Date loginFailDate) {
+		this.loginFailDate = loginFailDate;
+	}
+
 	public Byte[] getPicture() {
 		return picture;
 	}
 
 	public void setPicture(Byte[] picture) {
 		this.picture = picture;
+	}
+
+	public String getApiTokenHash() {
+		return apiTokenHash;
+	}
+
+	public void setApiTokenHash(String apiTokenHash) {
+		this.apiTokenHash = apiTokenHash;
+	}
+
+	public String getVerifyTokenHash() {
+		return verifyTokenHash;
+	}
+
+	public void setVerifyTokenHash(String verifyTokenHash) {
+		this.verifyTokenHash = verifyTokenHash;
+	}
+
+	public Date getVerifyExpiration() {
+		return verifyExpiration;
+	}
+
+	public void setVerifyExpiration(Date verifyExpiration) {
+		this.verifyExpiration = verifyExpiration;
+	}
+
+	/**
+	 * Convenience method to set all hashed values to null. Factors out this
+	 * sequence for reuse and especially to avoid missing one!
+	 */
+	public void clearHashes() {
+		setLoginHash(null);
+		setApiTokenHash(null);
+		setVerifyTokenHash(null);
 	}
 
 	@Override

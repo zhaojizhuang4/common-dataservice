@@ -61,14 +61,14 @@ public class MLPSolutionRevisionFOM extends MLPAbstractSolutionRevision implemen
 	private MLPSolutionFOM solution;
 
 	/**
-	 * A revision has one owner. Unidirectional mapping
+	 * A revision has one user. Unidirectional mapping
 	 * 
 	 * Use default LAZY fetch. This is only used for searching (never fetched, never
 	 * serialized as JSON).
 	 */
 	@OneToOne
-	@JoinColumn(name = "OWNER_ID", nullable = false, columnDefinition = "CHAR(36)")
-	private MLPUser owner;
+	@JoinColumn(name = "USER_ID", nullable = false, columnDefinition = "CHAR(36)")
+	private MLPUser user;
 
 	/**
 	 * A revision has zero or one source peer. Unidirectional mapping
@@ -102,12 +102,12 @@ public class MLPSolutionRevisionFOM extends MLPAbstractSolutionRevision implemen
 		this.solution = solution;
 	}
 
-	public MLPUser getOwner() {
-		return owner;
+	public MLPUser getUser() {
+		return user;
 	}
 
-	public void setOwner(MLPUser owner) {
-		this.owner = owner;
+	public void setUser(MLPUser user) {
+		this.user = user;
 	}
 
 	public MLPPeer getSource() {
@@ -128,7 +128,7 @@ public class MLPSolutionRevisionFOM extends MLPAbstractSolutionRevision implemen
 
 	@Override
 	public String toString() {
-		return this.getClass().getName() + "[revisionId=" + getRevisionId() + ", owner=" + owner + ", meta="
+		return this.getClass().getName() + "[revisionId=" + getRevisionId() + ", user=" + user + ", meta="
 				+ getMetadata() + ", version=" + getVersion() + ", artifacts=" + artifacts + ", created=" + getCreated()
 				+ ", modified=" + getModified() + "]";
 	}
@@ -137,7 +137,7 @@ public class MLPSolutionRevisionFOM extends MLPAbstractSolutionRevision implemen
 	 * @return MLPSolutionRevision with the information from this entity
 	 */
 	public MLPSolutionRevision toMLPSolutionRevision() {
-		MLPSolutionRevision rev = new MLPSolutionRevision(solution.getSolutionId(), getVersion(), owner.getUserId(),
+		MLPSolutionRevision rev = new MLPSolutionRevision(solution.getSolutionId(), getVersion(), user.getUserId(),
 				getAccessTypeCode(), getValidationStatusCode());
 		rev.setCreated(getCreated());
 		rev.setDescription(getDescription());

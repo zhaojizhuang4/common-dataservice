@@ -18,51 +18,12 @@
  * ===============LICENSE_END=========================================================
  */
 
-package org.acumos.cds.transport;
+package org.acumos.cds.repository;
 
-/**
- * Model for message sent as login request.
- */
-public class LoginTransport implements MLPTransportModel {
+import org.acumos.cds.domain.MLPRevisionDescription;
+import org.springframework.data.repository.CrudRepository;
 
-	private String name;
-	// Password or API token
-	private String pass;
-
-	/**
-	 * Builds an empty object.
-	 */
-	public LoginTransport() {
-		// no-arg constructor
-	}
-
-	/**
-	 * Builds an object with the specified values.
-	 * 
-	 * @param name
-	 *            Login name
-	 * @param pass
-	 *            Login password or token in clear text.
-	 */
-	public LoginTransport(String name, String pass) {
-		this.name = name;
-		this.pass = pass;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getPass() {
-		return pass;
-	}
-
-	public void setPass(String pass) {
-		this.pass = pass;
-	}
+public interface RevisionDescriptionRepository
+		extends CrudRepository<MLPRevisionDescription, MLPRevisionDescription.RevDescPK> {
 
 }

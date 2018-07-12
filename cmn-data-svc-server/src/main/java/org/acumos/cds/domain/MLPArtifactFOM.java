@@ -55,7 +55,7 @@ public class MLPArtifactFOM extends MLPAbstractArtifact implements Serializable 
 	 * serialized as JSON).
 	 */
 	@OneToOne
-	@JoinColumn(name = "OWNER_ID", nullable = false, columnDefinition = "CHAR(36)")
+	@JoinColumn(name = "USER_ID", nullable = false, columnDefinition = "CHAR(36)")
 	private MLPUser owner;
 
 	/**
