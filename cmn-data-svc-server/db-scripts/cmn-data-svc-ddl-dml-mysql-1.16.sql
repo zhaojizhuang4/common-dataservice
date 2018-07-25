@@ -481,7 +481,7 @@ INSERT INTO C_SITE_CONFIG (CONFIG_KEY, CONFIG_VAL) VALUES (
 );
 
 # Initial user, role setups for admin
-INSERT INTO C_USER (USER_ID, LOGIN_NAME, LOGIN_HASH, FIRST_NAME, LAST_NAME, EMAIL) VALUES ('12345678-abcd-90ab-cdef-1234567890ab', 'admin', '$2a$10$nogCM69/Vc0rEsZbHXlEm.nxSdGuD88Kd6NlW6fnKJz3AIz0PdOwa', 'Admin', 'User', 'noreply@acumos.org');
+INSERT INTO C_USER (USER_ID, LOGIN_NAME, LOGIN_HASH, FIRST_NAME, LAST_NAME, EMAIL) VALUES ('12345678-abcd-90ab-cdef-1234567890ab', 'admin', '$2a$10$nogCM69/Vc0rEsZbHXlEm.nxSdGuD88Kd6NlW6fnKJz3AIz0PdOwa', 'Acumos', 'Admin', 'noreply@acumos.org');
 
 INSERT INTO C_ROLE (ROLE_ID, NAME, ACTIVE_YN) VALUES ('8c850f07-4352-4afd-98b1-00cbceca569f', 'admin', 'Y');
 
