@@ -150,14 +150,19 @@ public class UserController extends AbstractController {
 	 */
 	private enum CredentialType {
 		PASSWORD, API_TOKEN, VERIFY_TOKEN;
-	};
+	}
 
 	/**
 	 * Checks specified user credentials against values in the database, which has
 	 * hashes (not clear text) of sensitive information like password or token.
-	 * Updates the record in case of failure.
+	 * Updates the record in case of failure. Temporarily blocks user if more than a
+	 * configurable number of login failures happen. Error messages reveal
+	 * information to clients like existence of user; clients should NOT pass on to
+	 * users. Reports much detail to the audit logger.
 	 * 
-	 * TODO: track failures for non-existent users to avoid revealing user existence
+	 * How can this track failures for non-existent users to avoid revealing user
+	 * existence? Is keeping an in-memory hash of limited size a reasonable
+	 * approach?
 	 * 
 	 * @param credentials
 	 *            User name and authentication token
@@ -176,7 +181,7 @@ public class UserController extends AbstractController {
 		}
 		MLPUser user = userRepository.findByLoginOrEmail(credentials.getName());
 		if (user == null || !user.isActive()) {
-			logger.warn(EELFLoggerDelegate.errorLogger, "checkUserCredentials: unknown or inactve: {}",
+			logger.info(EELFLoggerDelegate.auditLogger, "checkUserCredentials: unknown or inactve: {}",
 					credentials.getName());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			// This reveals that the username does not exist
@@ -186,26 +191,23 @@ public class UserController extends AbstractController {
 		if (user.getLoginFailCount() != null) {
 			// This is a second or subsequent failure
 			if (user.getLoginFailCount() < this.loginFailureCount) {
-				long delaySec = 2 * user.getLoginFailCount();
-				logger.warn(EELFLoggerDelegate.errorLogger, "checkUserCredentials: user {} delayed for {} sec",
-						user.getLoginName(), Long.toString(delaySec));
-				try {
-					Thread.sleep(1000 * delaySec);
-				} catch (InterruptedException ex) {
-					logger.debug("checkUserCredentials: sleep interrupted");
-				}
+				logger.info(EELFLoggerDelegate.auditLogger, "checkUserCredentials: user {} attempt after failure {}",
+						user.getLoginName(), Integer.toString(user.getLoginFailCount()));
 			} else {
-				// Don't blow up on null value
+				// Exceeds threshold. Defend against null fail date in db.
 				long lastFailureTime = user.getLoginFailDate() == null ? new Date().getTime()
 						: user.getLoginFailDate().getTime();
 				long elapsedTimeSec = (new Date().getTime() - lastFailureTime) / 1000;
 				if (elapsedTimeSec < this.loginFailureBlockTimeSec) {
-					logger.warn(EELFLoggerDelegate.errorLogger, "checkUserCredentials: user {} blocked for {} sec",
+					logger.info(EELFLoggerDelegate.auditLogger, "checkUserCredentials: user {} blocked for {} sec",
 							user.getLoginName(), Long.toString(this.loginFailureBlockTimeSec - elapsedTimeSec));
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					// This reveals that the username exists
 					return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 							"Repeated login failures, user temporarily blocked");
+				} else {
+					logger.info(EELFLoggerDelegate.auditLogger, "checkUserCredentials: user {} block expired",
+							user.getLoginName());
 				}
 			}
 		}
@@ -222,6 +224,8 @@ public class UserController extends AbstractController {
 			throw new IllegalArgumentException("Unexpected credential type: " + credentialType);
 		if (!BCrypt.checkpw(credentials.getPass(), hash)) {
 			// Record the failure
+			logger.info(EELFLoggerDelegate.auditLogger, "checkUserCredentials: user {} failed auth type {}",
+					user.getLoginName(), credentialType.name());
 			user.setLoginFailCount((short) (user.getLoginFailCount() == null ? 1 : user.getLoginFailCount() + 1));
 			user.setLoginFailDate(new Date());
 			userRepository.save(user);
@@ -230,7 +234,8 @@ public class UserController extends AbstractController {
 		}
 		// Success!
 		if (user.getLoginFailCount() != null) {
-			logger.debug("checkUserCredentials: clearing login failures for user {}", user.getLoginName());
+			logger.info(EELFLoggerDelegate.auditLogger, "checkUserCredentials: clearing login failures for user {}",
+					user.getLoginName());
 			user.setLoginFailCount(null);
 			user.setLoginFailDate(null);
 			userRepository.save(user);

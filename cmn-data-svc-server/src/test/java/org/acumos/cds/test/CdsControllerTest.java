@@ -391,9 +391,7 @@ public class CdsControllerTest {
 			}
 			// Successful login to clear the failure record
 			client.loginUser(loginName, loginPass);
-			
-			// Check the delay on repeated failures
-			Date beginLogin = new Date();
+			// Trigger the temporary block with 3 failures
 			try {
 				client.loginUser(loginName, "bogus");
 				throw new Exception("Unexpected login with bad password");
@@ -406,18 +404,7 @@ public class CdsControllerTest {
 			} catch (HttpStatusCodeException ex) {
 				logger.info("Login with bad password failed as expected");
 			}
-			try {
-				client.loginUser(loginName, "bogus");
-				throw new Exception("Unexpected login with bad password");
-			} catch (HttpStatusCodeException ex) {
-				logger.info("Login with bad password failed as expected");
-			}
-			Date endLogin = new Date();
-			long elapsedTimeMsec = endLogin.getTime() - beginLogin.getTime();
-			// Should delay 2s on second failure, 4s on third
-			Assert.assertTrue(elapsedTimeMsec > 6 * 1000);
-			
-			// Fourth try triggers a temporary block
+			// Third failure triggers a temporary block
 			try {
 				client.loginUser(loginName, "bogus");
 				throw new Exception("Unexpected login with bad password");
@@ -429,7 +416,7 @@ public class CdsControllerTest {
 				client.loginUser(loginName, loginPass);
 				throw new Exception("Unexpected login while blocked");
 			} catch (HttpStatusCodeException ex) {
-				logger.info("Login while blocked failed as expected");
+				logger.info("Login temporary block worked as expected");
 			}
 
 			MLPPasswordChangeRequest req = new MLPPasswordChangeRequest(loginPass, "HardToRemember");

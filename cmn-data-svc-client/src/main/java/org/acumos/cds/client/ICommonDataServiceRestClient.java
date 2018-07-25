@@ -706,8 +706,10 @@ public interface ICommonDataServiceRestClient {
 
 	/**
 	 * Checks credentials for the specified active user. Throws an exception if the
-	 * user is not found, is not active or the password does not match. Imposes a
-	 * delay after repeated failures. Does NOT check the expiration date of the
+	 * user is not found, is not active or the password does not match. The
+	 * exception message reveals details such as existence of the user, and should
+	 * NOT be passed on to end users. Imposes a temporary block after repeated
+	 * failures as configured at server. Does NOT check the expiration date of the
 	 * password, the client must do that as needed.
 	 * 
 	 * @param name
@@ -720,8 +722,10 @@ public interface ICommonDataServiceRestClient {
 
 	/**
 	 * Checks API credentials for the specified active user. Throws an exception if
-	 * the user is not found, is not active or the token does not match. Imposes a
-	 * delay after repeated failures.
+	 * the user is not found, is not active or the token does not match. The
+	 * exception message reveals details such as existence of the user, and should
+	 * NOT be passed on to end users. Imposes a temporary block after repeated
+	 * failures as configured at server.
 	 * 
 	 * @param name
 	 *            login name or email address; both attributes are checked
@@ -734,8 +738,10 @@ public interface ICommonDataServiceRestClient {
 	/**
 	 * Checks verification credentials for the specified active user. Throws an
 	 * exception if the user is not found, is not active or the token does not
-	 * match. Imposes a delay after repeated failures. This does NOT check the
-	 * expiration date of the token, the client must do that as needed.
+	 * match. The exception message reveals details such as existence of the user,
+	 * and should NOT be passed on to end users. Imposes a temporary block after
+	 * repeated failures as configured at server. This does NOT check the expiration
+	 * date of the token, the client must do that as needed.
 	 * 
 	 * @param name
 	 *            login name or email address; both attributes are checked
