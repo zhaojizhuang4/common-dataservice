@@ -1275,7 +1275,7 @@ public class DomainTest extends AbstractModelTest {
 
 	private void checkMLPUser(MLPUser m) {
 		Assert.assertEquals(b1, m.isActive());
-		Assert.assertEquals(s1, m.getApiTokenHash());
+		Assert.assertEquals(s1, m.getApiToken());
 		Assert.assertEquals(s2, m.getAuthToken());
 		Assert.assertEquals(d1, m.getCreated());
 		Assert.assertEquals(s3, m.getEmail());
@@ -1300,7 +1300,7 @@ public class DomainTest extends AbstractModelTest {
 		MLPUser m = new MLPUser(s1, s10, b1);
 		m = new MLPUser();
 		m.setActive(b1);
-		m.setApiTokenHash(s1);
+		m.setApiToken(s1);
 		m.setAuthToken(s2);
 		m.setCreated(d1);
 		m.setEmail(s3);

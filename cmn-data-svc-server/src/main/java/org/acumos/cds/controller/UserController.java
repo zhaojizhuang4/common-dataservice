@@ -63,6 +63,7 @@ import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
 import org.acumos.cds.transport.UsersRoleRequest;
 import org.acumos.cds.util.EELFLoggerDelegate;
+import org.jasypt.util.text.BasicTextEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -106,6 +107,11 @@ public class UserController extends AbstractController {
 	 */
 	@Value("${login.failure.block.time:90}")
 	private Integer loginFailureBlockTimeSec;
+	/**
+	 * Rudimentary encryption of API token
+	 */
+	@Value("${jasypt.encryptor.password:change-me-should-never-be-used}")
+	private String jasyptEncryptorPassword;
 
 	@Autowired
 	private EntityManager entityManager;
@@ -155,12 +161,13 @@ public class UserController extends AbstractController {
 	/**
 	 * Checks specified user credentials against values in the database, which has
 	 * hashes (not clear text) of sensitive information like password or token.
-	 * Updates the record in case of failure. Temporarily blocks user if more than a
-	 * configurable number of login failures happen. Error messages reveal
-	 * information to clients like existence of user; clients should NOT pass on to
-	 * users. Reports much detail to the audit logger.
+	 * Updates the record in all cases -- last login on success, failure count
+	 * otherwise. Temporarily blocks user if more than a configurable number of
+	 * login failures happen. Error messages reveal information to clients like
+	 * existence of user; clients should NOT pass on to users. Reports much detail
+	 * to the audit logger.
 	 * 
-	 * How can this track failures for non-existent users to avoid revealing user
+	 * Should this track failures for non-existent users to avoid revealing user
 	 * existence? Is keeping an in-memory hash of limited size a reasonable
 	 * approach?
 	 * 
@@ -212,17 +219,17 @@ public class UserController extends AbstractController {
 			}
 		}
 
-		String hash = null;
-		if (credentialType == CredentialType.PASSWORD)
-			hash = user.getLoginHash();
-		else if (credentialType == CredentialType.API_TOKEN)
-			hash = user.getApiTokenHash();
-		else if (credentialType == CredentialType.VERIFY_TOKEN)
-			hash = user.getVerifyTokenHash();
-		else
-			// Not reached by any test.
+		boolean match = false;
+		if (credentialType == CredentialType.PASSWORD || credentialType == CredentialType.VERIFY_TOKEN) {
+			String hash = credentialType == CredentialType.PASSWORD ? user.getLoginHash() : user.getVerifyTokenHash();
+			match = BCrypt.checkpw(credentials.getPass(), hash);
+		} else if (credentialType == CredentialType.API_TOKEN) {
+			match = credentials.getPass().equals(decryptWithJasypt(user.getApiToken()));
+		} else {
 			throw new IllegalArgumentException("Unexpected credential type: " + credentialType);
-		if (!BCrypt.checkpw(credentials.getPass(), hash)) {
+		}
+
+		if (!match) {
 			// Record the failure
 			logger.info(EELFLoggerDelegate.auditLogger, "checkUserCredentials: user {} failed auth type {}",
 					user.getLoginName(), credentialType.name());
@@ -238,13 +245,15 @@ public class UserController extends AbstractController {
 					user.getLoginName());
 			user.setLoginFailCount(null);
 			user.setLoginFailDate(null);
-			userRepository.save(user);
 		}
+		user.setLastLogin(new Date());
+		userRepository.save(user);
 		logger.audit(beginDate, "checkUserCredentials: authenticated user {}", user.getLoginName());
-		// This might not be necessary.
-		MLPUser userCopy = new MLPUser(user);
-		userCopy.clearHashes();
-		return userCopy;
+		entityManager.detach(user);
+		user.clearHashes();
+		if (user.getApiToken() != null)
+			user.setApiToken(decryptWithJasypt(user.getApiToken()));
+		return user;
 	}
 
 	/**
@@ -357,6 +366,8 @@ public class UserController extends AbstractController {
 			// detach from Hibernate and clear sensitive data
 			entityManager.detach(user);
 			user.clearHashes();
+			if (user.getApiToken() != null)
+				user.setApiToken(decryptWithJasypt(user.getApiToken()));
 		}
 		logger.audit(beginDate, "getUsers {}", pageable);
 		return page;
@@ -379,6 +390,8 @@ public class UserController extends AbstractController {
 			// detach from Hibernate and clear sensitive data
 			entityManager.detach(user);
 			user.clearHashes();
+			if (user.getApiToken() != null)
+				user.setApiToken(decryptWithJasypt(user.getApiToken()));
 		}
 		logger.audit(beginDate, "likeUsers: term {}", term);
 		return page;
@@ -416,6 +429,8 @@ public class UserController extends AbstractController {
 				MLPUser user = userIter.next();
 				entityManager.detach(user);
 				user.clearHashes();
+				if (user.getApiToken() != null)
+					user.setApiToken(decryptWithJasypt(user.getApiToken()));
 			}
 			logger.audit(beginDate, "searchUsers: query {}", queryParameters);
 			return userPage;
@@ -447,8 +462,36 @@ public class UserController extends AbstractController {
 		// detach from Hibernate and wipe hashes
 		entityManager.detach(user);
 		user.clearHashes();
+		if (user.getApiToken() != null)
+			user.setApiToken(decryptWithJasypt(user.getApiToken()));
 		logger.audit(beginDate, "getUser: userId {}", userId);
 		return user;
+	}
+
+	/**
+	 * Supports rudimentary decryption to avoid storing clear text in database.
+	 * 
+	 * @param encryptedMessage
+	 *            Cipher text
+	 * @return clear text
+	 */
+	private String decryptWithJasypt(String encryptedMessage) {
+		BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+		textEncryptor.setPassword(jasyptEncryptorPassword);
+		return textEncryptor.decrypt(encryptedMessage);
+	}
+
+	/**
+	 * Supports rudimentary encryption to avoid storing clear text in database.
+	 * 
+	 * @param clearText
+	 *            Clear text
+	 * @return cipher text
+	 */
+	private String encryptWithJasypt(String clearText) {
+		BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+		textEncryptor.setPassword(jasyptEncryptorPassword);
+		return textEncryptor.encrypt(clearText);
 	}
 
 	/**
@@ -474,13 +517,14 @@ public class UserController extends AbstractController {
 					return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "ID exists: " + id);
 				}
 			}
-			// Hash any clear-text values that arrive
+			// Hash any clear-text sensitive user credentials
 			if (user.getLoginHash() != null)
 				user.setLoginHash(BCrypt.hashpw(user.getLoginHash(), BCrypt.gensalt()));
-			if (user.getApiTokenHash() != null)
-				user.setApiTokenHash(BCrypt.hashpw(user.getApiTokenHash(), BCrypt.gensalt()));
 			if (user.getVerifyTokenHash() != null)
 				user.setVerifyTokenHash(BCrypt.hashpw(user.getVerifyTokenHash(), BCrypt.gensalt()));
+			// Encrypt any API token
+			if (user.getApiToken() != null)
+				user.setApiToken(encryptWithJasypt(user.getApiToken()));
 			// Create a new row
 			MLPUser newUser = userRepository.save(user);
 			response.setStatus(HttpServletResponse.SC_CREATED);
@@ -525,19 +569,19 @@ public class UserController extends AbstractController {
 		try {
 			// Use the path-parameter id; don't trust the one in the object
 			user.setUserId(userId);
-			// Hash any clear-text values that arrive; otherwise use old value
+			// Hash any clear-text sensitive user credentials; otherwise use old value
 			if (user.getLoginHash() != null)
 				user.setLoginHash(BCrypt.hashpw(user.getLoginHash(), BCrypt.gensalt()));
 			else
 				user.setLoginHash(existingUser.getLoginHash());
-			if (user.getApiTokenHash() != null)
-				user.setApiTokenHash(BCrypt.hashpw(user.getApiTokenHash(), BCrypt.gensalt()));
-			else
-				user.setApiTokenHash(existingUser.getApiTokenHash());
 			if (user.getVerifyTokenHash() != null)
 				user.setVerifyTokenHash(BCrypt.hashpw(user.getVerifyTokenHash(), BCrypt.gensalt()));
 			else
-				user.setVerifyTokenHash(existingUser.getApiTokenHash());
+				user.setVerifyTokenHash(existingUser.getVerifyTokenHash());
+			// Encrypt any API token.
+			// But unlike password, allow caller to null it out.
+			if (user.getApiToken() != null)
+				user.setApiToken(encryptWithJasypt(user.getApiToken()));
 			userRepository.save(user);
 			logger.audit(beginDate, "updateUser: userId {}", userId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);

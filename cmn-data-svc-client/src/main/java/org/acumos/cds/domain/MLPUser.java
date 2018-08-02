@@ -169,13 +169,13 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	private Byte[] picture;
 
 	/**
-	 * This field models the API token hash stored on disk. It is ALSO used to
-	 * transport a clear-text token from client to server.
+	 * This field models the API token stored on disk. Transported as clear text,
+	 * stored as cipher text.
 	 */
-	@Column(name = "API_TOKEN_HASH", columnDefinition = "VARCHAR(64)")
+	@Column(name = "API_TOKEN", columnDefinition = "VARCHAR(64)")
 	@Size(max = 64)
-	@ApiModelProperty(value = "API token, sent as clear text, never included in response")
-	private String apiTokenHash;
+	@ApiModelProperty(value = "API token clear text")
+	private String apiToken;
 
 	/**
 	 * This field models the verify token hash stored on disk. It is ALSO used to
@@ -230,7 +230,7 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	public MLPUser(MLPUser that) {
 		super(that);
 		this.active = that.active;
-		this.apiTokenHash = that.apiTokenHash;
+		this.apiToken = that.apiToken;
 		this.authToken = that.authToken;
 		this.email = that.email;
 		this.firstName = that.firstName;
@@ -384,12 +384,12 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 		this.picture = picture;
 	}
 
-	public String getApiTokenHash() {
-		return apiTokenHash;
+	public String getApiToken() {
+		return apiToken;
 	}
 
-	public void setApiTokenHash(String apiTokenHash) {
-		this.apiTokenHash = apiTokenHash;
+	public void setApiToken(String apiToken) {
+		this.apiToken = apiToken;
 	}
 
 	public String getVerifyTokenHash() {
@@ -414,7 +414,6 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	 */
 	public void clearHashes() {
 		setLoginHash(null);
-		setApiTokenHash(null);
 		setVerifyTokenHash(null);
 	}
 

@@ -329,7 +329,7 @@ public class CdsControllerTest {
 			final String verifyToken = "test_client_verify";
 			cu.setLoginName(loginName);
 			cu.setLoginHash(loginPass);
-			cu.setApiTokenHash(apiToken);
+			cu.setApiToken(apiToken);
 			cu.setVerifyTokenHash(verifyToken);
 			cu.setEmail("createSolArtuser@abc.com");
 			final String firstName = "test_" + unique;
@@ -369,6 +369,7 @@ public class CdsControllerTest {
 
 			MLPUser apiUser = client.loginApiUser(loginName, apiToken);
 			Assert.assertNotNull(apiUser);
+			Assert.assertEquals(apiUser.getApiToken(), apiToken);
 			logger.info("Logged in successfully via API token");
 
 			MLPUser verifyUser = client.verifyUser(loginName, verifyToken);

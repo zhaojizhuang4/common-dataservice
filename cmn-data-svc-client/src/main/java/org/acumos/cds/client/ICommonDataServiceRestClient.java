@@ -708,9 +708,11 @@ public interface ICommonDataServiceRestClient {
 	 * Checks credentials for the specified active user. Throws an exception if the
 	 * user is not found, is not active or the password does not match. The
 	 * exception message reveals details such as existence of the user, and should
-	 * NOT be passed on to end users. Imposes a temporary block after repeated
-	 * failures as configured at server. Does NOT check the expiration date of the
+	 * NOT be passed on to end users. Does NOT check the expiration date of the
 	 * password, the client must do that as needed.
+	 * 
+	 * Side effects: updates last-login field on success, count on failure. Imposes
+	 * a temporary block after repeated failures as configured at server.
 	 * 
 	 * @param name
 	 *            login name or email address; both attributes are checked
@@ -721,11 +723,13 @@ public interface ICommonDataServiceRestClient {
 	MLPUser loginUser(String name, String pass);
 
 	/**
-	 * Checks API credentials for the specified active user. Throws an exception if
-	 * the user is not found, is not active or the token does not match. The
-	 * exception message reveals details such as existence of the user, and should
-	 * NOT be passed on to end users. Imposes a temporary block after repeated
-	 * failures as configured at server.
+	 * Checks API token for the specified active user. Throws an exception if the
+	 * user is not found, is not active or the token does not match. The exception
+	 * message reveals details such as existence of the user, and should NOT be
+	 * passed on to end users.
+	 * 
+	 * Side effects: updates last-login field on success, count on failure. Imposes
+	 * a temporary block after repeated failures as configured at server.
 	 * 
 	 * @param name
 	 *            login name or email address; both attributes are checked
@@ -739,9 +743,11 @@ public interface ICommonDataServiceRestClient {
 	 * Checks verification credentials for the specified active user. Throws an
 	 * exception if the user is not found, is not active or the token does not
 	 * match. The exception message reveals details such as existence of the user,
-	 * and should NOT be passed on to end users. Imposes a temporary block after
-	 * repeated failures as configured at server. This does NOT check the expiration
+	 * and should NOT be passed on to end users. This does NOT check the expiration
 	 * date of the token, the client must do that as needed.
+	 * 
+	 * Side effects: updates last-login field on success, count on failure. Imposes
+	 * a temporary block after repeated failures as configured at server.
 	 * 
 	 * @param name
 	 *            login name or email address; both attributes are checked
