@@ -41,41 +41,41 @@ public abstract class CCDSConstants {
 
 	// Entities
 	public static final String ARTIFACT_PATH = "artifact";
-	public static final String SOLUTION_PATH = "solution";
-	public static final String REVISION_PATH = "revision";
-	public static final String ROLE_PATH = "role";
-	public static final String FUNCTION_PATH = "function";
-	public static final String USER_PATH = "user";
+	public static final String COMMENT_PATH = "comment";
+	public static final String COMPOSITE_PATH = "comp";
+	public static final String CONFIG_PATH = "config";
 	public static final String COUNT_PATH = "count";
-	public static final String VALIDATION_PATH = "validation";
-	public static final String PEER_PATH = "peer";
+	public static final String DATE_PATH = "date";
+	public static final String DEPLOY_PATH = "deploy";
+	public static final String DESCRIPTION_PATH = "descr";
+	public static final String DOCUMENT_PATH = "document";
 	public static final String DOWNLOAD_PATH = "dnld";
 	public static final String FAVORITE_PATH = "favorite";
-	public static final String RATING_PATH = "rating";
-	public static final String SUBSCRIPTION_PATH = "sub";
-	public static final String TAG_PATH = "tag";
+	public static final String FUNCTION_PATH = "function";
+	public static final String GROUP_PATH = "group";
 	public static final String NOTIFICATION_PATH = "notif";
 	public static final String NOTIFICATION_PREF_PATH = "notifpref";
-	public static final String VIEW_PATH = "view";
-	public static final String WEB_PATH = "web";
-	public static final String DEPLOY_PATH = "deploy";
-	public static final String CONFIG_PATH = "config";
-	public static final String THREAD_PATH = "thread";
-	public static final String COMMENT_PATH = "comment";
+	public static final String PEER_PATH = "peer";
+	public static final String RATING_PATH = "rating";
+	public static final String REVISION_PATH = "revision";
+	public static final String ROLE_PATH = "role";
 	public static final String STEP_RESULT_PATH = "stepresult";
-	public static final String GROUP_PATH = "group";
-	public static final String DATE_PATH = "date";
+	public static final String SOLUTION_PATH = "solution";
+	public static final String SUBSCRIPTION_PATH = "sub";
+	public static final String TAG_PATH = "tag";
+	public static final String THREAD_PATH = "thread";
+	public static final String USER_PATH = "user";
 	public static final String VAL_SEQ_PATH = "valseq";
 	public static final String VAL_TYPE_PATH = "valtype";
-	public static final String COMPOSITE_PATH = "comp";
-	public static final String DESCRIPTION_PATH = "desc";
-	public static final String ACCESS_PATH = "access";
-
+	public static final String VALIDATION_PATH = "validation";
+	public static final String VIEW_PATH = "view";
+	public static final String WEB_PATH = "web";
 	// Code-name pairs
 	public static final String CODE_PATH = "code";
 	public static final String NAME_PATH = "name";
 	public static final String PAIR_PATH = "pair";
-	// deprecated
+	// Other paths
+	public static final String ACCESS_PATH = "access";
 	public static final String LOGIN_PROVIDER_PATH = "logprov";
 	public static final String MODEL_PATH = "model";
 	public static final String NOTIFICATION_MECH_PATH = "notifmech";
@@ -85,7 +85,6 @@ public abstract class CCDSConstants {
 	public static final String TYPE_PATH = "type";
 	public static final String VAL_PATH = "val";
 	public static final String MSG_SEV_PATH = "msgsev";
-
 	// Actions on entities
 	public static final String LIKE_PATH = "like";
 	public static final String SEARCH_PATH = "search";

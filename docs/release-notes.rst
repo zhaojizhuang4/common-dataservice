@@ -23,6 +23,13 @@ Common Data Service Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
+Version 1.17.0, 9 Aug 2018
+--------------------------
+
+* Store metadata for user documents in Nexus (ACUMOS-1235)
+* Load capitalized role name "Admin" not "admin" (ACUMOS-1526)
+* Requires database schema version 1.17
+
 Version 1.16.1, 2 Aug 2018
 --------------------------
 

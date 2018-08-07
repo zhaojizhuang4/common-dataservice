@@ -31,6 +31,7 @@ import org.acumos.cds.domain.MLPArtifactType;
 import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
+import org.acumos.cds.domain.MLPDocument;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPModelType;
 import org.acumos.cds.domain.MLPNotification;
@@ -2107,5 +2108,81 @@ public interface ICommonDataServiceRestClient {
 	 *            access type code
 	 */
 	void deleteRevisionDescription(String revisionId, String accessTypeCode);
+
+	/**
+	 * Gets the document with the specified ID. This is usually metadata about a
+	 * user-supplied document stored in Nexus.
+	 * 
+	 * @param documentId
+	 *            document ID
+	 * @return Document object
+	 */
+	MLPDocument getDocument(String documentId);
+
+	/**
+	 * Creates a document. This is usually metadata about a user-supplied document
+	 * stored in Nexus.
+	 * 
+	 * @param document
+	 *            Document data. If the ID field is null a new value is generated;
+	 *            otherwise the ID value is used if valid and not already known.
+	 * @return Complete object, with generated information such as ID
+	 */
+	MLPDocument createDocument(MLPDocument document);
+
+	/**
+	 * Updates a document. This is usually metadata about a user-supplied document
+	 * stored in Nexus.
+	 * 
+	 * 
+	 * @param document
+	 *            Document data
+	 */
+	void updateDocument(MLPDocument document);
+
+	/**
+	 * Deletes a document. An document can be deleted if is not associated with any
+	 * solution revisions; if associations remain the delete will fail.
+	 * 
+	 * @param documentId
+	 *            document ID
+	 */
+	void deleteDocument(String documentId);
+
+	/**
+	 * Gets the documents for a solution revision at the specified access type.
+	 * 
+	 * @param revisionId
+	 *            revision ID
+	 * @param accessTypeCode
+	 *            Access type code; e.g., "PB"
+	 * @return List of MLPDocument
+	 */
+	List<MLPDocument> getSolutionRevisionDocuments(String revisionId, String accessTypeCode);
+
+	/**
+	 * Adds a user document to a solution revision at the specified access type.
+	 * 
+	 * @param revisionId
+	 *            Revision ID
+	 * @param accessTypeCode
+	 *            Access type code; e.g., "PB"
+	 * @param documentId
+	 *            Document Id
+	 */
+	void addSolutionRevisionDocument(String revisionId, String accessTypeCode, String documentId);
+
+	/**
+	 * Removes a user document from a solution revision at the specified access
+	 * type.
+	 * 
+	 * @param revisionId
+	 *            Revision ID
+	 * @param accessTypeCode
+	 *            Access type code; e.g., "PB"
+	 * @param documentId
+	 *            Document Id
+	 */
+	void dropSolutionRevisionDocument(String revisionId, String accessTypeCode, String documentId);
 
 }

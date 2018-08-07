@@ -39,6 +39,7 @@ import org.acumos.cds.domain.MLPArtifactType;
 import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
+import org.acumos.cds.domain.MLPDocument;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPModelType;
 import org.acumos.cds.domain.MLPNotifUserMap;
@@ -2320,6 +2321,64 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		URI uri = buildUri(new String[] { CCDSConstants.REVISION_PATH, revisionId, CCDSConstants.ACCESS_PATH,
 				accessTypeCode, CCDSConstants.DESCRIPTION_PATH }, null, null);
 		logger.debug("deleteRevisionDescription: uri {}", uri);
+		restTemplate.delete(uri);
+	}
+
+	@Override
+	public MLPDocument getDocument(String documentId) {
+		URI uri = buildUri(new String[] { CCDSConstants.DOCUMENT_PATH, documentId }, null, null);
+		logger.debug("getDocument: uri {}", uri);
+		ResponseEntity<MLPDocument> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<MLPDocument>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public MLPDocument createDocument(MLPDocument document) {
+		URI uri = buildUri(new String[] { CCDSConstants.DOCUMENT_PATH }, null, null);
+		logger.debug("createDocument: url {}", uri);
+		return restTemplate.postForObject(uri, document, MLPDocument.class);
+	}
+
+	@Override
+	public void updateDocument(MLPDocument art) {
+		URI uri = buildUri(new String[] { CCDSConstants.DOCUMENT_PATH, art.getDocumentId() }, null, null);
+		logger.debug("updateDocument: uri {}", uri);
+		restTemplate.put(uri, art);
+	}
+
+	@Override
+	public void deleteDocument(String documentId) {
+		URI uri = buildUri(new String[] { CCDSConstants.DOCUMENT_PATH, documentId }, null, null);
+		logger.debug("deleteDocument: url {}", uri);
+		restTemplate.delete(uri);
+	}
+
+	@Override
+	public List<MLPDocument> getSolutionRevisionDocuments(String revisionId, String accessTypeCode) {
+		URI uri = buildUri(new String[] { CCDSConstants.REVISION_PATH, revisionId, CCDSConstants.ACCESS_PATH,
+				accessTypeCode, CCDSConstants.DOCUMENT_PATH }, null, null);
+		logger.debug("getSolutionRevisionDocuments: uri {}", uri);
+		ResponseEntity<List<MLPDocument>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<MLPDocument>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public void addSolutionRevisionDocument(String revisionId, String accessTypeCode, String documentId) {
+		URI uri = buildUri(new String[] { CCDSConstants.REVISION_PATH, revisionId, CCDSConstants.ACCESS_PATH,
+				accessTypeCode, CCDSConstants.DOCUMENT_PATH, documentId }, null, null);
+		logger.debug("addSolutionRevisionDocument: url {}", uri);
+		restTemplate.postForLocation(uri, null);
+	}
+
+	@Override
+	public void dropSolutionRevisionDocument(String revisionId, String accessTypeCode, String documentId) {
+		URI uri = buildUri(new String[] { CCDSConstants.REVISION_PATH, revisionId, CCDSConstants.ACCESS_PATH,
+				accessTypeCode, CCDSConstants.DOCUMENT_PATH, documentId }, null, null);
+		logger.debug("dropSolutionRevisionDocument: url {}", uri);
 		restTemplate.delete(uri);
 	}
 

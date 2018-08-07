@@ -46,6 +46,7 @@ import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPCompSolMap;
+import org.acumos.cds.domain.MLPDocument;
 import org.acumos.cds.domain.MLPNotifUserMap;
 import org.acumos.cds.domain.MLPNotification;
 import org.acumos.cds.domain.MLPPeer;
@@ -60,6 +61,7 @@ import org.acumos.cds.domain.MLPRoleFunction;
 import org.acumos.cds.domain.MLPSiteConfig;
 import org.acumos.cds.domain.MLPSolGrpMemMap;
 import org.acumos.cds.domain.MLPSolRevArtMap;
+import org.acumos.cds.domain.MLPSolRevDocMap;
 import org.acumos.cds.domain.MLPSolTagMap;
 import org.acumos.cds.domain.MLPSolUserAccMap;
 import org.acumos.cds.domain.MLPSolution;
@@ -80,6 +82,7 @@ import org.acumos.cds.domain.MLPUserRoleMap;
 import org.acumos.cds.repository.ArtifactRepository;
 import org.acumos.cds.repository.CommentRepository;
 import org.acumos.cds.repository.CompSolMapRepository;
+import org.acumos.cds.repository.DocumentRepository;
 import org.acumos.cds.repository.NotifUserMapRepository;
 import org.acumos.cds.repository.NotificationRepository;
 import org.acumos.cds.repository.PeerGroupRepository;
@@ -94,6 +97,7 @@ import org.acumos.cds.repository.RoleRepository;
 import org.acumos.cds.repository.SiteConfigRepository;
 import org.acumos.cds.repository.SolGrpMemMapRepository;
 import org.acumos.cds.repository.SolRevArtMapRepository;
+import org.acumos.cds.repository.SolRevDocMapRepository;
 import org.acumos.cds.repository.SolTagMapRepository;
 import org.acumos.cds.repository.SolUserAccMapRepository;
 import org.acumos.cds.repository.SolutionDownloadRepository;
@@ -218,6 +222,10 @@ public class CdsRepositoryServiceTest {
 	private CodeNameService codeNameService;
 	@Autowired
 	private RevisionDescriptionRepository revisionDescRepository;
+	@Autowired
+	private DocumentRepository documentRepository;
+	@Autowired
+	private SolRevDocMapRepository solRevDocMapRepository;
 
 	@Test
 	public void testRepositories() throws Exception {
@@ -463,15 +471,39 @@ public class CdsRepositoryServiceTest {
 			Assert.assertNotNull("Revision ID", cr.getRevisionId());
 			logger.info("Created solution revision " + cr.getRevisionId());
 
+			logger.info("Adding artifact to revision");
+			solRevArtMapRepository.save(new MLPSolRevArtMap(cr.getRevisionId(), ca.getArtifactId()));
+			logger.info("Added" + cr.getRevisionId() + " and " + ca.getArtifactId());
+
 			MLPRevisionDescription revDesc = new MLPRevisionDescription(cr.getRevisionId(), "PB",
 					"Some bogus description");
 			revDesc = revisionDescRepository.save(revDesc);
 			Assert.assertNotNull(revDesc.getCreated());
 			revisionDescRepository.delete(new MLPRevisionDescription.RevDescPK(cr.getRevisionId(), "PB"));
 
-			logger.info("Adding artifact to revision");
-			solRevArtMapRepository.save(new MLPSolRevArtMap(cr.getRevisionId(), ca.getArtifactId()));
-			logger.info("Added" + cr.getRevisionId() + " and " + ca.getArtifactId());
+			MLPDocument doc = new MLPDocument();
+			doc.setName("doc name");
+			doc.setUri("http://doc.uri/");
+			doc.setSize(10);
+			doc.setUserId(cu.getUserId());
+			doc = documentRepository.save(doc);
+			Assert.assertNotNull(doc.getDocumentId());
+			Assert.assertNotNull(doc.getCreated());
+
+			logger.info("Adding document to revision");
+			MLPSolRevDocMap docMap = solRevDocMapRepository
+					.save(new MLPSolRevDocMap(cr.getRevisionId(), "PB", doc.getDocumentId()));
+			Assert.assertNotNull(docMap);
+			
+			Iterable<MLPDocument> docs = documentRepository.findByRevisionAccess(cr.getRevisionId(), "PB");
+			Assert.assertTrue(docs.iterator().hasNext());
+
+			logger.info("Cleaning up revision doc");
+			solRevDocMapRepository.delete(docMap);
+			documentRepository.delete(doc.getDocumentId());
+
+			docs = documentRepository.findByRevisionAccess(cr.getRevisionId(), "PB");
+			Assert.assertFalse(docs.iterator().hasNext());
 
 			logger.info("Finding portal solutions");
 			String[] solKw = { solName };

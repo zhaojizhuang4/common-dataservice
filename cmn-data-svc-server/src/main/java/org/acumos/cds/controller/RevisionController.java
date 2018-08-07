@@ -28,11 +28,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.acumos.cds.CCDSConstants;
 import org.acumos.cds.CodeNameType;
 import org.acumos.cds.domain.MLPArtifact;
+import org.acumos.cds.domain.MLPDocument;
 import org.acumos.cds.domain.MLPRevisionDescription;
 import org.acumos.cds.domain.MLPSolRevArtMap;
+import org.acumos.cds.domain.MLPSolRevDocMap;
 import org.acumos.cds.repository.ArtifactRepository;
+import org.acumos.cds.repository.DocumentRepository;
 import org.acumos.cds.repository.RevisionDescriptionRepository;
 import org.acumos.cds.repository.SolRevArtMapRepository;
+import org.acumos.cds.repository.SolRevDocMapRepository;
 import org.acumos.cds.repository.SolutionRevisionRepository;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.SuccessTransport;
@@ -60,11 +64,15 @@ public class RevisionController extends AbstractController {
 	@Autowired
 	private ArtifactRepository artifactRepository;
 	@Autowired
+	private DocumentRepository documentRepository;
+	@Autowired
 	private SolutionRevisionRepository revisionRepository;
 	@Autowired
 	private RevisionDescriptionRepository revisionDescRepository;
 	@Autowired
 	private SolRevArtMapRepository solRevArtMapRepository;
+	@Autowired
+	private SolRevDocMapRepository solRevDocMapRepository;
 
 	/**
 	 * @param revisionId
@@ -269,4 +277,74 @@ public class RevisionController extends AbstractController {
 		}
 	}
 
+	/**
+	 * @param revisionId
+	 *            revision ID
+	 * @param accessTypeCode
+	 *            access type code
+	 * @param response
+	 *            HttpServletResponse
+	 * @return List of MLPDocument
+	 */
+	@ApiOperation(value = "Gets the documents for the specified revision and access type.", response = MLPDocument.class, responseContainer = "List")
+	@RequestMapping(value = "/{revisionId}/" + CCDSConstants.ACCESS_PATH + "/{accessTypeCode}/"
+			+ CCDSConstants.DOCUMENT_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public Iterable<MLPDocument> getSolRevDocuments(@PathVariable("revisionId") String revisionId,
+			@PathVariable("accessTypeCode") String accessTypeCode, HttpServletResponse response) {
+		Date beginDate = new Date();
+		Iterable<MLPDocument> result = documentRepository.findByRevisionAccess(revisionId, accessTypeCode);
+		logger.audit(beginDate, "getSolRevDocuments: revisionId {} accessType {}", revisionId, accessTypeCode);
+		return result;
+	}
+
+	/**
+	 * @param revisionId
+	 *            revision ID
+	 * @param accessTypeCode
+	 *            access type code
+	 * @param documentId
+	 *            document ID
+	 * @param response
+	 *            HttpServletResponse
+	 * @return Success indicator
+	 */
+	@ApiOperation(value = "Adds a user document to the specified revision and access type.", response = SuccessTransport.class)
+	@RequestMapping(value = "/{revisionId}/" + CCDSConstants.ACCESS_PATH + "/{accessTypeCode}/"
+			+ CCDSConstants.DOCUMENT_PATH + "/{documentId}", method = RequestMethod.POST)
+	@ResponseBody
+	public SuccessTransport addRevisionDocument(@PathVariable("revisionId") String revisionId,
+			@PathVariable("accessTypeCode") String accessTypeCode, @PathVariable("documentId") String documentId,
+			HttpServletResponse response) {
+		Date beginDate = new Date();
+		MLPSolRevDocMap map = new MLPSolRevDocMap(revisionId, accessTypeCode, documentId);
+		solRevDocMapRepository.save(map);
+		logger.audit(beginDate, "addRevisionDocument: revisionId {} accessType {} documentId {}", revisionId,
+				accessTypeCode, documentId);
+		return new SuccessTransport(HttpServletResponse.SC_OK, null);
+	}
+
+	/**
+	 * @param revisionId
+	 *            revision ID
+	 * @param accessTypeCode
+	 *            access type code
+	 * @param documentId
+	 *            document ID
+	 * @param response
+	 *            HttpServletResponse
+	 * @return Success indicator
+	 */
+	@ApiOperation(value = "Removes a document from the specified revision and access type.", response = SuccessTransport.class)
+	@RequestMapping(value = "/{revisionId}/" + CCDSConstants.ACCESS_PATH + "/{accessTypeCode}/"
+			+ CCDSConstants.DOCUMENT_PATH + "/{documentId}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public SuccessTransport dropRevisionDocument(@PathVariable("revisionId") String revisionId,
+			@PathVariable("accessTypeCode") String accessTypeCode, @PathVariable("documentId") String documentId,
+			HttpServletResponse response) {
+		Date beginDate = new Date();
+		solRevDocMapRepository.delete(new MLPSolRevDocMap.SolRevDocMapPK(revisionId, accessTypeCode, documentId));
+		logger.audit(beginDate, "dropRevisionDocument: revisionId {} documentId {}", revisionId, documentId);
+		return new SuccessTransport(HttpServletResponse.SC_OK, null);
+	}
 }

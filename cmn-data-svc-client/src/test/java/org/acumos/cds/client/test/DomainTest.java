@@ -29,6 +29,7 @@ import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPCompSolMap;
 import org.acumos.cds.domain.MLPDeploymentStatus;
+import org.acumos.cds.domain.MLPDocument;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPModelType;
 import org.acumos.cds.domain.MLPNotifUserMap;
@@ -47,6 +48,7 @@ import org.acumos.cds.domain.MLPRoleFunction;
 import org.acumos.cds.domain.MLPSiteConfig;
 import org.acumos.cds.domain.MLPSolGrpMemMap;
 import org.acumos.cds.domain.MLPSolRevArtMap;
+import org.acumos.cds.domain.MLPSolRevDocMap;
 import org.acumos.cds.domain.MLPSolTagMap;
 import org.acumos.cds.domain.MLPSolUserAccMap;
 import org.acumos.cds.domain.MLPSolution;
@@ -195,6 +197,45 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertTrue(pk.equals(pk));
 		Assert.assertFalse(pk.hashCode() == 0);
 		logger.info(pk.toString());
+	}
+
+	private void checkMLPDocument(MLPDocument m) {
+		Assert.assertEquals(d1, m.getCreated());
+		Assert.assertEquals(s1, m.getDocumentId());
+		Assert.assertEquals(d2, m.getModified());
+		Assert.assertEquals(s2, m.getName());
+		Assert.assertEquals(i1, m.getSize());
+		Assert.assertEquals(s3, m.getUri());
+		Assert.assertEquals(s4, m.getUserId());
+		Assert.assertEquals(s5, m.getVersion());
+	}
+
+	@Test
+	public void testMLPDocument() {
+		MLPDocument m = new MLPDocument(s1, s1, s1, i1, s1);
+		m = new MLPDocument();
+		m.setCreated(d1);
+		m.setDocumentId(s1);
+		m.setModified(d2);
+		m.setName(s2);
+		m.setSize(i1);
+		m.setUri(s3);
+		m.setUserId(s4);
+		m.setVersion(s5);
+		checkMLPDocument(m);
+		m = new MLPDocument(m);
+		checkMLPDocument(m);
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		logger.info(m.toString());
+		try {
+			new MLPDocument(null, null, null, 0, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
 	}
 
 	private void checkMLPNotification(MLPNotification m) {
@@ -687,6 +728,42 @@ public class DomainTest extends AbstractModelTest {
 		}
 		MLPSolRevArtMap.SolRevArtMapPK pk = new MLPSolRevArtMap.SolRevArtMapPK();
 		pk = new MLPSolRevArtMap.SolRevArtMapPK(s1, s2);
+		Assert.assertFalse(pk.equals(null));
+		Assert.assertFalse(pk.equals(new Object()));
+		Assert.assertTrue(pk.equals(pk));
+		Assert.assertFalse(pk.hashCode() == 0);
+		logger.info(pk.toString());
+	}
+
+	private void checkMLPSolRevDocMap(MLPSolRevDocMap m) {
+		Assert.assertEquals(s1, m.getAccessTypeCode());
+		Assert.assertEquals(s2, m.getDocumentId());
+		Assert.assertEquals(s3, m.getRevisionId());
+	}
+
+	@Test
+	public void testMLPSolRevDocMap() {
+		MLPSolRevDocMap m = new MLPSolRevDocMap(s1, s1, s1);
+		m = new MLPSolRevDocMap();
+		m.setAccessTypeCode(s1);
+		m.setDocumentId(s2);
+		m.setRevisionId(s3);
+		checkMLPSolRevDocMap(m);
+		m = new MLPSolRevDocMap(m);
+		checkMLPSolRevDocMap(m);
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		logger.info(m.toString());
+		try {
+			new MLPSolRevDocMap(null, null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
+		MLPSolRevDocMap.SolRevDocMapPK pk = new MLPSolRevDocMap.SolRevDocMapPK();
+		pk = new MLPSolRevDocMap.SolRevDocMapPK(s1, s2, s3);
 		Assert.assertFalse(pk.equals(null));
 		Assert.assertFalse(pk.equals(new Object()));
 		Assert.assertTrue(pk.equals(pk));

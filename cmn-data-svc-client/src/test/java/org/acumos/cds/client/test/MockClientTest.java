@@ -29,6 +29,7 @@ import java.util.Map;
 import org.acumos.cds.client.CommonDataServiceRestClientMockImpl;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPComment;
+import org.acumos.cds.domain.MLPDocument;
 import org.acumos.cds.domain.MLPNotification;
 import org.acumos.cds.domain.MLPPasswordChangeRequest;
 import org.acumos.cds.domain.MLPPeer;
@@ -532,6 +533,20 @@ public class MockClientTest {
 		Assert.assertTrue(revDesc == client.createRevisionDescription(revDesc));
 		client.updateRevisionDescription(revDesc);
 		client.deleteRevisionDescription("", "");
+
+		MLPDocument document = new MLPDocument();
+		client.setDocumentById(document);
+		Assert.assertTrue(document == client.getDocument("id"));
+		client.setDocument(document);
+		Assert.assertTrue(document == client.createDocument(document));
+		client.updateDocument(document);
+		client.deleteDocument("id");
+
+		List<MLPDocument> docList = new ArrayList<>();
+		client.setSolutionRevisionDocuments(docList);
+		Assert.assertTrue(docList == client.getSolutionRevisionDocuments("id", "id"));
+		client.addSolutionRevisionDocument("id", "id", "id");
+		client.dropSolutionRevisionDocument("id", "id", "id");
 
 	}
 

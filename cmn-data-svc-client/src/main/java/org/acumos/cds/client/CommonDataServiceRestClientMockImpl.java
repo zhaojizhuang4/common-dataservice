@@ -43,6 +43,7 @@ import org.acumos.cds.domain.MLPArtifactType;
 import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
+import org.acumos.cds.domain.MLPDocument;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPModelType;
 import org.acumos.cds.domain.MLPNotification;
@@ -213,6 +214,9 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private RestPageResponse<MLPSolution> userSolutions;
 	private long solutionRevisionCommentCount;
 	private MLPRevisionDescription description;
+	private MLPDocument document;
+	private MLPDocument documentById;
+	private List<MLPDocument> solutionRevisionDocuments;
 
 	/**
 	 * No-argument constructor.
@@ -1740,6 +1744,53 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	@Override
 	public void deleteRevisionDescription(String revisionId, String accessTypeCode) {
 		// How to mock?
+	}
+
+	public void setDocumentById(MLPDocument document) {
+		this.documentById = document;
+	}
+
+	@Override
+	public MLPDocument getDocument(String documentId) {
+		return this.documentById;
+	}
+
+	public void setDocument(MLPDocument document) {
+		this.document = document;
+	}
+
+	@Override
+	public MLPDocument createDocument(MLPDocument document) {
+		return this.document;
+	}
+
+	@Override
+	public void updateDocument(MLPDocument document) {
+		this.document = document;
+	}
+
+	@Override
+	public void deleteDocument(String documentId) {
+		// How to mock?
+	}
+
+	public void setSolutionRevisionDocuments(List<MLPDocument> documents) {
+		this.solutionRevisionDocuments = documents;
+	}
+
+	@Override
+	public List<MLPDocument> getSolutionRevisionDocuments(String revisionId, String accessTypeCode) {
+		return solutionRevisionDocuments;
+	}
+
+	@Override
+	public void addSolutionRevisionDocument(String revisionId, String accessTypeCode, String documentId) {
+		// what to mock?
+	}
+
+	@Override
+	public void dropSolutionRevisionDocument(String revisionId, String accessTypeCode, String documentId) {
+		// what to mock?
 	}
 
 }

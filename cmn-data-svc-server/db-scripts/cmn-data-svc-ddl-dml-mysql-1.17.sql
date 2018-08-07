@@ -16,7 +16,7 @@
 -- limitations under the License.
 -- ===============LICENSE_END=========================================================
 
--- DDL and DML for tables managed by the Common Data Service version 1.16.x
+-- DDL and DML for tables managed by the Common Data Service version 1.17.x
 -- No database is created or specified to allow flexible deployment;
 -- also see script cmn-data-svc-base-mysql.sql.
 
@@ -185,6 +185,7 @@ CREATE TABLE C_SOLUTION_REV (
   CONSTRAINT C_SOLUTION_REV_C_PEER FOREIGN KEY (SOURCE_ID) REFERENCES C_PEER (PEER_ID)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- System-generated content stored in Nexus
 CREATE TABLE C_ARTIFACT (
   ARTIFACT_ID CHAR(36) NOT NULL PRIMARY KEY,
   VERSION VARCHAR(25) NOT NULL,
@@ -461,6 +462,29 @@ CREATE TABLE C_REVISION_DESC (
   CONSTRAINT C_REV_DESC_C_REVISION FOREIGN KEY (REVISION_ID) REFERENCES C_SOLUTION_REV (REVISION_ID)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- User-generated content stored in Nexus
+CREATE TABLE C_DOCUMENT (
+  DOCUMENT_ID CHAR(36) NOT NULL PRIMARY KEY,
+  NAME VARCHAR(100) NOT NULL,
+  URI VARCHAR(512) NOT NULL,
+  VERSION VARCHAR(25),
+  SIZE INT NOT NULL,
+  USER_ID CHAR(36) NOT NULL,
+  CREATED_DATE TIMESTAMP NOT NULL DEFAULT 0,
+  MODIFIED_DATE TIMESTAMP NOT NULL,
+  CONSTRAINT C_DOCUMENT_C_USER FOREIGN KEY (USER_ID) REFERENCES C_USER (USER_ID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Many:many mapping of solution_rev to document requires a map (join) table
+CREATE TABLE C_SOL_REV_DOC_MAP (
+  REVISION_ID CHAR(36) NOT NULL,
+  ACCESS_TYPE_CD CHAR(2) NOT NULL,
+  DOCUMENT_ID CHAR(36) NOT NULL,
+  PRIMARY KEY (REVISION_ID, ACCESS_TYPE_CD, DOCUMENT_ID),
+  CONSTRAINT C_REV_DOC_MAP_C_SOLUTION_REV FOREIGN KEY (REVISION_ID) REFERENCES C_SOLUTION_REV (REVISION_ID),
+  CONSTRAINT C_REV_DOC_MAP_C_REV_DOC      FOREIGN KEY (DOCUMENT_ID) REFERENCES C_DOCUMENT (DOCUMENT_ID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- For tracking create/upgrade/downgrade; no Java entity
 CREATE TABLE C_HISTORY (
   ID INT PRIMARY KEY AUTO_INCREMENT,
@@ -480,9 +504,10 @@ INSERT INTO C_SITE_CONFIG (CONFIG_KEY, CONFIG_VAL) VALUES (
   '{"fields":[{"type":"text","name":"siteInstanceName","label":"Site Instance Name","required":"true","data":"Acumos"}, {"type":"file","name":"headerLogo","label":"Header Logo","data":{"lastModified":1510831880727,"lastModifiedDate":"2017-11-16T11:31:20.727Z","name":"acumos_logo_white.png","size":3657,"type":"image/png"}},{"type":"file","name":"footerLogo","label":"Footer Logo","data":{"lastModified":1510831874776,"lastModifiedDate":"2017-11-16T11:31:14.776Z","name":"footer_logo.png","size":3127,"type":"image/png"}},{"type":"heading","name":"ConnectionConfig","label":"Connection Configuration","required":"true","subFields":[{"type":"text","name":"socketTimeout","label":"Socket Timeout","required":"true","data":"300"},{"type":"text","name":"connectionTimeout","label":"Connection Timeout","required":"true","data":"10"}]},{"type":"select","name":"enableOnBoarding","label":"Enable On-Boarding","options":[{"name":"Enabled"},{"name":"Disabled"}],"required":true,"data":{"name":"Enabled"}},{"type":"textarea","name":"validationText","label":"Model Validation Keyword Scan Entries (CSV)","required":"false","data":"test"},{"type":"select","name":"EnableDCAE","label":"Enable DCAE","options":[{"name":"Enabled"},{"name":"Disabled"}],"required":true,"data":{"name":"Enabled"}}]}'
 );
 
-# Initial user, role setups for admin
+-- Initial user, role setups for admin
 INSERT INTO C_USER (USER_ID, LOGIN_NAME, LOGIN_HASH, FIRST_NAME, LAST_NAME, EMAIL) VALUES ('12345678-abcd-90ab-cdef-1234567890ab', 'admin', '$2a$10$nogCM69/Vc0rEsZbHXlEm.nxSdGuD88Kd6NlW6fnKJz3AIz0PdOwa', 'Acumos', 'Admin', 'noreply@acumos.org');
 
+-- Role name is case sensitive
 INSERT INTO C_ROLE (ROLE_ID, NAME, ACTIVE_YN) VALUES ('8c850f07-4352-4afd-98b1-00cbceca569f', 'Admin', 'Y');
 
 INSERT INTO C_USER_ROLE_MAP (USER_ID, ROLE_ID) VALUES ('12345678-abcd-90ab-cdef-1234567890ab', '8c850f07-4352-4afd-98b1-00cbceca569f');

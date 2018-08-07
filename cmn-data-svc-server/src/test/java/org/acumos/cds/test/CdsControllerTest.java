@@ -53,6 +53,7 @@ import org.acumos.cds.domain.MLPArtifactType;
 import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.domain.MLPComment;
 import org.acumos.cds.domain.MLPDeploymentStatus;
+import org.acumos.cds.domain.MLPDocument;
 import org.acumos.cds.domain.MLPLoginProvider;
 import org.acumos.cds.domain.MLPModelType;
 import org.acumos.cds.domain.MLPNotification;
@@ -719,6 +720,24 @@ public class CdsControllerTest {
 			revDescPb = client.createRevisionDescription(revDescPb);
 			Assert.assertNotNull(revDescPb.getCreated());
 
+			logger.info("Creating user document");
+			MLPDocument doc = new MLPDocument();
+			doc.setName("some name");
+			doc.setUri("http://other.user.doc.uri");
+			doc.setSize(100);
+			doc.setUserId(cu.getUserId());
+			doc = client.createDocument(doc);
+			Assert.assertNotNull(doc.getDocumentId());
+			client.updateDocument(doc);
+			doc = client.getDocument(doc.getDocumentId());
+			Assert.assertNotNull(doc);
+
+			final String orgAccessType = "OR";
+			logger.info("Associating description to rev 1 at access type OR");
+			client.addSolutionRevisionDocument(cr.getRevisionId(), orgAccessType, doc.getDocumentId());
+			List<MLPDocument> dl = client.getSolutionRevisionDocuments(cr.getRevisionId(), orgAccessType);
+			Assert.assertFalse(dl.isEmpty());
+
 			logger.info("Querying for revisions by solution");
 			List<MLPSolutionRevision> revs = client.getSolutionRevisions(new String[] { s.getSolutionId() });
 			Assert.assertTrue(revs != null && revs.size() > 0);
@@ -918,6 +937,8 @@ public class CdsControllerTest {
 
 			if (cleanup) {
 				logger.info("Deleting newly created instances");
+				client.dropSolutionRevisionDocument(cr.getRevisionId(), "OR", doc.getDocumentId());
+				client.deleteDocument(doc.getDocumentId());
 				client.deleteRevisionDescription(cr.getRevisionId(), "OR");
 				client.deleteRevisionDescription(cr.getRevisionId(), "PB");
 				client.dropSolutionTag(cs.getSolutionId(), tagName1);
