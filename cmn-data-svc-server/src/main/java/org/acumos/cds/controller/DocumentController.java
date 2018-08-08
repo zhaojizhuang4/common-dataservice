@@ -21,7 +21,6 @@
 package org.acumos.cds.controller;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Date;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
@@ -32,9 +31,11 @@ import org.acumos.cds.repository.DocumentRepository;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
-import org.acumos.cds.util.EELFLoggerDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,10 +49,10 @@ import io.swagger.annotations.ApiOperation;
  * Answers REST requests to get, create, update and delete documents.
  */
 @Controller
-@RequestMapping(value = "/" + CCDSConstants.DOCUMENT_PATH, produces = CCDSConstants.APPLICATION_JSON)
+@RequestMapping(value = "/" + CCDSConstants.DOCUMENT_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 public class DocumentController extends AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private DocumentRepository documentRepository;
@@ -67,9 +68,8 @@ public class DocumentController extends AbstractController {
 	@RequestMapping(value = "/{documentId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getDocument(@PathVariable("documentId") String documentId, HttpServletResponse response) {
-		Date beginDate = new Date();
+		logger.info("getDocument ID {}", documentId);
 		MLPDocument da = documentRepository.findOne(documentId);
-		logger.audit(beginDate, "getDocument ID {}", documentId);
 		if (da == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + documentId, null);
@@ -89,7 +89,7 @@ public class DocumentController extends AbstractController {
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createDocument(@RequestBody MLPDocument document, HttpServletResponse response) {
-		Date beginDate = new Date();
+		logger.info("createDocument document {}", document);
 		try {
 			String id = document.getDocumentId();
 			if (id != null) {
@@ -104,12 +104,11 @@ public class DocumentController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			// This is a hack to create the location path.
 			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.DOCUMENT_PATH + "/" + document.getDocumentId());
-			logger.audit(beginDate, "createDocument ID {}", document.getDocumentId());
 			return result;
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createDocument failed: {}", cve.toString());
+			logger.warn("createDocument failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createDocument failed", cve);
 		}
@@ -129,7 +128,7 @@ public class DocumentController extends AbstractController {
 	@ResponseBody
 	public Object updateDocument(@PathVariable("documentId") String documentId, @RequestBody MLPDocument document,
 			HttpServletResponse response) {
-		Date beginDate = new Date();
+		logger.info("updateDocument ID {}", documentId);
 		// Check for existing because the Hibernate save() method doesn't distinguish
 		MLPDocument existing = documentRepository.findOne(documentId);
 		if (existing == null) {
@@ -142,12 +141,11 @@ public class DocumentController extends AbstractController {
 			// Update the existing row
 			documentRepository.save(document);
 			Object result = new SuccessTransport(HttpServletResponse.SC_OK, null);
-			logger.audit(beginDate, "updateDocument ID {}", documentId);
 			return result;
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateDocument failed: {}", cve.toString());
+			logger.warn("updateDocument failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateDocument failed", cve);
 		}
@@ -166,14 +164,13 @@ public class DocumentController extends AbstractController {
 	@ResponseBody
 	public MLPTransportModel deleteDocument(@PathVariable("documentId") String documentId,
 			HttpServletResponse response) {
-		Date beginDate = new Date();
+		logger.info("deleteDocument ID {}", documentId);
 		try {
 			documentRepository.delete(documentId);
-			logger.audit(beginDate, "deleteDocument ID {}", documentId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteDocument failed: {}", ex.toString());
+			logger.warn("deleteDocument failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteDocument failed", ex);
 		}

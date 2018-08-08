@@ -26,6 +26,7 @@ Maven Nexus repository. The server is deployed as a Docker image to a Docker reg
 Version 1.17.2, 17 Aug 2018
 ---------------------------
 
+* Revise logging for ONAP recommended output pattern (ACUMOS-625)
 * Revise message sent when user is locked out temporarily (ACUMOS-1597)
 * Requires database schema version 1.17
 

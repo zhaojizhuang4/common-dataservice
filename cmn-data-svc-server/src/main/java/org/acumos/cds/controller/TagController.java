@@ -21,7 +21,6 @@
 package org.acumos.cds.controller;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,10 +30,12 @@ import org.acumos.cds.repository.TagRepository;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
-import org.acumos.cds.util.EELFLoggerDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,10 +49,10 @@ import io.swagger.annotations.ApiOperation;
  * Provides methods to create and delete tags for solutions.
  */
 @Controller
-@RequestMapping("/" + CCDSConstants.TAG_PATH)
+@RequestMapping(value = "/" + CCDSConstants.TAG_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 public class TagController extends AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private TagRepository tagRepository;
@@ -65,9 +66,8 @@ public class TagController extends AbstractController {
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPTag> getTags(Pageable pageable) {
-		Date beginDate = new Date();
+		logger.info("getTags: {}", pageable);
 		Page<MLPTag> result = tagRepository.findAll(pageable);
-		logger.audit(beginDate, "getTags: {}", pageable);
 		return result;
 	}
 
@@ -82,19 +82,18 @@ public class TagController extends AbstractController {
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createTag(@RequestBody MLPTag tag, HttpServletResponse response) {
-		Date beginDate = new Date();
+		logger.info("createTag: tag {}", tag);
 		if (tagRepository.findOne(tag.getTag()) != null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Tag exists: " + tag, null);
 		}
 		try {
 			Object result = tagRepository.save(tag);
-			logger.audit(beginDate, "createTag: tag {}", tag);
 			return result;
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createTag failed: {}", cve.toString());
+			logger.warn("createTag failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createTag failed", cve);
 		}
@@ -111,14 +110,13 @@ public class TagController extends AbstractController {
 	@RequestMapping(value = "/{tag}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteTag(@PathVariable("tag") String tag, HttpServletResponse response) {
-		Date beginDate = new Date();
+		logger.info("deleteTag: tag {}", tag);
 		try {
 			tagRepository.delete(tag);
-			logger.audit(beginDate, "deleteTag: tag {}", tag);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteTag failed: {}", ex.toString());
+			logger.warn("deleteTag failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteTag failed", ex);
 		}

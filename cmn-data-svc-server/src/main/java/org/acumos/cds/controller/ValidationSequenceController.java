@@ -21,7 +21,6 @@
 package org.acumos.cds.controller;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,9 +32,11 @@ import org.acumos.cds.repository.ValidationSequenceRepository;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
-import org.acumos.cds.util.EELFLoggerDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,10 +52,10 @@ import io.swagger.annotations.ApiOperation;
  * clients that don't use the provided Java client.
  */
 @Controller
-@RequestMapping("/" + CCDSConstants.VAL_SEQ_PATH)
+@RequestMapping(value = "/" + CCDSConstants.VAL_SEQ_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 public class ValidationSequenceController extends AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private ValidationSequenceRepository validationSequenceRepository;
@@ -66,9 +67,8 @@ public class ValidationSequenceController extends AbstractController {
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPValidationSequence> getValidationSequenceList() {
-		Date beginDate = new Date();
+		logger.info("getValidationSequenceList");
 		Iterable<MLPValidationSequence> result = validationSequenceRepository.findAll();
-		logger.audit(beginDate, "getValidationSequenceList");
 		return result;
 	}
 
@@ -91,7 +91,7 @@ public class ValidationSequenceController extends AbstractController {
 	public Object createValidationSequence(@PathVariable("sequence") Integer sequence,
 			@PathVariable("valTypeCode") String valTypeCode, @RequestBody MLPValidationSequence valSeq,
 			HttpServletResponse response) {
-		Date beginDate = new Date();
+		logger.info("createValidationSequence: sequence {} valTypeCode {}", sequence, valTypeCode);
 		try {
 			// Validate enum code
 			super.validateCode(valTypeCode, CodeNameType.VALIDATION_TYPE);
@@ -103,12 +103,11 @@ public class ValidationSequenceController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			// This is a hack to create the location path.
 			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.VAL_SEQ_PATH);
-			logger.audit(beginDate, "createValidationSequence: sequence {} valTypeCode {}", sequence, valTypeCode);
 			return result;
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createValidationSequence failed: {}", cve.toString());
+			logger.warn("createValidationSequence failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createValidationSequence failed", cve);
 		}
@@ -129,16 +128,15 @@ public class ValidationSequenceController extends AbstractController {
 	@ResponseBody
 	public MLPTransportModel deleteValidationSequence(@PathVariable("sequence") Integer sequence,
 			@PathVariable("valTypeCode") String valTypeCode, HttpServletResponse response) {
-		Date beginDate = new Date();
+		logger.info("deleteValidationSequence: sequence {} valTypeCode {}", sequence, valTypeCode);
 		try {
 			// Build a key for fetch
 			ValidationSequencePK pk = new ValidationSequencePK(sequence, valTypeCode);
 			validationSequenceRepository.delete(pk);
-			logger.audit(beginDate, "deleteValidationSequence: sequence {} valTypeCode {}", sequence, valTypeCode);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteValidationSequence failed: {}", ex.toString());
+			logger.warn("deleteValidationSequence failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteValidationSequence failed", ex);
 		}

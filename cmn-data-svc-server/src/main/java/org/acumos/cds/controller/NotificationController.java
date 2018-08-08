@@ -21,7 +21,6 @@
 package org.acumos.cds.controller;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Date;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
@@ -33,11 +32,13 @@ import org.acumos.cds.transport.CountTransport;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
-import org.acumos.cds.util.EELFLoggerDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,10 +56,10 @@ import io.swagger.annotations.ApiOperation;
  * https://stackoverflow.com/questions/942951/rest-api-error-return-good-practices
  */
 @Controller
-@RequestMapping("/" + CCDSConstants.NOTIFICATION_PATH)
+@RequestMapping(value = "/" + CCDSConstants.NOTIFICATION_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 public class NotificationController extends AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private NotificationRepository notificationRepository;
@@ -70,9 +71,8 @@ public class NotificationController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public CountTransport getNotificationCount() {
-		Date beginDate = new Date();
+		logger.info("getNotificationCount");
 		Long count = notificationRepository.count();
-		logger.audit(beginDate, "getNotificationCount");
 		return new CountTransport(count);
 	}
 
@@ -86,9 +86,8 @@ public class NotificationController extends AbstractController {
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPNotification> getNotifications(Pageable pageable) {
-		Date beginDate = new Date();
+		logger.info("getNotifications: request {} ", pageable);
 		Page<MLPNotification> result = notificationRepository.findAll(pageable);
-		logger.audit(beginDate, "getNotifications: request {} ", pageable);
 		return result;
 	}
 
@@ -104,7 +103,7 @@ public class NotificationController extends AbstractController {
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createNotification(@RequestBody MLPNotification notif, HttpServletResponse response) {
-		Date beginDate = new Date();
+		logger.info("createNotification: notification {} ", notif);
 		try {
 			String id = notif.getNotificationId();
 			if (id != null) {
@@ -119,12 +118,11 @@ public class NotificationController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			// This is a hack to create the location path.
 			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.NOTIFICATION_PATH + "/" + notif.getNotificationId());
-			logger.audit(beginDate, "createNotification: notificationID {} ", notif.getNotificationId());
 			return result;
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "createNotification failed: {}", cve.toString());
+			logger.warn("createNotification failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createNotification failed", cve);
 		}
@@ -144,7 +142,7 @@ public class NotificationController extends AbstractController {
 	@ResponseBody
 	public Object updateNotification(@PathVariable("notificationId") String notifId, @RequestBody MLPNotification notif,
 			HttpServletResponse response) {
-		Date beginDate = new Date();
+		logger.info("updateNotification: notifId {} ", notifId);
 		// Get the existing one
 		MLPNotification existing = notificationRepository.findOne(notifId);
 		if (existing == null) {
@@ -156,12 +154,11 @@ public class NotificationController extends AbstractController {
 			notif.setNotificationId(notifId);
 			// Update the existing row
 			notificationRepository.save(notif);
-			logger.audit(beginDate, "updateNotification: notifId {} ", notifId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn(EELFLoggerDelegate.errorLogger, "updateNotification failed: {}", cve.toString());
+			logger.warn("updateNotification failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateNotification failed", cve);
 		}
@@ -179,14 +176,13 @@ public class NotificationController extends AbstractController {
 	@ResponseBody
 	public MLPTransportModel deleteNotification(@PathVariable("notificationId") String notifId,
 			HttpServletResponse response) {
-		Date beginDate = new Date();
+		logger.info("deleteNotification: notifId {} ", notifId);
 		try {
 			notificationRepository.delete(notifId);
-			logger.audit(beginDate, "deleteNotification: notifId {} ", notifId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "deleteNotification failed: {}", ex.toString());
+			logger.warn("deleteNotification failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteNotification failed", ex);
 		}

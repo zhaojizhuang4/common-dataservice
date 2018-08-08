@@ -30,7 +30,6 @@ import javax.transaction.Transactional;
 
 import org.acumos.cds.domain.MLPSolution;
 import org.acumos.cds.domain.MLPSolutionFOM;
-import org.acumos.cds.util.EELFLoggerDelegate;
 import org.hibernate.AssertionFailure;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
@@ -40,6 +39,8 @@ import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -75,7 +76,7 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl implements SolutionSearchService {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -98,7 +99,6 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 	public Page<MLPSolution> findSolutions(Map<String, ? extends Object> queryParameters, boolean isOr,
 			Pageable pageable) {
 
-		Date beginDate = new Date();
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolution.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 
@@ -123,7 +123,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 		// Get a page of results and send it back with the total available
 		List<MLPSolution> items = criteria.list();
-		logger.audit(beginDate, "findSolutions: result size={}", items.size());
+		logger.info("findSolutions: result size={}", items.size());
 		return new PageImpl<>(items, pageable, count);
 	}
 
@@ -184,7 +184,6 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			String[] userIds, String[] modelTypeCode, String[] accessTypeCode, String[] validationStatusCode,
 			String[] tags, String[] authorKeywords, String[] publisherKeywords, Pageable pageable) {
 
-		Date beginDate = new Date();
 		// build the query using FOM to access child attributes
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
 		// Attributes on the solution
@@ -219,7 +218,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			criteria.add(Restrictions.in(tagAlias + ".tag", tags));
 		}
 		Page<MLPSolution> result = runSolutionFomQuery(criteria, pageable);
-		logger.audit(beginDate, "findPortalSolutions: result size={}", result.getNumberOfElements());
+		logger.info("findPortalSolutions: result size={}", result.getNumberOfElements());
 		return result;
 	}
 
@@ -240,7 +239,6 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			String userId, String[] modelTypeCode, String[] accessTypeCode, String[] validationStatusCode,
 			String[] tags, Pageable pageable) {
 
-		Date beginDate = new Date();
 		// build the query using FOM to access child attributes
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
 		// Find user's own models AND others via access map which requires outer join
@@ -272,7 +270,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			criteria.add(Restrictions.in(tagAlias + ".tag", tags));
 		}
 		Page<MLPSolution> result = runSolutionFomQuery(criteria, pageable);
-		logger.audit(beginDate, "findUserSolutions: result size={}", result.getNumberOfElements());
+		logger.info("findUserSolutions: result size={}", result.getNumberOfElements());
 		return result;
 	}
 
@@ -288,7 +286,6 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 	public Page<MLPSolution> findSolutionsByModifiedDate(boolean active, String[] accessTypeCode,
 			String[] validationStatusCode, Date date, Pageable pageable) {
 
-		Date beginDate = new Date();
 		// build the query using FOM to access child attributes
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
 		// A solution should ALWAYS have revisions.
@@ -313,7 +310,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		criteria.add(itemModifiedAfter);
 
 		Page<MLPSolution> result = runSolutionFomQuery(criteria, pageable);
-		logger.audit(beginDate, "findSolutionsByModifiedDate: result size={}", result.getNumberOfElements());
+		logger.info("findSolutionsByModifiedDate: result size={}", result.getNumberOfElements());
 		return result;
 	}
 

@@ -22,7 +22,8 @@ package org.acumos.cds.config;
 
 import java.lang.invoke.MethodHandles;
 
-import org.acumos.cds.util.EELFLoggerDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContextRefreshedListener implements ApplicationListener<ContextRefreshedEvent> {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Value("${spring.datasource.url}")
 	private String dbUrl;

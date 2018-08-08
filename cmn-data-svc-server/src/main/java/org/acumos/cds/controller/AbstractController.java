@@ -32,7 +32,8 @@ import java.util.Set;
 
 import org.acumos.cds.CodeNameType;
 import org.acumos.cds.service.CodeNameService;
-import org.acumos.cds.util.EELFLoggerDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
 
@@ -43,7 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public abstract class AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private CodeNameService codeNameService;
@@ -101,7 +102,7 @@ public abstract class AbstractController {
 		Set<String> fieldNames = new HashSet<>();
 		fieldNames.addAll(queryParameters.keySet());
 		while (clazz != null) {
-			logger.trace(EELFLoggerDelegate.debugLogger, "convertQueryParameters: checking class {}", clazz.getName());
+			logger.trace("convertQueryParameters: checking class {}", clazz.getName());
 			Field[] fields = clazz.getDeclaredFields();
 			Iterator<Map.Entry<String, List<String>>> iter = queryParameters.entrySet().iterator();
 			while (iter.hasNext()) {
@@ -116,8 +117,7 @@ public abstract class AbstractController {
 					}
 				if (f == null)
 					continue;
-				logger.trace(EELFLoggerDelegate.debugLogger, "convertQueryParameters: field {} type is {}", f.getName(),
-						f.getType());
+				logger.trace("convertQueryParameters: field {} type is {}", f.getName(), f.getType());
 				if (f.getType().equals(String.class)) {
 					if (queryParm.getValue().size() == 1)
 						convertedQryParm.put(queryParm.getKey(), queryParm.getValue().get(0));

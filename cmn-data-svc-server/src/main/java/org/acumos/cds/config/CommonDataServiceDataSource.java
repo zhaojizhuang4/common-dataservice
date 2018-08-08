@@ -24,7 +24,8 @@ import java.lang.invoke.MethodHandles;
 
 import javax.sql.DataSource;
 
-import org.acumos.cds.util.EELFLoggerDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -36,7 +37,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommonDataServiceDataSource {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Value("${spring.database.driver.classname}")
 	private String dbDriverClassName;

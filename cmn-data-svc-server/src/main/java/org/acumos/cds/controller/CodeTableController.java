@@ -22,7 +22,6 @@ package org.acumos.cds.controller;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -32,8 +31,10 @@ import org.acumos.cds.CodeNameType;
 import org.acumos.cds.domain.MLPCodeNamePair;
 import org.acumos.cds.service.CodeNameService;
 import org.acumos.cds.transport.ErrorTransport;
-import org.acumos.cds.util.EELFLoggerDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,10 +48,10 @@ import io.swagger.annotations.ApiOperation;
  * property sources.
  */
 @Controller
-@RequestMapping("/" + CCDSConstants.CODE_PATH)
+@RequestMapping(value = "/" + CCDSConstants.CODE_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 public class CodeTableController extends AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private CodeNameService codeNameService;
@@ -63,12 +64,11 @@ public class CodeTableController extends AbstractController {
 	@RequestMapping(value = "/" + CCDSConstants.PAIR_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public List<String> getValueSetNames() {
-		Date beginDate = new Date();
+		logger.info("getValueSetNames");
 		List<String> list = new ArrayList<>();
 		for (CodeNameType cn : CodeNameType.values()) {
 			list.add(cn.name());
 		}
-		logger.audit(beginDate, "getValueSetNames");
 		return list;
 	}
 
@@ -84,16 +84,15 @@ public class CodeTableController extends AbstractController {
 	@ResponseBody
 	public Object getCodeNamePairs(@PathVariable(CCDSConstants.NAME_PATH) String valueSetName,
 			HttpServletResponse response) {
-		Date beginDate = new Date();
+		logger.info("getCodeNamePairs {}", valueSetName);
 		CodeNameType type;
 		try {
 			type = CodeNameType.valueOf(valueSetName);
 			Object result = codeNameService.getCodeNamePairs(type);
-			logger.audit(beginDate, "getCodeNamePairs {}", valueSetName);
 			return result;
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn(EELFLoggerDelegate.errorLogger, "getCodeNamePairs failed: {}", ex.toString());
+			logger.warn("getCodeNamePairs failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Unexpected value set name " + valueSetName);
 		}

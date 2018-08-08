@@ -23,7 +23,8 @@ package org.acumos.cds;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
-import org.acumos.cds.util.EELFLoggerDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -39,7 +40,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootApplication
 public class CdsApplication implements ApplicationContextAware {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	public static final String CONFIG_ENV_VAR_NAME = "SPRING_APPLICATION_JSON";
 
@@ -47,10 +48,6 @@ public class CdsApplication implements ApplicationContextAware {
 	 * Emits a message about the environment configuration. Runs only when started
 	 * on the command line via java -jar ..; does not run when started by test use
 	 * of Spring Runner.
-	 * 
-	 * This method uses the default logger (i.e., does not select the application or
-	 * debug logger) at level info to ensure its messages appear at startup on
-	 * stdout.
 	 * 
 	 * @param args
 	 *            Command line

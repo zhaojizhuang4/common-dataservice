@@ -24,7 +24,7 @@
 	<!-- Basic logback configuration for the Common Data Service client
 		ONLY FOR DEV AND TEST - this file is not packaged with the jar. -->
 		
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder 
 			by default -->
 		<encoder>
@@ -34,7 +34,7 @@
 	</appender>
 
 	<root level="debug">
-		<appender-ref ref="STDOUT" />
+		<appender-ref ref="console" />
 	</root>
 
 	<!-- Apache HttpClient has verbose debug output; silence it -->

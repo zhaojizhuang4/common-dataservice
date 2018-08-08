@@ -23,10 +23,7 @@ package org.acumos.cds;
 /**
  * Publishes constants for the CCDS server and client.
  */
-public abstract class CCDSConstants {
-
-	// Seems like this should available somewhere
-	public static final String APPLICATION_JSON = "application/json";
+public interface CCDSConstants {
 
 	public static final String X_REQUEST_ID = "X-Request-ID";
 
@@ -107,9 +104,5 @@ public abstract class CCDSConstants {
 	public static final String SEARCH_DATE = "datems";
 	public static final String SEARCH_AUTH = "auth";
 	public static final String SEARCH_PUB = "pub";
-
-	// Sonar wants a private constructor, placed after all fields
-	private CCDSConstants() {
-	}
 
 }

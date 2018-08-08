@@ -21,15 +21,16 @@
 package org.acumos.cds.controller;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Date;
 
 import org.acumos.cds.CCDSConstants;
 import org.acumos.cds.CdsApplication;
 import org.acumos.cds.repository.ArtifactRepository;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
-import org.acumos.cds.util.EELFLoggerDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,10 +42,10 @@ import io.swagger.annotations.ApiOperation;
  * Answers REST requests for the service health.
  */
 @Controller
-@RequestMapping(value = "/", produces = CCDSConstants.APPLICATION_JSON)
+@RequestMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
 public class HealthcheckController extends AbstractController {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private ArtifactRepository artifactRepository;
@@ -56,9 +57,8 @@ public class HealthcheckController extends AbstractController {
 	@RequestMapping(value = CCDSConstants.HEALTHCHECK_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public MLPTransportModel getHealth() {
-		Date beginDate = new Date();
+		logger.info("getHealth enter");
 		long count = artifactRepository.count();
-		logger.audit(beginDate, "getHealth");
 		return new SuccessTransport(200, "database reports artifact count is " + count);
 	}
 
@@ -70,12 +70,11 @@ public class HealthcheckController extends AbstractController {
 	@RequestMapping(value = CCDSConstants.VERSION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public MLPTransportModel getVersion() {
-		Date beginDate = new Date();
+		logger.info("getVersion enter");
 		String className = this.getClass().getSimpleName() + ".class";
 		String classPath = this.getClass().getResource(className).toString();
 		String version = classPath.startsWith("jar") ? CdsApplication.class.getPackage().getImplementationVersion()
 				: "no version, classpath is not jar";
-		logger.audit(beginDate, "getVersion");
 		return new SuccessTransport(200, version);
 	}
 

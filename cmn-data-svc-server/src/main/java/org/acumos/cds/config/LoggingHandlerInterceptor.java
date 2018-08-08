@@ -27,10 +27,9 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.acumos.cds.logging.ONAPLogConstants;
 import org.slf4j.MDC;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
-import com.att.eelf.configuration.Configuration;
 
 /**
  * Adds request details to the mapped diagnostic context (MDC) so they can be
@@ -51,11 +50,12 @@ public class LoggingHandlerInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		addKey(Configuration.MDC_SERVER_IP_ADDRESS, InetAddress.getLocalHost().getHostAddress());
-		addKey(Configuration.MDC_REMOTE_HOST, request.getRemoteAddr());
+
+		addKey(ONAPLogConstants.MDCs.SERVER_FQDN, InetAddress.getLocalHost().getCanonicalHostName());
+		addKey(ONAPLogConstants.MDCs.CLIENT_IP_ADDRESS, request.getRemoteAddr());
 		final String requestId = request.getHeader("X-Request-ID");
 		if (requestId != null)
-			addKey(Configuration.MDC_KEY_REQUEST_ID, requestId);
+			addKey(ONAPLogConstants.MDCs.REQUEST_ID, requestId);
 		return true;
 	}
 

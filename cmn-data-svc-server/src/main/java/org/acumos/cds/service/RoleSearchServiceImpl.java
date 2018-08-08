@@ -28,10 +28,11 @@ import java.util.Map;
 import javax.transaction.Transactional;
 
 import org.acumos.cds.domain.MLPRole;
-import org.acumos.cds.util.EELFLoggerDelegate;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -46,7 +47,7 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class RoleSearchServiceImpl extends AbstractSearchServiceImpl implements RoleSearchService {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -70,7 +71,7 @@ public class RoleSearchServiceImpl extends AbstractSearchServiceImpl implements 
 
 		// Get a page of results and send it back with the total available
 		List<MLPRole> items = criteria.list();
-		logger.debug(EELFLoggerDelegate.debugLogger, "getRoles: result size={}", items.size());
+		logger.debug("getRoles: result size={}", items.size());
 		return new PageImpl<>(items, pageable, count);
 	}
 

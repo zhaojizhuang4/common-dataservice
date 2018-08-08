@@ -121,10 +121,11 @@ import org.acumos.cds.service.SolutionSearchService;
 import org.acumos.cds.service.StepResultSearchService;
 import org.acumos.cds.service.UserSearchService;
 import org.acumos.cds.transport.AuthorTransport;
-import org.acumos.cds.util.EELFLoggerDelegate;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -142,7 +143,7 @@ import org.springframework.transaction.TransactionSystemException;
 @SpringBootTest
 public class CdsRepositoryServiceTest {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private ArtifactRepository artifactRepository;
@@ -1356,26 +1357,6 @@ public class CdsRepositoryServiceTest {
 		solutionRepository.delete(cs2);
 		solutionRepository.delete(cs1);
 		userRepository.delete(cu);
-	}
-
-	@Test
-	public void testLogger() {
-		logger.init();
-		logger.trace(EELFLoggerDelegate.applicationLogger, "A trace message");
-		logger.trace(EELFLoggerDelegate.applicationLogger, "A trace {}", "message");
-		logger.trace(EELFLoggerDelegate.applicationLogger, "A trace message", new Exception());
-		logger.debug(EELFLoggerDelegate.applicationLogger, "A debug message");
-		logger.debug(EELFLoggerDelegate.applicationLogger, "A debug {}", "message");
-		logger.debug(EELFLoggerDelegate.applicationLogger, "A debug message", new Exception());
-		logger.info(EELFLoggerDelegate.applicationLogger, "An info message");
-		logger.info(EELFLoggerDelegate.applicationLogger, "An info {}", "message");
-		logger.info(EELFLoggerDelegate.applicationLogger, "An info message", new Exception());
-		logger.warn(EELFLoggerDelegate.applicationLogger, "A warning message");
-		logger.warn(EELFLoggerDelegate.applicationLogger, "A warning {}", "message");
-		logger.warn(EELFLoggerDelegate.applicationLogger, "A warning message", new Exception());
-		logger.error(EELFLoggerDelegate.applicationLogger, "An error message");
-		logger.error(EELFLoggerDelegate.applicationLogger, "An error {}", "message");
-		logger.error(EELFLoggerDelegate.applicationLogger, "An error message", new Exception());
 	}
 
 	@Test

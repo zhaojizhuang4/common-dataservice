@@ -22,17 +22,17 @@ package org.acumos.cds.service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.transaction.Transactional;
 
 import org.acumos.cds.domain.MLPPeer;
-import org.acumos.cds.util.EELFLoggerDelegate;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -46,7 +46,7 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class PeerSearchServiceImpl extends AbstractSearchServiceImpl implements PeerSearchService {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -55,7 +55,6 @@ public class PeerSearchServiceImpl extends AbstractSearchServiceImpl implements 
 	@Override
 	public Page<MLPPeer> findPeers(Map<String, ? extends Object> queryParameters, boolean isOr, Pageable pageable) {
 
-		Date beginDate = new Date();
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPPeer.class);
 		super.buildCriteria(criteria, queryParameters, isOr);
 
@@ -72,7 +71,7 @@ public class PeerSearchServiceImpl extends AbstractSearchServiceImpl implements 
 
 		// Get a page of results and send it back with the total available
 		List<MLPPeer> items = criteria.list();
-		logger.audit(beginDate, "getPeers: result size={}", items.size());
+		logger.info("getPeers: result size={}", items.size());
 		return new PageImpl<>(items, pageable, count);
 	}
 }

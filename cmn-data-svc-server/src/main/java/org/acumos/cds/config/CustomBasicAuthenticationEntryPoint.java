@@ -27,7 +27,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.acumos.cds.util.EELFLoggerDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 
@@ -37,7 +38,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationEn
  */
 public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
 
-	private static final EELFLoggerDelegate logger = EELFLoggerDelegate.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	/**
 	 * Confusing name, this method is called for a request that resulted in an
@@ -46,8 +47,8 @@ public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntr
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authEx)
 			throws IOException, ServletException {
-		logger.warn(EELFLoggerDelegate.auditLogger, "{} on request for {} from address {}", authEx.getMessage(),
-				request.getRequestURI(), request.getRemoteAddr());
+		logger.warn("{} on request for {} from address {}", authEx.getMessage(), request.getRequestURI(),
+				request.getRemoteAddr());
 		super.commence(request, response, authEx);
 	}
 
