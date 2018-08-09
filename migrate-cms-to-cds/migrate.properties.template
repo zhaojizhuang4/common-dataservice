@@ -1,0 +1,18 @@
+# properties for the CMS-to-CDS/Nexus migration tool
+
+# must include host, port and base context path
+cds.url = http://cdshost.myproject.org:8001/ccds
+cds.user = 
+cds.pass = 
+
+# must include host, port and base context path
+cms.url = http://cmshost.myproject.org:8085/site
+cms.user = 
+cms.pass = 
+
+# must include host, port and repo path
+nexus.url = http://nexushost.myproject.org:8081/repository/repo_name
+nexus.user = 
+nexus.pass = 
+# this is the group prefix; UUID will be appended
+nexus.prefix = org.acumos
