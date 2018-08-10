@@ -597,11 +597,20 @@ public class CdsControllerTest {
 			cs.setDescription("Tagged solution");
 			cs.setModelTypeCode(ModelTypeCode.CL.name());
 			cs.setToolkitTypeCode(ToolkitTypeCode.CP.name());
-			cs.getTags().add(tag1);
+			// This tag should spring into existence here
+			MLPTag newTag = new MLPTag("new-solution-tag");
+			cs.getTags().add(newTag);
 			cs = client.createSolution(cs);
 			Assert.assertNotNull(cs.getSolutionId());
 			Assert.assertFalse(cs.getTags().isEmpty());
+			Assert.assertTrue(cs.getTags().contains(newTag));
 			logger.info("Created public solution {}", cs);
+
+			// clean out the instant tag and ensure it was removed
+			client.dropSolutionTag(cs.getSolutionId(), newTag.getTag());
+			client.deleteTag(newTag);
+			cs = client.getSolution(cs.getSolutionId());
+			Assert.assertFalse(cs.getTags().contains(newTag));
 
 			// no tags
 			MLPSolution csOrg = new MLPSolution("solution organization", cu.getUserId(), true);
@@ -639,16 +648,28 @@ public class CdsControllerTest {
 			client.addSolutionTag(cs.getSolutionId(), tagName1);
 			client.addSolutionTag(cs.getSolutionId(), tagName2);
 			client.dropSolutionTag(cs.getSolutionId(), tagName2);
-
-			logger.info("Fetching back newly created solution");
+			// New feature: create tag upon adding
+			String instantTag = "instant-tag-just-add-water";
+			client.addSolutionTag(cs.getSolutionId(), instantTag);
+			
+			logger.info("Fetching back newly tagged solution");
 			MLPSolution s = client.getSolution(cs.getSolutionId());
 			Assert.assertTrue(s != null && !s.getTags().isEmpty() && s.getWebStats() != null);
 			logger.info("Solution {}", s);
 
 			// Query for tags
 			List<MLPTag> solTags = client.getSolutionTags(cs.getSolutionId());
-			Assert.assertTrue(solTags.size() > 0);
-			logger.info("Found tag on solution {}", solTags.get(0));
+			Assert.assertTrue(solTags.size() > 1);
+			logger.info("Found tags on solution {}", solTags);
+
+			// Clean up the instant mess
+			client.dropSolutionTag(cs.getSolutionId(), instantTag);
+			client.deleteTag(new MLPTag(instantTag));
+
+			logger.info("Fetching back less tagged solution");
+			cs = client.getSolution(cs.getSolutionId());
+			Assert.assertTrue(cs != null && !cs.getTags().isEmpty());
+			logger.info("Solution tags: {}", cs.getTags());
 
 			logger.info("Getting all solutions");
 			RestPageResponse<MLPSolution> page = client.getSolutions(new RestPageRequest(0, 2, "name"));
@@ -666,7 +687,7 @@ public class CdsControllerTest {
 			Assert.assertTrue(sl1 != null && sl1.getNumberOfElements() > 0);
 
 			logger.info("Querying for solutions by tag");
-			RestPageResponse<MLPSolution> sl2 = client.findSolutionsByTag(tagName1, new RestPageRequest(0, 1));
+			RestPageResponse<MLPSolution> sl2 = client.findSolutionsByTag(tagName1, new RestPageRequest(0, 5));
 			Assert.assertTrue(sl2 != null && sl2.getNumberOfElements() > 0);
 
 			// Add user access
@@ -2712,11 +2733,21 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create tag failed on dupe as expected: {}", ex.getResponseBodyAsString());
 		}
+		// This should succeed
+		client.addSolutionTag(cs.getSolutionId(), ct.getTag());
+		// now try adding it again
 		try {
-			client.addSolutionTag("bogus", ct.getTag());
-			throw new Exception("Unexpected success");
+			client.addSolutionTag(cs.getSolutionId(), ct.getTag());
 		} catch (HttpStatusCodeException ex) {
-			logger.info("Add tag failed as expected: {}", ex.getResponseBodyAsString());
+			logger.info("Add sol tag dupe failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		// Again this should succeed
+		client.dropSolutionTag(cs.getSolutionId(), ct.getTag());
+		// Try deleting it again
+		try {
+			client.dropSolutionTag(cs.getSolutionId(), ct.getTag());
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Drop sol tag failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
 			client.findSolutionsByTag("bogus-bogus-bogus", new RestPageRequest(0, 1));
@@ -2738,31 +2769,25 @@ public class CdsControllerTest {
 			client.addSolutionTag("bogus", "bogus");
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("Add tag failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.addSolutionTag(cs.getSolutionId(), "bogus");
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Add tag failed as expected: {}", ex.getResponseBodyAsString());
+			logger.info("Add tag failed on invalid solution as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
 			client.dropSolutionTag("bogus", "bogus");
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("Drop tag failed as expected: {}", ex.getResponseBodyAsString());
+			logger.info("Drop tag failed on invalid solution as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
 			client.dropSolutionTag("bogus", ct.getTag());
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("Drop tag failed as expected: {}", ex.getResponseBodyAsString());
+			logger.info("Drop tag failed on invalid solution as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
 			client.dropSolutionTag(cs.getSolutionId(), "bogus");
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("Drop tag failed as expected: {}", ex.getResponseBodyAsString());
+			logger.info("Drop tag failedon invalid tag  as expected: {}", ex.getResponseBodyAsString());
 		}
 		client.deleteTag(ct);
 

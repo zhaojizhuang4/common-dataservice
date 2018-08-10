@@ -480,6 +480,8 @@ public class SolutionController extends AbstractController {
 			}
 			// Ensure web stat object is empty
 			solution.setWebStats(null);
+			// Cascade manually - create user-supplied tags as needed
+			createMissingTags(solution);
 			// Create a new row
 			// ALSO send back the model for client convenience
 			MLPSolution persisted = solutionRepository.save(solution);
@@ -495,6 +497,21 @@ public class SolutionController extends AbstractController {
 			logger.warn(EELFLoggerDelegate.errorLogger, "createSolution failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createSolution failed", cve);
+		}
+	}
+
+	/**
+	 * Adds entries to the tags table as needed.
+	 * 
+	 * @param solution
+	 *            MLPSolution
+	 */
+	private void createMissingTags(MLPSolution solution) {
+		for (MLPTag tag : solution.getTags()) {
+			if (tagRepository.findOne(tag.getTag()) == null) {
+				tagRepository.save(tag);
+				logger.info("createMissingTags: tag {}", tag);
+			}
 		}
 	}
 
@@ -529,6 +546,8 @@ public class SolutionController extends AbstractController {
 			solution.setSolutionId(solutionId);
 			// Discard any stats object; updates don't happen via this interface
 			solution.setWebStats(null);
+			// Cascade manually - create user-supplied tags as needed
+			createMissingTags(solution);
 			solutionRepository.save(solution);
 			logger.audit(beginDate, "updateSolution: ID {}", solutionId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
@@ -816,20 +835,23 @@ public class SolutionController extends AbstractController {
 	@ApiOperation(value = "Adds a tag to the solution.", response = SuccessTransport.class)
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.TAG_PATH + "/{tag}", method = RequestMethod.POST)
 	@ResponseBody
-	public Object addTag(@PathVariable("solutionId") String solutionId, @PathVariable("tag") String tag,
+	public Object addSolutionTag(@PathVariable("solutionId") String solutionId, @PathVariable("tag") String tag,
 			HttpServletResponse response) {
-		Date beginDate = new Date();
-		if (tagRepository.findOne(tag) == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + tag, null);
-		} else if (solutionRepository.findOne(solutionId) == null) {
+		logger.info("addSolutionTag: solutionId {} tag {}", solutionId, tag);
+		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
-		} else {
-			solTagMapRepository.save(new MLPSolTagMap(solutionId, tag));
-			logger.audit(beginDate, "addTag: solutionId {} tag {}", solutionId, tag);
-			return new SuccessTransport(HttpServletResponse.SC_OK, null);
+		} else if (solTagMapRepository.findOne(new MLPSolTagMap.SolTagMapPK(solutionId, tag)) != null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Already has tag " + tag, null);
 		}
+		if (tagRepository.findOne(tag) == null) {
+			// Tags are cheap & easy to create, so make life easy for client
+			tagRepository.save(new MLPTag(tag));
+			logger.info("addSolutionTag: created tag {}", tag);
+		}
+		solTagMapRepository.save(new MLPSolTagMap(solutionId, tag));
+		return new SuccessTransport(HttpServletResponse.SC_OK, null);
 	}
 
 	/**
@@ -844,15 +866,15 @@ public class SolutionController extends AbstractController {
 	@ApiOperation(value = "Drops a tag from the solution.", response = SuccessTransport.class)
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.TAG_PATH + "/{tag}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public Object dropTag(@PathVariable("solutionId") String solutionId, @PathVariable("tag") String tag,
+	public Object dropSolutionTag(@PathVariable("solutionId") String solutionId, @PathVariable("tag") String tag,
 			HttpServletResponse response) {
 		Date beginDate = new Date();
-		if (tagRepository.findOne(tag) == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + tag, null);
-		} else if (solutionRepository.findOne(solutionId) == null) {
+		if (solutionRepository.findOne(solutionId) == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
+		} else if (solTagMapRepository.findOne(new MLPSolTagMap.SolTagMapPK(solutionId, tag)) == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + tag, null);
 		} else {
 			solTagMapRepository.delete(new MLPSolTagMap.SolTagMapPK(solutionId, tag));
 			logger.audit(beginDate, "dropTag: solutionId {} tag {}", solutionId, tag);

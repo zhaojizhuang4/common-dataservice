@@ -378,13 +378,14 @@ public interface ICommonDataServiceRestClient {
 	 * 
 	 * @param solution
 	 *            Solution data. If the ID field is null a new value is generated;
-	 *            otherwise the ID value is used if valid and not already known.
+	 *            otherwise the ID value is used if valid and not already known. Any
+	 *            tags in the entry will be created if needed.
 	 * @return Complete object, with generated information such as ID
 	 */
 	MLPSolution createSolution(MLPSolution solution);
 
 	/**
-	 * Updates a solution.
+	 * Updates a solution. Any tags in the entry will be created if needed.
 	 * 
 	 * @param solution
 	 *            Solution data
@@ -553,7 +554,7 @@ public interface ICommonDataServiceRestClient {
 	List<MLPTag> getSolutionTags(String solutionId);
 
 	/**
-	 * Adds the specified tag to the specified solution.
+	 * Adds the specified tag to the specified solution. Creates the tag if needed.
 	 * 
 	 * @param tag
 	 *            tag string

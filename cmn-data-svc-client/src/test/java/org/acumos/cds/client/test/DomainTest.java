@@ -1312,9 +1312,10 @@ public class DomainTest extends AbstractModelTest {
 		try {
 			String n = null;
 			new MLPTag(n);
+			new MLPTag("");
 			Assert.assertTrue("Unexpected success", false);
 		} catch (IllegalArgumentException iae) {
-			// null arg is rejected
+			// null or empty arg is rejected
 		}
 	}
 
