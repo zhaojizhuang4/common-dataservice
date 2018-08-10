@@ -27,6 +27,7 @@ Version 1.17.1, 10 Aug 2018
 ---------------------------
 
 * Create tags automatically when creating or updating a solution (ACUMOS-1546)
+* Change data type of picture fields from Byte[] to byte [] (ACUMOS-1557)
 * Requires database schema version 1.17
 
 Version 1.17.0, 9 Aug 2018

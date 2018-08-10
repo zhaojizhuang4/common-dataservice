@@ -773,7 +773,7 @@ public class CdsRepositoryServiceTest {
 			cu.setLoginName(loginName);
 			cu.setLoginHash(loginPass);
 			cu.setAuthToken("JWT is Greek to me");
-			Byte[] bytes = { 0, 1, 2, 3, 4, 5 };
+			byte[] bytes = { 0, 1, 2, 3, 4, 5 };
 			cu.setPicture(bytes);
 			cu = userRepository.save(cu);
 			Assert.assertNotNull(cu.getUserId());

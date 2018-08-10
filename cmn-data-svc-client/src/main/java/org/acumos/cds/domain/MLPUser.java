@@ -166,7 +166,7 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	@Lob
 	@Column(name = "PICTURE", length = 2000000 /* DO NOT USE: columnDefinition = "BLOB" */)
 	@ApiModelProperty(value = "User profile picture as byte array")
-	private Byte[] picture;
+	private byte[] picture;
 
 	/**
 	 * This field models the API token stored on disk. Transported as clear text,
@@ -376,11 +376,11 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 		this.loginFailDate = loginFailDate;
 	}
 
-	public Byte[] getPicture() {
+	public byte[] getPicture() {
 		return picture;
 	}
 
-	public void setPicture(Byte[] picture) {
+	public void setPicture(byte[] picture) {
 		this.picture = picture;
 	}
 

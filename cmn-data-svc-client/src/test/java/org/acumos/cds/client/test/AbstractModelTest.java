@@ -28,7 +28,7 @@ public abstract class AbstractModelTest {
 	final long time = new Date().getTime();
 	final boolean b1 = true;
 	final boolean b2 = false;
-	final Byte[] by1 = { 0, 1, 2, 3 };
+	final byte[] by1 = { 0, 1, 2, 3 };
 	final Date d1 = new Date(time + 1 * 24 * 60 * 60 * 1000);
 	final Date d2 = new Date(time + 2 * 24 * 60 * 60 * 1000);
 	final Date d3 = new Date(time + 3 * 24 * 60 * 60 * 1000);

@@ -340,7 +340,7 @@ public class CdsControllerTest {
 			cu.setActive(true);
 			cu.setLastLogin(lastLogin);
 			cu.setLoginPassExpire(new Date());
-			final Byte[] fakePicture = new Byte[] { 1, 2, 3, 4, 5 };
+			final byte[] fakePicture = new byte[] { 1, 2, 3, 4, 5 };
 			cu.setPicture(fakePicture);
 			cu = client.createUser(cu);
 			Assert.assertNotNull(cu.getUserId());

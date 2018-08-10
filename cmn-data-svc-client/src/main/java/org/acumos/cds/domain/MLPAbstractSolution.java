@@ -117,7 +117,7 @@ public abstract class MLPAbstractSolution extends MLPTimestampedEntity {
 	@Lob
 	@Column(name = "PICTURE", length = 2000000 /* DO NOT USE: columnDefinition = "BLOB" */)
 	@ApiModelProperty(value = "Solution picture as byte array")
-	private Byte[] picture;
+	private byte[] picture;
 
 	/**
 	 * No-arg constructor
@@ -235,11 +235,11 @@ public abstract class MLPAbstractSolution extends MLPTimestampedEntity {
 		this.origin = origin;
 	}
 
-	public Byte[] getPicture() {
+	public byte[] getPicture() {
 		return picture;
 	}
 
-	public void setPicture(Byte[] picture) {
+	public void setPicture(byte[] picture) {
 		this.picture = picture;
 	}
 
