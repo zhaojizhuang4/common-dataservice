@@ -31,6 +31,7 @@ Common Data Service
    requirements.rst
    client.rst
    server.rst
+   migrate.rst
    release-notes.rst
 
 * :ref:`search`
