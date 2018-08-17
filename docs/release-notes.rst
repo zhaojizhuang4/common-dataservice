@@ -23,6 +23,12 @@ Common Data Service Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
+Version 1.17.2, 17 Aug 2018
+---------------------------
+
+* Revise message sent when user is locked out temporarily (ACUMOS-1597)
+* Requires database schema version 1.17
+
 Version 1.17.1, 10 Aug 2018
 ---------------------------
 

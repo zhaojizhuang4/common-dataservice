@@ -205,13 +205,14 @@ public class UserController extends AbstractController {
 				long lastFailureTime = user.getLoginFailDate() == null ? new Date().getTime()
 						: user.getLoginFailDate().getTime();
 				long elapsedTimeSec = (new Date().getTime() - lastFailureTime) / 1000;
-				if (elapsedTimeSec < this.loginFailureBlockTimeSec) {
+				long blockedTimeSec = this.loginFailureBlockTimeSec - elapsedTimeSec;
+				if (blockedTimeSec > 0) {
 					logger.info(EELFLoggerDelegate.auditLogger, "checkUserCredentials: user {} blocked for {} sec",
-							user.getLoginName(), Long.toString(this.loginFailureBlockTimeSec - elapsedTimeSec));
+							user.getLoginName(), Long.toString(blockedTimeSec));
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					// This reveals that the username exists
 					return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
-							"Repeated login failures, user temporarily blocked");
+							"Repeated login failures, user blocked for " + Long.toString(blockedTimeSec) + " sec");
 				} else {
 					logger.info(EELFLoggerDelegate.auditLogger, "checkUserCredentials: user {} block expired",
 							user.getLoginName());
