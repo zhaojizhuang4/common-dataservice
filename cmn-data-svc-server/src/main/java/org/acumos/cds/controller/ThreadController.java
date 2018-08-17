@@ -35,6 +35,7 @@ import org.acumos.cds.transport.CountTransport;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
+import org.acumos.cds.util.ApiPageable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +86,7 @@ public class ThreadController extends AbstractController {
 	 * @return Page of threads
 	 */
 	@ApiOperation(value = "Gets a page of threads, optionally sorted.", response = MLPThread.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPThread> getThreads(Pageable pageable) {
@@ -103,6 +105,7 @@ public class ThreadController extends AbstractController {
 	 * @return Page of threads for specified solution and revision
 	 */
 	@ApiOperation(value = "Gets a page of threads for the solution and revision IDs, optionally sorted.", response = MLPThread.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = CCDSConstants.SOLUTION_PATH + "/{solutionId}/" + CCDSConstants.REVISION_PATH
 			+ "/{revisionId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -255,6 +258,7 @@ public class ThreadController extends AbstractController {
 	 * @return Page of comments
 	 */
 	@ApiOperation(value = "Gets a page of comments in the thread.", response = MLPComment.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = "{threadId}/" + CCDSConstants.COMMENT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getThreadComments(@PathVariable("threadId") String threadId, Pageable pageable,
@@ -300,6 +304,7 @@ public class ThreadController extends AbstractController {
 	 *         include multiple threads
 	 */
 	@ApiOperation(value = "Gets a page of comments for the solution revision, optionally sorted.", response = MLPThread.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = CCDSConstants.SOLUTION_PATH + "/{solutionId}/" + CCDSConstants.REVISION_PATH
 			+ "/{revisionId}/" + CCDSConstants.COMMENT_PATH, method = RequestMethod.GET)
 	@ResponseBody

@@ -70,6 +70,7 @@ import org.acumos.cds.transport.CountTransport;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
+import org.acumos.cds.util.ApiPageable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -193,6 +194,7 @@ public class SolutionController extends AbstractController {
 	 * @return Page of solutions
 	 */
 	@ApiOperation(value = "Gets a page of solutions, optionally sorted on fields.", response = MLPSolution.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPSolution> getSolutions(Pageable pageable, HttpServletResponse response) {
@@ -1241,6 +1243,7 @@ public class SolutionController extends AbstractController {
 	 * @return A usage if found, an error otherwise.
 	 */
 	@ApiOperation(value = "Gets a page of solutions with the specified user in the ACL, optionally sorted on fields.", response = MLPSolution.class, responseContainer = "List")
+	@ApiPageable
 	@RequestMapping(value = CCDSConstants.USER_PATH + "/{userId}/"
 			+ CCDSConstants.ACCESS_PATH, method = RequestMethod.GET)
 	@ResponseBody

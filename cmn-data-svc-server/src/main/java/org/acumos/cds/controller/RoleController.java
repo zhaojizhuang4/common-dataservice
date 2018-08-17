@@ -37,6 +37,7 @@ import org.acumos.cds.transport.CountTransport;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
+import org.acumos.cds.util.ApiPageable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +92,7 @@ public class RoleController extends AbstractController {
 	 * @return List of artifacts, for serialization as JSON
 	 */
 	@ApiOperation(value = "Gets a page of roles, optionally sorted on fields.", response = MLPRole.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPRole> getRoles(Pageable pageable) {

@@ -37,6 +37,7 @@ import org.acumos.cds.service.PeerSearchService;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
+import org.acumos.cds.util.ApiPageable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,7 @@ public class PeerController extends AbstractController {
 	 * @return List of artifacts, for serialization as JSON
 	 */
 	@ApiOperation(value = "Gets a page of peers, optionally sorted on fields.", response = MLPPeer.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPPeer> getPeers(Pageable pageable) {
@@ -99,6 +101,7 @@ public class PeerController extends AbstractController {
 	 * @return Page of peers, for serialization as JSON.
 	 */
 	@ApiOperation(value = "Searches for peers using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disjunction).", response = MLPPeer.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object searchPeers(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageable,
@@ -264,6 +267,7 @@ public class PeerController extends AbstractController {
 	 * @return List of artifacts, for serialization as JSON
 	 */
 	@ApiOperation(value = "Gets all subscriptions for the specified peer.", response = MLPPeerSubscription.class, responseContainer = "List")
+	@ApiPageable
 	@RequestMapping(value = "/{peerId}/" + CCDSConstants.SUBSCRIPTION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getPeerSubs(@PathVariable("peerId") String peerId, Pageable pageable, HttpServletResponse response) {
