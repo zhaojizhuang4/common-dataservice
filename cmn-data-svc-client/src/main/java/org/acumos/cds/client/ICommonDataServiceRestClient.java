@@ -271,11 +271,11 @@ public interface ICommonDataServiceRestClient {
 	 * to support the dynamic search page on the portal marketplace.
 	 * 
 	 * @param nameKeywords
-	 *            Keywords to perform "LIKE" search in Name field; ignored if null
-	 *            or empty
+	 *            Keywords to perform "LIKE" search in solution name field; ignored
+	 *            if null or empty
 	 * @param descriptionKeywords
-	 *            Keywords to perform "LIKE" search in Description field; ignored if
-	 *            null or empty
+	 *            Keywords to perform "LIKE" search in the revision description (any
+	 *            access type); ignored if null or empty
 	 * @param active
 	 *            Solution active status; true for active, false for inactive
 	 * @param userIds
@@ -308,17 +308,46 @@ public interface ICommonDataServiceRestClient {
 			RestPageRequest pageRequest);
 
 	/**
+	 * Gets a page of solutions that match every condition, with the caveat that any
+	 * one of the keywords can match, and multiple free-text fields are searched.
+	 * Other facets such as userId, model type code, etc. must match. This will be
+	 * slow because it requires table scans.
+	 * 
+	 * @param keywords
+	 *            Keywords to find in the name, revision description, author,
+	 *            publisher and other fields. Required; must not be empty.
+	 * @param active
+	 *            Solution active status; true for active, false for inactive
+	 * @param userIds
+	 *            User IDs who created the solution; ignored if null or empty
+	 * @param accessTypeCodes
+	 *            Access type codes; use four-letter sequence "null" to match a null
+	 *            value; ignored if null or empty
+	 * @param modelTypeCodes
+	 *            Model type codes; use four-letter sequence "null" to match a null
+	 *            value; ignored if null or empty
+	 * @param tags
+	 *            Solution tag names; ignored if null or empty
+	 * @param pageRequest
+	 *            Page index, page size and sort information; defaults to page 0 of
+	 *            size 20 if null.
+	 * @return Page of solution objects.
+	 */
+	RestPageResponse<MLPSolution> findPortalSolutionsByKw(String[] keywords, boolean active, String[] userIds,
+			String[] accessTypeCodes, String[] modelTypeCodes, String[] tags, RestPageRequest pageRequest);
+
+	/**
 	 * Finds solutions editable by the specified user ('my models'). This includes
 	 * the user's private solutions and solutions co-owned by (shared with) the
 	 * user. This special-purpose method supports a dynamic search page on the
 	 * portal interface.
 	 * 
 	 * @param nameKeywords
-	 *            Keywords to perform "LIKE" search in Name field; ignored if null
-	 *            or empty
+	 *            Keywords to perform "LIKE" search in solution name field; ignored
+	 *            if null or empty
 	 * @param descriptionKeywords
-	 *            Keywords to perform "LIKE" search in Description field; ignored if
-	 *            null or empty
+	 *            Keywords to perform "LIKE" search in the revision description (any
+	 *            access type); ignored if null or empty
 	 * @param active
 	 *            Solution active status; true for active, false for inactive;
 	 *            required.
@@ -346,12 +375,12 @@ public interface ICommonDataServiceRestClient {
 			String[] tags, RestPageRequest pageRequest);
 
 	/**
-	 * Searches the solutions.
+	 * Searches the solutions for matches on attribute values.
 	 * 
 	 * @param queryParameters
 	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Accepts Boolean, Date, Integer, Long, String values; also Array of
-	 *            those types.
+	 *            Only fields defined on solution may be used. Accepts Boolean,
+	 *            Date, Integer, Long, String values; also Array of those types.
 	 * @param isOr
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs

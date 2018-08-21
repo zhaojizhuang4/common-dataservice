@@ -71,6 +71,14 @@ import org.springframework.stereotype.Service;
  * https://stackoverflow.com/questions/11038234/pagination-with-hibernate-criteria-and-distinct-root-entity
  * https://stackoverflow.com/questions/42910271/duplicate-records-with-hibernate-joins-and-pagination
  * </PRE>
+ * 
+ * Many of the queries here check properties of the solution AND associated
+ * entities especially revisions. The queries require an inner join and yield a
+ * large cross product that Hibernate will coalesce. Because of the joins it's
+ * unsafe to apply limit (pagination) parameters at the database. Therefore the
+ * approach taken here is to fetch the full result from the database then
+ * reduces the result size in the method, which is inefficient.
+ *
  */
 @Service("solutionSearchService")
 @Transactional
@@ -86,6 +94,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 	private final String ownerAlias = "ownr";
 	private final String tagAlias = "tag";
 	private final String accAlias = "acc";
+	private final String descsAlias = "descs";
 	private final String solutionId = "solutionId";
 
 	/*
@@ -129,7 +138,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 	/**
 	 * Runs a query on the SolutionFOM entity, returns a page after converting
-	 * objects to plain solution.
+	 * objects to plain (non-FOM) MLPSolution
 	 * 
 	 * @param criteria
 	 *            Criteria to evaluate
@@ -168,13 +177,10 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		return new PageImpl<>(items, pageable, foms.size());
 	}
 
-	/*
-	 * This query checks properties of the solution AND associated entities
-	 * especially revisions, which requires an inner join and yields a large cross
-	 * product that Hibernate will coalesce. Because of the joins it's unsafe to
-	 * apply limit parameters at the database. Therefore this method fetches the
-	 * full result from the database then reduces the result size here, which is
-	 * inefficient.
+	/**
+	 * Finds solutions in the marketplace.
+	 * 
+	 * Also see comment above about paginated queries.
 	 *
 	 * This implementation is made yet more awkward due to the requirement to
 	 * perform LIKE queries on certain fields.
@@ -189,24 +195,29 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		// Attributes on the solution
 		criteria.add(Restrictions.eq("active", active));
 		if (nameKeywords != null && nameKeywords.length > 0)
-			criteria.add(buildLikeListCriterion("name", nameKeywords));
-		if (descKeywords != null && descKeywords.length > 0)
-			criteria.add(buildLikeListCriterion("description", descKeywords));
+			criteria.add(buildLikeListCriterion("name", nameKeywords, true));
 		if (modelTypeCode != null && modelTypeCode.length > 0)
-			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode));
-		if ((accessTypeCode != null && accessTypeCode.length > 0)
+			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode, false));
+		if ((accessTypeCode != null && accessTypeCode.length > 0) //
+				|| (descKeywords != null && descKeywords.length > 0)
 				|| (validationStatusCode != null && validationStatusCode.length > 0)
 				|| (authorKeywords != null && authorKeywords.length > 0)
 				|| (publisherKeywords != null && publisherKeywords.length > 0)) {
+			// revisions are optional, but a solution without them is useless
 			criteria.createAlias("revisions", revAlias);
 			if (accessTypeCode != null && accessTypeCode.length > 0)
-				criteria.add(buildEqualsListCriterion(revAlias + ".accessTypeCode", accessTypeCode));
+				criteria.add(buildEqualsListCriterion(revAlias + ".accessTypeCode", accessTypeCode, false));
 			if (validationStatusCode != null && validationStatusCode.length > 0)
-				criteria.add(buildEqualsListCriterion(revAlias + ".validationStatusCode", validationStatusCode));
+				criteria.add(buildEqualsListCriterion(revAlias + ".validationStatusCode", validationStatusCode, false));
 			if (authorKeywords != null && authorKeywords.length > 0)
-				criteria.add(buildLikeListCriterion(revAlias + ".authors", authorKeywords));
+				criteria.add(buildLikeListCriterion(revAlias + ".authors", authorKeywords, true));
 			if (publisherKeywords != null && publisherKeywords.length > 0)
-				criteria.add(buildLikeListCriterion(revAlias + ".publisher", publisherKeywords));
+				criteria.add(buildLikeListCriterion(revAlias + ".publisher", publisherKeywords, true));
+			if (descKeywords != null && descKeywords.length > 0) {
+				criteria.createAlias(revAlias + ".descriptions", descsAlias,
+						org.hibernate.sql.JoinType.LEFT_OUTER_JOIN);
+				criteria.add(buildLikeListCriterion(descsAlias + ".description", descKeywords, true));
+			}
 		}
 		if (userIds != null && userIds.length > 0) {
 			criteria.createAlias("owner", ownerAlias);
@@ -222,9 +233,10 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		return result;
 	}
 
-	/*
-	 * See comments on {@link #findPortalSolutions(String[], String[], boolean,
-	 * String[], String[], String[], String[], String[], Pageable)}
+	/**
+	 * Finds models for a single user, in support of Portal's My Models page.
+	 * 
+	 * Also see comment above about paginated queries.
 	 *
 	 * Baffling problem occurred here:
 	 * 
@@ -251,18 +263,23 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		// Attributes on the solution
 		criteria.add(Restrictions.eq("active", active));
 		if (nameKeywords != null && nameKeywords.length > 0)
-			criteria.add(buildLikeListCriterion("name", nameKeywords));
-		if (descKeywords != null && descKeywords.length > 0)
-			criteria.add(buildLikeListCriterion("description", descKeywords));
+			criteria.add(buildLikeListCriterion("name", nameKeywords, false));
 		if (modelTypeCode != null && modelTypeCode.length > 0)
-			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode));
-		if ((accessTypeCode != null && accessTypeCode.length > 0)
+			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode, false));
+		if ((accessTypeCode != null && accessTypeCode.length > 0) //
+				|| (descKeywords != null && descKeywords.length > 0) //
 				|| (validationStatusCode != null && validationStatusCode.length > 0)) {
+			// revisions are optional, but a solution without them is useless
 			criteria.createAlias("revisions", revAlias);
 			if (accessTypeCode != null && accessTypeCode.length > 0)
-				criteria.add(buildEqualsListCriterion(revAlias + ".accessTypeCode", accessTypeCode));
+				criteria.add(buildEqualsListCriterion(revAlias + ".accessTypeCode", accessTypeCode, false));
 			if (validationStatusCode != null && validationStatusCode.length > 0)
-				criteria.add(buildEqualsListCriterion(revAlias + ".validationStatusCode", validationStatusCode));
+				criteria.add(buildEqualsListCriterion(revAlias + ".validationStatusCode", validationStatusCode, false));
+			if (descKeywords != null && descKeywords.length > 0) {
+				criteria.createAlias(revAlias + ".descriptions", descsAlias,
+						org.hibernate.sql.JoinType.LEFT_OUTER_JOIN);
+				criteria.add(buildLikeListCriterion(descsAlias + ".description", descKeywords, false));
+			}
 		}
 		if (tags != null && tags.length > 0) {
 			// Tags are optional, so must use outer join
@@ -274,13 +291,11 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		return result;
 	}
 
-	/*
-	 * This query checks properties of the solution AND associated entities, like
-	 * the revision's access type, which requires an inner join and yields a large
-	 * cross product that Hibernate will coalesce. Because of the joins it's unsafe
-	 * to apply limit parameters at the database. Therefore this method fetches the
-	 * full result from the database then reduces the result size here, which is
-	 * inefficient.
+	/**
+	 * This supports federation, which needs to search for solutions modified after
+	 * a point in time.
+	 * 
+	 * Also see comment above about paginated queries.
 	 */
 	@Override
 	public Page<MLPSolution> findSolutionsByModifiedDate(boolean active, String[] accessTypeCode,
@@ -311,6 +326,49 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 
 		Page<MLPSolution> result = runSolutionFomQuery(criteria, pageable);
 		logger.info("findSolutionsByModifiedDate: result size={}", result.getNumberOfElements());
+		return result;
+	}
+
+	/*
+	 * Low-rent version of full-text search.
+	 */
+	@Override
+	public Page<MLPSolution> findPortalSolutionsByKw(String[] keywords, boolean active, String[] userIds,
+			String[] modelTypeCode, String[] accessTypeCode, String[] tags, Pageable pageable) {
+
+		// build the query using FOM to access child attributes
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
+		criteria.add(Restrictions.eq("active", active));
+		// A solution should ALWAYS have revisions.
+		criteria.createAlias("revisions", revAlias);
+		// Descriptions are optional, so must use outer join
+		if (keywords != null && keywords.length > 0) {
+			criteria.createAlias(revAlias + ".descriptions", descsAlias, org.hibernate.sql.JoinType.LEFT_OUTER_JOIN);
+			Disjunction keywordDisjunction = Restrictions.disjunction();
+			keywordDisjunction.add(buildLikeListCriterion("name", keywords, false));
+			keywordDisjunction.add(buildLikeListCriterion(descsAlias + ".description", keywords, false));
+			keywordDisjunction.add(buildLikeListCriterion(revAlias + ".authors", keywords, false));
+			keywordDisjunction.add(buildLikeListCriterion(revAlias + ".publisher", keywords, false));
+			// Also match on IDs, but exact only
+			keywordDisjunction.add(buildEqualsListCriterion("solutionId", keywords, false));
+			keywordDisjunction.add(buildEqualsListCriterion(revAlias + ".revisionId", keywords, false));
+			criteria.add(keywordDisjunction);
+		}
+		if (modelTypeCode != null && modelTypeCode.length > 0)
+			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode, false));
+		if (accessTypeCode != null && accessTypeCode.length > 0)
+			criteria.add(buildEqualsListCriterion(revAlias + ".accessTypeCode", accessTypeCode, false));
+		if (userIds != null && userIds.length > 0) {
+			criteria.createAlias("owner", ownerAlias);
+			criteria.add(Restrictions.in(ownerAlias + ".userId", userIds));
+		}
+		if (tags != null && tags.length > 0) {
+			// Tags are optional, so must use outer join
+			criteria.createAlias("tags", tagAlias, org.hibernate.sql.JoinType.LEFT_OUTER_JOIN);
+			criteria.add(Restrictions.in(tagAlias + ".tag", tags));
+		}
+		Page<MLPSolution> result = runSolutionFomQuery(criteria, pageable);
+		logger.info("findPortalSolutionsByKw: result size={}", result.getNumberOfElements());
 		return result;
 	}
 

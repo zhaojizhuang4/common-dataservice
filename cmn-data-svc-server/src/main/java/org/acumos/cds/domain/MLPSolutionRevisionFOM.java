@@ -29,6 +29,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -94,6 +95,18 @@ public class MLPSolutionRevisionFOM extends MLPAbstractSolutionRevision implemen
 	)
 	private Set<MLPArtifactFOM> artifacts = new HashSet<>(0);
 
+	/**
+	 * A revision may have zero, one or two descriptions, which are in a separate
+	 * table. The descriptions have different access-type codes. This is a (poorly
+	 * handled) extension of the basic data model.
+	 * 
+	 * Use default LAZY fetch. This is only used for searching (never fetched, never
+	 * serialized as JSON).
+	 */
+	@OneToMany
+	@JoinColumn(name = REVISION_ID_COL_NAME, referencedColumnName = MLPRevisionDescription.REVISION_ID_COL_NAME)
+	private Set<MLPRevisionDescription> descriptions = new HashSet<>(0);
+
 	public MLPSolutionFOM getSolution() {
 		return solution;
 	}
@@ -126,16 +139,26 @@ public class MLPSolutionRevisionFOM extends MLPAbstractSolutionRevision implemen
 		this.artifacts = artifacts;
 	}
 
+	public Set<MLPRevisionDescription> getDescriptions() {
+		return descriptions;
+	}
+
+	public void setDescriptions(Set<MLPRevisionDescription> descriptions) {
+		this.descriptions = descriptions;
+	}
+
+	@SuppressWarnings("deprecation")
 	@Override
 	public String toString() {
-		return this.getClass().getName() + "[revisionId=" + getRevisionId() + ", user=" + user + ", meta="
-				+ getMetadata() + ", version=" + getVersion() + ", artifacts=" + artifacts + ", created=" + getCreated()
+		return this.getClass().getName() + "[revisionId=" + getRevisionId() + ", version=" + getVersion() + ", user="
+				+ user + ", description=" + getDescription() + ", artifacts=" + artifacts + ", created=" + getCreated()
 				+ ", modified=" + getModified() + "]";
 	}
 
 	/**
 	 * @return MLPSolutionRevision with the information from this entity
 	 */
+	@SuppressWarnings("deprecation")
 	public MLPSolutionRevision toMLPSolutionRevision() {
 		MLPSolutionRevision rev = new MLPSolutionRevision(solution.getSolutionId(), getVersion(), user.getUserId(),
 				getAccessTypeCode(), getValidationStatusCode());

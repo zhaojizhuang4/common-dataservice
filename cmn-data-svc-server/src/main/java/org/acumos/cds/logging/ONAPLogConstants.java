@@ -119,7 +119,7 @@ public final class ONAPLogConstants {
 		/**
 		 * MDC recording timestamp at the start of the current request, with the same
 		 * scope as {@link #REQUEST_ID}.
-	 */
+		 */
 		public static final String ENTRY_TIMESTAMP = "EntryTimestamp";
 
 		/** MDC recording timestamp at the start of the current invocation. */

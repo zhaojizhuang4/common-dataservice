@@ -187,14 +187,14 @@ public class MLPSolutionFOM extends MLPAbstractSolution implements Serializable 
 	@Override
 	public String toString() {
 		return this.getClass().getName() + "[solutionId=" + getSolutionId() + ", name=" + getName() + ", owner=" + owner
-				+ ", desc=" + getDescription() + ", active=" + isActive() + ", modelTypeCode=" + getModelTypeCode()
-				+ ", source=" + source + ", revisions=" + revisions + ", created=" + getCreated() + ", modified="
-				+ getModified() + "]";
+				+ ", active=" + isActive() + ", modelTypeCode=" + getModelTypeCode() + ", source=" + source
+				+ ", revisions=" + revisions + ", created=" + getCreated() + ", modified=" + getModified() + "]";
 	}
 
 	/**
 	 * @return MLPSolution with the information from this entity
 	 */
+	@SuppressWarnings("deprecation")
 	public MLPSolution toMLPSolution() {
 		MLPSolution sol = new MLPSolution(getName(), owner.getUserId(), isActive());
 		sol.setCreated(getCreated());

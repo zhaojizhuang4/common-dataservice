@@ -299,7 +299,7 @@ public class SolutionController extends AbstractController {
 			Object result = solutionSearchService.findSolutions(convertedQryParm, isOr, pageRequest);
 			return result;
 		} catch (Exception ex) {
-			logger.warn("searchSolutions failed: {}", ex.toString());
+			logger.error("searchSolutions failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchSolutions failed", ex);
@@ -343,7 +343,7 @@ public class SolutionController extends AbstractController {
 					accTypeCodes, valStatusCodes, tags, authKws, pubKws, pageRequest);
 			return result;
 		} catch (Exception ex) {
-			logger.warn("findPortalSolutions failed: {}", ex.toString());
+			logger.error("findPortalSolutions failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 					ex.getCause() != null ? ex.getCause().getMessage() : "findPortalSolutions failed", ex);
@@ -351,8 +351,46 @@ public class SolutionController extends AbstractController {
 	}
 
 	/**
-	 * Supports a dynamic query by user on Portal screen for user-accessible
-	 * solutions.
+	 * Supports a flexible query on Portal/Marketplace screen.
+	 * 
+	 * @param queryParameters
+	 *            Field name-value pairs, see below for names.
+	 * @param pageRequest
+	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
+	 *            sends nothing.
+	 * @param response
+	 *            HttpServletResponse
+	 * @return Page of solutions
+	 */
+	@ApiOperation(value = "Gets a page of solutions matching all criteria.  If keywords are supplied, returns any match across multiple text fields.  Returns a page of solutions matching all criteria.", response = MLPSolution.class, responseContainer = "Page")
+	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH + "/" + CCDSConstants.PORTAL_PATH + "/"
+			+ CCDSConstants.KEYWORD_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public Object findPortalSolutionsByKw(@RequestParam MultiValueMap<String, String> queryParameters,
+			Pageable pageRequest, HttpServletResponse response) {
+		logger.info("findPortalSolutionsByKw: query {}", queryParameters);
+		try {
+			// This parameter is required
+			Boolean active = new Boolean(queryParameters.getFirst(CCDSConstants.SEARCH_ACTIVE));
+			// All remaining parameters are optional
+			String[] kws = getOptStringArray(CCDSConstants.SEARCH_KW, queryParameters);
+			String[] userIds = getOptStringArray(CCDSConstants.SEARCH_USERS, queryParameters);
+			String[] modelTypeCodes = getOptStringArray(CCDSConstants.SEARCH_MODEL_TYPES, queryParameters);
+			String[] accTypeCodes = getOptStringArray(CCDSConstants.SEARCH_ACCESS_TYPES, queryParameters);
+			String[] tags = getOptStringArray(CCDSConstants.SEARCH_TAGS, queryParameters);
+			Object result = solutionSearchService.findPortalSolutionsByKw(kws, active, userIds, modelTypeCodes,
+					accTypeCodes, tags, pageRequest);
+			return result;
+		} catch (Exception ex) {
+			logger.error("findPortalSolutionsByKw failed", ex);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+					ex.getCause() != null ? ex.getCause().getMessage() : "findPortalSolutionsByKw failed", ex);
+		}
+	}
+
+	/**
+	 * Supports a flexible query on Portal screen for user-accessible solutions.
 	 * 
 	 * @param queryParameters
 	 *            Field names-value pairs, see below for names. Some values can be
@@ -388,7 +426,7 @@ public class SolutionController extends AbstractController {
 					accTypeCodes, valStatusCodes, tags, pageRequest);
 			return result;
 		} catch (Exception ex) {
-			logger.warn("findUserSolutions failed: {}", ex.toString());
+			logger.error("findUserSolutions failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
 					ex.getCause() != null ? ex.getCause().getMessage() : "findUserSolutions failed", ex);
@@ -396,6 +434,8 @@ public class SolutionController extends AbstractController {
 	}
 
 	/**
+	 * Supports federation
+	 * 
 	 * @param queryParameters
 	 *            Map of String (field name) to String (value) for restricting the
 	 *            query. Expects access type codes (optional), validation status

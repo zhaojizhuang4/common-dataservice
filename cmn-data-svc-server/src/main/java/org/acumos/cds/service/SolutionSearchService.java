@@ -55,7 +55,7 @@ public interface SolutionSearchService {
 	 *            LIKE after surrounding with wildcard '%' characters; ignored if
 	 *            null or empty
 	 * @param descriptionKeywords
-	 *            Searches the description field for the keywords using
+	 *            Searches the revision descriptions for the keywords using
 	 *            case-insensitive LIKE after surrounding with wildcard '%'
 	 *            characters; ignored if null or empty
 	 * @param active
@@ -95,6 +95,37 @@ public interface SolutionSearchService {
 			String[] tags, String[] authorKeywords, String[] publisherKeywords, Pageable pageable);
 
 	/**
+	 * * Gets a page of solutions matching all query parameters, with the caveat
+	 * that any one keyword can match and multiple text fields are searched. If
+	 * keywords are supplied this will be slow because it requires table scans.
+	 * 
+	 * @param keywords
+	 *            Keywords to find in the name, revision description, author,
+	 *            publisher and other fields; ignored if null or empty.
+	 * @param active
+	 *            Active status: true or false; required.
+	 * @param userIds
+	 *            Limits match to solutions with one of the specified values;
+	 *            ignored if null or empty
+	 * @param modelTypeCodes
+	 *            Limits match to solutions with one of the specified values
+	 *            including null (not the 4-character sequence "null"); ignored if
+	 *            null or empty
+	 * @param accessTypeCodes
+	 *            Limits match to solutions containing revisions with one of the
+	 *            specified values including null (not the 4-character sequence
+	 *            "null"); ignored if null or empty
+	 * @param tags
+	 *            Limits match to solutions with one of the specified tags; ignored
+	 *            if null or empty
+	 * @param pageable
+	 *            Page and sort info
+	 * @return Page of matches
+	 */
+	Page<MLPSolution> findPortalSolutionsByKw(String[] keywords, boolean active, String[] userIds,
+			String[] modelTypeCodes, String[] accessTypeCodes, String[] tags, Pageable pageable);
+
+	/**
 	 * Gets a page of user-accessible solutions. This includes the user's own
 	 * private solutions as well as solutions shared with the user via the
 	 * solution-access-map table.
@@ -104,7 +135,7 @@ public interface SolutionSearchService {
 	 *            LIKE after surrounding with wildcard '%' characters; ignored if
 	 *            null or empty
 	 * @param descriptionKeywords
-	 *            Searches the description field for the keywords using
+	 *            Searches the revision descriptions for the keywords using
 	 *            case-insensitive LIKE after surrounding with wildcard '%'
 	 *            characters; ignored if null or empty
 	 * @param active
@@ -135,11 +166,12 @@ public interface SolutionSearchService {
 			String[] tags, Pageable pageable);
 
 	/**
-	 * Gets a page of solutions with a change after the specified date. A match is
-	 * found if the solution's modified field, an associated revision's modified
-	 * field, or an associated artifact's modified field has a value larger than the
-	 * specified date. Only finds solutions that have 1+ revision(s) and in turn 1+
-	 * artifact(s). A freshly created solution with no revisions will not be found.
+	 * Gets a page of solutions with a change after the specified date to benefit
+	 * the Federation feature. A match is found if the solution's modified field, an
+	 * associated revision's modified field, or an associated artifact's modified
+	 * field has a value larger than the specified date. Only finds solutions that
+	 * have 1+ revision(s) and in turn 1+ artifact(s). A freshly created solution
+	 * with no revisions will not be found.
 	 * 
 	 * @param active
 	 *            Active status: true or false; required

@@ -64,17 +64,19 @@ public abstract class AbstractSearchServiceImpl {
 	}
 
 	/**
-	 * Builds a disjunction ("OR") criterion to check exact match of any value in
+	 * Builds criterion to check exact match of any value in
 	 * the list, with special handling for null.
 	 * 
 	 * @param fieldName
 	 *            POJO field name
 	 * @param values
 	 *            Set of values; null is permitted
+	 * @param isOr
+	 *            If true, treat the query as a disjunction; else as a conjunction.
 	 * @return Criterion
 	 */
-	protected Criterion buildEqualsListCriterion(String fieldName, Object[] values) {
-		Junction junction = Restrictions.disjunction();
+	protected Criterion buildEqualsListCriterion(String fieldName, Object[] values, boolean isOr) {
+		Junction junction = isOr ? Restrictions.disjunction() : Restrictions.conjunction();
 		for (Object v : values) {
 			if (v == null)
 				junction.add(Restrictions.isNull(fieldName));
@@ -85,17 +87,19 @@ public abstract class AbstractSearchServiceImpl {
 	}
 
 	/**
-	 * Builds a disjunction ("OR") criterion to check approximate match of any value
-	 * in the list; null is not permitted.
+	 * Builds a criterion to check approximate match of values in the list; null is
+	 * not permitted.
 	 * 
 	 * @param fieldName
 	 *            POJO field name
 	 * @param values
 	 *            String values; null is forbidden
+	 * @param isOr
+	 *            If true, treat the query as a disjunction; else as a conjunction.
 	 * @return Criterion
 	 */
-	protected Criterion buildLikeListCriterion(String fieldName, String[] values) {
-		Junction junction = Restrictions.disjunction();
+	protected Criterion buildLikeListCriterion(String fieldName, String[] values, boolean isOr) {
+		Junction junction = isOr ? Restrictions.disjunction() : Restrictions.conjunction();
 		for (String v : values) {
 			if (v == null)
 				throw new IllegalArgumentException("Null not permitted in value list");

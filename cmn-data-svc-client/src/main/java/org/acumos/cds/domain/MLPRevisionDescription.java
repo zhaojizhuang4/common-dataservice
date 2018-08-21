@@ -53,6 +53,9 @@ public class MLPRevisionDescription extends MLPTimestampedEntity implements Seri
 
 	private static final long serialVersionUID = 6949987343881297064L;
 
+	/* package */ static final String REVISION_ID_COL_NAME = "REVISION_ID";
+	/* package */ static final String ACCESS_TYPE_CODE_COL_NAME = "ACCESS_TYPE_CD";
+
 	/**
 	 * Embedded key for Hibernate
 	 */
@@ -107,7 +110,7 @@ public class MLPRevisionDescription extends MLPTimestampedEntity implements Seri
 	 * Must be an entry in the solution revision table
 	 */
 	@Id
-	@Column(name = "REVISION_ID", nullable = false, updatable = false, columnDefinition = "CHAR(36)")
+	@Column(name = REVISION_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
 	@ApiModelProperty(required = true, value = "Revision ID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String revisionId;
@@ -116,7 +119,7 @@ public class MLPRevisionDescription extends MLPTimestampedEntity implements Seri
 	 * The Access Type Code value set is defined by server-side configuration.
 	 */
 	@Id
-	@Column(name = "ACCESS_TYPE_CD", nullable = false, columnDefinition = "CHAR(2)")
+	@Column(name = ACCESS_TYPE_CODE_COL_NAME, nullable = false, columnDefinition = "CHAR(2)")
 	@NotNull(message = "Access type code cannot be null")
 	@Size(max = 2)
 	@ApiModelProperty(value = "Access type code that is valid for this site", example = "PB")
@@ -204,6 +207,22 @@ public class MLPRevisionDescription extends MLPTimestampedEntity implements Seri
 		return this.getClass().getName() + "[revisionId=" + getRevisionId() + ", accessTypeCode=" + getAccessTypeCode()
 				+ ", description=" + getDescription() + ", created=" + getCreated() + ", modified=" + getModified()
 				+ "]";
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(revisionId, accessTypeCode);
+	}
+
+	@Override
+	public boolean equals(Object that) {
+		if (that == null)
+			return false;
+		if (!(that instanceof MLPRevisionDescription))
+			return false;
+		MLPRevisionDescription thatObj = (MLPRevisionDescription) that;
+		return Objects.equals(revisionId, thatObj.revisionId) && Objects.equals(accessTypeCode, thatObj.accessTypeCode)
+				&& Objects.equals(description, thatObj.description);
 	}
 
 }

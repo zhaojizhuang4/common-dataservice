@@ -28,6 +28,7 @@ import java.util.Map;
 import org.acumos.cds.client.CommonDataServiceRestClientImpl;
 import org.acumos.cds.client.ICommonDataServiceRestClient;
 import org.acumos.cds.domain.MLPArtifact;
+import org.acumos.cds.domain.MLPRevisionDescription;
 import org.acumos.cds.domain.MLPSolution;
 import org.acumos.cds.domain.MLPSolutionRevision;
 import org.acumos.cds.domain.MLPUser;
@@ -73,10 +74,12 @@ public class BasicSequenceDemo {
 			logger.info("Created solution {}", cs);
 
 			MLPSolutionRevision cr = new MLPSolutionRevision(cs.getSolutionId(), "1.0R", cu.getUserId(), "PB", null);
-			cr.setDescription("Some description");
 			cr.setPublisher("Big Data Org");
 			cr = client.createSolutionRevision(cr);
 			logger.info("Created solution revision {}", cr);
+
+			MLPRevisionDescription rd = new MLPRevisionDescription(cr.getRevisionId(), "PB", "A revision description");
+			rd = client.createRevisionDescription(rd);
 
 			MLPArtifact ca = new MLPArtifact("1.0A", "DI", "artifact name", "http://nexus/artifact", cu.getUserId(), 1);
 			ca = client.createArtifact(ca);
@@ -95,6 +98,7 @@ public class BasicSequenceDemo {
 			logger.info("Deleting objects");
 			client.dropSolutionRevisionArtifact(cs.getSolutionId(), cr.getRevisionId(), ca.getArtifactId());
 			client.deleteArtifact(ca.getArtifactId());
+			client.deleteRevisionDescription(cr.getRevisionId(), "PB");
 			client.deleteSolutionRevision(cs.getSolutionId(), cr.getRevisionId());
 			client.deleteSolution(cs.getSolutionId());
 			client.deleteUser(cu.getUserId());

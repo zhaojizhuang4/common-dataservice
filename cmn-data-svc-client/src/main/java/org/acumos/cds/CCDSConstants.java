@@ -50,6 +50,7 @@ public interface CCDSConstants {
 	public static final String FAVORITE_PATH = "favorite";
 	public static final String FUNCTION_PATH = "function";
 	public static final String GROUP_PATH = "group";
+	public static final String KEYWORD_PATH = "kw";
 	public static final String NOTIFICATION_PATH = "notif";
 	public static final String NOTIFICATION_PREF_PATH = "notifpref";
 	public static final String PEER_PATH = "peer";
@@ -97,6 +98,7 @@ public interface CCDSConstants {
 	public static final String SEARCH_ACTIVE = "active";
 	public static final String SEARCH_USERS = "user";
 	public static final String SEARCH_DESC = "desc";
+	public static final String SEARCH_KW = "kw";
 	public static final String SEARCH_MODEL_TYPES = "mtc";
 	public static final String SEARCH_NAME = "name";
 	public static final String SEARCH_TAGS = "tag";

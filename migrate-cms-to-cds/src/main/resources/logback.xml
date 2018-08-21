@@ -24,7 +24,7 @@
 	<!-- Basic logback configuration -->
 		
 	<property name="componentName" value="migrate-cms-to-cds"></property>
-	<property name="defaultPattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+	<property name="defaultPattern" value="%d{&quot;yyyy-MM-dd'T'HH:mm:ss.SSSXXX&quot;, UTC} [%thread] %-5level %logger{36} - %msg%n" />
 
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder 
