@@ -21,8 +21,8 @@ CMS User Data Migration Tool
 ============================
 
 This document explains a utility that migrates user-supplied data from the
-Hippo-CMS system to the Acumos Common Data Service version 1.17 and the 
-Acumos Nexus repository.  This utility migrates the following data items:
+Hippo-CMS system to the Common Data Service and the Nexus repository.
+This utility migrates the following data items:
 
 # Solution picture: a user can add a picture to a solution.
 
@@ -39,8 +39,9 @@ Acumos Nexus repository.  This utility migrates the following data items:
 Prerequisites
 -------------
 
-This migration tool pushes data to an Acumos Common Data Service at version 1.17.0 or later.
-Use of the tool requires read access to CMS, and write access to CDS and Nexus.
+This migration tool requires Acumos Common Data Service at version 1.17.0 or later,
+credentials to read from the CMS instance, credentials to write to the CDS instance, 
+and also credentials to write to the Nexus instance (3 sets of username/password pairs).
 
 Configuration
 -------------
