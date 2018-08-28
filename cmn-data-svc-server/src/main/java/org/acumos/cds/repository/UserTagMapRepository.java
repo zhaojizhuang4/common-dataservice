@@ -18,16 +18,24 @@
  * ===============LICENSE_END=========================================================
  */
 
-package org.acumos.cds;
+package org.acumos.cds.repository;
 
-/**
- * Provides a constant for every code-name value set.
- */
-public enum CodeNameType {
+import org.acumos.cds.domain.MLPUserTagMap;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
-	ACCESS_TYPE, ARTIFACT_TYPE, DEPLOYMENT_STATUS, LOGIN_PROVIDER, //
-	MESSAGE_SEVERITY, MODEL_TYPE, NOTIFICATION_DELIVERY_MECHANISM, //
-	PEER_STATUS, PUBLISH_REQUEST_STATUS, STEP_STATUS, STEP_TYPE, //
-	SUBSCRIPTION_SCOPE, TOOLKIT_TYPE, VALIDATION_STATUS, VALIDATION_TYPE;
+public interface UserTagMapRepository extends CrudRepository<MLPUserTagMap, MLPUserTagMap.UserTagMapPK> {
+
+	/**
+	 * Deletes all map entries for the specified user ID.
+	 * 
+	 * @param userId
+	 *            User ID
+	 */
+	@Modifying
+	@Transactional // throws exception without this
+	void deleteByUserId(@Param("userId") String userId);
 
 }

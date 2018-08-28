@@ -22,6 +22,7 @@ package org.acumos.cds.controller;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +32,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.acumos.cds.CodeNameType;
+import org.acumos.cds.domain.MLPTag;
+import org.acumos.cds.repository.TagRepository;
 import org.acumos.cds.service.CodeNameService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +51,9 @@ public abstract class AbstractController {
 
 	@Autowired
 	private CodeNameService codeNameService;
+	// Shared among controllers
+	@Autowired
+	protected TagRepository tagRepository;
 
 	protected static final String NO_ENTRY_WITH_ID = "No entry with ID ";
 
@@ -214,6 +220,21 @@ public abstract class AbstractController {
 			throw new IllegalArgumentException("Unexpected null for CodeNameType " + type.name());
 		if (!codeNameService.validateCode(code, type))
 			throw new IllegalArgumentException("Unexpected code " + code + " for CodeNameType " + type.name());
+	}
+
+	/**
+	 * Adds entries to the tags table as needed.
+	 * 
+	 * @param tags
+	 *            Collection of tags
+	 */
+	protected void createMissingTags(Collection<MLPTag> tags) {
+		for (MLPTag tag : tags) {
+			if (tagRepository.findOne(tag.getTag()) == null) {
+				tagRepository.save(tag);
+				logger.info("createMissingTags: tag {}", tag);
+			}
+		}
 	}
 
 }

@@ -22,13 +22,19 @@ package org.acumos.cds.domain;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -196,6 +202,24 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	private Date verifyExpiration;
 
 	/**
+	 * Tags assigned to the user via a join table. Tags can be reused by many users,
+	 * so this is a many-many (not one-many) relationship.
+	 * 
+	 * Unidirectional relationship - the MLPTag object is not annotated.
+	 * 
+	 * This does NOT use cascade; e.g., "cascade = { CascadeType.ALL }". With that
+	 * annotation, use of an EXISTING tag when creating a user yields a SQL
+	 * constraint-violation error, Hibernate attempts to insert a duplicate row to
+	 * the join table, also see https://hibernate.atlassian.net/browse/HHH-6776
+	 * 
+	 */
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = MLPUserTagMap.TABLE_NAME, //
+			joinColumns = { @JoinColumn(name = MLPUserTagMap.USER_ID_COL_NAME) }, //
+			inverseJoinColumns = { @JoinColumn(name = MLPUserTagMap.TAG_COL_NAME) })
+	private Set<MLPTag> tags = new HashSet<>(0);
+
+	/**
 	 * No-arg constructor
 	 */
 	public MLPUser() {
@@ -247,6 +271,7 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 		this.userId = that.userId;
 		this.verifyTokenHash = that.verifyTokenHash;
 		this.verifyExpiration = that.verifyExpiration;
+		this.tags = that.tags;
 	}
 
 	public String getUserId() {
@@ -406,6 +431,27 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 
 	public void setVerifyExpiration(Date verifyExpiration) {
 		this.verifyExpiration = verifyExpiration;
+	}
+
+	/**
+	 * Tags may be updated by modifying this set, but all tag objects must exist;
+	 * i.e., have been created previously.
+	 * 
+	 * @return Set of MLPTag, which may be empty.
+	 */
+	public Set<MLPTag> getTags() {
+		return tags;
+	}
+
+	/**
+	 * Tags may be updated via this method, but all tag objects must exist; i.e.,
+	 * have been created previously.
+	 * 
+	 * @param tags
+	 *            Set of MLPTag
+	 */
+	public void setTags(Set<MLPTag> tags) {
+		this.tags = tags;
 	}
 
 	/**

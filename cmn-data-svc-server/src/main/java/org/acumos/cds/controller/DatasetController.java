@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.acumos.cds.CCDSConstants;
+import org.acumos.cds.transport.ErrorTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -37,9 +38,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * Answers REST requests to get, create, update and delete datasets.
+ * 
+ * Added by the CMLP team in version 1.17.3 as an empty placeholder.
  */
 @Controller
 @RequestMapping(value = "/" + CCDSConstants.DATASET_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -47,15 +52,9 @@ public class DatasetController extends AbstractController {
 
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	
-	
-	/**
-	 * @param datasetId
-	 *            Path parameter with row ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A dataset if found, an error otherwise.
-	 */
-	@ApiOperation(value = "Gets the dataset for the specified ID.", response = Map.class)
+	@ApiOperation(value = "Gets the dataset for the specified ID. Returns bad request if the ID is not found.", //
+			response = Map.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{datasetId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getDataset(@PathVariable("datasetId") String datasetId, HttpServletResponse response) {

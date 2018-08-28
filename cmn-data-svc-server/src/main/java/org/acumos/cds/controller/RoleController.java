@@ -55,6 +55,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * Answers REST requests to get, add, update and delete roles.
@@ -74,9 +77,6 @@ public class RoleController extends AbstractController {
 	@Autowired
 	private RoleFunctionRepository roleFunctionRepository;
 
-	/**
-	 * @return CountTransport with count of roles
-	 */
 	@ApiOperation(value = "Gets the count of roles.", response = CountTransport.class)
 	@RequestMapping(value = CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
@@ -86,12 +86,8 @@ public class RoleController extends AbstractController {
 		return new CountTransport(count);
 	}
 
-	/**
-	 * @param pageable
-	 *            Sort and page criteria
-	 * @return List of artifacts, for serialization as JSON
-	 */
-	@ApiOperation(value = "Gets a page of roles, optionally sorted on fields.", response = MLPRole.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of roles, optionally sorted on fields.", //
+			response = MLPRole.class, responseContainer = "Page")
 	@ApiPageable
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
@@ -101,20 +97,17 @@ public class RoleController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param queryParameters
-	 *            Map of String (field name) to String (value) for restricting the
-	 *            query
-	 * @param pageRequest
-	 *            Sort and page criteria
-	 * @param response
-	 *            HttpServletResponse
-	 * @return List of roles, for serialization as JSON.
-	 */
-	@ApiOperation(value = "Searches for roles using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disjunction).", response = MLPRole.class, responseContainer = "Page")
+	@ApiOperation(value = "Searches for entities with attribute values matching the field name - field value pairs specified as query parameters. " //
+			+ "Defaults to and (conjunction); send junction query parameter '_j=o' for or (disjunction).", //
+			response = MLPRole.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchRoles(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
+	public Object searchRoles(
+			// This actually IS required; set flag to false for swagger UI
+			@ApiParam(value = "Field name - field value pairs as request parameters in the format name=value, minimum 1; repeats allowed. " //
+					+ "Not supported by Swagger web UI.", allowMultiple = true, type = "Array[string]", required = false) //
+			@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
 			HttpServletResponse response) {
 		logger.info("searchRoles query {}", queryParameters);
 		cleanPageableParameters(queryParameters);
@@ -137,14 +130,9 @@ public class RoleController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param roleId
-	 *            Path parameter with row ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A role if found, an error otherwise.
-	 */
-	@ApiOperation(value = "Gets the role for the specified ID.", response = MLPRole.class)
+	@ApiOperation(value = "Gets the entity for the specified ID. Returns bad request if the ID is not found.", //
+			response = MLPRole.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{roleId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getRole(@PathVariable("roleId") String roleId, HttpServletResponse response) {
@@ -157,15 +145,9 @@ public class RoleController extends AbstractController {
 		return da;
 	}
 
-	/**
-	 * @param role
-	 *            Role to save. If no ID is set a new one will be generated; if an
-	 *            ID value is set, it will be used if valid and not in table.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return model to be serialized as JSON
-	 */
-	@ApiOperation(value = "Creates a new role.", response = MLPRole.class)
+	@ApiOperation(value = "Creates a new entity and generates an ID if needed. Returns bad request on constraint violation etc.", //
+			response = MLPRole.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createRole(@RequestBody MLPRole role, HttpServletResponse response) {
@@ -194,16 +176,9 @@ public class RoleController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param roleId
-	 *            Path parameter with the row ID
-	 * @param role
-	 *            Role to be updated
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
-	 */
-	@ApiOperation(value = "Updates a role.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{roleId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updateRole(@PathVariable("roleId") String roleId, @RequestBody MLPRole role,
@@ -230,14 +205,9 @@ public class RoleController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param roleId
-	 *            Path parameter that identifies the instance
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
-	 */
-	@ApiOperation(value = "Deletes a role.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{roleId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteRole(@PathVariable("roleId") String roleId, HttpServletResponse response) {
@@ -256,15 +226,8 @@ public class RoleController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param roleId
-	 *            Path parameter with role ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return List of role functions if the specified role is found; an error
-	 *         otherwise.
-	 */
-	@ApiOperation(value = "Gets the functions for the specified role.", response = MLPRoleFunction.class, responseContainer = "List")
+	@ApiOperation(value = "Gets the functions for the specified role. Returns bad request if the ID is not found.", //
+			response = MLPRoleFunction.class, responseContainer = "List")
 	@RequestMapping(value = "/{roleId}/" + CCDSConstants.FUNCTION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getListOfRoleFunc(@PathVariable("roleId") String roleId, HttpServletResponse response) {
@@ -277,16 +240,9 @@ public class RoleController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param roleId
-	 *            Path parameter with role ID, which is ignored.
-	 * @param functionId
-	 *            Path parameter with role function ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A role if found, an error otherwise.
-	 */
-	@ApiOperation(value = "Gets the role function for the specified role and function IDs.", response = MLPRoleFunction.class)
+	@ApiOperation(value = "Gets the role function for the specified role and function IDs. Returns bad request if an ID is not found.", //
+			response = MLPRoleFunction.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{roleId}/" + CCDSConstants.FUNCTION_PATH + "/{functionId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getRoleFunc(@PathVariable("roleId") String roleId, @PathVariable("functionId") String functionId,
@@ -300,16 +256,9 @@ public class RoleController extends AbstractController {
 		return rf;
 	}
 
-	/**
-	 * @param roleId
-	 *            role ID
-	 * @param roleFunction
-	 *            role function to save
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Solution revision model for serialization as JSON
-	 */
-	@ApiOperation(value = "Creates a new role function.", response = MLPRoleFunction.class)
+	@ApiOperation(value = "Creates a new entity and generates an ID if needed. Returns bad request on constraint violation etc.", //
+			response = MLPRoleFunction.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{roleId}/" + CCDSConstants.FUNCTION_PATH, method = RequestMethod.POST)
 	@ResponseBody
 	public Object createRoleFunc(@PathVariable("roleId") String roleId, @RequestBody MLPRoleFunction roleFunction,
@@ -337,18 +286,9 @@ public class RoleController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param roleId
-	 *            role ID
-	 * @param functionId
-	 *            function ID
-	 * @param roleFunction
-	 *            item to update
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Status message
-	 */
-	@ApiOperation(value = "Updates an existing role function.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{roleId}/" + CCDSConstants.FUNCTION_PATH + "/{functionId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updateRoleFunc(@PathVariable("roleId") String roleId, @PathVariable("functionId") String functionId,
@@ -378,17 +318,9 @@ public class RoleController extends AbstractController {
 		}
 	}
 
-	/**
-	 * 
-	 * @param roleId
-	 *            Path parameter that identifies the role
-	 * @param functionId
-	 *            Path parameter that identifies the role function
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
-	 */
-	@ApiOperation(value = "Deletes a role function.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{roleId}/" + CCDSConstants.FUNCTION_PATH + "/{functionId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteRoleFunc(@PathVariable("roleId") String roleId,

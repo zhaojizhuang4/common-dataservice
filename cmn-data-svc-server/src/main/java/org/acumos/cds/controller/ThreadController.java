@@ -51,10 +51,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
-/**
- * Provides methods to create and delete threads.
- */
 @Controller
 @RequestMapping(value = "/" + CCDSConstants.THREAD_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 public class ThreadController extends AbstractController {
@@ -68,9 +67,6 @@ public class ThreadController extends AbstractController {
 	@Autowired
 	private UserRepository userRepository;
 
-	/**
-	 * @return Count of all threads
-	 */
 	@ApiOperation(value = "Gets the count of threads.", response = CountTransport.class)
 	@RequestMapping(value = CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
@@ -80,12 +76,8 @@ public class ThreadController extends AbstractController {
 		return new CountTransport(count);
 	}
 
-	/**
-	 * @param pageable
-	 *            Sort and page criteria
-	 * @return Page of threads
-	 */
-	@ApiOperation(value = "Gets a page of threads, optionally sorted.", response = MLPThread.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of threads, optionally sorted.", //
+			response = MLPThread.class, responseContainer = "Page")
 	@ApiPageable
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
@@ -95,14 +87,8 @@ public class ThreadController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param solutionId
-	 *            Solution ID
-	 * @param revisionId
-	 *            Revision ID
-	 * @return Count of threads for specified solution and revision
-	 */
-	@ApiOperation(value = "Gets the count of threads for the solution and revision IDs.", response = CountTransport.class)
+	@ApiOperation(value = "Gets the count of threads for the solution and revision IDs.", //
+			response = CountTransport.class)
 	@RequestMapping(value = CCDSConstants.SOLUTION_PATH + "/{solutionId}/" + CCDSConstants.REVISION_PATH
 			+ "/{revisionId}/" + CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
@@ -113,16 +99,8 @@ public class ThreadController extends AbstractController {
 		return new CountTransport(count);
 	}
 
-	/**
-	 * @param solutionId
-	 *            Solution ID
-	 * @param revisionId
-	 *            Revision ID
-	 * @param pageable
-	 *            Sort and page criteria
-	 * @return Page of threads for specified solution and revision
-	 */
-	@ApiOperation(value = "Gets a page of threads for the solution and revision IDs, optionally sorted.", response = MLPThread.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of threads for the solution and revision IDs, optionally sorted.", //
+			response = MLPThread.class, responseContainer = "Page")
 	@ApiPageable
 	@RequestMapping(value = CCDSConstants.SOLUTION_PATH + "/{solutionId}/" + CCDSConstants.REVISION_PATH
 			+ "/{revisionId}", method = RequestMethod.GET)
@@ -134,14 +112,9 @@ public class ThreadController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param threadId
-	 *            Path parameter with row ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A thread if ID exists, an error otherwise.
-	 */
-	@ApiOperation(value = "Gets the thread for the specified ID.", response = MLPThread.class)
+	@ApiOperation(value = "Gets the thread for the specified ID. Returns bad request if an ID is not found.", //
+			response = MLPThread.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "{threadId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getThread(@PathVariable("threadId") String threadId, HttpServletResponse response) {
@@ -154,14 +127,9 @@ public class ThreadController extends AbstractController {
 		return thread;
 	}
 
-	/**
-	 * @param thread
-	 *            Thread details
-	 * @param response
-	 *            HttpServletResponse
-	 * @return MLPThread
-	 */
-	@ApiOperation(value = "Creates a thread.", response = MLPThread.class)
+	@ApiOperation(value = "Creates a new entity and generates an ID if needed. Returns bad request on constraint violation etc.", //
+			response = MLPThread.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createThread(@RequestBody MLPThread thread, HttpServletResponse response) {
@@ -190,16 +158,9 @@ public class ThreadController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param threadId
-	 *            Path parameter with the row ID
-	 * @param thread
-	 *            data to be updated
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Status indicator
-	 */
-	@ApiOperation(value = "Updates a thread.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "{threadId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updateThread(@PathVariable("threadId") String threadId, @RequestBody MLPThread thread,
@@ -225,14 +186,9 @@ public class ThreadController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param threadId
-	 *            Path parameter that identifies the instance
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Status indicator
-	 */
-	@ApiOperation(value = "Deletes a thread.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "{threadId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteThread(@PathVariable("threadId") String threadId, HttpServletResponse response) {
@@ -250,11 +206,6 @@ public class ThreadController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param threadId
-	 *            Path parameter that identifies the instance
-	 * @return Count of comments in the thread
-	 */
 	@ApiOperation(value = "Gets the number of comments in the thread.", response = CountTransport.class)
 	@RequestMapping(value = "{threadId}/" + CCDSConstants.COMMENT_PATH + "/"
 			+ CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
@@ -265,16 +216,6 @@ public class ThreadController extends AbstractController {
 		return new CountTransport(count);
 	}
 
-	/**
-	 * 
-	 * @param threadId
-	 *            Thread ID
-	 * @param pageable
-	 *            Sort and page criteria
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of comments
-	 */
 	@ApiOperation(value = "Gets a page of comments in the thread.", response = MLPComment.class, responseContainer = "Page")
 	@ApiPageable
 	@RequestMapping(value = "{threadId}/" + CCDSConstants.COMMENT_PATH, method = RequestMethod.GET)
@@ -291,14 +232,6 @@ public class ThreadController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param solutionId
-	 *            Solution ID
-	 * @param revisionId
-	 *            Revision ID
-	 * @return Count of comments for specified solution and revision, which may
-	 *         include multiple threads
-	 */
 	@ApiOperation(value = "Gets comment count for the solution revision.", response = CountTransport.class)
 	@RequestMapping(value = CCDSConstants.SOLUTION_PATH + "/{solutionId}/" + CCDSConstants.REVISION_PATH
 			+ "/{revisionId}/" + CCDSConstants.COMMENT_PATH + "/"
@@ -311,17 +244,8 @@ public class ThreadController extends AbstractController {
 		return new CountTransport(result);
 	}
 
-	/**
-	 * @param solutionId
-	 *            Solution ID
-	 * @param revisionId
-	 *            Revision ID
-	 * @param pageable
-	 *            Sort and page criteria
-	 * @return Page of comments for specified solution and revision, which may
-	 *         include multiple threads
-	 */
-	@ApiOperation(value = "Gets a page of comments for the solution revision, optionally sorted.", response = MLPThread.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of comments for the solution revision, optionally sorted.", //
+			response = MLPThread.class, responseContainer = "Page")
 	@ApiPageable
 	@RequestMapping(value = CCDSConstants.SOLUTION_PATH + "/{solutionId}/" + CCDSConstants.REVISION_PATH
 			+ "/{revisionId}/" + CCDSConstants.COMMENT_PATH, method = RequestMethod.GET)
@@ -333,16 +257,9 @@ public class ThreadController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param threadId
-	 *            Thread ID
-	 * @param commentId
-	 *            Path parameter with row ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A comment if the ID exists, an error otherwise.
-	 */
-	@ApiOperation(value = "Gets the comment for the specified ID.", response = MLPComment.class)
+	@ApiOperation(value = "Gets the comment for the specified ID. Returns bad request if the ID is not found.", //
+			response = MLPComment.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "{threadId}/" + CCDSConstants.COMMENT_PATH + "/{commentId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getComment(@PathVariable("threadId") String threadId, @PathVariable("commentId") String commentId,
@@ -356,16 +273,9 @@ public class ThreadController extends AbstractController {
 		return comment;
 	}
 
-	/**
-	 * @param threadId
-	 *            Thread ID
-	 * @param comment
-	 *            Comment details
-	 * @param response
-	 *            HttpServletResponse
-	 * @return MLPComment
-	 */
-	@ApiOperation(value = "Creates a comment.", response = MLPComment.class)
+	@ApiOperation(value = "Creates a new entity and generates an ID if needed. Returns bad request on constraint violation etc.", //
+			response = MLPComment.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "{threadId}/" + CCDSConstants.COMMENT_PATH, method = RequestMethod.POST)
 	@ResponseBody
 	public Object createComment(@PathVariable("threadId") String threadId, @RequestBody MLPComment comment,
@@ -407,18 +317,9 @@ public class ThreadController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param threadId
-	 *            Thread ID. Not used, comment ID is sufficient.
-	 * @param commentId
-	 *            Path parameter with the comment ID
-	 * @param comment
-	 *            data to be updated
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Status indicator
-	 */
-	@ApiOperation(value = "Updates a comment.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "{threadId}/" + CCDSConstants.COMMENT_PATH + "/{commentId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updateComment(@PathVariable("threadId") String threadId, @PathVariable("commentId") String commentId,
@@ -456,16 +357,9 @@ public class ThreadController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param threadId
-	 *            Thread ID. Not used, comment ID is sufficient.
-	 * @param commentId
-	 *            Path parameter with the comment ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Status indicator
-	 */
-	@ApiOperation(value = "Deletes a comment.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if an ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "{threadId}/" + CCDSConstants.COMMENT_PATH + "/{commentId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteComment(@PathVariable("threadId") String threadId,

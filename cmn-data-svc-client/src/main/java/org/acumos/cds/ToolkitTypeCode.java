@@ -21,7 +21,11 @@
 package org.acumos.cds;
 
 /**
- * This enum defines Acumos toolkit type codes.
+ * This enum defines Acumos toolkit type codes. * This enum defines Acumos
+ * artifact type codes. Because these codes are highly likely to vary between
+ * installations, it's NOT SAFE to rely on this Java enum as providing the
+ * definitive value set.
+ * 
  * 
  * @deprecated Use
  *             {@link org.acumos.cds.client.ICommonDataServiceRestClient#getCodeNamePairs(CodeNameType)}

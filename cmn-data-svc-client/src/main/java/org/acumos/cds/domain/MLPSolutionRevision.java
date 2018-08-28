@@ -41,6 +41,7 @@ public class MLPSolutionRevision extends MLPAbstractSolutionRevision implements 
 	private static final long serialVersionUID = 7037843597553091071L;
 
 	@Column(name = SOL_ID_COL_NAME, nullable = false, columnDefinition = "CHAR(36)")
+	@NotNull(message = "SolutionId cannot be null")
 	@Size(max = 36)
 	@ApiModelProperty(required = true, value = "Solution ID (UUID)", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String solutionId;

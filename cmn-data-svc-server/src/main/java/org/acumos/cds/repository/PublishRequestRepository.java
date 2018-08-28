@@ -17,17 +17,11 @@
  * limitations under the License.
  * ===============LICENSE_END=========================================================
  */
+package org.acumos.cds.repository;
 
-package org.acumos.cds;
+import org.acumos.cds.domain.MLPPublishRequest;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-/**
- * Provides a constant for every code-name value set.
- */
-public enum CodeNameType {
-
-	ACCESS_TYPE, ARTIFACT_TYPE, DEPLOYMENT_STATUS, LOGIN_PROVIDER, //
-	MESSAGE_SEVERITY, MODEL_TYPE, NOTIFICATION_DELIVERY_MECHANISM, //
-	PEER_STATUS, PUBLISH_REQUEST_STATUS, STEP_STATUS, STEP_TYPE, //
-	SUBSCRIPTION_SCOPE, TOOLKIT_TYPE, VALIDATION_STATUS, VALIDATION_TYPE;
+public interface PublishRequestRepository extends PagingAndSortingRepository<MLPPublishRequest, Long> {
 
 }

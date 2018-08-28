@@ -50,9 +50,6 @@ public class HealthcheckController extends AbstractController {
 	@Autowired
 	private ArtifactRepository artifactRepository;
 
-	/**
-	 * @return a JSON block with some status details.
-	 */
 	@ApiOperation(value = "Assesses the health of the application by querying the database.", response = SuccessTransport.class)
 	@RequestMapping(value = CCDSConstants.HEALTHCHECK_PATH, method = RequestMethod.GET)
 	@ResponseBody
@@ -62,10 +59,6 @@ public class HealthcheckController extends AbstractController {
 		return new SuccessTransport(200, "database reports artifact count is " + count);
 	}
 
-	/**
-	 * @return A JSON block with version information as read from the
-	 *         Implementation-Version property of the MANIFEST.MF.
-	 */
 	@ApiOperation(value = "Gets the value of the MANIFEST.MF property Implementation-Version as written by maven.", response = SuccessTransport.class)
 	@RequestMapping(value = CCDSConstants.VERSION_PATH, method = RequestMethod.GET)
 	@ResponseBody

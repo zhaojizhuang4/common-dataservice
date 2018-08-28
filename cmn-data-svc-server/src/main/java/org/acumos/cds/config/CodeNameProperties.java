@@ -56,6 +56,7 @@ public class CodeNameProperties {
 	private Map<String, String> modelType;
 	private Map<String, String> notificationDeliveryMechanism;
 	private Map<String, String> peerStatus;
+	private Map<String, String> publishRequestStatus;
 	private Map<String, String> stepStatus;
 	private Map<String, String> stepType;
 	private Map<String, String> subscriptionScope;
@@ -125,6 +126,14 @@ public class CodeNameProperties {
 
 	public void setPeerStatus(Map<String, String> peerStatus) {
 		this.peerStatus = peerStatus;
+	}
+
+	public Map<String, String> getPublishRequestStatus() {
+		return publishRequestStatus;
+	}
+
+	public void setPublishRequestStatus(Map<String, String> publishRequestStatus) {
+		this.publishRequestStatus = publishRequestStatus;
 	}
 
 	public Map<String, String> getStepStatus() {

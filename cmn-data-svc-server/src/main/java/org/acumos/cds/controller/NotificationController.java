@@ -48,6 +48,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * Answers REST requests to get, add, update and delete notifications; to record
@@ -65,9 +67,6 @@ public class NotificationController extends AbstractController {
 	@Autowired
 	private NotificationRepository notificationRepository;
 
-	/**
-	 * @return SuccessTransport object
-	 */
 	@ApiOperation(value = "Gets the count of notifications.", response = CountTransport.class)
 	@RequestMapping(value = "/" + CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
@@ -77,13 +76,8 @@ public class NotificationController extends AbstractController {
 		return new CountTransport(count);
 	}
 
-	/**
-	 * 
-	 * @param pageable
-	 *            Sort and page criteria
-	 * @return Page of notifications
-	 */
-	@ApiOperation(value = "Gets a page of notifications, optionally sorted.", response = MLPNotification.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of notifications, optionally sorted.", //
+			response = MLPNotification.class, responseContainer = "Page")
 	@ApiPageable
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
@@ -93,15 +87,9 @@ public class NotificationController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param notif
-	 *            Notification to save. If no ID is set a new one will be generated;
-	 *            if an ID value is set, it will be used if valid and not in table.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return model to be serialized as JSON
-	 */
-	@ApiOperation(value = "Creates a new notification.", response = MLPNotification.class)
+	@ApiOperation(value = "Creates a new entity and generates an ID if needed. Returns bad request on constraint violation etc.", //
+			response = MLPNotification.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createNotification(@RequestBody MLPNotification notif, HttpServletResponse response) {
@@ -130,16 +118,9 @@ public class NotificationController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param notifId
-	 *            Path parameter with the row ID
-	 * @param notif
-	 *            Notification to be updated
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
-	 */
-	@ApiOperation(value = "Updates a notification.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{notificationId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updateNotification(@PathVariable("notificationId") String notifId, @RequestBody MLPNotification notif,
@@ -166,14 +147,8 @@ public class NotificationController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param notifId
-	 *            Path parameter that identifies the instance
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
-	 */
-	@ApiOperation(value = "Deletes a notification.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
 	@RequestMapping(value = "/{notificationId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteNotification(@PathVariable("notificationId") String notifId,

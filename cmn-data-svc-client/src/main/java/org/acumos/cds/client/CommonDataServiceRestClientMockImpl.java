@@ -52,6 +52,7 @@ import org.acumos.cds.domain.MLPPeer;
 import org.acumos.cds.domain.MLPPeerGroup;
 import org.acumos.cds.domain.MLPPeerSolAccMap;
 import org.acumos.cds.domain.MLPPeerSubscription;
+import org.acumos.cds.domain.MLPPublishRequest;
 import org.acumos.cds.domain.MLPRevisionDescription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
@@ -217,6 +218,10 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private MLPDocument document;
 	private MLPDocument documentById;
 	private List<MLPDocument> solutionRevisionDocuments;
+	private MLPPublishRequest publishRequestById;
+	private RestPageResponse<MLPPublishRequest> publishRequests;
+	private RestPageResponse<MLPPublishRequest> searchPublishRequests;
+	private MLPPublishRequest publishRequest;
 
 	/**
 	 * No-argument constructor.
@@ -1800,6 +1805,68 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 
 	@Override
 	public void dropSolutionRevisionDocument(String revisionId, String accessTypeCode, String documentId) {
+		// what to mock?
+	}
+
+	public void setPublishRequestById(MLPPublishRequest publishRequest) {
+		this.publishRequestById = publishRequest;
+	}
+
+	@Override
+	public MLPPublishRequest getPublishRequest(long publishRequestId) {
+		return publishRequestById;
+	}
+
+	public void setPublishRequests(RestPageResponse<MLPPublishRequest> results) {
+		this.publishRequests = results;
+	}
+
+	@Override
+	public RestPageResponse<MLPPublishRequest> getPublishRequests(RestPageRequest pageRequest) {
+		return publishRequests;
+	}
+
+	public void setSearchPublishRequests(RestPageResponse<MLPPublishRequest> results) {
+		this.searchPublishRequests = results;
+	}
+
+	@Override
+	public RestPageResponse<MLPPublishRequest> searchPublishRequests(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
+		return this.searchPublishRequests;
+	}
+
+	@Override
+	public boolean isPublishRequestPending(String solutionId, String revisionId) {
+		return false;
+	}
+
+	public void setPublishRequest(MLPPublishRequest result) {
+		this.publishRequest = result;
+	}
+
+	@Override
+	public MLPPublishRequest createPublishRequest(MLPPublishRequest publishRequest) {
+		return this.publishRequest;
+	}
+
+	@Override
+	public void updatePublishRequest(MLPPublishRequest publishRequest) {
+		this.publishRequest = publishRequest;
+	}
+
+	@Override
+	public void deletePublishRequest(long publishRequestId) {
+		// How to mock?
+	}
+
+	@Override
+	public void addUserTag(String userId, String tag) {
+		// what to mock?
+	}
+
+	@Override
+	public void dropUserTag(String userId, String tag) {
 		// what to mock?
 	}
 

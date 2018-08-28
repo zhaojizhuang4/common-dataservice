@@ -37,6 +37,7 @@ import org.acumos.cds.transport.CountTransport;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
+import org.acumos.cds.util.ApiPageable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,10 +55,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
-/**
- * Answers REST requests to get, search, create, update and delete artifacts.
- */
 @Controller
 @RequestMapping(value = "/" + CCDSConstants.ARTIFACT_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 public class ArtifactController extends AbstractController {
@@ -71,39 +72,44 @@ public class ArtifactController extends AbstractController {
 	@Autowired
 	private SolutionRevisionRepository solutionRevisionRepository;
 
-	/**
-	 * @return SuccessTransport object
-	 */
 	@ApiOperation(value = "Gets the count of artifacts.", response = CountTransport.class)
 	@RequestMapping(value = "/" + CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public CountTransport getArtifactCount() {
+		logger.info("getArtifactCount");
 		Long count = artifactRepository.count();
 		return new CountTransport(count);
 	}
 
-	/**
-	 * @param pageRequest
-	 *            Page and sort criteria
-	 * @return List of artifacts, for serialization as JSON
-	 */
-	@ApiOperation(value = "Gets a page of artifacts, optionally sorted on fields.", response = MLPArtifact.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of artifacts, optionally sorted.", //
+			response = MLPArtifact.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPArtifact> getArtifacts(Pageable pageRequest) {
-		logger.info("getArtifacts pageRequest {}", pageRequest);
+		logger.info("getArtifacts {}", pageRequest);
 		Page<MLPArtifact> page = artifactRepository.findAll(pageRequest);
 		return page;
 	}
 
-	/**
-	 * @param term
-	 *            Search term used for partial match ("like")
-	 * @param pageRequest
-	 *            Page and sort criteria
-	 * @return List of artifacts
-	 */
-	@ApiOperation(value = "Searches for artifacts with names or descriptions that contain the search term", response = MLPArtifact.class, responseContainer = "List")
+	@ApiOperation(value = "Gets the entity for the specified ID. Returns bad request if the ID is not found.", //
+			response = MLPArtifact.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
+	@RequestMapping(value = "/{artifactId}", method = RequestMethod.GET)
+	@ResponseBody
+	public Object getArtifact(@PathVariable("artifactId") String artifactId, HttpServletResponse response) {
+		logger.info("getArtifact ID {}", artifactId);
+		MLPArtifact da = artifactRepository.findOne(artifactId);
+		if (da == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + artifactId, null);
+		}
+		return da;
+	}
+
+	@ApiOperation(value = "Searches for entities with names or descriptions that contain the search term using the like operator.", //
+			response = MLPArtifact.class, responseContainer = "List")
+	@ApiPageable
 	@RequestMapping(value = "/" + CCDSConstants.LIKE_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPArtifact> like(@RequestParam(CCDSConstants.TERM_PATH) String term, Pageable pageRequest) {
@@ -112,22 +118,20 @@ public class ArtifactController extends AbstractController {
 		return i;
 	}
 
-	/**
-	 * @param queryParameters
-	 *            Map of String (field name) to String (value) for restricting the
-	 *            query
-	 * @param pageRequest
-	 *            Page and sort criteria
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of artifacts, for serialization as JSON
-	 */
-	@ApiOperation(value = "Searches for artifacts using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disjunction).", response = MLPArtifact.class, responseContainer = "Page")
+	@ApiOperation(value = "Searches for entities with attribute values matching the field name - field value pairs specified as query parameters. " //
+			+ "Defaults to and (conjunction); send junction query parameter '_j=o' for or (disjunction).", //
+			response = MLPArtifact.class, responseContainer = "Page")
+	@ApiPageable
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchArtifacts(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
+	public Object searchArtifacts(
+			// This actually IS required; set flag to false for swagger UI
+			@ApiParam(value = "Field name - field value pairs as request parameters in the format name=value, minimum 1; repeats allowed. " //
+					+ "Not supported by Swagger web UI.", allowMultiple = true, type = "Array[string]", required = false) //
+			@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
 			HttpServletResponse response) {
-		logger.info("searchArtifacts query {}", queryParameters);
+		logger.info("searchArtifacts {}", queryParameters);
 		cleanPageableParameters(queryParameters);
 		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
 		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
@@ -148,34 +152,9 @@ public class ArtifactController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param artifactId
-	 *            Path parameter with row ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return An artifact if found, an error otherwise.
-	 */
-	@ApiOperation(value = "Gets the artifact for the specified ID.", response = MLPArtifact.class)
-	@RequestMapping(value = "/{artifactId}", method = RequestMethod.GET)
-	@ResponseBody
-	public Object getArtifact(@PathVariable("artifactId") String artifactId, HttpServletResponse response) {
-		logger.info("getArtifact ID {}", artifactId);
-		MLPArtifact da = artifactRepository.findOne(artifactId);
-		if (da == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + artifactId, null);
-		}
-		return da;
-	}
-
-	/**
-	 * @param artifactId
-	 *            Path parameter with row ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A list of revisions, possibly empty
-	 */
-	@ApiOperation(value = "Gets the solution revisions that use the specified artifact ID.", response = MLPSolutionRevision.class, responseContainer = "List")
+	@ApiOperation(value = "Gets the solution revisions that use the specified artifact ID.", //
+			response = MLPSolutionRevision.class, responseContainer = "List")
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{artifactId}/" + CCDSConstants.REVISION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getRevisionsForArtifact(@PathVariable("artifactId") String artifactId, HttpServletResponse response) {
@@ -190,15 +169,9 @@ public class ArtifactController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param artifact
-	 *            artifact to save. If no ID is set a new one will be generated; if
-	 *            an ID value is set, it will be used if valid and not in table.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Entity on success; error on failure.
-	 */
-	@ApiOperation(value = "Creates a new artifact.", response = MLPArtifact.class)
+	@ApiOperation(value = "Creates a new entity and generates an ID if needed. Returns bad request on constraint violation etc.", //
+			response = MLPArtifact.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createArtifact(@RequestBody MLPArtifact artifact, HttpServletResponse response) {
@@ -227,16 +200,9 @@ public class ArtifactController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param artifactId
-	 *            Path parameter with the row ID
-	 * @param artifact
-	 *            artifact data to be updated
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Artifact that maps String to Object, for serialization as JSON
-	 */
-	@ApiOperation(value = "Updates an artifact.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{artifactId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updateArtifact(@PathVariable("artifactId") String artifactId, @RequestBody MLPArtifact artifact,
@@ -264,15 +230,9 @@ public class ArtifactController extends AbstractController {
 		}
 	}
 
-	/**
-	 * 
-	 * @param artifactId
-	 *            Path parameter that identifies the instance
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Artifact that maps String to Object, for serialization as JSON
-	 */
-	@ApiOperation(value = "Deletes the artifact with the specified ID.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{artifactId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteArtifact(@PathVariable("artifactId") String artifactId,

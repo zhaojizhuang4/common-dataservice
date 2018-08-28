@@ -44,6 +44,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * Answers REST requests to manage site configuration entries.
@@ -59,14 +61,7 @@ public class SiteConfigController extends AbstractController {
 	@Autowired
 	private UserRepository userRepository;
 
-	/**
-	 * @param configKey
-	 *            Key to row with config value
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success or Error transport model
-	 */
-	@ApiOperation(value = "Gets the site configuration for the specified key.", response = SuccessTransport.class)
+	@ApiOperation(value = "Gets the site configuration value for the specified key.", response = SuccessTransport.class)
 	@RequestMapping(value = "/{configKey}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getSiteConfig(@PathVariable("configKey") String configKey, HttpServletResponse response) {
@@ -79,14 +74,8 @@ public class SiteConfigController extends AbstractController {
 		return da;
 	}
 
-	/**
-	 * @param siteConfig
-	 *            SiteConfig model
-	 * @param response
-	 *            HttpServletResponse
-	 * @return SiteConfig model
-	 */
-	@ApiOperation(value = "Creates a new site configuration.", response = MLPSiteConfig.class)
+	@ApiOperation(value = "Creates a new site configuration record. Returns bad request on constraint violation etc.", response = MLPSiteConfig.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createSiteConfig(@RequestBody MLPSiteConfig siteConfig, HttpServletResponse response) {
@@ -117,16 +106,9 @@ public class SiteConfigController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param configKey
-	 *            config key
-	 * @param siteConfig
-	 *            SiteConfig model
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success or error model
-	 */
-	@ApiOperation(value = "Updates a site configuration.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{configKey}", method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updateSiteConfig(@PathVariable("configKey") String configKey, @RequestBody MLPSiteConfig siteConfig,
@@ -152,14 +134,9 @@ public class SiteConfigController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param configKey
-	 *            config key
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success or error model
-	 */
-	@ApiOperation(value = "Deletes a site configuration.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified key. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{configKey}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteSiteConfig(@PathVariable("configKey") String configKey,

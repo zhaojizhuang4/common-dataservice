@@ -21,18 +21,18 @@
 package org.acumos.cds;
 
 /**
- * This enum defines Acumos access type codes.
+ * This enum defines Acumos access type codes. The knowledge of these values has
+ * become deeply encoded into the system, they are unlikely to change, so it's
+ * safe to use this enum in Java code.
  * 
- * @deprecated Use
- *             {@link org.acumos.cds.client.ICommonDataServiceRestClient#getCodeNamePairs(CodeNameType)}
+ * The value set may also be obtained by calling method
+ * {@link org.acumos.cds.client.ICommonDataServiceRestClient#getCodeNamePairs(CodeNameType)}.
  */
-@Deprecated
 public enum AccessTypeCode {
 
-	OR("Organization"), //
+	OR("Organization"), // displayed as "Company" in Portal/Marketplace.
 	PB("Public"), //
-	PR("Private"), //
-	RS("Restricted"); // for federation peer-solution groups
+	PR("Private");
 
 	private String typeName;
 

@@ -44,10 +44,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
-/**
- * Answers REST requests to get, create, update and delete documents.
- */
 @Controller
 @RequestMapping(value = "/" + CCDSConstants.DOCUMENT_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 public class DocumentController extends AbstractController {
@@ -57,14 +56,9 @@ public class DocumentController extends AbstractController {
 	@Autowired
 	private DocumentRepository documentRepository;
 
-	/**
-	 * @param documentId
-	 *            Path parameter with row ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A document if found, an error otherwise.
-	 */
-	@ApiOperation(value = "Gets the document for the specified ID.", response = MLPDocument.class)
+	@ApiOperation(value = "Gets the entity for the specified ID. Returns bad request if the ID is not found.", //
+			response = MLPDocument.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{documentId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getDocument(@PathVariable("documentId") String documentId, HttpServletResponse response) {
@@ -77,19 +71,13 @@ public class DocumentController extends AbstractController {
 		return da;
 	}
 
-	/**
-	 * @param document
-	 *            document to save. If no ID is set a new one will be generated; if
-	 *            an ID value is set, it will be used if valid and not in table.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Entity on success; error on failure.
-	 */
-	@ApiOperation(value = "Creates a new document.", response = MLPDocument.class)
+	@ApiOperation(value = "Creates a new entity and generates an ID if needed. Returns bad request on constraint violation etc.", //
+			response = MLPDocument.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createDocument(@RequestBody MLPDocument document, HttpServletResponse response) {
-		logger.info("createDocument document {}", document);
+		logger.info("createDocument entry");
 		try {
 			String id = document.getDocumentId();
 			if (id != null) {
@@ -114,16 +102,9 @@ public class DocumentController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param documentId
-	 *            Path parameter with the row ID
-	 * @param document
-	 *            document data to be updated
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Document that maps String to Object, for serialization as JSON
-	 */
-	@ApiOperation(value = "Updates a document.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{documentId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updateDocument(@PathVariable("documentId") String documentId, @RequestBody MLPDocument document,
@@ -151,15 +132,9 @@ public class DocumentController extends AbstractController {
 		}
 	}
 
-	/**
-	 * 
-	 * @param documentId
-	 *            Path parameter that identifies the instance
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Document that maps String to Object, for serialization as JSON
-	 */
-	@ApiOperation(value = "Deletes the document with the specified ID.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{documentId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteDocument(@PathVariable("documentId") String documentId,

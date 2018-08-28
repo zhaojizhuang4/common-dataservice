@@ -55,6 +55,7 @@ import org.acumos.cds.domain.MLPPeerGrpMemMap;
 import org.acumos.cds.domain.MLPPeerPeerAccMap;
 import org.acumos.cds.domain.MLPPeerSolAccMap;
 import org.acumos.cds.domain.MLPPeerSubscription;
+import org.acumos.cds.domain.MLPPublishRequest;
 import org.acumos.cds.domain.MLPRevisionDescription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
@@ -91,6 +92,7 @@ import org.acumos.cds.repository.PeerPeerAccMapRepository;
 import org.acumos.cds.repository.PeerRepository;
 import org.acumos.cds.repository.PeerSolAccMapRepository;
 import org.acumos.cds.repository.PeerSubscriptionRepository;
+import org.acumos.cds.repository.PublishRequestRepository;
 import org.acumos.cds.repository.RevisionDescriptionRepository;
 import org.acumos.cds.repository.RoleFunctionRepository;
 import org.acumos.cds.repository.RoleRepository;
@@ -116,6 +118,7 @@ import org.acumos.cds.repository.UserRoleMapRepository;
 import org.acumos.cds.service.ArtifactSearchService;
 import org.acumos.cds.service.CodeNameService;
 import org.acumos.cds.service.PeerSearchService;
+import org.acumos.cds.service.PublishRequestSearchService;
 import org.acumos.cds.service.RoleSearchService;
 import org.acumos.cds.service.SolutionSearchService;
 import org.acumos.cds.service.StepResultSearchService;
@@ -227,6 +230,10 @@ public class CdsRepositoryServiceTest {
 	private DocumentRepository documentRepository;
 	@Autowired
 	private SolRevDocMapRepository solRevDocMapRepository;
+	@Autowired
+	private PublishRequestRepository publishRequestRepository;
+	@Autowired
+	private PublishRequestSearchService publishRequestSearchService;
 
 	@Test
 	public void testRepositories() throws Exception {
@@ -741,6 +748,22 @@ public class CdsRepositoryServiceTest {
 			MLPCompSolMap.CompSolMapPK compSolMapKey = new MLPCompSolMap.CompSolMapPK(cs.getSolutionId(),
 					cs.getSolutionId());
 			compSolMapRepository.delete(compSolMapKey);
+
+			MLPPublishRequest pubReq = new MLPPublishRequest(cs.getSolutionId(), cr.getRevisionId(), cu.getUserId(),
+					"PE");
+			pubReq = publishRequestRepository.save(pubReq);
+			Assert.assertNotNull(pubReq.getRequestId());
+			long reqCountTrans = publishRequestRepository.count();
+			Assert.assertTrue(reqCountTrans > 0);
+			MLPPublishRequest reqFound = publishRequestRepository.findOne(pubReq.getRequestId());
+			Assert.assertNotNull(reqFound);
+			logger.info("First publish request {}", reqFound);
+			HashMap<String, Object> queryParameters = new HashMap<>();
+			queryParameters.put("solutionId", cs.getSolutionId());
+			Page<MLPPublishRequest> pubReqPage = publishRequestSearchService.findPublishRequests(queryParameters, false,
+					new PageRequest(0, 5, null));
+			Assert.assertTrue(pubReqPage.getNumberOfElements() > 0);
+			publishRequestRepository.delete(pubReq.getRequestId());
 
 			if (cleanup) {
 				logger.info("Removing newly added entities");

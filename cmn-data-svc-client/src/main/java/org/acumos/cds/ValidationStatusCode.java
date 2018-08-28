@@ -21,7 +21,9 @@
 package org.acumos.cds;
 
 /**
- * This enum defines Acumos validation status codes.
+ * This enum once defined Acumos validation status codes, but the validation
+ * feature was not implemented as originally planned, so this enum MUST NOT BE
+ * USED.
  * 
  * @deprecated Use
  *             {@link org.acumos.cds.client.ICommonDataServiceRestClient#getCodeNamePairs(CodeNameType)}

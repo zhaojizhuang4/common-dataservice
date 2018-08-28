@@ -31,50 +31,50 @@ import javax.persistence.IdClass;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
-import org.acumos.cds.domain.MLPSolTagMap.SolTagMapPK;
+import org.acumos.cds.domain.MLPUserTagMap.UserTagMapPK;
 
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * Model for a row in the solution-tag mapping table. This is in lieu of
- * many-to-one annotations.
+ * Model for a row in the user-tag mapping table. This is in lieu of many-to-one
+ * annotations.
  */
 @Entity
-@IdClass(SolTagMapPK.class)
-@Table(name = MLPSolTagMap.TABLE_NAME)
-public class MLPSolTagMap implements MLPEntity, Serializable {
+@IdClass(UserTagMapPK.class)
+@Table(name = MLPUserTagMap.TABLE_NAME)
+public class MLPUserTagMap implements MLPEntity, Serializable {
+
+	private static final long serialVersionUID = -4323298277808436884L;
 
 	// Define constants so names can be reused in many-many annotation.
-	/* package */ static final String TABLE_NAME = "C_SOL_TAG_MAP";
-	/* package */ static final String SOL_ID_COL_NAME = "SOLUTION_ID";
+	/* package */ static final String TABLE_NAME = "C_USER_TAG_MAP";
+	/* package */ static final String USER_ID_COL_NAME = "USER_ID";
 	/* package */ static final String TAG_COL_NAME = "TAG";
-
-	private static final long serialVersionUID = -7814665924253912856L;
 
 	/**
 	 * Embedded key for Hibernate
 	 */
 	@Embeddable
-	public static class SolTagMapPK implements Serializable {
+	public static class UserTagMapPK implements Serializable {
 
-		private static final long serialVersionUID = -503957020456645384L;
-		private String solutionId;
+		private static final long serialVersionUID = -7947700720724160523L;
+		private String userId;
 		private String tag;
 
-		public SolTagMapPK() {
+		public UserTagMapPK() {
 			// no-arg constructor
 		}
 
 		/**
 		 * Convenience constructor
 		 * 
-		 * @param solutionId
-		 *            solution ID
+		 * @param userId
+		 *            user ID
 		 * @param tag
 		 *            Tag
 		 */
-		public SolTagMapPK(String solutionId, String tag) {
-			this.solutionId = solutionId;
+		public UserTagMapPK(String userId, String tag) {
+			this.userId = userId;
 			this.tag = tag;
 		}
 
@@ -82,32 +82,32 @@ public class MLPSolTagMap implements MLPEntity, Serializable {
 		public boolean equals(Object that) {
 			if (that == null)
 				return false;
-			if (!(that instanceof SolTagMapPK))
+			if (!(that instanceof UserTagMapPK))
 				return false;
-			SolTagMapPK thatPK = (SolTagMapPK) that;
-			return Objects.equals(solutionId, thatPK.solutionId) && Objects.equals(tag, thatPK.tag);
+			UserTagMapPK thatPK = (UserTagMapPK) that;
+			return Objects.equals(userId, thatPK.userId) && Objects.equals(tag, thatPK.tag);
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(solutionId, tag);
+			return Objects.hash(userId, tag);
 		}
 
 		@Override
 		public String toString() {
-			return this.getClass().getName() + "[solutionId=" + solutionId + ", tag=" + tag + "]";
+			return this.getClass().getName() + "[userId=" + userId + ", tag=" + tag + "]";
 		}
 
 	}
 
 	@Id
-	@Column(name = MLPSolTagMap.SOL_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "CHAR(36)")
+	@Column(name = MLPUserTagMap.USER_ID_COL_NAME, nullable = false, updatable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
 	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
-	private String solutionId;
+	private String userId;
 
 	@Id
-	@Column(name = MLPSolTagMap.TAG_COL_NAME, nullable = false, updatable = false, columnDefinition = "VARCHAR(32)")
+	@Column(name = MLPUserTagMap.TAG_COL_NAME, nullable = false, updatable = false, columnDefinition = "VARCHAR(32)")
 	@Size(max = 32)
 	@ApiModelProperty(required = true, example = "Tag1")
 	private String tag;
@@ -115,22 +115,22 @@ public class MLPSolTagMap implements MLPEntity, Serializable {
 	/**
 	 * No-arg constructor
 	 */
-	public MLPSolTagMap() {
+	public MLPUserTagMap() {
 		// no-arg constructor
 	}
 
 	/**
 	 * Convenience constructor
 	 * 
-	 * @param solutionId
+	 * @param userId
 	 *            solution ID
 	 * @param tag
 	 *            Tag
 	 */
-	public MLPSolTagMap(String solutionId, String tag) {
-		if (solutionId == null || tag == null)
+	public MLPUserTagMap(String userId, String tag) {
+		if (userId == null || tag == null)
 			throw new IllegalArgumentException("Null not permitted");
-		this.solutionId = solutionId;
+		this.userId = userId;
 		this.tag = tag;
 	}
 
@@ -140,17 +140,17 @@ public class MLPSolTagMap implements MLPEntity, Serializable {
 	 * @param that
 	 *            Instance to copy
 	 */
-	public MLPSolTagMap(MLPSolTagMap that) {
-		this.solutionId = that.solutionId;
+	public MLPUserTagMap(MLPUserTagMap that) {
+		this.userId = that.userId;
 		this.tag = that.tag;
 	}
 
-	public String getSolutionId() {
-		return solutionId;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setSolutionId(String solutionId) {
-		this.solutionId = solutionId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getTag() {
@@ -165,20 +165,20 @@ public class MLPSolTagMap implements MLPEntity, Serializable {
 	public boolean equals(Object that) {
 		if (that == null)
 			return false;
-		if (!(that instanceof MLPSolTagMap))
+		if (!(that instanceof MLPUserTagMap))
 			return false;
-		MLPSolTagMap thatObj = (MLPSolTagMap) that;
-		return Objects.equals(solutionId, thatObj.solutionId) && Objects.equals(tag, thatObj.tag);
+		MLPUserTagMap thatObj = (MLPUserTagMap) that;
+		return Objects.equals(userId, thatObj.userId) && Objects.equals(tag, thatObj.tag);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(solutionId, tag);
+		return Objects.hash(userId, tag);
 	}
 
 	@Override
 	public String toString() {
-		return this.getClass().getName() + "[solutionId=" + solutionId + ", tag=" + tag + "]";
+		return this.getClass().getName() + "[userId=" + userId + ", tag=" + tag + "]";
 	}
 
 }

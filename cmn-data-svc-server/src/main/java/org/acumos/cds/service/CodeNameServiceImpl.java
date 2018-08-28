@@ -60,6 +60,8 @@ public class CodeNameServiceImpl implements CodeNameService {
 			return codeNameProps.getNotificationDeliveryMechanism();
 		case PEER_STATUS:
 			return codeNameProps.getPeerStatus();
+		case PUBLISH_REQUEST_STATUS:
+			return codeNameProps.getPublishRequestStatus();
 		case STEP_STATUS:
 			return codeNameProps.getStepStatus();
 		case STEP_TYPE:

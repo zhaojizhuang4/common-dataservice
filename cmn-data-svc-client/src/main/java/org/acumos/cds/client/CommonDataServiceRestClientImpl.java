@@ -33,6 +33,7 @@ import java.util.Random;
 
 import org.acumos.cds.CCDSConstants;
 import org.acumos.cds.CodeNameType;
+import org.acumos.cds.PublishRequestStatusCode;
 import org.acumos.cds.domain.MLPAccessType;
 import org.acumos.cds.domain.MLPArtifact;
 import org.acumos.cds.domain.MLPArtifactType;
@@ -51,6 +52,7 @@ import org.acumos.cds.domain.MLPPeerGrpMemMap;
 import org.acumos.cds.domain.MLPPeerPeerAccMap;
 import org.acumos.cds.domain.MLPPeerSolAccMap;
 import org.acumos.cds.domain.MLPPeerSubscription;
+import org.acumos.cds.domain.MLPPublishRequest;
 import org.acumos.cds.domain.MLPRevisionDescription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
@@ -1995,7 +1997,8 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public MLPStepResult getStepResult(long stepResultId) {
-		URI uri = buildUri(new String[] { CCDSConstants.STEP_RESULT_PATH, Long.toString(stepResultId) }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.STEP_RESULT_PATH, Long.toString(stepResultId) }, null,
+				null);
 		logger.debug("getStepResult: uri {}", uri);
 		ResponseEntity<MLPStepResult> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<MLPStepResult>() {
@@ -2036,15 +2039,17 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public void updateStepResult(MLPStepResult stepResult) {
-		URI uri = buildUri(new String[] { CCDSConstants.STEP_RESULT_PATH, Long.toString(stepResult.getStepResultId()) },
-				null, null);
+		URI uri = buildUri(
+				new String[] { CCDSConstants.STEP_RESULT_PATH, Long.toString(stepResult.getStepResultId()) }, null,
+				null);
 		logger.debug("updateStepResult: url {}", uri);
 		restTemplate.put(uri, stepResult);
 	}
 
 	@Override
 	public void deleteStepResult(Long stepResultId) {
-		URI uri = buildUri(new String[] { CCDSConstants.STEP_RESULT_PATH, Long.toString(stepResultId) }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.STEP_RESULT_PATH, Long.toString(stepResultId) }, null,
+				null);
 		logger.debug("deleteStepResult: url {}", uri);
 		restTemplate.delete(uri);
 	}
@@ -2416,6 +2421,91 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		URI uri = buildUri(new String[] { CCDSConstants.REVISION_PATH, revisionId, CCDSConstants.ACCESS_PATH,
 				accessTypeCode, CCDSConstants.DOCUMENT_PATH, documentId }, null, null);
 		logger.debug("dropSolutionRevisionDocument: url {}", uri);
+		restTemplate.delete(uri);
+	}
+
+	@Override
+	public MLPPublishRequest getPublishRequest(long publishRequestId) {
+		URI uri = buildUri(new String[] { CCDSConstants.PUBLISH_REQUEST_PATH, Long.toString(publishRequestId) }, null,
+				null);
+		logger.debug("getPublishRequest: uri {}", uri);
+		ResponseEntity<MLPPublishRequest> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<MLPPublishRequest>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public RestPageResponse<MLPPublishRequest> getPublishRequests(RestPageRequest pageRequest) {
+		URI uri = buildUri(new String[] { CCDSConstants.PUBLISH_REQUEST_PATH }, null, pageRequest);
+		logger.debug("getPublishRequests: uri {}", uri);
+		ResponseEntity<RestPageResponse<MLPPublishRequest>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPPublishRequest>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public RestPageResponse<MLPPublishRequest> searchPublishRequests(Map<String, Object> queryParameters, boolean isOr,
+			RestPageRequest pageRequest) {
+		Map<String, Object> copy = new HashMap<>(queryParameters);
+		copy.put(CCDSConstants.JUNCTION_QUERY_PARAM, isOr ? "o" : "a");
+		URI uri = buildUri(new String[] { CCDSConstants.PUBLISH_REQUEST_PATH, CCDSConstants.SEARCH_PATH }, copy,
+				pageRequest);
+		logger.debug("searchPublishRequests: uri {}", uri);
+		ResponseEntity<RestPageResponse<MLPPublishRequest>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPPublishRequest>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
+	public boolean isPublishRequestPending(String solutionId, String revisionId) {
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("solutionId", solutionId);
+		map.put("revisionId", revisionId);
+		map.put("statusCode", PublishRequestStatusCode.PE.toString());
+		RestPageResponse<MLPPublishRequest> reqs = searchPublishRequests(map, false, new RestPageRequest(0, 1));
+		return reqs.getNumberOfElements() == 1;
+	}
+
+	@Override
+	public MLPPublishRequest createPublishRequest(MLPPublishRequest publishRequest) {
+		URI uri = buildUri(new String[] { CCDSConstants.PUBLISH_REQUEST_PATH }, null, null);
+		logger.debug("createPublishRequest: uri {}", uri);
+		return restTemplate.postForObject(uri, publishRequest, MLPPublishRequest.class);
+	}
+
+	@Override
+	public void updatePublishRequest(MLPPublishRequest publishRequest) {
+		URI uri = buildUri(
+				new String[] { CCDSConstants.PUBLISH_REQUEST_PATH, Long.toString(publishRequest.getRequestId()) }, null,
+				null);
+		logger.debug("updatePublishRequest: url {}", uri);
+		restTemplate.put(uri, publishRequest);
+	}
+
+	@Override
+	public void deletePublishRequest(long publishRequestId) {
+		URI uri = buildUri(new String[] { CCDSConstants.PUBLISH_REQUEST_PATH, Long.toString(publishRequestId) }, null,
+				null);
+		logger.debug("deletePublishRequest: url {}", uri);
+		restTemplate.delete(uri);
+	}
+
+	@Override
+	public void addUserTag(String userId, String tag) {
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.TAG_PATH, tag }, null,
+				null);
+		logger.debug("addUserTag: uri {}", uri);
+		restTemplate.postForLocation(uri, null);
+	}
+
+	@Override
+	public void dropUserTag(String userId, String tag) {
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.TAG_PATH, tag }, null,
+				null);
+		logger.debug("dropUserTag: uri {}", uri);
 		restTemplate.delete(uri);
 	}
 

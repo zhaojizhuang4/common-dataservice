@@ -63,7 +63,6 @@ import org.acumos.cds.repository.SolutionRevisionRepository;
 import org.acumos.cds.repository.SolutionValidationRepository;
 import org.acumos.cds.repository.SolutionWebRepository;
 import org.acumos.cds.repository.StepResultRepository;
-import org.acumos.cds.repository.TagRepository;
 import org.acumos.cds.repository.UserRepository;
 import org.acumos.cds.service.SolutionSearchService;
 import org.acumos.cds.transport.CountTransport;
@@ -88,11 +87,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * A solution is a collection of revisions. A revision points to a collection of
- * artifacts. A solution revision cannot exist without a solution, but an
- * artifact can exist without a revision.
+ * artifacts. A revision cannot exist without a solution, but a solution can
+ * exist without a revision (altho it will not be found by searches).
  */
 @Controller
 @RequestMapping(value = "/" + CCDSConstants.SOLUTION_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -124,8 +126,6 @@ public class SolutionController extends AbstractController {
 	private SolutionRevisionRepository solutionRevisionRepository;
 	@Autowired
 	private SolutionSearchService solutionSearchService;
-	@Autowired
-	private TagRepository tagRepository;
 	@Autowired
 	private SolutionValidationRepository solutionValidationRepository;
 	@Autowired
@@ -174,9 +174,6 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @return SuccessTransport object
-	 */
 	@ApiOperation(value = "Gets the count of solutions.", response = CountTransport.class)
 	@RequestMapping(value = CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
@@ -186,14 +183,7 @@ public class SolutionController extends AbstractController {
 		return new CountTransport(count);
 	}
 
-	/**
-	 * @param pageable
-	 *            Sort and page criteria
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of solutions
-	 */
-	@ApiOperation(value = "Gets a page of solutions, optionally sorted on fields.", response = MLPSolution.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of solutions, optionally sorted.", response = MLPSolution.class, responseContainer = "Page")
 	@ApiPageable
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
@@ -203,17 +193,8 @@ public class SolutionController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param term
-	 *            Search term used for partial match ("like")
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of solutions
-	 */
-	@ApiOperation(value = "Searches for solutions with names or descriptions that contain the search term.", response = MLPSolution.class, responseContainer = "Page")
+	@ApiOperation(value = "Searches for entities with names or descriptions that contain the search term using the like operator.", //
+			response = MLPSolution.class, responseContainer = "Page")
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH + "/" + CCDSConstants.LIKE_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPSolution> findSolutionsByLikeKeyword(@RequestParam(CCDSConstants.TERM_PATH) String term,
@@ -223,68 +204,29 @@ public class SolutionController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param tag
-	 *            Tag string to find
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of solutions
-	 */
 	@ApiOperation(value = "Gets a page of solutions matching the specified tag.", response = MLPSolution.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH + "/" + CCDSConstants.TAG_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object findSolutionsByTag(@RequestParam("tag") String tag, Pageable pageRequest,
 			HttpServletResponse response) {
 		logger.info("findSolutionsByTag {}", tag);
-		MLPTag existing = tagRepository.findOne(tag);
-		if (existing == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + tag, null);
-		}
 		Page<MLPSolution> result = solutionRepository.findByTag(tag, pageRequest);
 		return result;
 	}
 
-	/**
-	 * Fetches the value, and converts the four-letter sequence "null" to the null
-	 * value.
-	 * 
-	 * @param parmName
-	 *            Map key
-	 * @param queryParameters
-	 *            Map of parameters
-	 * @return String array; empty if key is not present
-	 */
-	private String[] getOptStringArray(String parmName, MultiValueMap<String, String> queryParameters) {
-		List<String> val = queryParameters.get(parmName);
-		if (val == null)
-			return new String[0];
-		String[] vals = new String[val.size()];
-		vals = val.toArray(vals);
-		for (int i = 0; i < vals.length; ++i)
-			if ("null".equals(vals[i]))
-				vals[i] = null;
-		return vals;
-	}
-
-	/**
-	 * @param queryParameters
-	 *            Map of String (field name) to String (value) for restricting the
-	 *            query
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of solutions
-	 */
-	@ApiOperation(value = "Searches for solutions using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disjunction). With no limit, defaults to size 20.", response = MLPSolution.class, responseContainer = "Page")
+	@ApiOperation(value = "Searches for entities with attribute values matching the field name - field value pairs specified as query parameters. " //
+			+ "Only checks solution attributes; does not search any child entities, tags, etc. " //
+			+ "Defaults to and (conjunction); send junction query parameter '_j=o' for or (disjunction).", //
+			response = MLPSolution.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchSolutions(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
+	public Object searchSolutions(
+			// This actually IS required; set flag to false for swagger UI
+			@ApiParam(value = "Field name - field value pairs as request parameters in the format name=value, minimum 1; repeats allowed. " //
+					+ "Not supported by Swagger web UI.", allowMultiple = true, type = "Array[string]", required = false) //
+			@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
 			HttpServletResponse response) {
 		logger.info("searchSolutions: query {}", queryParameters);
 		cleanPageableParameters(queryParameters);
@@ -296,8 +238,7 @@ public class SolutionController extends AbstractController {
 		}
 		try {
 			Map<String, Object> convertedQryParm = convertQueryParameters(MLPSolution.class, queryParameters);
-			Object result = solutionSearchService.findSolutions(convertedQryParm, isOr, pageRequest);
-			return result;
+			return solutionSearchService.findSolutions(convertedQryParm, isOr, pageRequest);
 		} catch (Exception ex) {
 			logger.error("searchSolutions failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -306,42 +247,39 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * Supports a dynamic query by user on Portal screen.
-	 * 
-	 * @param queryParameters
-	 *            Field names-value pairs, see below for names. Some values can be
-	 *            comma-separated lists.
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of solutions
-	 */
-	@ApiOperation(value = "Gets a page of solutions matching all criteria.", response = MLPSolution.class, responseContainer = "Page")
+	@ApiOperation(value = "Finds solutions with attribute values and/or child attribute values matching the field name - field value pairs specified as query parameters. " //
+			+ "Supports faceted search; i.e., check for kw1 in name, kw2 in description and so on.", //
+			response = MLPSolution.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH + "/"
 			+ CCDSConstants.PORTAL_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object findPortalSolutions(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
-			HttpServletResponse response) {
-		logger.info("findPortalSolutions: query {}", queryParameters);
+	public Object findPortalSolutions( //
+			@ApiParam(value = "Active Y/N", required = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_ACTIVE, required = true) boolean active, //
+			@ApiParam(value = "Access type codes", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_ACCESS_TYPES, required = false) String[] accTypeCodes, //
+			@ApiParam(value = "Model type codes", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_MODEL_TYPES, required = false) String[] modelTypeCodes, //
+			@ApiParam(value = "Validation status codes (deprecated)", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_VAL_STATUSES, required = false) String[] valStatusCodes, //
+			@ApiParam(value = "User IDs", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_USERS, required = false) String[] userIds, //
+			@ApiParam(value = "Tags", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_TAGS, required = false) String[] tags, //
+			@ApiParam(value = "Name key words", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_NAME, required = false) String[] nameKws, //
+			@ApiParam(value = "Description key words", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_DESC, required = false) String[] descKws, //
+			@ApiParam(value = "Author key words", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_AUTH, required = false) String[] authKws, //
+			@ApiParam(value = "Publisher key words", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_PUB, required = false) String[] pubKws, //
+			Pageable pageRequest, HttpServletResponse response) {
+		logger.info("findPortalSolutions: active {} nameKws {}", active, nameKws);
 		try {
-			// This parameter is required
-			Boolean active = new Boolean(queryParameters.getFirst(CCDSConstants.SEARCH_ACTIVE));
-			// All remaining parameters are optional
-			String[] nameKws = getOptStringArray(CCDSConstants.SEARCH_NAME, queryParameters);
-			String[] descKws = getOptStringArray(CCDSConstants.SEARCH_DESC, queryParameters);
-			String[] userIds = getOptStringArray(CCDSConstants.SEARCH_USERS, queryParameters);
-			String[] modelTypeCodes = getOptStringArray(CCDSConstants.SEARCH_MODEL_TYPES, queryParameters);
-			String[] accTypeCodes = getOptStringArray(CCDSConstants.SEARCH_ACCESS_TYPES, queryParameters);
-			String[] valStatusCodes = getOptStringArray(CCDSConstants.SEARCH_VAL_STATUSES, queryParameters);
-			String[] tags = getOptStringArray(CCDSConstants.SEARCH_TAGS, queryParameters);
-			String[] authKws = getOptStringArray(CCDSConstants.SEARCH_AUTH, queryParameters);
-			String[] pubKws = getOptStringArray(CCDSConstants.SEARCH_PUB, queryParameters);
-			Object result = solutionSearchService.findPortalSolutions(nameKws, descKws, active, userIds, modelTypeCodes,
+			return solutionSearchService.findPortalSolutions(nameKws, descKws, active, userIds, modelTypeCodes,
 					accTypeCodes, valStatusCodes, tags, authKws, pubKws, pageRequest);
-			return result;
 		} catch (Exception ex) {
 			logger.error("findPortalSolutions failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -350,37 +288,31 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * Supports a flexible query on Portal/Marketplace screen.
-	 * 
-	 * @param queryParameters
-	 *            Field name-value pairs, see below for names.
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of solutions
-	 */
-	@ApiOperation(value = "Gets a page of solutions matching all criteria.  If keywords are supplied, returns any match across multiple text fields.  Returns a page of solutions matching all criteria.", response = MLPSolution.class, responseContainer = "Page")
+	@ApiOperation(value = "Finds solutions matching the specified attribute values and/or child attribute values. " //
+			+ "Checks multiple fields for the supplied keywords, including ID, name, description etc.", //
+			response = MLPSolution.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH + "/" + CCDSConstants.PORTAL_PATH + "/"
 			+ CCDSConstants.KEYWORD_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object findPortalSolutionsByKw(@RequestParam MultiValueMap<String, String> queryParameters,
+	public Object findPortalSolutionsByKw( //
+			@ApiParam(value = "Active Y/N", required = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_ACTIVE, required = true) boolean active, //
+			@ApiParam(value = "Access type codes", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_ACCESS_TYPES, required = false) String[] accTypeCodes, //
+			@ApiParam(value = "Model type codes", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_MODEL_TYPES, required = false) String[] modelTypeCodes, //
+			@ApiParam(value = "Key words", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_KW, required = false) String[] kws, //
+			@ApiParam(value = "User IDs", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_USERS, required = false) String[] userIds, //
+			@ApiParam(value = "Tags", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_TAGS, required = false) String[] tags, //
 			Pageable pageRequest, HttpServletResponse response) {
-		logger.info("findPortalSolutionsByKw: query {}", queryParameters);
+		logger.info("findPortalSolutionsByKw: active {} kw {}", active, kws);
 		try {
-			// This parameter is required
-			Boolean active = new Boolean(queryParameters.getFirst(CCDSConstants.SEARCH_ACTIVE));
-			// All remaining parameters are optional
-			String[] kws = getOptStringArray(CCDSConstants.SEARCH_KW, queryParameters);
-			String[] userIds = getOptStringArray(CCDSConstants.SEARCH_USERS, queryParameters);
-			String[] modelTypeCodes = getOptStringArray(CCDSConstants.SEARCH_MODEL_TYPES, queryParameters);
-			String[] accTypeCodes = getOptStringArray(CCDSConstants.SEARCH_ACCESS_TYPES, queryParameters);
-			String[] tags = getOptStringArray(CCDSConstants.SEARCH_TAGS, queryParameters);
-			Object result = solutionSearchService.findPortalSolutionsByKw(kws, active, userIds, modelTypeCodes,
-					accTypeCodes, tags, pageRequest);
-			return result;
+			return solutionSearchService.findPortalSolutionsByKw(kws, active, userIds, modelTypeCodes, accTypeCodes,
+					tags, pageRequest);
 		} catch (Exception ex) {
 			logger.error("findPortalSolutionsByKw failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -389,42 +321,34 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * Supports a flexible query on Portal screen for user-accessible solutions.
-	 * 
-	 * @param queryParameters
-	 *            Field names-value pairs, see below for names. Some values can be
-	 *            comma-separated lists.
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of solutions
-	 */
-	@ApiOperation(value = "Gets a page of user-accessible solutions", response = MLPSolution.class, responseContainer = "Page")
+	@ApiOperation(value = "Finds user-accessible solutions matching the specified attribute values. "
+			+ "Keywords are processed using LIKE-operator search.  Does not search any child entities.", //
+			response = MLPSolution.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH + "/" + CCDSConstants.USER_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object findUserSolutions(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
-			HttpServletResponse response) {
-		logger.info("findUserSolutions: query {}", queryParameters);
+	public Object findUserSolutions( //
+			@ApiParam(value = "Active Y/N", required = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_ACTIVE, required = true) boolean active, //
+			@ApiParam(value = "User ID", required = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_USERS, required = true) String userId, //
+			@ApiParam(value = "Access type codes", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_ACCESS_TYPES, required = false) String[] accTypeCodes, //
+			@ApiParam(value = "Model type codes", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_MODEL_TYPES, required = false) String[] modelTypeCodes, //
+			@ApiParam(value = "Validation status codes (deprecated)", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_VAL_STATUSES, required = false) String[] valStatusCodes, //
+			@ApiParam(value = "Name key words", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_NAME, required = false) String[] nameKws, //
+			@ApiParam(value = "Description key words", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_DESC, required = false) String[] descKws, //
+			@ApiParam(value = "Tags", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_TAGS, required = false) String[] tags, //
+			Pageable pageRequest, HttpServletResponse response) {
+		logger.info("findUserSolutions: active {} userId {}", active, userId);
 		try {
-			// These parameters are required
-			String activeString = queryParameters.getFirst(CCDSConstants.SEARCH_ACTIVE);
-			String userId = queryParameters.getFirst(CCDSConstants.SEARCH_USERS);
-			if (activeString == null || activeString.length() == 0 || userId == null || userId.length() == 0)
-				throw new IllegalArgumentException("Missing parameter");
-			Boolean active = new Boolean(activeString);
-			// All remaining parameters are optional
-			String[] nameKws = getOptStringArray(CCDSConstants.SEARCH_NAME, queryParameters);
-			String[] descKws = getOptStringArray(CCDSConstants.SEARCH_DESC, queryParameters);
-			String[] modelTypeCodes = getOptStringArray(CCDSConstants.SEARCH_MODEL_TYPES, queryParameters);
-			String[] accTypeCodes = getOptStringArray(CCDSConstants.SEARCH_ACCESS_TYPES, queryParameters);
-			String[] valStatusCodes = getOptStringArray(CCDSConstants.SEARCH_VAL_STATUSES, queryParameters);
-			String[] tags = getOptStringArray(CCDSConstants.SEARCH_TAGS, queryParameters);
-			Object result = solutionSearchService.findUserSolutions(nameKws, descKws, active, userId, modelTypeCodes,
+			return solutionSearchService.findUserSolutions(nameKws, descKws, active, userId, modelTypeCodes,
 					accTypeCodes, valStatusCodes, tags, pageRequest);
-			return result;
 		} catch (Exception ex) {
 			logger.error("findUserSolutions failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -433,47 +357,39 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * Supports federation
-	 * 
-	 * @param queryParameters
-	 *            Map of String (field name) to String (value) for restricting the
-	 *            query. Expects access type codes (optional), validation status
-	 *            codes (optional), and date (required).
-	 * @param pageRequest
-	 *            Page and sort criteria
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of solutions
-	 */
-	@ApiOperation(value = "Gets a page of solutions modified after the specified time, expressed in milliseconds since the Epoch.", response = MLPSolution.class, responseContainer = "Page")
+	@ApiOperation(value = "Finds solutions based on specified date, active status and access type query parameters. " //
+			+ "Limits result to solutions modified after the specified time, expressed in milliseconds since the Epoch.", //
+			response = MLPSolution.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH + "/" + CCDSConstants.DATE_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object findSolutionsByDate(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
-			HttpServletResponse response) {
-		logger.info("findSolutionsByDate: query {}", queryParameters);
-		Boolean active = new Boolean(queryParameters.getFirst(CCDSConstants.SEARCH_ACTIVE));
-		String[] accessTypeCodes = getOptStringArray(CCDSConstants.SEARCH_ACCESS_TYPES, queryParameters);
-		String[] valStatusCodes = getOptStringArray(CCDSConstants.SEARCH_VAL_STATUSES, queryParameters);
-		String[] dateMillis = getOptStringArray(CCDSConstants.SEARCH_DATE, queryParameters);
-		if (dateMillis.length != 1) {
+	public Object findSolutionsByDate( //
+			@ApiParam(value = "Milliseconds since the Epoch", required = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_DATE, required = true) long dateMillis, //
+			@ApiParam(value = "Active Y/N") //
+			@RequestParam(name = CCDSConstants.SEARCH_ACTIVE, required = false) boolean active, //
+			@ApiParam(value = "Access type codes", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_ACCESS_TYPES, required = false) String[] accTypeCodes, //
+			@ApiParam(value = "Validation status codes (deprecated)", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_VAL_STATUSES, required = false) String[] valStatusCodes, //
+			Pageable pageRequest, HttpServletResponse response) {
+		logger.info("findSolutionsByDate: date {}", dateMillis);
+		Date date = new Date(dateMillis);
+		try {
+			return solutionSearchService.findSolutionsByModifiedDate(active, accTypeCodes, valStatusCodes, date,
+					pageRequest);
+		} catch (Exception ex) {
+			logger.error("findSolutionsByDate failed", ex);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing date parameter in query", null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+					ex.getCause() != null ? ex.getCause().getMessage() : "findSolutionsByDate failed", ex);
 		}
-		Date date = new Date(Long.parseLong(dateMillis[0]));
-		Object result = solutionSearchService.findSolutionsByModifiedDate(active, accessTypeCodes, valStatusCodes, date,
-				pageRequest);
-		return result;
+
 	}
 
-	/**
-	 * @param solutionId
-	 *            Path parameter with row ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A solution if found, an error otherwise.
-	 */
-	@ApiOperation(value = "Gets the solution for the specified ID.", response = MLPSolution.class)
+	@ApiOperation(value = "Gets the solution for the specified ID. Returns bad request if the ID is not found.", //
+			response = MLPSolution.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getSolution(@PathVariable("solutionId") String solutionId, HttpServletResponse response) {
@@ -486,15 +402,9 @@ public class SolutionController extends AbstractController {
 		return da;
 	}
 
-	/**
-	 * @param solution
-	 *            Solution to save. If no ID is set a new one will be generated; if
-	 *            an ID value is set, it will be used if valid and not in table.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return solution model for serialization as JSON
-	 */
-	@ApiOperation(value = "Creates a new solution.", response = MLPSolution.class)
+	@ApiOperation(value = "Creates a new entity and generates an ID if needed. Returns bad request on constraint violation etc.", //
+			response = MLPSolution.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createSolution(@RequestBody MLPSolution solution, HttpServletResponse response) {
@@ -516,7 +426,7 @@ public class SolutionController extends AbstractController {
 			// Ensure web stat object is empty
 			solution.setWebStats(null);
 			// Cascade manually - create user-supplied tags as needed
-			createMissingTags(solution);
+			createMissingTags(solution.getTags());
 			// Create a new row
 			// ALSO send back the model for client convenience
 			MLPSolution persisted = solutionRepository.save(solution);
@@ -534,31 +444,9 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * Adds entries to the tags table as needed.
-	 * 
-	 * @param solution
-	 *            MLPSolution
-	 */
-	private void createMissingTags(MLPSolution solution) {
-		for (MLPTag tag : solution.getTags()) {
-			if (tagRepository.findOne(tag.getTag()) == null) {
-				tagRepository.save(tag);
-				logger.info("createMissingTags: tag {}", tag);
-			}
-		}
-	}
-
-	/**
-	 * @param solutionId
-	 *            Path parameter with the row ID
-	 * @param solution
-	 *            solution data to be updated
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Status message
-	 */
-	@ApiOperation(value = "Updates a solution.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updateSolution(@PathVariable("solutionId") String solutionId, @RequestBody MLPSolution solution,
@@ -581,7 +469,7 @@ public class SolutionController extends AbstractController {
 			// Discard any stats object; updates don't happen via this interface
 			solution.setWebStats(null);
 			// Cascade manually - create user-supplied tags as needed
-			createMissingTags(solution);
+			createMissingTags(solution.getTags());
 			solutionRepository.save(solution);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
@@ -592,16 +480,9 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * Special case of update that increments a solution view count.
-	 * 
-	 * @param solutionId
-	 *            Path parameter with the row ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Status message
-	 */
-	@ApiOperation(value = "Increments view count of the specified solution.", response = SuccessTransport.class)
+	@ApiOperation(value = "Increments the view count of the specified solution (special case of update). Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.VIEW_PATH, method = RequestMethod.PUT)
 	@ResponseBody
 	public Object incrementViewCount(@PathVariable("solutionId") String solutionId, HttpServletResponse response) {
@@ -624,18 +505,14 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
+	/*
 	 * Originally this was declared void and accordingly returned nothing. But when
 	 * used in SpringBoot, after invoking the method it would look for a ThymeLeaf
 	 * template, fail to find it, then throw internal server error.
-	 * 
-	 * @param solutionId
-	 *            Path parameter that identifies the instance
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Solution that maps String to Object, for serialization as JSON
 	 */
-	@ApiOperation(value = "Deletes a solution.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the solution with the specified ID. Cascades the delete to related entities. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteSolution(@PathVariable("solutionId") String solutionId,
@@ -673,14 +550,12 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionIds
-	 *            Array of solution IDs (comma-separated values - the name should be
-	 *            plural but it's declared above). Spring will split the list if the
-	 *            path variable is declared as String array or List of String.
-	 * @return List of revisions
+	/*
+	 * Spring will split the list if the path variable is declared as String array
+	 * or List of String.
 	 */
-	@ApiOperation(value = "Gets a list of revisions for the specified solution IDs.", response = MLPSolutionRevision.class, responseContainer = "List")
+	@ApiOperation(value = "Gets a list of revisions for the specified solution IDs.", //
+			response = MLPSolutionRevision.class, responseContainer = "List")
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<MLPSolutionRevision> getListOfRevisions(@PathVariable("solutionId") String[] solutionIds) {
@@ -689,16 +564,9 @@ public class SolutionController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param solutionId
-	 *            Path parameter with solution ID; ignored
-	 * @param revisionId
-	 *            Path parameter with revision ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A solution if found, an error otherwise.
-	 */
-	@ApiOperation(value = "Gets the revision for the specified ID.", response = MLPSolution.class)
+	@ApiOperation(value = "Gets the revision for the specified ID. Returns bad request if the ID is not found.", //
+			response = MLPSolution.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH
 			+ "/{revisionId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -713,17 +581,9 @@ public class SolutionController extends AbstractController {
 		return da;
 	}
 
-	/**
-	 * @param solutionId
-	 *            solution ID
-	 * @param revision
-	 *            Revision to save. If no ID is set a new one will be generated; if
-	 *            an ID value is set, it will be used if valid and not in table.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Solution revision model for serialization as JSON
-	 */
-	@ApiOperation(value = "Creates a new solution revision.", response = MLPSolutionRevision.class)
+	@ApiOperation(value = "Creates a new solution revision and generates an ID if needed. Returns bad request on constraint violation etc.", //
+			response = MLPSolutionRevision.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH, method = RequestMethod.POST)
 	@ResponseBody
 	public Object createSolutionRevision(@PathVariable("solutionId") String solutionId,
@@ -760,18 +620,9 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            solution ID
-	 * @param revisionId
-	 *            revision ID
-	 * @param revision
-	 *            revision to update
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Status message
-	 */
-	@ApiOperation(value = "Updates an existing solution revision.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH
 			+ "/{revisionId}", method = RequestMethod.PUT)
 	@ResponseBody
@@ -806,16 +657,9 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            solution ID
-	 * @param revisionId
-	 *            revision ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Status message
-	 */
-	@ApiOperation(value = "Deletes a solution revision.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH
 			+ "/{revisionId}", method = RequestMethod.DELETE)
 	@ResponseBody
@@ -833,11 +677,6 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            Solution ID
-	 * @return List of MLPTag
-	 */
 	@ApiOperation(value = "Gets a list of tags for the specified solution.", response = MLPTag.class, responseContainer = "List")
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.TAG_PATH, method = RequestMethod.GET)
 	@ResponseBody
@@ -847,16 +686,9 @@ public class SolutionController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param solutionId
-	 *            solution ID
-	 * @param tag
-	 *            tag to add
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success indicator
-	 */
-	@ApiOperation(value = "Adds a tag to the solution.", response = SuccessTransport.class)
+	@ApiOperation(value = "Adds a tag to the solution. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.TAG_PATH + "/{tag}", method = RequestMethod.POST)
 	@ResponseBody
 	public Object addSolutionTag(@PathVariable("solutionId") String solutionId, @PathVariable("tag") String tag,
@@ -878,44 +710,29 @@ public class SolutionController extends AbstractController {
 		return new SuccessTransport(HttpServletResponse.SC_OK, null);
 	}
 
-	/**
-	 * @param solutionId
-	 *            solution ID
-	 * @param tag
-	 *            tag to remove
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success indicator
-	 */
-	@ApiOperation(value = "Drops a tag from the solution.", response = SuccessTransport.class)
+	@ApiOperation(value = "Drops a tag from the solution. Returns bad request if not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.TAG_PATH + "/{tag}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public Object dropSolutionTag(@PathVariable("solutionId") String solutionId, @PathVariable("tag") String tag,
 			HttpServletResponse response) {
-		logger.info("dropTag: solutionId {} tag {}", solutionId, tag);
-		if (solutionRepository.findOne(solutionId) == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
-		} else if (solTagMapRepository.findOne(new MLPSolTagMap.SolTagMapPK(solutionId, tag)) == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + tag, null);
-		} else {
+		logger.info("dropSolutionTag: solutionId {} tag {}", solutionId, tag);
+		try {
 			solTagMapRepository.delete(new MLPSolTagMap.SolTagMapPK(solutionId, tag));
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
+		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			logger.warn("dropSolutionTag failed: {}", ex.toString());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "dropSolutionTag failed", ex);
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            Path parameter with solution ID
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A page of download records
-	 */
-	@ApiOperation(value = "Gets a page of download records for the specified solution ID.", response = MLPSolutionDownload.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of download records for the specified solution ID. Returns bad request if the ID is not found.", //
+			response = MLPSolutionDownload.class, responseContainer = "Page")
+	@ApiPageable
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.DOWNLOAD_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getSolutionDownloads(@PathVariable("solutionId") String solutionId, Pageable pageRequest,
@@ -929,20 +746,9 @@ public class SolutionController extends AbstractController {
 		return da;
 	}
 
-	/**
-	 * @param solutionId
-	 *            Solution ID
-	 * @param artifactId
-	 *            Artifact ID
-	 * @param userId
-	 *            User ID
-	 * @param sd
-	 *            solution download object
-	 * @param response
-	 *            HttpServletResponse
-	 * @return solution model for serialization as JSON
-	 */
-	@ApiOperation(value = "Creates a new solution download record.", response = MLPSolutionDownload.class)
+	@ApiOperation(value = "Creates a new solution download record. Returns bad request on constraint violation etc.", //
+			response = MLPSolutionDownload.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.DOWNLOAD_PATH + "/" + CCDSConstants.ARTIFACT_PATH
 			+ "/{artifactId}/" + CCDSConstants.USER_PATH + "/{userId}", method = RequestMethod.POST)
 	@ResponseBody
@@ -983,16 +789,9 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            solution ID
-	 * @param downloadId
-	 *            ID of record
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success
-	 */
-	@ApiOperation(value = "Deletes the specified solution download record.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.DOWNLOAD_PATH
 			+ "/{downloadId}", method = RequestMethod.DELETE)
 	@ResponseBody
@@ -1012,17 +811,9 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            Path parameter with ID
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A list of solution ratings
-	 */
-	@ApiOperation(value = "Gets all user ratings for the specified solution.", response = MLPSolutionRating.class, responseContainer = "List")
+	@ApiOperation(value = "Gets all user ratings for the specified solution. Returns bad request if the ID is not found.", //
+			response = MLPSolutionRating.class, responseContainer = "List")
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.RATING_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getListOfSolutionRating(@PathVariable("solutionId") String solutionId, Pageable pageRequest,
@@ -1036,16 +827,9 @@ public class SolutionController extends AbstractController {
 		return sr;
 	}
 
-	/**
-	 * @param solutionId
-	 *            Path parameter with solution ID
-	 * @param userId
-	 *            Path parameter with user ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return MLPSolutionRating
-	 */
-	@ApiOperation(value = "Gets an existing solution rating.", response = MLPSolutionRating.class)
+	@ApiOperation(value = "Gets an existing solution rating. Returns bad request if the ID is not found", //
+			response = MLPSolutionRating.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.RATING_PATH + "/" + CCDSConstants.USER_PATH
 			+ "/{userId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -1061,18 +845,7 @@ public class SolutionController extends AbstractController {
 		return da;
 	}
 
-	/**
-	 * @param solutionId
-	 *            Solution ID
-	 * @param userId
-	 *            User who gave the rating
-	 * @param sr
-	 *            Solution rating object
-	 * @param response
-	 *            HttpServletResponse
-	 * @return solution model for serialization as JSON
-	 */
-	@ApiOperation(value = "Creates a new solution rating.", response = MLPSolutionRating.class)
+	@ApiOperation(value = "Creates a new solution rating. Returns bad request on constrain violation etc.", response = MLPSolutionRating.class)
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.RATING_PATH + "/" + CCDSConstants.USER_PATH
 			+ "/{userId}", method = RequestMethod.POST)
 	@ResponseBody
@@ -1107,18 +880,9 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            Solution ID
-	 * @param userId
-	 *            User who gave the rating
-	 * @param sr
-	 *            Solution rating object
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
-	 */
-	@ApiOperation(value = "Updates the specified solution rating.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.RATING_PATH + "/" + CCDSConstants.USER_PATH
 			+ "/{userId}", method = RequestMethod.PUT)
 	@ResponseBody
@@ -1149,16 +913,9 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            solution ID
-	 * @param userId
-	 *            User who gave the rating
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success
-	 */
-	@ApiOperation(value = "Deletes the specified solution rating.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.RATING_PATH + "/" + CCDSConstants.USER_PATH
 			+ "/{userId}", method = RequestMethod.DELETE)
 	@ResponseBody
@@ -1180,15 +937,9 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            Solution ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Web site metadata about the specified solution including view count,
-	 *         download count, rating count and such.
-	 */
-	@ApiOperation(value = "Gets web metadata for the specified solution including average rating and total download count.", response = MLPSolutionWeb.class)
+	@ApiOperation(value = "Gets web metadata for the specified solution including average rating and total download count. Returns bad request if the ID is not found.", //
+			response = MLPSolutionWeb.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.WEB_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getSolutionWebStats(@PathVariable("solutionId") String solutionId, HttpServletResponse response) {
@@ -1201,12 +952,8 @@ public class SolutionController extends AbstractController {
 		return stats;
 	}
 
-	/**
-	 * @param solutionId
-	 *            Solution ID
-	 * @return List of users
-	 */
-	@ApiOperation(value = "Gets access-control list of users for the specified solution.", response = MLPUser.class, responseContainer = "List")
+	@ApiOperation(value = "Gets access-control list of users for the specified solution.", //
+			response = MLPUser.class, responseContainer = "List")
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.USER_PATH + "/"
 			+ CCDSConstants.ACCESS_PATH, method = RequestMethod.GET)
 	@ResponseBody
@@ -1216,16 +963,9 @@ public class SolutionController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param solutionId
-	 *            solution ID
-	 * @param userId
-	 *            user ID to add
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success indicator
-	 */
-	@ApiOperation(value = "Adds a user to the ACL for the specified solution.", response = SuccessTransport.class)
+	@ApiOperation(value = "Adds a user to the ACL for the specified solution. Returns bad request if an ID is not found", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.USER_PATH + "/{userId}/"
 			+ CCDSConstants.ACCESS_PATH, method = RequestMethod.POST)
 	@ResponseBody
@@ -1244,45 +984,29 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            solution ID
-	 * @param userId
-	 *            user ID to drop
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success indicator
-	 */
-	@ApiOperation(value = "Drops a user from the ACL for the specified solution.", response = SuccessTransport.class)
+	@ApiOperation(value = "Drops a user from the ACL for the specified solution. Returns bad request if an ID is not found", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.USER_PATH + "/{userId}/"
 			+ CCDSConstants.ACCESS_PATH, method = RequestMethod.DELETE)
 	@ResponseBody
 	public Object dropUserFromSolutionACL(@PathVariable("solutionId") String solutionId,
 			@PathVariable("userId") String userId, HttpServletResponse response) {
 		logger.info("dropUserFromSolutionACL: solution {}, user {}", solutionId, userId);
-		if (solutionRepository.findOne(solutionId) == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
-		} else if (userRepository.findOne(userId) == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
-		} else {
+		try {
 			solUserAccMapRepository.delete(new MLPSolUserAccMap.SolUserAccessMapPK(solutionId, userId));
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
+		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			logger.warn("dropUserFromSolutionACL failed: {}", ex.toString());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "dropUserFromSolutionACL failed", ex);
 		}
+
 	}
 
-	/**
-	 * @param userId
-	 *            Path parameter with user ID
-	 * @param pageable
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A usage if found, an error otherwise.
-	 */
-	@ApiOperation(value = "Gets a page of solutions with the specified user in the ACL, optionally sorted on fields.", response = MLPSolution.class, responseContainer = "List")
+	@ApiOperation(value = "Gets a page of solutions with the specified user in the ACL, optionally sorted on fields.", //
+			response = MLPSolution.class, responseContainer = "List")
 	@ApiPageable
 	@RequestMapping(value = CCDSConstants.USER_PATH + "/{userId}/"
 			+ CCDSConstants.ACCESS_PATH, method = RequestMethod.GET)
@@ -1294,16 +1018,9 @@ public class SolutionController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param solutionId
-	 *            Path parameter with solution ID
-	 * @param revisionId
-	 *            Path parameter with revision ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A list of solution ratings
-	 */
-	@ApiOperation(value = "Gets validation results for the specified solution and revision.", response = MLPSolutionValidation.class, responseContainer = "List")
+	@ApiOperation(value = "Gets validation results for the specified solution and revision. Returns bad request if an ID is not found", //
+			response = MLPSolutionValidation.class, responseContainer = "List")
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/"
 			+ CCDSConstants.VALIDATION_PATH, method = RequestMethod.GET)
 	@ResponseBody
@@ -1320,20 +1037,8 @@ public class SolutionController extends AbstractController {
 		return items;
 	}
 
-	/**
-	 * @param solutionId
-	 *            Path parameter with solution ID
-	 * @param revisionId
-	 *            Path parameter with revision ID
-	 * @param taskId
-	 *            Path parameter with task ID
-	 * @param sv
-	 *            Solution validation object
-	 * @param response
-	 *            HttpServletResponse
-	 * @return solution model for serialization as JSON
-	 */
-	@ApiOperation(value = "Creates a new solution validation record.", response = MLPSolutionValidation.class)
+	@ApiOperation(value = "Creates a new solution validation record. Returns bad request if an ID is not found.", response = MLPSolutionValidation.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/"
 			+ CCDSConstants.VALIDATION_PATH + "/{taskId}", method = RequestMethod.POST)
 	@ResponseBody
@@ -1374,20 +1079,9 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            Path parameter with solution ID
-	 * @param revisionId
-	 *            Path parameter with revision ID
-	 * @param taskId
-	 *            Path parameter with task ID
-	 * @param sv
-	 *            Solution validation object
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
-	 */
-	@ApiOperation(value = "Updates the specified solution validation.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/"
 			+ CCDSConstants.VALIDATION_PATH + "/{taskId}", method = RequestMethod.PUT)
 	@ResponseBody
@@ -1423,18 +1117,9 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            Path parameter with solution ID
-	 * @param revisionId
-	 *            Path parameter with revision ID
-	 * @param taskId
-	 *            Path parameter with task ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success
-	 */
-	@ApiOperation(value = "Deletes the specified solution validation record.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/"
 			+ CCDSConstants.VALIDATION_PATH + "/{taskId}", method = RequestMethod.DELETE)
 	@ResponseBody
@@ -1454,19 +1139,10 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            Path parameter with solution ID
-	 * @param revisionId
-	 *            Path parameter with revision ID
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of deployments
-	 */
-	@ApiOperation(value = "Gets the deployments for the specified solution and revision IDs.", response = MLPSolutionDeployment.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets the deployments for the specified solution and revision IDs. Returns bad request if an ID is not found.", //
+			response = MLPSolutionDeployment.class, responseContainer = "Page")
+	@ApiPageable
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/"
 			+ CCDSConstants.DEPLOY_PATH, method = RequestMethod.GET)
 	@ResponseBody
@@ -1486,21 +1162,10 @@ public class SolutionController extends AbstractController {
 		return da;
 	}
 
-	/**
-	 * @param solutionId
-	 *            Path parameter with solution ID
-	 * @param revisionId
-	 *            Path parameter with revision ID
-	 * @param userId
-	 *            Path parameter with user ID
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of deployments
-	 */
-	@ApiOperation(value = "Gets the deployments for the specified solution, revision and user IDs.", response = MLPSolutionDeployment.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets the deployments for the specified solution, revision and user IDs. Returns bad request if an ID is not found.", //
+			response = MLPSolutionDeployment.class, responseContainer = "Page")
+	@ApiPageable
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/" + CCDSConstants.USER_PATH
 			+ "/{userId}/" + CCDSConstants.DEPLOY_PATH, method = RequestMethod.GET)
 	@ResponseBody
@@ -1526,18 +1191,9 @@ public class SolutionController extends AbstractController {
 		return da;
 	}
 
-	/**
-	 * @param solutionId
-	 *            Solution ID
-	 * @param revisionId
-	 *            Path parameter with revision ID
-	 * @param sd
-	 *            Solution Deployment model
-	 * @param response
-	 *            HttpServletResponse
-	 * @return model for serialization as JSON
-	 */
-	@ApiOperation(value = "Creates a new deployment record for the specified solution and revision.", response = MLPSolutionDeployment.class)
+	@ApiOperation(value = "Creates a new deployment record for the specified solution and revision. Returns bad request if an ID is not found.", //
+			response = MLPSolutionDeployment.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/"
 			+ CCDSConstants.DEPLOY_PATH, method = RequestMethod.POST)
 	@ResponseBody
@@ -1589,20 +1245,9 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            Path parameter with Solution ID
-	 * @param revisionId
-	 *            Path parameter with revision ID
-	 * @param deploymentId
-	 *            Path parameter with deployment ID
-	 * @param sd
-	 *            Solution Deployment model
-	 * @param response
-	 *            HttpServletResponse
-	 * @return model for serialization as JSON
-	 */
-	@ApiOperation(value = "Updates the deployment record for the specified ID.", response = MLPSolutionDeployment.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/"
 			+ CCDSConstants.DEPLOY_PATH + "/{deploymentId}", method = RequestMethod.PUT)
 	@ResponseBody
@@ -1632,18 +1277,9 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param solutionId
-	 *            Solution ID; actually not required
-	 * @param revisionId
-	 *            Revision ID; actually not required
-	 * @param deploymentId
-	 *            Deployment ID; the primary key
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success
-	 */
-	@ApiOperation(value = "Deletes the specified deployment record.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{solutionId}/" + CCDSConstants.REVISION_PATH + "/{revisionId}/"
 			+ CCDSConstants.DEPLOY_PATH + "/{deploymentId}", method = RequestMethod.DELETE)
 	@ResponseBody
@@ -1663,12 +1299,8 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param parentId
-	 *            Parent solution ID
-	 * @return List of child solution IDs
-	 */
-	@ApiOperation(value = "Gets a list of child solution IDs used in the specified composite solution.", response = String.class, responseContainer = "List")
+	@ApiOperation(value = "Gets a list of child solution IDs used in the specified composite solution.", //
+			response = String.class, responseContainer = "List")
 	@RequestMapping(value = "/{parentId}/" + CCDSConstants.COMPOSITE_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Iterable<String> getCompositeSolutionMembers(@PathVariable("parentId") String parentId) {
@@ -1681,16 +1313,9 @@ public class SolutionController extends AbstractController {
 		return children;
 	}
 
-	/**
-	 * @param parentId
-	 *            parent solution ID
-	 * @param childId
-	 *            child solution ID to add
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success indicator
-	 */
-	@ApiOperation(value = "Adds a child to the parent composite solution.", response = SuccessTransport.class)
+	@ApiOperation(value = "Adds a child to the parent composite solution. Returns bad request if an ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{parentId}/" + CCDSConstants.COMPOSITE_PATH + "/{childId}", method = RequestMethod.POST)
 	@ResponseBody
 	public Object addCompositeSolutionMember(@PathVariable("parentId") String parentId,
@@ -1708,30 +1333,22 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param parentId
-	 *            parent solution ID
-	 * @param childId
-	 *            child solution ID to remove
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success indicator
-	 */
-	@ApiOperation(value = "Drops a child from the parent composite solution.", response = SuccessTransport.class)
+	@ApiOperation(value = "Drops a child from the parent composite solution. Returns bad request if an ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{parentId}/" + CCDSConstants.COMPOSITE_PATH + "/{childId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public Object dropCompositeSolutionMember(@PathVariable("parentId") String parentId,
 			@PathVariable("childId") String childId, HttpServletResponse response) {
 		logger.info("dropCompositeSolutionMember: parentId {} childId {}", parentId, childId);
-		if (solutionRepository.findOne(parentId) == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + parentId, null);
-		} else if (solutionRepository.findOne(childId) == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + childId, null);
-		} else {
+		try {
 			compSolMapRepository.delete(new MLPCompSolMap(parentId, childId));
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
+		} catch (Exception ex) {
+			// e.g., EmptyResultDataAccessException is NOT an internal server error
+			logger.warn("dropCompositeSolutionMember failed: {}", ex.toString());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "dropCompositeSolutionMember failed", ex);
 		}
 	}
 

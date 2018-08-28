@@ -42,6 +42,7 @@ import org.acumos.cds.domain.MLPPeerPeerAccMap;
 import org.acumos.cds.domain.MLPPeerSolAccMap;
 import org.acumos.cds.domain.MLPPeerStatus;
 import org.acumos.cds.domain.MLPPeerSubscription;
+import org.acumos.cds.domain.MLPPublishRequest;
 import org.acumos.cds.domain.MLPRevisionDescription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
@@ -70,6 +71,7 @@ import org.acumos.cds.domain.MLPUser;
 import org.acumos.cds.domain.MLPUserLoginProvider;
 import org.acumos.cds.domain.MLPUserNotification;
 import org.acumos.cds.domain.MLPUserRoleMap;
+import org.acumos.cds.domain.MLPUserTagMap;
 import org.acumos.cds.domain.MLPValidationSequence;
 import org.acumos.cds.domain.MLPValidationStatus;
 import org.acumos.cds.domain.MLPValidationType;
@@ -126,6 +128,28 @@ public class DomainTest extends AbstractModelTest {
 		logger.info(m.toString());
 		try {
 			new MLPArtifact(null, null, null, null, null, 0);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
+	}
+
+	@Test
+	public void testMLPCodeNamePair() {
+		MLPCodeNamePair m = new MLPCodeNamePair(s1, s1);
+		m = new MLPCodeNamePair();
+		m.setCode(s1);
+		m.setName(s2);
+		Assert.assertEquals(s1, m.getCode());
+		Assert.assertEquals(s2, m.getName());
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		logger.info(m.toString());
+		try {
+			String n = null;
+			new MLPPeerGroup(n);
 			Assert.assertTrue("Unexpected success", false);
 		} catch (IllegalArgumentException iae) {
 			// null arg is rejected
@@ -571,6 +595,47 @@ public class DomainTest extends AbstractModelTest {
 		logger.info(pk.toString());
 	}
 
+	private void checkMLPPublishRequest(MLPPublishRequest m) {
+		Assert.assertEquals(s1, m.getComment());
+		Assert.assertEquals(d1, m.getCreated());
+		Assert.assertEquals(d2, m.getModified());
+		Assert.assertTrue(l1 == m.getRequestId());
+		Assert.assertEquals(s2, m.getRequestUserId());
+		Assert.assertEquals(s3, m.getReviewUserId());
+		Assert.assertEquals(s4, m.getRevisionId());
+		Assert.assertEquals(s5, m.getSolutionId());
+		Assert.assertEquals(s6, m.getStatusCode());
+	}
+
+	@Test
+	public void testMLPPublishRequest() {
+		MLPPublishRequest m = new MLPPublishRequest(s1, s2, s3, s4);
+		m = new MLPPublishRequest();
+		m.setComment(s1);
+		m.setCreated(d1);
+		m.setModified(d2);
+		m.setRequestId(l1);
+		m.setRequestUserId(s2);
+		m.setReviewUserId(s3);
+		m.setRevisionId(s4);
+		m.setSolutionId(s5);
+		m.setStatusCode(s6);
+		checkMLPPublishRequest(m);
+		m = new MLPPublishRequest(m);
+		checkMLPPublishRequest(m);
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		logger.info(m.toString());
+		try {
+			new MLPPublishRequest(null, null, null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
+	}
+
 	private void checkMLPRevisionDescription(MLPRevisionDescription m) {
 		Assert.assertEquals(s1, m.getAccessTypeCode());
 		Assert.assertEquals(d1, m.getCreated());
@@ -887,6 +952,7 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertArrayEquals(by1, m.getPicture());
 		Assert.assertEquals(s7, m.getSolutionId());
 		Assert.assertEquals(s8, m.getSourceId());
+		Assert.assertEquals(tags, m.getTags());
 		Assert.assertEquals(s9, m.getToolkitTypeCode());
 	}
 
@@ -906,6 +972,7 @@ public class DomainTest extends AbstractModelTest {
 		m.setPicture(by1);
 		m.setSolutionId(s7);
 		m.setSourceId(s8);
+		m.setTags(tags);
 		m.setToolkitTypeCode(s9);
 		checkMLPSolution(m);
 		m = new MLPSolution(m);
@@ -1368,6 +1435,7 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertEquals(s8, m.getMiddleName());
 		Assert.assertEquals(s9, m.getOrgName());
 		Assert.assertArrayEquals(by1, m.getPicture());
+		Assert.assertEquals(tags, m.getTags());
 		Assert.assertEquals(s10, m.getUserId());
 		Assert.assertEquals(s11, m.getVerifyTokenHash());
 		Assert.assertEquals(d5, m.getVerifyExpiration());
@@ -1394,6 +1462,7 @@ public class DomainTest extends AbstractModelTest {
 		m.setModified(d4);
 		m.setOrgName(s9);
 		m.setPicture(by1);
+		m.setTags(tags);
 		m.setUserId(s10);
 		m.setVerifyTokenHash(s11);
 		m.setVerifyExpiration(d5);
@@ -1548,6 +1617,40 @@ public class DomainTest extends AbstractModelTest {
 		Assert.assertEquals(s1, m.getValTypeCode());
 	}
 
+	private void checkMLPUserTagMap(MLPUserTagMap m) {
+		Assert.assertEquals(s1, m.getUserId());
+		Assert.assertEquals(s2, m.getTag());
+	}
+
+	@Test
+	public void testMLPUserTagMap() {
+		MLPUserTagMap m = new MLPUserTagMap(s1, s1);
+		m = new MLPUserTagMap();
+		m.setUserId(s1);
+		m.setTag(s2);
+		checkMLPUserTagMap(m);
+		m = new MLPUserTagMap(m);
+		checkMLPUserTagMap(m);
+		Assert.assertFalse(m.equals(null));
+		Assert.assertFalse(m.equals(new Object()));
+		Assert.assertTrue(m.equals(m));
+		Assert.assertNotNull(m.hashCode());
+		try {
+			new MLPUserTagMap(null, null);
+			Assert.assertTrue("Unexpected success", false);
+		} catch (IllegalArgumentException iae) {
+			// null arg is rejected
+		}
+		logger.info(m.toString());
+		MLPUserTagMap.UserTagMapPK pk = new MLPUserTagMap.UserTagMapPK();
+		pk = new MLPUserTagMap.UserTagMapPK(s1, s2);
+		Assert.assertFalse(pk.equals(null));
+		Assert.assertFalse(pk.equals(new Object()));
+		Assert.assertTrue(pk.equals(pk));
+		Assert.assertFalse(pk.hashCode() == 0);
+		logger.info(pk.toString());
+	}
+
 	@Test
 	public void testMLPValidationSequence() {
 		MLPValidationSequence m = new MLPValidationSequence(i1, s1);
@@ -1579,28 +1682,6 @@ public class DomainTest extends AbstractModelTest {
 	}
 
 	// Collect all the deprecated types together below
-
-	@Test
-	public void testMLPCodeNamePair() {
-		MLPCodeNamePair m = new MLPCodeNamePair(s1, s1);
-		m = new MLPCodeNamePair();
-		m.setCode(s1);
-		m.setName(s2);
-		Assert.assertEquals(s1, m.getCode());
-		Assert.assertEquals(s2, m.getName());
-		Assert.assertFalse(m.equals(null));
-		Assert.assertFalse(m.equals(new Object()));
-		Assert.assertTrue(m.equals(m));
-		Assert.assertNotNull(m.hashCode());
-		logger.info(m.toString());
-		try {
-			String n = null;
-			new MLPPeerGroup(n);
-			Assert.assertTrue("Unexpected success", false);
-		} catch (IllegalArgumentException iae) {
-			// null arg is rejected
-		}
-	}
 
 	@Test
 	public void testMLPAccessType() {

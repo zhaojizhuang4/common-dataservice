@@ -62,6 +62,7 @@ import org.acumos.cds.domain.MLPPeer;
 import org.acumos.cds.domain.MLPPeerGroup;
 import org.acumos.cds.domain.MLPPeerSolAccMap;
 import org.acumos.cds.domain.MLPPeerSubscription;
+import org.acumos.cds.domain.MLPPublishRequest;
 import org.acumos.cds.domain.MLPRevisionDescription;
 import org.acumos.cds.domain.MLPRole;
 import org.acumos.cds.domain.MLPRoleFunction;
@@ -601,6 +602,10 @@ public class CdsControllerTest {
 			RestPageResponse<MLPTag> tags = client.getTags(new RestPageRequest(0, 100));
 			Assert.assertTrue(tags.getNumberOfElements() > 0);
 
+			// Tag some users for fun
+			client.addUserTag(cu.getUserId(), tagName1);
+			client.dropUserTag(cu.getUserId(), tagName1);
+
 			MLPSolution cs = new MLPSolution("solution name", cu.getUserId(), true);
 			cs.setDescription("Tagged solution");
 			cs.setModelTypeCode(ModelTypeCode.CL.name());
@@ -971,6 +976,30 @@ public class CdsControllerTest {
 			client.dropCompositeSolutionMember(cs.getSolutionId(), csOrg.getSolutionId());
 			kids = client.getCompositeSolutionMembers(cs.getSolutionId());
 			Assert.assertTrue(kids != null && kids.size() == 0);
+
+			MLPPublishRequest pubReq = new MLPPublishRequest(cs.getSolutionId(), cr.getRevisionId(), cu.getUserId(),
+					"PE");
+			pubReq = client.createPublishRequest(pubReq);
+			Assert.assertNotNull(pubReq.getRequestId());
+			pubReq.setComment("foo bar");
+			client.updatePublishRequest(pubReq);
+			MLPPublishRequest reqFound = client.getPublishRequest(pubReq.getRequestId());
+			Assert.assertNotNull(reqFound);
+			Assert.assertNotNull(reqFound.getComment());
+			Assert.assertTrue(client.isPublishRequestPending(cs.getSolutionId(), cr.getRevisionId()));
+			logger.info("First publish request {}", reqFound);
+			HashMap<String, Object> queryParameters = new HashMap<>();
+			queryParameters.put("solutionId", cs.getSolutionId());
+			RestPageResponse<MLPPublishRequest> pubReqPage = client.searchPublishRequests(queryParameters, false,
+					new RestPageRequest(0, 5));
+			Assert.assertTrue(pubReqPage.getNumberOfElements() > 0);
+			client.deletePublishRequest(pubReq.getRequestId());
+			try {
+				client.getPublishRequest(pubReq.getRequestId());
+				throw new Exception("Unexpected find of deleted item");
+			} catch (HttpStatusCodeException ex) {
+				logger.info("Get of deleted pub req failed as expected");
+			}
 
 			if (cleanup) {
 				logger.info("Deleting newly created instances");
@@ -2086,18 +2115,6 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Update user roles failed on bad role as expected {}", ex.getResponseBodyAsString());
 		}
-		try {
-			client.dropUserRole("bogusUser", "bogusRole");
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Drop role failed on bad user as expected {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.dropUserRole(cu.getUserId(), "bogusRole");
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Drop role failed on bad role as expected {}", ex.getResponseBodyAsString());
-		}
 		List<String> emptyList = new ArrayList<>();
 		try {
 			client.addUsersInRole(emptyList, "bogusRole");
@@ -2287,12 +2304,6 @@ public class CdsControllerTest {
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("getUserLoginProvider failed on bad login as expected {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.getUserLoginProviders("bogusUser");
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("getUserLoginProviders failed on bad user as expected {}", ex.getResponseBodyAsString());
 		}
 		try {
 			client.createUserLoginProvider(new MLPUserLoginProvider("bogus", "bogus", "something", "access token", 1));
@@ -2768,12 +2779,6 @@ public class CdsControllerTest {
 			logger.info("Drop sol tag failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.findSolutionsByTag("bogus-bogus-bogus", new RestPageRequest(0, 1));
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Find sols by tag failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
 			String[] searchTags = new String[] { "%" };
 			client.findPortalSolutions(null, null, true, null, null, null, null, searchTags, null, null,
 					new RestPageRequest(0, 1));
@@ -3191,12 +3196,6 @@ public class CdsControllerTest {
 		}
 
 		try {
-			client.getFavoriteSolutions("bogus", new RestPageRequest(0, 1));
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Get fave sols failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
 			MLPSolutionFavorite sf = new MLPSolutionFavorite("solId", "userId");
 			client.createSolutionFavorite(sf);
 			throw new Exception("Unexpected success");
@@ -3242,30 +3241,61 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Add user to notif failed as expected: {}", ex.getResponseBodyAsString());
 		}
-		try {
-			client.dropUserFromNotification("notifId", "userId");
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Drop user notif failed as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.dropUserFromNotification("notifId", cu.getUserId());
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Add user to notif failed as expected: {}", ex.getResponseBodyAsString());
-		}
 
-		try {
-			client.getUserDeployments("userId", new RestPageRequest(0, 1));
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Get user deps failed as expected: {}", ex.getResponseBodyAsString());
-		}
 		try {
 			client.getUserSolutionDeployments("solId", "revId", "userId", new RestPageRequest(0, 1));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Get user soln deps failed as expected: {}", ex.getResponseBodyAsString());
+		}
+
+		try {
+			client.getPublishRequest(99999L);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("get publish request failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			HashMap<String, Object> restr = new HashMap<>();
+			client.searchPublishRequests(restr, true, new RestPageRequest(0, 1));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("search publish request empty failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			HashMap<String, Object> restr = new HashMap<>();
+			restr.put("bogus", "value");
+			client.searchPublishRequests(restr, true, new RestPageRequest(0, 1));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("search publish request bad field failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createPublishRequest(new MLPPublishRequest());
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("create publish request failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.createPublishRequest(new MLPPublishRequest("bogus", "name", "bogus", "bogus"));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("create publish request failed on bad status code as expected: {}",
+					ex.getResponseBodyAsString());
+		}
+		try {
+			MLPPublishRequest stepResult = new MLPPublishRequest();
+			stepResult.setRequestId(999L);
+			client.updatePublishRequest(stepResult);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("update publish request failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.deletePublishRequest(999L);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("delete publish request failed as expected: {}", ex.getResponseBodyAsString());
 		}
 
 		try {

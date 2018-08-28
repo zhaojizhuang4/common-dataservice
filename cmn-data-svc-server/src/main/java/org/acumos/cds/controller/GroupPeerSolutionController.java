@@ -45,6 +45,7 @@ import org.acumos.cds.transport.CountTransport;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
+import org.acumos.cds.util.ApiPageable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * Provides methods to manage peer groups and solution groups, peer group and
@@ -87,13 +90,9 @@ public class GroupPeerSolutionController extends AbstractController {
 	@Autowired
 	private PeerPeerAccMapRepository peerPeerAccMapRepository;
 
-	/**
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @return Page of peer groups
-	 */
-	@ApiOperation(value = "Gets a page of peer groups, optionally sorted.", response = MLPPeerGroup.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of peer groups, optionally sorted.", //
+			response = MLPPeerGroup.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = CCDSConstants.PEER_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPPeerGroup> getPeerGroups(Pageable pageRequest) {
@@ -102,14 +101,9 @@ public class GroupPeerSolutionController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param group
-	 *            Peer group
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Tag
-	 */
-	@ApiOperation(value = "Creates a new peer group.", response = MLPPeerGroup.class)
+	@ApiOperation(value = "Creates a new entity with a generated ID. Returns bad request on constraint violation etc.", //
+			response = MLPPeerGroup.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = CCDSConstants.PEER_PATH, method = RequestMethod.POST)
 	@ResponseBody
 	public Object createPeerGroup(@RequestBody MLPPeerGroup group, HttpServletResponse response) {
@@ -126,16 +120,9 @@ public class GroupPeerSolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param groupId
-	 *            Path parameter with the row ID
-	 * @param group
-	 *            Peer group to be updated
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
-	 */
-	@ApiOperation(value = "Updates a peer group.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{groupId}/" + CCDSConstants.PEER_PATH, method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updatePeerGroup(@PathVariable("groupId") Long groupId, @RequestBody MLPPeerGroup group,
@@ -163,14 +150,9 @@ public class GroupPeerSolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param groupId
-	 *            ID of group to delete
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Status message
-	 */
-	@ApiOperation(value = "Deletes a peer group.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{groupId}/" + CCDSConstants.PEER_PATH, method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deletePeerGroup(@PathVariable("groupId") Long groupId, HttpServletResponse response) {
@@ -186,17 +168,10 @@ public class GroupPeerSolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param groupId
-	 *            Peer group ID
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of peers
-	 */
-	@ApiOperation(value = "Gets a page of peer members of the specified peer group, optionally sorted.", response = MLPSolutionGroup.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of peer members of the specified peer group, optionally sorted.", //
+			response = MLPSolutionGroup.class, responseContainer = "Page")
+	@ApiPageable
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{groupId}/" + CCDSConstants.PEER_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getPeersInGroup(@PathVariable("groupId") Long groupId, Pageable pageRequest,
@@ -210,18 +185,8 @@ public class GroupPeerSolutionController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param groupId
-	 *            Peer group ID
-	 * @param peerId
-	 *            Peer ID
-	 * @param map
-	 *            Peer to peer group mapping object (ignored)
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success or error
-	 */
-	@ApiOperation(value = "Adds the specified peer as a member of the specified peer group.", response = SuccessTransport.class)
+	@ApiOperation(value = "Adds the specified peer as a member of the specified peer group.", //
+			response = SuccessTransport.class)
 	@RequestMapping(value = "/{groupId}/" + CCDSConstants.PEER_PATH + "/{peerId}", method = RequestMethod.POST)
 	@ResponseBody
 	public Object addPeerToGroup(@PathVariable("groupId") Long groupId, @PathVariable("peerId") String peerId,
@@ -242,17 +207,9 @@ public class GroupPeerSolutionController extends AbstractController {
 		return new SuccessTransport(HttpServletResponse.SC_OK, null);
 	}
 
-	/**
-	 * 
-	 * @param groupId
-	 *            Peer group ID
-	 * @param peerId
-	 *            Peer ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success or error
-	 */
-	@ApiOperation(value = "Drops the specified peer as a member of the specified peer group.", response = SuccessTransport.class)
+	@ApiOperation(value = "Drops the specified peer as a member of the specified peer group.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{groupId}/" + CCDSConstants.PEER_PATH + "/{peerId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public Object dropPeerFromGroup(@PathVariable("groupId") Long groupId, @PathVariable("peerId") String peerId,
@@ -267,13 +224,9 @@ public class GroupPeerSolutionController extends AbstractController {
 		return new SuccessTransport(HttpServletResponse.SC_OK, null);
 	}
 
-	/**
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @return Page of peer groups
-	 */
-	@ApiOperation(value = "Gets a page of solution groups, optionally sorted.", response = MLPSolutionGroup.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of solution groups, optionally sorted.", //
+			response = MLPSolutionGroup.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = CCDSConstants.SOLUTION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPSolutionGroup> getSolutionGroups(Pageable pageRequest) {
@@ -282,21 +235,15 @@ public class GroupPeerSolutionController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param group
-	 *            Solution group
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Tag
-	 */
-	@ApiOperation(value = "Creates a new solution group.", response = MLPSolutionGroup.class)
+	@ApiOperation(value = "Creates a new entity with a generated ID. Returns bad request on constraint violation etc.", //
+			response = MLPSolutionGroup.class)
 	@RequestMapping(value = CCDSConstants.SOLUTION_PATH, method = RequestMethod.POST)
 	@ResponseBody
 	public Object createSolutionGroup(@RequestBody MLPSolutionGroup group, HttpServletResponse response) {
 		logger.info("createSolutionGroup group {}", group);
 		try {
-			Object result = solutionGroupRepository.save(group);
-			return result;
+			group.setGroupId(null);
+			return solutionGroupRepository.save(group);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
@@ -306,16 +253,9 @@ public class GroupPeerSolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param groupId
-	 *            Path parameter with the row ID
-	 * @param group
-	 *            Solution group to be updated
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
-	 */
-	@ApiOperation(value = "Updates a solution group.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{groupId}/" + CCDSConstants.SOLUTION_PATH, method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updateSolutionGroup(@PathVariable("groupId") Long groupId, @RequestBody MLPSolutionGroup group,
@@ -343,14 +283,9 @@ public class GroupPeerSolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param groupId
-	 *            ID of group to delete
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Status message
-	 */
-	@ApiOperation(value = "Deletes a solution group.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{groupId}/" + CCDSConstants.SOLUTION_PATH, method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteSolutionGroup(@PathVariable("groupId") Long groupId, HttpServletResponse response) {
@@ -366,17 +301,10 @@ public class GroupPeerSolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param groupId
-	 *            Solution group ID
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of solutions
-	 */
-	@ApiOperation(value = "Gets a page of solution members in the specified solution group, optionally sorted.", response = MLPSolutionGroup.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of solution members in the specified solution group, optionally sorted.", //
+			response = MLPSolutionGroup.class, responseContainer = "Page")
+	@ApiPageable
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{groupId}/" + CCDSConstants.SOLUTION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getSolutionsInGroup(@PathVariable("groupId") Long groupId, Pageable pageRequest,
@@ -390,18 +318,8 @@ public class GroupPeerSolutionController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param groupId
-	 *            Solution group ID
-	 * @param solutionId
-	 *            Solution ID
-	 * @param map
-	 *            Solution to solution group mapping object (ignored)
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success or error
-	 */
-	@ApiOperation(value = "Adds the specified solution as a member of the specified solution group.", response = SuccessTransport.class)
+	@ApiOperation(value = "Adds the specified solution as a member of the specified solution group.", //
+			response = SuccessTransport.class)
 	@RequestMapping(value = "/{groupId}/" + CCDSConstants.SOLUTION_PATH + "/{solutionId}", method = RequestMethod.POST)
 	@ResponseBody
 	public Object addSolutionToGroup(@PathVariable("groupId") Long groupId,
@@ -431,17 +349,9 @@ public class GroupPeerSolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * 
-	 * @param groupId
-	 *            Solution group ID
-	 * @param solutionId
-	 *            Solution ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success or error
-	 */
-	@ApiOperation(value = "Drops the specified solution as a member of the specified solution group.", response = SuccessTransport.class)
+	@ApiOperation(value = "Drops the specified solution as a member of the specified solution group.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{groupId}/" + CCDSConstants.SOLUTION_PATH
 			+ "/{solutionId}", method = RequestMethod.DELETE)
 	@ResponseBody
@@ -460,13 +370,9 @@ public class GroupPeerSolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param pageRequest
-	 *            Page and sort criteria. Spring sets to page 0 of size 20 if client
-	 *            sends nothing.
-	 * @return Page of peer-solution map objects
-	 */
-	@ApiOperation(value = "Gets a page of peer-solution membership mappings, optionally sorted.", response = MLPPeerSolAccMap.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of peer-solution membership mappings, optionally sorted.", //
+			response = MLPPeerSolAccMap.class, responseContainer = "Page")
+	@ApiPageable
 	@RequestMapping(value = CCDSConstants.PEER_PATH + "/" + CCDSConstants.SOLUTION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Page<MLPPeerSolAccMap> getPeerSolutionGroupMaps(Pageable pageRequest) {
@@ -475,19 +381,9 @@ public class GroupPeerSolutionController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * 
-	 * @param peerGroupId
-	 *            Peer group ID
-	 * @param solutionGroupId
-	 *            Solution group ID
-	 * @param map
-	 *            Peer group to solution group mapping object (ignored)
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success or error
-	 */
-	@ApiOperation(value = "Grants access for the specified peer group to the specified solution group.", response = SuccessTransport.class)
+	@ApiOperation(value = "Grants access for the specified peer group to the specified solution group.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = CCDSConstants.PEER_PATH + "/{peerGroupId}/" + CCDSConstants.SOLUTION_PATH
 			+ "/{solutionGroupId}", method = RequestMethod.POST)
 	@ResponseBody
@@ -518,17 +414,9 @@ public class GroupPeerSolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * 
-	 * @param peerGroupId
-	 *            Peer group ID
-	 * @param solutionGroupId
-	 *            Solution group ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success or error
-	 */
-	@ApiOperation(value = "Removes access for the specified peer group to the specified solution group.", response = SuccessTransport.class)
+	@ApiOperation(value = "Removes access for the specified peer group to the specified solution group.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = CCDSConstants.PEER_PATH + "/{peerGroupId}/" + CCDSConstants.SOLUTION_PATH
 			+ "/{solutionGroupId}", method = RequestMethod.DELETE)
 	@ResponseBody
@@ -547,19 +435,9 @@ public class GroupPeerSolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * 
-	 * @param principalGroupId
-	 *            Principal peer group ID
-	 * @param resourceGroupId
-	 *            Resource peer group ID
-	 * @param map
-	 *            Peer group to peer group mapping object (ignored)
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success or error
-	 */
-	@ApiOperation(value = "Grants access for the specified principal peer group to the specified resource peer group.", response = SuccessTransport.class)
+	@ApiOperation(value = "Grants access for the specified principal peer group to the specified resource peer group.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = CCDSConstants.PEER_PATH + "/{principalGroupId}/" + CCDSConstants.PEER_PATH
 			+ "/{resourceGroupId}", method = RequestMethod.POST)
 	@ResponseBody
@@ -594,17 +472,9 @@ public class GroupPeerSolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * 
-	 * @param principalGroupId
-	 *            Principal peer group ID
-	 * @param resourceGroupId
-	 *            Resource peer group ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Success or error
-	 */
-	@ApiOperation(value = "Removes access for the specified principal peer group to the specified resource peer group.", response = SuccessTransport.class)
+	@ApiOperation(value = "Removes access for the specified principal peer group to the specified resource peer group.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = CCDSConstants.PEER_PATH + "/{principalGroupId}/" + CCDSConstants.PEER_PATH
 			+ "/{resourceGroupId}", method = RequestMethod.DELETE)
 	@ResponseBody
@@ -625,18 +495,8 @@ public class GroupPeerSolutionController extends AbstractController {
 		}
 	}
 
-	/**
-	 * 
-	 * @param peerId
-	 *            Peer ID
-	 * @param solutionId
-	 *            Solution ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Count of access paths; zero if none. Throws an exception if the peer
-	 *         or solution IDs are bad.
-	 */
 	@ApiOperation(value = "Checks access for the specified peer to the specified solution.", response = MLPEntity.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = CCDSConstants.PEER_PATH + "/{peerId}/" + CCDSConstants.SOLUTION_PATH + "/{solutionId}/"
 			+ CCDSConstants.ACCESS_PATH, method = RequestMethod.GET)
 	@ResponseBody
@@ -655,15 +515,8 @@ public class GroupPeerSolutionController extends AbstractController {
 		return new CountTransport(count);
 	}
 
-	/**
-	 * 
-	 * @param peerId
-	 *            Peer ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return List of MLPPeer
-	 */
 	@ApiOperation(value = "Gets peers accessible to the specified peer.", response = MLPPeer.class, responseContainer = "List")
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = CCDSConstants.PEER_PATH + "/{peerId}/"
 			+ CCDSConstants.ACCESS_PATH, method = RequestMethod.GET)
 	@ResponseBody

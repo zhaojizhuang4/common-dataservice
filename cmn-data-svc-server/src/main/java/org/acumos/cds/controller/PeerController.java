@@ -55,6 +55,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * Answers REST requests to get, add, update and delete peers.
@@ -74,13 +77,8 @@ public class PeerController extends AbstractController {
 	@Autowired
 	private PeerSearchService peerSearchService;
 
-	/**
-	 * 
-	 * @param pageable
-	 *            Sort and page criteria
-	 * @return List of artifacts, for serialization as JSON
-	 */
-	@ApiOperation(value = "Gets a page of peers, optionally sorted on fields.", response = MLPPeer.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of peers, optionally sorted.", //
+			response = MLPPeer.class, responseContainer = "Page")
 	@ApiPageable
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
@@ -90,21 +88,17 @@ public class PeerController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param queryParameters
-	 *            Map of String (field name) to String (value) for restricting the
-	 *            query
-	 * @param pageable
-	 *            Sort and page criteria
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Page of peers, for serialization as JSON.
-	 */
-	@ApiOperation(value = "Searches for peers using the field name - field value pairs specified as query parameters. Defaults to and (conjunction); send junction query parameter = o for or (disjunction).", response = MLPPeer.class, responseContainer = "Page")
+	@ApiOperation(value = "Searches for entities with attribute values matching the field name - field value pairs specified as query parameters. " //
+			+ "Defaults to and (conjunction); send junction query parameter '_j=o' for or (disjunction).", //
+			response = MLPPeer.class, responseContainer = "Page")
 	@ApiPageable
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchPeers(@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageable,
+	public Object searchPeers(
+			// This actually IS required; set flag to false for swagger UI
+			@ApiParam(value = "Field name - field value pairs as request parameters in the format name=value, minimum 1; repeats allowed. " //
+					+ "Not supported by Swagger web UI.", allowMultiple = true, type = "Array[string]", required = false) //
+			@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageable,
 			HttpServletResponse response) {
 		logger.info("searchPeers {}", queryParameters);
 		cleanPageableParameters(queryParameters);
@@ -127,14 +121,9 @@ public class PeerController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param peerId
-	 *            Path parameter with row ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A peer if found, an error otherwise.
-	 */
-	@ApiOperation(value = "Gets the peer for the specified ID.", response = MLPPeer.class)
+	@ApiOperation(value = "Gets the entity for the specified ID. Returns bad request if the ID is not found.", //
+			response = MLPPeer.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) }) //
 	@RequestMapping(value = "/{peerId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getPeer(@PathVariable("peerId") String peerId, HttpServletResponse response) {
@@ -147,14 +136,9 @@ public class PeerController extends AbstractController {
 		return peer;
 	}
 
-	/**
-	 * @param peer
-	 *            peer to save
-	 * @param response
-	 *            HttpServletResponse
-	 * @return peer model to be serialized as JSON
-	 */
-	@ApiOperation(value = "Creates a new peer.", response = MLPPeer.class)
+	@ApiOperation(value = "Creates a new entity and generates an ID if needed. Returns bad request on constraint violation etc.", //
+			response = MLPPeer.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createPeer(@RequestBody MLPPeer peer, HttpServletResponse response) {
@@ -186,16 +170,9 @@ public class PeerController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param peerId
-	 *            Path parameter with the row ID
-	 * @param peer
-	 *            Peer data to be updated
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
-	 */
-	@ApiOperation(value = "Updates a peer.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{peerId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updatePeer(@PathVariable("peerId") String peerId, @RequestBody MLPPeer peer,
@@ -225,18 +202,14 @@ public class PeerController extends AbstractController {
 		}
 	}
 
-	/**
+	/*
 	 * Originally this was declared void and accordingly returned nothing. But when
 	 * used in SpringBoot, after invoking the method it would look for a ThymeLeaf
 	 * template, fail to find it, then throw internal server error.
-	 * 
-	 * @param peerId
-	 *            Path parameter that identifies the instance
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
 	 */
-	@ApiOperation(value = "Deletes a peer.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{peerId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deletePeer(@PathVariable("peerId") String peerId, HttpServletResponse response) {
@@ -257,17 +230,10 @@ public class PeerController extends AbstractController {
 
 	/* Peer Subscriptions */
 
-	/**
-	 * @param peerId
-	 *            Path parameter that identifies the instance
-	 * @param pageable
-	 *            Sort and page criteria
-	 * @param response
-	 *            HttpServletResponse
-	 * @return List of artifacts, for serialization as JSON
-	 */
-	@ApiOperation(value = "Gets all subscriptions for the specified peer.", response = MLPPeerSubscription.class, responseContainer = "List")
+	@ApiOperation(value = "Gets all subscriptions for the specified peer.", //
+			response = MLPPeerSubscription.class, responseContainer = "List")
 	@ApiPageable
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{peerId}/" + CCDSConstants.SUBSCRIPTION_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public Object getPeerSubs(@PathVariable("peerId") String peerId, Pageable pageable, HttpServletResponse response) {
@@ -281,13 +247,6 @@ public class PeerController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param subId
-	 *            Path parameter with subscription ID
-	 * @param response
-	 *            HttpServletResponse
-	 * @return A peer if found, an error otherwise.
-	 */
 	@ApiOperation(value = "Gets the peer subscription for the specified ID.", response = MLPPeerSubscription.class)
 	@RequestMapping(value = "/" + CCDSConstants.SUBSCRIPTION_PATH + "/{subId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -301,14 +260,9 @@ public class PeerController extends AbstractController {
 		return peerSub;
 	}
 
-	/**
-	 * @param peerSub
-	 *            peerSubscription to save
-	 * @param response
-	 *            HttpServletResponse
-	 * @return peer model to be serialized as JSON
-	 */
-	@ApiOperation(value = "Creates a new peer subscription.", response = MLPPeerSubscription.class)
+	@ApiOperation(value = "Creates a new entity with a generated ID. Returns bad request on constraint violation etc.", //
+			response = MLPPeerSubscription.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/" + CCDSConstants.SUBSCRIPTION_PATH, method = RequestMethod.POST)
 	@ResponseBody
 	public Object createPeerSub(@RequestBody MLPPeerSubscription peerSub, HttpServletResponse response) {
@@ -339,16 +293,9 @@ public class PeerController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param subId
-	 *            Path parameter with the row ID
-	 * @param peerSub
-	 *            Peer data to be updated
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
-	 */
-	@ApiOperation(value = "Updates a peer subscription.", response = SuccessTransport.class)
+	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/" + CCDSConstants.SUBSCRIPTION_PATH + "/{subId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public Object updatePeerSub(@PathVariable("subId") Long subId, @RequestBody MLPPeerSubscription peerSub,
@@ -379,14 +326,9 @@ public class PeerController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param subId
-	 *            Path parameter that identifies the peer subscription
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success or failure
-	 */
-	@ApiOperation(value = "Deletes a peer subscription.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/" + CCDSConstants.SUBSCRIPTION_PATH + "/{subId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deletePeerSub(@PathVariable("subId") Long subId, HttpServletResponse response) {

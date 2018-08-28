@@ -28,9 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.acumos.cds.CCDSConstants;
 import org.acumos.cds.CodeNameType;
 import org.acumos.cds.domain.MLPPublishRequest;
-import org.acumos.cds.domain.MLPStepResult;
-import org.acumos.cds.repository.StepResultRepository;
-import org.acumos.cds.service.StepResultSearchService;
+import org.acumos.cds.repository.PublishRequestRepository;
+import org.acumos.cds.service.PublishRequestSearchService;
 import org.acumos.cds.transport.ErrorTransport;
 import org.acumos.cds.transport.MLPTransportModel;
 import org.acumos.cds.transport.SuccessTransport;
@@ -57,38 +56,38 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @Controller
-@RequestMapping(value = "/" + CCDSConstants.STEP_RESULT_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
-public class StepResultController extends AbstractController {
+@RequestMapping(value = "/" + CCDSConstants.PUBLISH_REQUEST_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
+public class PublishRequestController extends AbstractController {
 
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Autowired
-	private StepResultRepository stepResultRepository;
+	private PublishRequestRepository publishRequestRepository;
 	@Autowired
-	private StepResultSearchService stepResultSearchService;
+	private PublishRequestSearchService publishRequestSearchService;
 
-	@ApiOperation(value = "Gets a page of step results, optionally sorted on fields.", //
-			response = MLPStepResult.class, responseContainer = "Page")
+	@ApiOperation(value = "Gets a page of publish requests, optionally sorted on fields.", //
+			response = MLPPublishRequest.class, responseContainer = "Page")
 	@ApiPageable
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	public Page<MLPStepResult> getStepResults(Pageable pageRequest) {
-		logger.info("getStepResults {}", pageRequest);
-		Page<MLPStepResult> result = stepResultRepository.findAll(pageRequest);
+	public Page<MLPPublishRequest> getPublishRequests(Pageable pageRequest) {
+		logger.info("getPublishRequests {}", pageRequest);
+		Page<MLPPublishRequest> result = publishRequestRepository.findAll(pageRequest);
 		return result;
 	}
 
-	@ApiOperation(value = "Gets the step result for the specified ID. Returns bad request if the ID is not found.", //
-			response = MLPStepResult.class)
+	@ApiOperation(value = "Gets the entity for the specified ID. Returns bad request if the ID is not found.", //
+			response = MLPPublishRequest.class)
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
-	@RequestMapping(value = "/{stepResultId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{requestId}", method = RequestMethod.GET)
 	@ResponseBody
-	public Object getStepResult(@PathVariable("stepResultId") Long stepResultId, HttpServletResponse response) {
-		logger.info("getStepResult: stepResultId {}", stepResultId);
-		MLPStepResult sr = stepResultRepository.findOne(stepResultId);
+	public Object getPublishRequest(@PathVariable("requestId") long requestId, HttpServletResponse response) {
+		logger.info("getPublishRequest: requestId {}", requestId);
+		MLPPublishRequest sr = publishRequestRepository.findOne(requestId);
 		if (sr == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + stepResultId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + requestId, null);
 		}
 		return sr;
 	}
@@ -100,13 +99,13 @@ public class StepResultController extends AbstractController {
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchStepResults(
+	public Object searchPublishRequests(
 			// This actually IS required; set flag to false for swagger UI
 			@ApiParam(value = "Field name - field value pairs as request parameters in the format name=value, minimum 1; repeats allowed. " //
 					+ "Not supported by Swagger web UI.", allowMultiple = true, type = "Array[string]", required = false) //
 			@RequestParam MultiValueMap<String, String> queryParameters, HttpServletResponse response,
 			Pageable pageRequest) {
-		logger.info("searchStepResults {}", queryParameters);
+		logger.info("searchPublishRequests {}", queryParameters);
 		cleanPageableParameters(queryParameters);
 		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
 		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
@@ -115,92 +114,87 @@ public class StepResultController extends AbstractController {
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
 		}
 		try {
-			Map<String, Object> convertedQryParm = convertQueryParameters(MLPStepResult.class, queryParameters);
-			Object result = stepResultSearchService.findStepResults(convertedQryParm, isOr, pageRequest);
-			return result;
+			Map<String, Object> convertedQryParm = convertQueryParameters(MLPPublishRequest.class, queryParameters);
+			return publishRequestSearchService.findPublishRequests(convertedQryParm, isOr, pageRequest);
 		} catch (Exception ex) {
-			logger.warn("searchStepResults failed: {}", ex.toString());
+			logger.warn("searchPublishRequests failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
-					ex.getCause() != null ? ex.getCause().getMessage() : "searchStepResults failed", ex);
+					ex.getCause() != null ? ex.getCause().getMessage() : "searchPublishRequests failed", ex);
 		}
 	}
 
 	@ApiOperation(value = "Creates a new entity with a generated ID. Returns bad request on constraint violation etc.", //
-			response = MLPStepResult.class)
+			response = MLPPublishRequest.class)
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
-	public Object createStepResult(@RequestBody MLPStepResult stepResult, HttpServletResponse response) {
-		logger.info("createStepResult: enter");
+	public Object createPublishRequest(@RequestBody MLPPublishRequest publishRequest, HttpServletResponse response) {
+		logger.info("createPublishRequest: enter");
 		try {
 			// Validate enum codes
-			super.validateCode(stepResult.getStepCode(), CodeNameType.STEP_TYPE);
-			super.validateCode(stepResult.getStatusCode(), CodeNameType.STEP_STATUS);
+			super.validateCode(publishRequest.getStatusCode(), CodeNameType.PUBLISH_REQUEST_STATUS);
 			// Force creation of new ID
-			stepResult.setStepResultId(null);
-			MLPStepResult result = stepResultRepository.save(stepResult);
+			publishRequest.setRequestId(null);
+			MLPPublishRequest result = publishRequestRepository.save(publishRequest);
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			// This is a hack to create the location path.
-			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.STEP_RESULT_PATH + "/" + result.getStepResultId());
+			response.setHeader(HttpHeaders.LOCATION, CCDSConstants.PUBLISH_REQUEST_PATH + "/" + result.getRequestId());
 			return result;
 		} catch (Exception ex) {
-			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn("createStepResult failed: {}", cve.toString());
+			logger.warn("createPublishRequest failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createStepResult failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "createPublishRequest failed", cve);
 		}
 	}
 
 	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
 			response = SuccessTransport.class)
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
-	@RequestMapping(value = "/{stepResultId}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{requestId}", method = RequestMethod.PUT)
 	@ResponseBody
-	public Object updateStepResult(@PathVariable("stepResultId") Long stepResultId,
-			@RequestBody MLPStepResult stepResult, HttpServletResponse response) {
-		logger.info("updateStepResult: stepResultId {}", stepResultId);
+	public Object updatePublishRequest(@PathVariable("requestId") long requestId,
+			@RequestBody MLPPublishRequest publishRequest, HttpServletResponse response) {
+		logger.info("updatePublishRequest: requestId {}", requestId);
 		// Get the existing one
-		MLPStepResult existing = stepResultRepository.findOne(stepResultId);
+		MLPPublishRequest existing = publishRequestRepository.findOne(requestId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + stepResultId, null);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + requestId, null);
 		}
 		try {
-			// Validate enum codes
-			super.validateCode(stepResult.getStepCode(), CodeNameType.STEP_TYPE);
-			super.validateCode(stepResult.getStatusCode(), CodeNameType.STEP_STATUS);
+			super.validateCode(publishRequest.getStatusCode(), CodeNameType.PUBLISH_REQUEST_STATUS);
 			// Use the path-parameter id; don't trust the one in the object
-			stepResult.setStepResultId(stepResultId);
+			publishRequest.setRequestId(requestId);
 			// Update the existing row
-			stepResultRepository.save(stepResult);
+			publishRequestRepository.save(publishRequest);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
-			logger.warn("updateStepResult failed: {}", cve.toString());
+			logger.warn("updatePublishRequest failed: {}", cve.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updateStepResult failed", cve);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "updatePublishRequest failed", cve);
 		}
 	}
 
 	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
 			response = SuccessTransport.class)
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
-	@RequestMapping(value = "/{stepResultId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{requestId}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public MLPTransportModel deleteStepResult(@PathVariable("stepResultId") Long stepResultId,
+	public MLPTransportModel deletePublishRequest(@PathVariable("requestId") long requestId,
 			HttpServletResponse response) {
-		logger.info("deleteStepResult: stepResultId {}", stepResultId);
+		logger.info("deletePublishRequest: requestId {}", requestId);
 		try {
-			stepResultRepository.delete(stepResultId);
+			publishRequestRepository.delete(requestId);
 			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn("deleteStepResult failed: {}", ex.toString());
+			logger.warn("deletePublishRequest failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deleteStepResult failed", ex);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "deletePublishRequest failed", ex);
 		}
 	}
 

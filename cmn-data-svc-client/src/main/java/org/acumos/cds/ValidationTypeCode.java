@@ -21,7 +21,9 @@
 package org.acumos.cds;
 
 /**
- * This enum defines Acumos validation type codes.
+ * This enum once defined Acumos validation type codes, but the validation
+ * feature was not implemented as originally planned, so this enum MUST NOT BE
+ * USED.
  * 
  * @deprecated Use
  *             {@link org.acumos.cds.client.ICommonDataServiceRestClient#getCodeNamePairs(CodeNameType)}

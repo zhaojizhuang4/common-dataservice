@@ -18,16 +18,32 @@
  * ===============LICENSE_END=========================================================
  */
 
-package org.acumos.cds;
+package org.acumos.cds.service;
+
+import java.util.Map;
+
+import org.acumos.cds.domain.MLPPublishRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
- * Provides a constant for every code-name value set.
+ * Defines methods to query publish request information.
  */
-public enum CodeNameType {
+public interface PublishRequestSearchService {
 
-	ACCESS_TYPE, ARTIFACT_TYPE, DEPLOYMENT_STATUS, LOGIN_PROVIDER, //
-	MESSAGE_SEVERITY, MODEL_TYPE, NOTIFICATION_DELIVERY_MECHANISM, //
-	PEER_STATUS, PUBLISH_REQUEST_STATUS, STEP_STATUS, STEP_TYPE, //
-	SUBSCRIPTION_SCOPE, TOOLKIT_TYPE, VALIDATION_STATUS, VALIDATION_TYPE;
+	/**
+	 * Searches for instances matching all or one of the query parameters, depending
+	 * on the isOr parameter.
+	 * 
+	 * @param queryParameters
+	 *            field-name, field-value pairs. Value may be scalar or array.
+	 * @param isOr
+	 *            If true, the query is a disjunction ("or"); otherwise the query is
+	 *            a conjunction ("and").
+	 * @param pageable
+	 *            Page and sort criteria
+	 * @return List of instances, which may be empty.
+	 */
+	Page<MLPPublishRequest> findPublishRequests(Map<String, Object> queryParameters, boolean isOr, Pageable pageable);
 
 }

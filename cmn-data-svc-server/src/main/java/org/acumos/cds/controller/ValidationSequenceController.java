@@ -46,11 +46,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.swagger.annotations.ApiOperation;
 
-/**
- * Provides getters for all code-name value sets. Fixed value sets are
- * implemented as Java enums, so these controllers are only of interest to
- * clients that don't use the provided Java client.
- */
 @Controller
 @RequestMapping(value = "/" + CCDSConstants.VAL_SEQ_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 public class ValidationSequenceController extends AbstractController {
@@ -72,18 +67,6 @@ public class ValidationSequenceController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param sequence
-	 *            sequence number
-	 * @param valTypeCode
-	 *            validation type code
-	 * @param valSeq
-	 *            Instance to save (redundant; the path parameters have all the
-	 *            required data)
-	 * @param response
-	 *            HttpServletResponse
-	 * @return solution model for serialization as JSON
-	 */
 	@ApiOperation(value = "Creates a new validation sequence record.", response = MLPValidationSequence.class)
 	@RequestMapping(value = "/{sequence}/" + CCDSConstants.VAL_TYPE_PATH
 			+ "/{valTypeCode}", method = RequestMethod.POST)
@@ -113,15 +96,6 @@ public class ValidationSequenceController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param sequence
-	 *            sequence number
-	 * @param valTypeCode
-	 *            validation type code
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Transport model with success
-	 */
 	@ApiOperation(value = "Deletes the specified validation sequence record.", response = SuccessTransport.class)
 	@RequestMapping(value = "/{sequence}/" + CCDSConstants.VAL_TYPE_PATH
 			+ "/{valTypeCode}", method = RequestMethod.DELETE)

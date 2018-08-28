@@ -21,6 +21,10 @@
 package org.acumos.cds.client.test;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.acumos.cds.domain.MLPTag;
 
 public abstract class AbstractModelTest {
 
@@ -55,5 +59,10 @@ public abstract class AbstractModelTest {
 	final String s10 = "string10";
 	final String s11 = "string11";
 	final String s12 = "string12";
+	final Set<MLPTag> tags = new HashSet<>();
+
+	public AbstractModelTest() {
+		tags.add(new MLPTag("taggy"));
+	}
 
 }

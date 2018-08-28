@@ -45,10 +45,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
-/**
- * Provides methods to create and delete tags for solutions.
- */
 @Controller
 @RequestMapping(value = "/" + CCDSConstants.TAG_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 public class TagController extends AbstractController {
@@ -58,11 +57,6 @@ public class TagController extends AbstractController {
 	@Autowired
 	private TagRepository tagRepository;
 
-	/**
-	 * @param pageable
-	 *            Sort and page criteria
-	 * @return Page of tags
-	 */
 	@ApiOperation(value = "Gets a page of tags, optionally sorted.", response = MLPTag.class, responseContainer = "Page")
 	@ApiPageable
 	@RequestMapping(method = RequestMethod.GET)
@@ -73,14 +67,8 @@ public class TagController extends AbstractController {
 		return result;
 	}
 
-	/**
-	 * @param tag
-	 *            Tag string
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Tag
-	 */
-	@ApiOperation(value = "Creates a new tag.", response = MLPTag.class)
+	@ApiOperation(value = "Creates a new tag. Returns bad request on constraint violation etc.", response = MLPTag.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Object createTag(@RequestBody MLPTag tag, HttpServletResponse response) {
@@ -101,14 +89,9 @@ public class TagController extends AbstractController {
 		}
 	}
 
-	/**
-	 * @param tag
-	 *            tag to delete
-	 * @param response
-	 *            HttpServletResponse
-	 * @return Status message
-	 */
-	@ApiOperation(value = "Deletes a tag.", response = SuccessTransport.class)
+	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+			response = SuccessTransport.class)
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{tag}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public MLPTransportModel deleteTag(@PathVariable("tag") String tag, HttpServletResponse response) {
