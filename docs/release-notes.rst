@@ -23,6 +23,12 @@ Common Data Service Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
+
+Version 1.17.3, 31 Aug 2018
+---------------------------
+
+* Added new API endpoint to get Dataset info, right now it is just prototype (ACUMOS-1182)
+
 Version 1.17.2, 28 Aug 2018
 ---------------------------
 
