@@ -1857,11 +1857,22 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
+	public long getSolutionRevisionThreadCount(String solutionId, String revisionId) {
+		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, CCDSConstants.SOLUTION_PATH, solutionId,
+				CCDSConstants.REVISION_PATH, revisionId, CCDSConstants.COUNT_PATH }, null, null);
+		logger.debug("getSolutionRevisionThreadCount: uri {}", uri);
+		ResponseEntity<CountTransport> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<CountTransport>() {
+				});
+		return response.getBody().getCount();
+	}
+
+	@Override
 	public RestPageResponse<MLPThread> getSolutionRevisionThreads(String solutionId, String revisionId,
 			RestPageRequest pageRequest) {
 		URI uri = buildUri(new String[] { CCDSConstants.THREAD_PATH, CCDSConstants.SOLUTION_PATH, solutionId,
 				CCDSConstants.REVISION_PATH, revisionId }, null, pageRequest);
-		logger.debug("getThreads: uri {}", uri);
+		logger.debug("getSolutionRevisionThreads: uri {}", uri);
 		ResponseEntity<RestPageResponse<MLPThread>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<RestPageResponse<MLPThread>>() {
 				});

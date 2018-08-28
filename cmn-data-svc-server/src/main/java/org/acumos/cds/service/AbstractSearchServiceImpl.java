@@ -64,8 +64,8 @@ public abstract class AbstractSearchServiceImpl {
 	}
 
 	/**
-	 * Builds criterion to check exact match of any value in
-	 * the list, with special handling for null.
+	 * Builds criterion to check exact match of any value in the list, with special
+	 * handling for null.
 	 * 
 	 * @param fieldName
 	 *            POJO field name

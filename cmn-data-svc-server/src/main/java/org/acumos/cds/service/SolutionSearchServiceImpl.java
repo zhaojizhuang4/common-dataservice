@@ -98,7 +98,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 	private final String descsAlias = "descs";
 	private final String solutionId = "solutionId";
 	// Aliases used in subquery for required tags
-	private final String solAlias = "sol"; 
+	private final String solAlias = "sol";
 	private final String subqAlias = "subsol";
 	private final String tagsFieldAlias = "t";
 	private final String tagValueField = tagsFieldAlias + ".tag";

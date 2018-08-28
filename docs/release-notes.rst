@@ -32,6 +32,7 @@ Version 1.17.2, 28 Aug 2018
 * Filter search results using all tags not any tag (ACUMOS-1601)
 * Document Pageable request parameters in Swagger (ACUMOS-1608)
 * Enhance search for revision description (ACUMOS-1614)
+* Add API to count top-level comments on a revision (ACUMOS-1644)
 * Requires database schema version 1.17
 
 Version 1.17.1, 10 Aug 2018

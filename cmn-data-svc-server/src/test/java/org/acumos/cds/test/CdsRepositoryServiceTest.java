@@ -709,6 +709,8 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(thread.getThreadId() != null);
 			logger.info("Created thread {}", thread);
 
+			long threadCount = threadRepository.countBySolutionIdAndRevisionId(cs.getSolutionId(), cr.getRevisionId());
+			Assert.assertTrue(threadCount > 0);
 			Page<MLPThread> threads = threadRepository.findBySolutionIdAndRevisionId(cs.getSolutionId(),
 					cr.getRevisionId(), new PageRequest(0, 5, null));
 			Assert.assertTrue(threads != null && threads.getNumberOfElements() > 0);

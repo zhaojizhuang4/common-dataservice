@@ -1477,6 +1477,8 @@ public class CdsControllerTest {
 		MLPThread retrieved = client.getThread(thread.getThreadId());
 		Assert.assertNotNull(retrieved);
 
+		long threadCountById = client.getSolutionRevisionThreadCount(cs.getSolutionId(), cr.getRevisionId());
+		Assert.assertTrue(threadCountById > 0);
 		RestPageResponse<MLPThread> threadsById = client.getSolutionRevisionThreads(cs.getSolutionId(),
 				cr.getRevisionId(), new RestPageRequest(0, 1));
 		Assert.assertTrue(threadsById != null && threadsById.getNumberOfElements() > 0);

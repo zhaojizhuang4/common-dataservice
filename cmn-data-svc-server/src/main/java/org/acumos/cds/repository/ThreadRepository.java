@@ -28,6 +28,17 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface ThreadRepository extends PagingAndSortingRepository<MLPThread, String> {
 
 	/**
+	 * Gets count of threads with the specified IDs using Spring magic.
+	 * 
+	 * @param solutionId
+	 *            Solution ID
+	 * @param revisionId
+	 *            Revision ID
+	 * @return Count of threads
+	 */
+	long countBySolutionIdAndRevisionId(String solutionId, String revisionId);
+
+	/**
 	 * Gets a page of threads with the specified IDs using Spring magic.
 	 * 
 	 * @param solutionId
@@ -36,7 +47,7 @@ public interface ThreadRepository extends PagingAndSortingRepository<MLPThread, 
 	 *            Revision ID
 	 * @param pageable
 	 *            Page and sort criteria
-	 * @return Page of MLPComment
+	 * @return Page of MLPThread
 	 */
 	Page<MLPThread> findBySolutionIdAndRevisionId(String solutionId, String revisionId, Pageable pageable);
 

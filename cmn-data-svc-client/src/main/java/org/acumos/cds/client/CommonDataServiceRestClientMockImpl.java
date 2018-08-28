@@ -1486,6 +1486,10 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return this.searchSolutions;
 	}
 
+	public long getSolutionRevisionThreadCount(String solutionId, String revisionId) {
+		return this.solutionRevisionThreads.getSize();
+	}
+
 	public void setSolutionRevisionThreads(RestPageResponse<MLPThread> threads) {
 		this.solutionRevisionThreads = threads;
 	}

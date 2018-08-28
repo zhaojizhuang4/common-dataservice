@@ -69,14 +69,14 @@ public class ThreadController extends AbstractController {
 	private UserRepository userRepository;
 
 	/**
-	 * @return Model that maps String to Object, for serialization as JSON
+	 * @return Count of all threads
 	 */
 	@ApiOperation(value = "Gets the count of threads.", response = CountTransport.class)
 	@RequestMapping(value = CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
 	@ResponseBody
 	public CountTransport getThreadCount() {
 		logger.info("getThreadCount");
-		Long count = threadRepository.count();
+		long count = threadRepository.count();
 		return new CountTransport(count);
 	}
 
@@ -93,6 +93,24 @@ public class ThreadController extends AbstractController {
 		logger.info("getThreads {}", pageable);
 		Page<MLPThread> result = threadRepository.findAll(pageable);
 		return result;
+	}
+
+	/**
+	 * @param solutionId
+	 *            Solution ID
+	 * @param revisionId
+	 *            Revision ID
+	 * @return Count of threads for specified solution and revision
+	 */
+	@ApiOperation(value = "Gets the count of threads for the solution and revision IDs.", response = CountTransport.class)
+	@RequestMapping(value = CCDSConstants.SOLUTION_PATH + "/{solutionId}/" + CCDSConstants.REVISION_PATH
+			+ "/{revisionId}/" + CCDSConstants.COUNT_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public CountTransport getSolutionRevisionThreadCount(@PathVariable("solutionId") String solutionId,
+			@PathVariable("revisionId") String revisionId) {
+		logger.info("getSolutionRevisionThreadCount: solutionId {} revisionId {}", solutionId, revisionId);
+		long count = threadRepository.countBySolutionIdAndRevisionId(solutionId, revisionId);
+		return new CountTransport(count);
 	}
 
 	/**
@@ -121,7 +139,7 @@ public class ThreadController extends AbstractController {
 	 *            Path parameter with row ID
 	 * @param response
 	 *            HttpServletResponse
-	 * @return A user if found, an error otherwise.
+	 * @return A thread if ID exists, an error otherwise.
 	 */
 	@ApiOperation(value = "Gets the thread for the specified ID.", response = MLPThread.class)
 	@RequestMapping(value = "{threadId}", method = RequestMethod.GET)
@@ -179,7 +197,7 @@ public class ThreadController extends AbstractController {
 	 *            data to be updated
 	 * @param response
 	 *            HttpServletResponse
-	 * @return Status message
+	 * @return Status indicator
 	 */
 	@ApiOperation(value = "Updates a thread.", response = SuccessTransport.class)
 	@RequestMapping(value = "{threadId}", method = RequestMethod.PUT)
@@ -212,7 +230,7 @@ public class ThreadController extends AbstractController {
 	 *            Path parameter that identifies the instance
 	 * @param response
 	 *            HttpServletResponse
-	 * @return Solution that maps String to Object, for serialization as JSON
+	 * @return Status indicator
 	 */
 	@ApiOperation(value = "Deletes a thread.", response = SuccessTransport.class)
 	@RequestMapping(value = "{threadId}", method = RequestMethod.DELETE)
@@ -235,7 +253,7 @@ public class ThreadController extends AbstractController {
 	/**
 	 * @param threadId
 	 *            Path parameter that identifies the instance
-	 * @return Model that maps String to Object, for serialization as JSON
+	 * @return Count of comments in the thread
 	 */
 	@ApiOperation(value = "Gets the number of comments in the thread.", response = CountTransport.class)
 	@RequestMapping(value = "{threadId}/" + CCDSConstants.COMMENT_PATH + "/"
@@ -322,7 +340,7 @@ public class ThreadController extends AbstractController {
 	 *            Path parameter with row ID
 	 * @param response
 	 *            HttpServletResponse
-	 * @return A user if found, an error otherwise.
+	 * @return A comment if the ID exists, an error otherwise.
 	 */
 	@ApiOperation(value = "Gets the comment for the specified ID.", response = MLPComment.class)
 	@RequestMapping(value = "{threadId}/" + CCDSConstants.COMMENT_PATH + "/{commentId}", method = RequestMethod.GET)
@@ -398,7 +416,7 @@ public class ThreadController extends AbstractController {
 	 *            data to be updated
 	 * @param response
 	 *            HttpServletResponse
-	 * @return Status message
+	 * @return Status indicator
 	 */
 	@ApiOperation(value = "Updates a comment.", response = SuccessTransport.class)
 	@RequestMapping(value = "{threadId}/" + CCDSConstants.COMMENT_PATH + "/{commentId}", method = RequestMethod.PUT)
@@ -445,7 +463,7 @@ public class ThreadController extends AbstractController {
 	 *            Path parameter with the comment ID
 	 * @param response
 	 *            HttpServletResponse
-	 * @return Solution that maps String to Object, for serialization as JSON
+	 * @return Status indicator
 	 */
 	@ApiOperation(value = "Deletes a comment.", response = SuccessTransport.class)
 	@RequestMapping(value = "{threadId}/" + CCDSConstants.COMMENT_PATH + "/{commentId}", method = RequestMethod.DELETE)

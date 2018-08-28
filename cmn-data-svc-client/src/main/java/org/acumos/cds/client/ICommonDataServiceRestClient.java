@@ -1611,6 +1611,17 @@ public interface ICommonDataServiceRestClient {
 	RestPageResponse<MLPThread> getThreads(RestPageRequest pageRequest);
 
 	/**
+	 * Gets the count of threads for the specified solution and revision.
+	 * 
+	 * @param solutionId
+	 *            Solution ID
+	 * @param revisionId
+	 *            Revision ID
+	 * @return Count of threads
+	 */
+	long getSolutionRevisionThreadCount(String solutionId, String revisionId);
+
+	/**
 	 * Gets a page of threads for the specified solution and revision.
 	 * 
 	 * @param solutionId
