@@ -23,12 +23,13 @@ Common Data Service Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
-Version 1.17.2, 24 Aug 2018
+Version 1.17.2, 28 Aug 2018
 ---------------------------
 
 * Revise logging for ONAP recommended output pattern (ACUMOS-625)
 * Include solution and revision ID fields in search (ACUMOS-1576)
 * Revise message sent when user is locked out temporarily (ACUMOS-1597)
+* Filter search results using all tags not any tag (ACUMOS-1601)
 * Document Pageable request parameters in Swagger (ACUMOS-1608)
 * Enhance search for revision description (ACUMOS-1614)
 * Requires database schema version 1.17

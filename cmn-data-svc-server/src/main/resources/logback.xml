@@ -71,16 +71,13 @@
 		<appender-ref ref="asyncFile" />
 	</root>
 
+	<!-- Show SQL generated for Criteria queries; must set root level to debug of course -->
+	<logger name="org.hibernate.SQL" level="DEBUG" />
+	<!-- Reduce the verbose debug output -->
+	<logger name="org.apache.http" level="INFO" />
+	<logger name="org.springframework.web.client" level="INFO" />
 	<logger name="org.springframework.beans.factory.support" level="INFO"/>
 	<logger name="springfox.documentation" level="INFO" />
 	<logger name="org.hibernate.engine.jdbc.spi" level="INFO" />
-	<!-- this shows SQL executed for Criteria queries -->
-	<logger name="org.hibernate.SQL" level="DEBUG" />
-	
-	<!-- Apache HttpClient has verbose debug output; silence it -->
-	<logger name="org.apache.http" level="INFO" />
-
-	<!-- Spring client has verbose debug output; silence it -->
-	<logger name="org.springframework.web.client" level="INFO" />
 
 </configuration>

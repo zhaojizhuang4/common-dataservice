@@ -442,6 +442,19 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(cs.getTags().size() == 2);
 			logger.info("Created solution " + cs.getSolutionId());
 
+			// This solution has one tag
+			MLPSolution cs2 = new MLPSolution();
+			cs2.setName("solution name");
+			cs2.setActive(true);
+			cs2.setUserId(cu.getUserId());
+			cs2.setDescription("Another Data Org");
+			cs2.setModelTypeCode(ModelTypeCode.CL.toString());
+			cs2.setToolkitTypeCode(ToolkitTypeCode.SK.toString());
+			cs2.getTags().add(solTag1);
+			cs2 = solutionRepository.save(cs2);
+			Assert.assertNotNull("Solution 2 ID", cs2.getSolutionId());
+			logger.info("Created solution 2 " + cs2.getSolutionId());
+
 			// Search with single values
 			Map<String, String> solParms = new HashMap<>();
 			solParms.put("name", solName);
@@ -472,9 +485,18 @@ public class CdsRepositoryServiceTest {
 			Assert.assertNotNull("Revision ID", cr.getRevisionId());
 			logger.info("Created solution revision " + cr.getRevisionId());
 
+			MLPSolutionRevision rev2 = new MLPSolutionRevision(cs2.getSolutionId(), "1.0X", cu.getUserId(),
+					AccessTypeCode.PR.name(), ValidationStatusCode.NV.name());
+			rev2 = revisionRepository.save(rev2);
+			Assert.assertNotNull("Revision ID", rev2.getRevisionId());
+			logger.info("Created solution revision " + rev2.getRevisionId());
+
 			logger.info("Adding artifact to revision");
 			solRevArtMapRepository.save(new MLPSolRevArtMap(cr.getRevisionId(), ca.getArtifactId()));
 			logger.info("Added" + cr.getRevisionId() + " and " + ca.getArtifactId());
+
+			solRevArtMapRepository.save(new MLPSolRevArtMap(rev2.getRevisionId(), ca.getArtifactId()));
+			logger.info("Added" + rev2.getRevisionId() + " and " + ca.getArtifactId());
 
 			MLPRevisionDescription revDesc = new MLPRevisionDescription(cr.getRevisionId(), "PB",
 					"Some bogus description");
@@ -495,21 +517,30 @@ public class CdsRepositoryServiceTest {
 			Page<MLPSolution> portalSearchResult = solutionSearchService.findPortalSolutions(solKw, descKw, active,
 					userIds, modelTypeCodes, accTypeCodes, valStatusCodes, searchTags, searchAuths, searchPubs,
 					new PageRequest(0, 2, Direction.ASC, "name"));
-			Assert.assertTrue(portalSearchResult != null && portalSearchResult.getNumberOfElements() > 0);
+			Assert.assertTrue(portalSearchResult != null && portalSearchResult.getNumberOfElements() == 1);
 			logger.info("Found portal solution total " + portalSearchResult.getTotalElements());
+
+			logger.info("Check that one tag yields multiple matches");
+			Page<MLPSolution> oneTagSearchResult = solutionSearchService.findPortalSolutions(null, null, active, null,
+					null, null, null, searchTags, null, null, new PageRequest(0, 5));
+			Assert.assertTrue(oneTagSearchResult != null && oneTagSearchResult.getNumberOfElements() == 2);
+
+			logger.info("Check that two tags yields single match");
+			searchTags = new String[] { solTag1.getTag(), solTag2.getTag() };
+			Page<MLPSolution> twoTagsSearchResult = solutionSearchService.findPortalSolutions(null, null, active, null,
+					null, null, null, searchTags, null, null, new PageRequest(0, 5));
+			Assert.assertTrue(twoTagsSearchResult != null && twoTagsSearchResult.getNumberOfElements() == 1);
 
 			String[] ids = { cs.getSolutionId() };
 			Page<MLPSolution> idSearchResult = solutionSearchService.findPortalSolutionsByKw(ids, active, userIds,
-					modelTypeCodes, accTypeCodes, searchTags,
-					new PageRequest(0, 2, Direction.ASC, "name"));
+					modelTypeCodes, accTypeCodes, searchTags, new PageRequest(0, 2, Direction.ASC, "name"));
 			Assert.assertTrue(idSearchResult != null && idSearchResult.getNumberOfElements() == 1);
 			logger.info("Found models by id total " + idSearchResult.getTotalElements());
-			
+
 			// All keywords must occur in the same field to match
 			String[] kw = { "Big", "Data" };
 			Page<MLPSolution> kwSearchResult = solutionSearchService.findPortalSolutionsByKw(kw, active, userIds,
-					modelTypeCodes, accTypeCodes, searchTags,
-					new PageRequest(0, 2, Direction.ASC, "name"));
+					modelTypeCodes, accTypeCodes, searchTags, new PageRequest(0, 2, Direction.ASC, "name"));
 			Assert.assertTrue(kwSearchResult != null && kwSearchResult.getNumberOfElements() > 0);
 			logger.info("Found models by kw total " + kwSearchResult.getTotalElements());
 
@@ -711,15 +742,15 @@ public class CdsRepositoryServiceTest {
 
 			if (cleanup) {
 				logger.info("Removing newly added entities");
-				// Dropping the revision above; don't need delete here
-				// solRevArtMapRepository.delete(new
-				// MLPSolRevArtMap.SolRevArtMapPK(cr.getRevisionId(),
-				// ca.getArtifactId()));
+				solRevArtMapRepository
+						.delete(new MLPSolRevArtMap.SolRevArtMapPK(rev2.getRevisionId(), ca.getArtifactId()));
+				revisionRepository.delete(rev2);
 				revisionRepository.delete(cr);
 				solutionRatingRepository.delete(solrate);
 				MLPSolTagMap.SolTagMapPK solTagMapKey = new MLPSolTagMap.SolTagMapPK(cs.getSolutionId(), tag1.getTag());
 				solTagMapRepository.delete(solTagMapKey);
 				solutionDownloadRepository.delete(sd);
+				solutionRepository.delete(cs2.getSolutionId());
 				solutionRepository.delete(cs.getSolutionId());
 				artifactRepository.delete(ca);
 				peerSubscriptionRepository.delete(ps);
@@ -913,6 +944,7 @@ public class CdsRepositoryServiceTest {
 			Iterable<MLPUser> usersWithAccess = solUserAccMapRepository.getUsersForSolution(cs.getSolutionId());
 			Assert.assertTrue(usersWithAccess.iterator().hasNext());
 
+			// This one has no tags
 			MLPSolution cs2 = new MLPSolution();
 			cs2.setName("solution name");
 			cs2.setActive(true);

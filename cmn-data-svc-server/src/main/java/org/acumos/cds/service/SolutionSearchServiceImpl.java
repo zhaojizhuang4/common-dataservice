@@ -35,10 +35,12 @@ import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,16 +94,22 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 	private final String revAlias = "revs";
 	private final String artAlias = "arts";
 	private final String ownerAlias = "ownr";
-	private final String tagAlias = "tag";
 	private final String accAlias = "acc";
 	private final String descsAlias = "descs";
 	private final String solutionId = "solutionId";
+	// Aliases used in subquery for required tags
+	private final String solAlias = "sol"; 
+	private final String subqAlias = "subsol";
+	private final String tagsFieldAlias = "t";
+	private final String tagValueField = tagsFieldAlias + ".tag";
 
 	/*
 	 * This criteria only checks properties of the solution entity, not of any
 	 * associated entities, so inner joins and their cross products are avoidable.
 	 * Therefore it's safe to use limit criteria in the database, which saves the
 	 * effort of computing a big result and discarding all but the desired page.
+	 * Unfortunately the solution entity has very few properties that are worth
+	 * searching, so this is largely worthless.
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -137,8 +145,8 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 	}
 
 	/**
-	 * Runs a query on the SolutionFOM entity, returns a page after converting
-	 * objects to plain (non-FOM) MLPSolution
+	 * Runs a query on the SolutionFOM entity, returns a page after converting the
+	 * resulting FOM solution objects to plain solution objects.
 	 * 
 	 * @param criteria
 	 *            Criteria to evaluate
@@ -191,7 +199,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			String[] tags, String[] authorKeywords, String[] publisherKeywords, Pageable pageable) {
 
 		// build the query using FOM to access child attributes
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class, solAlias);
 		// Attributes on the solution
 		criteria.add(Restrictions.eq("active", active));
 		if (nameKeywords != null && nameKeywords.length > 0)
@@ -224,9 +232,13 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			criteria.add(Restrictions.in(ownerAlias + ".userId", userIds));
 		}
 		if (tags != null && tags.length > 0) {
-			// Tags are optional, so must use outer join
-			criteria.createAlias("tags", tagAlias, org.hibernate.sql.JoinType.LEFT_OUTER_JOIN);
-			criteria.add(Restrictions.in(tagAlias + ".tag", tags));
+			// https://stackoverflow.com/questions/51992269/hibernate-java-criteria-query-for-instances-with-multiple-collection-members-lik
+			DetachedCriteria subquery = DetachedCriteria.forClass(MLPSolutionFOM.class, subqAlias)
+					.add(Restrictions.eqProperty(subqAlias + ".id", solAlias + ".id")) //
+					.createAlias("tags", tagsFieldAlias) //
+					.add(Restrictions.in(tagValueField, tags)) //
+					.setProjection(Projections.count(tagValueField));
+			criteria.add(Subqueries.eq((long) tags.length, subquery));
 		}
 		Page<MLPSolution> result = runSolutionFomQuery(criteria, pageable);
 		logger.info("findPortalSolutions: result size={}", result.getNumberOfElements());
@@ -252,7 +264,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			String[] tags, Pageable pageable) {
 
 		// build the query using FOM to access child attributes
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class, solAlias);
 		// Find user's own models AND others via access map which requires outer join
 		criteria.createAlias("owner", ownerAlias);
 		Criterion owner = Restrictions.eq(ownerAlias + ".userId", userId);
@@ -282,9 +294,13 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			}
 		}
 		if (tags != null && tags.length > 0) {
-			// Tags are optional, so must use outer join
-			criteria.createAlias("tags", tagAlias, org.hibernate.sql.JoinType.LEFT_OUTER_JOIN);
-			criteria.add(Restrictions.in(tagAlias + ".tag", tags));
+			// https://stackoverflow.com/questions/51992269/hibernate-java-criteria-query-for-instances-with-multiple-collection-members-lik
+			DetachedCriteria subquery = DetachedCriteria.forClass(MLPSolutionFOM.class, subqAlias)
+					.add(Restrictions.eqProperty(subqAlias + ".id", solAlias + ".id")) //
+					.createAlias("tags", tagsFieldAlias) //
+					.add(Restrictions.in(tagValueField, tags)) //
+					.setProjection(Projections.count(tagValueField));
+			criteria.add(Subqueries.eq((long) tags.length, subquery));
 		}
 		Page<MLPSolution> result = runSolutionFomQuery(criteria, pageable);
 		logger.info("findUserSolutions: result size={}", result.getNumberOfElements());
@@ -302,7 +318,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			String[] validationStatusCode, Date date, Pageable pageable) {
 
 		// build the query using FOM to access child attributes
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class, solAlias);
 		// A solution should ALWAYS have revisions.
 		criteria.createAlias("revisions", revAlias);
 		// A revision should ALWAYS have artifacts
@@ -337,7 +353,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			String[] modelTypeCode, String[] accessTypeCode, String[] tags, Pageable pageable) {
 
 		// build the query using FOM to access child attributes
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class);
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class, solAlias);
 		criteria.add(Restrictions.eq("active", active));
 		// A solution should ALWAYS have revisions.
 		criteria.createAlias("revisions", revAlias);
@@ -363,9 +379,13 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			criteria.add(Restrictions.in(ownerAlias + ".userId", userIds));
 		}
 		if (tags != null && tags.length > 0) {
-			// Tags are optional, so must use outer join
-			criteria.createAlias("tags", tagAlias, org.hibernate.sql.JoinType.LEFT_OUTER_JOIN);
-			criteria.add(Restrictions.in(tagAlias + ".tag", tags));
+			// https://stackoverflow.com/questions/51992269/hibernate-java-criteria-query-for-instances-with-multiple-collection-members-lik
+			DetachedCriteria subquery = DetachedCriteria.forClass(MLPSolutionFOM.class, subqAlias)
+					.add(Restrictions.eqProperty(subqAlias + ".id", solAlias + ".id")) //
+					.createAlias("tags", tagsFieldAlias) //
+					.add(Restrictions.in(tagValueField, tags)) //
+					.setProjection(Projections.count(tagValueField));
+			criteria.add(Subqueries.eq((long) tags.length, subquery));
 		}
 		Page<MLPSolution> result = runSolutionFomQuery(criteria, pageable);
 		logger.info("findPortalSolutionsByKw: result size={}", result.getNumberOfElements());
