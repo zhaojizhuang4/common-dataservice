@@ -52,6 +52,8 @@ public abstract class AbstractSearchServiceImpl {
 		Junction junction = isOr ? Restrictions.disjunction() : Restrictions.conjunction();
 		criteria.add(junction);
 		for (Map.Entry<String, ? extends Object> entry : queryParameters.entrySet()) {
+			if (entry.getValue() == null)
+				throw new IllegalArgumentException("Unexpected null value in query parameters");
 			Criterion criterion = null;
 			if (entry.getValue().getClass().isArray()) {
 				Object[] array = (Object[]) entry.getValue();

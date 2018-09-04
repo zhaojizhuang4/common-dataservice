@@ -65,6 +65,7 @@
 		<appender-ref ref="file" />
 	</appender>
 
+	<!-- root level can be set with property logging.level.root=LEVEL -->
 	<!-- using level debug yields enormous output from spring and friends -->
 	<root level="INFO">
 		<appender-ref ref="console" />

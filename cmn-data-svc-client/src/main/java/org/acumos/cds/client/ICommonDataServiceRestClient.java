@@ -257,7 +257,7 @@ public interface ICommonDataServiceRestClient {
 	 * @param accessTypeCodes
 	 *            Access type codes (required)
 	 * @param validationStatusCodes
-	 *            Validation status codes (required)
+	 *            Validation status codes (ignored if null or empty)
 	 * @param date
 	 *            Date threshold
 	 * @param pageRequest

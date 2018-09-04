@@ -630,7 +630,8 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 		HashMap<String, Object> parms = new HashMap<>();
 		parms.put(CCDSConstants.SEARCH_ACTIVE, active);
 		parms.put(CCDSConstants.SEARCH_ACCESS_TYPES, accessTypeCodes);
-		parms.put(CCDSConstants.SEARCH_VAL_STATUSES, validationStatusCodes);
+		if (validationStatusCodes != null && validationStatusCodes.length > 0)
+			parms.put(CCDSConstants.SEARCH_VAL_STATUSES, validationStatusCodes);
 		parms.put(CCDSConstants.SEARCH_DATE, date.getTime());
 		URI uri = buildUri(
 				new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH, CCDSConstants.DATE_PATH }, parms,

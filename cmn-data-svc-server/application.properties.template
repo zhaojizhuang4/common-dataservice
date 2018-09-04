@@ -211,5 +211,7 @@ login.failure.count = 3
 # in seconds
 login.failure.block.time = 900
 
+# App root logger level can be configured here:
+# logging.level.root=INFO
 # Specific loggers can be configured here:
 # logging.level.org.springframework.web=INFO

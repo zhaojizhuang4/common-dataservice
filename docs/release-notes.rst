@@ -23,11 +23,14 @@ Common Data Service Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
-Version 1.18.1, 1 Sep 2018
+Version 1.18.1, ? Sep 2018
 --------------------------
 
+* Defend against null arguments (ACUMOS-1696)
+* Refactor artifact-search controller annotations for Swagger web UI
 * Add example federation selector to Swagger annotation
 * Increase default memory limit to 1GB
+* Upgrade Spring-Boot from 1.15.14.RELEASE to 1.15.15.RELEASE.
 * Requires database schema version 1.18
 
 Version 1.18.0, 31 Aug 2018

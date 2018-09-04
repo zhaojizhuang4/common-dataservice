@@ -230,6 +230,8 @@ public abstract class AbstractController {
 	 */
 	protected void createMissingTags(Collection<MLPTag> tags) {
 		for (MLPTag tag : tags) {
+			if (tag == null || tag.getTag() == null)
+				throw new IllegalArgumentException("Unexpected null tag");
 			if (tagRepository.findOne(tag.getTag()) == null) {
 				tagRepository.save(tag);
 				logger.info("createMissingTags: tag {}", tag);

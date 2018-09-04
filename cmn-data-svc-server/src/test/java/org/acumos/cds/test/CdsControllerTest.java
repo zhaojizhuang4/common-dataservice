@@ -586,8 +586,7 @@ public class CdsControllerTest {
 
 			// This will get no results but will cover some clauses
 			restr.clear();
-			restr.put("created", new Date());
-			restr.put("size", 10);
+			restr.put("uri", "http://nowhwere");
 			filtered = client.searchArtifacts(restr, true, new RestPageRequest(0, 10));
 			Assert.assertTrue(filtered.getNumberOfElements() == 0);
 

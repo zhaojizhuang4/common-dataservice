@@ -20,6 +20,9 @@
 -- No database is created or specified to allow flexible deployment;
 -- also see script cmn-data-svc-base-mysql.sql.
 
+-- Remember: DATETIME stores a date and a time (no zone), the exact behavior depends on
+-- the server's timezone.  TIMESTAMP stores an unambiguous point in time up to 2038.
+
 -- DDL --
 
 CREATE TABLE C_USER (

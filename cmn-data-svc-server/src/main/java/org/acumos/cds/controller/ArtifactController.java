@@ -21,7 +21,7 @@
 package org.acumos.cds.controller;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -46,7 +46,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -118,30 +117,57 @@ public class ArtifactController extends AbstractController {
 		return i;
 	}
 
-	@ApiOperation(value = "Searches for entities with attribute values matching the field name - field value pairs specified as query parameters. " //
-			+ "Defaults to and (conjunction); send junction query parameter '_j=o' for or (disjunction).", //
+	/*
+	 * This method was an early attempt to provide a search feature. Originally
+	 * written with a generic map request parameter to avoid binding field names,
+	 * but that is not supported by Swagger web UI. Now allows use from that web UI
+	 * at the cost of hard-coding many field names from the MLPArtifact class.
+	 */
+	private final String artifactTypeCodeField = "artifactTypeCode";
+	private final String nameField = "name";
+	private final String uriField = "uri";
+	private final String versionField = "version";
+	private final String userIdField = "userId";
+	@ApiOperation(value = "Searches for artifacts with attributes matching the values specified as query parameters. " //
+			+ "Defaults to match all (conjunction); send junction query parameter '_j=o' to match any (disjunction).", //
 			response = MLPArtifact.class, responseContainer = "Page")
 	@ApiPageable
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchArtifacts(
-			// This actually IS required; set flag to false for swagger UI
-			@ApiParam(value = "Field name - field value pairs as request parameters in the format name=value, minimum 1; repeats allowed. " //
-					+ "Not supported by Swagger web UI.", allowMultiple = true, type = "Array[string]", required = false) //
-			@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
-			HttpServletResponse response) {
-		logger.info("searchArtifacts {}", queryParameters);
-		cleanPageableParameters(queryParameters);
-		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
-		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
+	public Object searchArtifacts(//
+			@ApiParam(value = "Junction", allowableValues = "a,o") //
+			@RequestParam(name = CCDSConstants.JUNCTION_QUERY_PARAM, required = false) String junction, //
+			@ApiParam(value = "Artifact type code") //
+			@RequestParam(name = artifactTypeCodeField, required = false) String artifactTypeCode, //
+			@ApiParam(value = "Name") //
+			@RequestParam(name = nameField, required = false) String name, //
+			@ApiParam(value = "URI") //
+			@RequestParam(name = uriField, required = false) String uri, //
+			@ApiParam(value = "Version") //
+			@RequestParam(name = versionField, required = false) String version, //
+			@ApiParam(value = "User ID") //
+			@RequestParam(name = userIdField, required = false) String userId, //
+			Pageable pageRequest, HttpServletResponse response) {
+		logger.info("searchArtifacts enter");
+		boolean isOr = junction != null && "o".equals(junction);
+		Map<String, Object> queryParameters = new HashMap<>();
+		if (artifactTypeCode != null)
+			queryParameters.put(artifactTypeCodeField, artifactTypeCode);
+		if (name != null)
+			queryParameters.put(nameField, name);
+		if (uri != null)
+			queryParameters.put(uriField, uri);
+		if (version != null)
+			queryParameters.put(versionField, version);
+		if (userId != null)
+			queryParameters.put(userIdField, userId);
 		if (queryParameters.size() == 0) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
 		}
 		try {
-			Map<String, Object> convertedQryParm = convertQueryParameters(MLPArtifact.class, queryParameters);
-			Object result = artifactService.findArtifacts(convertedQryParm, isOr, pageRequest);
+			Object result = artifactService.findArtifacts(queryParameters, isOr, pageRequest);
 			return result;
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
