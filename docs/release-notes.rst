@@ -23,6 +23,13 @@ Common Data Service Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
+Version 1.18.1, 1 Sep 2018
+--------------------------
+
+* Add example federation selector to Swagger annotation
+* Increase default memory limit to 1GB
+* Requires database schema version 1.18
+
 Version 1.18.0, 31 Aug 2018
 ---------------------------
 

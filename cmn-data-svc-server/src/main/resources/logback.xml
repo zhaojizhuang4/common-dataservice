@@ -66,12 +66,12 @@
 	</appender>
 
 	<!-- using level debug yields enormous output from spring and friends -->
-	<root level="info">
+	<root level="INFO">
 		<appender-ref ref="console" />
 		<appender-ref ref="asyncFile" />
 	</root>
 
-	<!-- Show SQL generated for Criteria queries; must set root level to debug of course -->
+	<!-- Show SQL generated for Criteria queries; view with root level at DEBUG -->
 	<logger name="org.hibernate.SQL" level="DEBUG" />
 	<!-- Reduce the verbose debug output -->
 	<logger name="org.apache.http" level="INFO" />
