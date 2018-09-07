@@ -156,6 +156,8 @@ public class CdsControllerTest {
 			cu.setEmail("basissqedemuser@abc.com");
 			cu.setFirstName("First Name");
 			cu.setLastName("Last Name");
+			cu.setApiToken("apiToken");
+			cu.setVerifyTokenHash("verifyToken");
 			cu = client.createUser(cu);
 			logger.info("Created user {}", cu);
 
@@ -285,6 +287,7 @@ public class CdsControllerTest {
 
 		List<MLPStepType> st = client.getStepTypes();
 		Assert.assertFalse(st.isEmpty());
+
 	}
 
 	@Test
@@ -603,6 +606,12 @@ public class CdsControllerTest {
 
 			// Tag some users for fun
 			client.addUserTag(cu.getUserId(), tagName1);
+			try {
+				client.addUserTag(cu.getUserId(), tagName1);
+				throw new Exception("Unexpected success add user tag");
+			} catch (HttpStatusCodeException ex) {
+				logger.info("Failed to tag user a second time as expected");
+			}
 			client.dropUserTag(cu.getUserId(), tagName1);
 
 			MLPSolution cs = new MLPSolution("solution name", cu.getUserId(), true);
@@ -738,6 +747,10 @@ public class CdsControllerTest {
 			logger.info("Adding artifact to revision 2");
 			client.addSolutionRevisionArtifact(csOrg.getSolutionId(), crOrg.getRevisionId(), ca.getArtifactId());
 
+			logger.info("Querying revision artifacts");
+			List<MLPArtifact> revArgs = client.getSolutionRevisionArtifacts(cs.getSolutionId(), cr.getRevisionId());
+			Assert.assertFalse(revArgs.isEmpty());
+
 			logger.info("Creating description org for revision 1");
 			MLPRevisionDescription revDescOr = new MLPRevisionDescription(cr.getRevisionId(), "OR", "Some text");
 			revDescOr = client.createRevisionDescription(revDescOr);
@@ -764,6 +777,13 @@ public class CdsControllerTest {
 			client.updateDocument(doc);
 			doc = client.getDocument(doc.getDocumentId());
 			Assert.assertNotNull(doc);
+
+			try {
+				client.createDocument(new MLPDocument(doc.getDocumentId(), "name", "uri", 100, "user"));
+				throw new Exception("Unexpected success");
+			} catch (HttpStatusCodeException ex) {
+				logger.info("Failed to create new doc with existing ID as expected");
+			}
 
 			final String orgAccessType = "OR";
 			logger.info("Associating document to rev 1 at access type OR");
@@ -1723,7 +1743,7 @@ public class CdsControllerTest {
 		Assert.assertNotNull("User ID", cu.getUserId());
 		logger.info("Created user " + cu.getUserId());
 
-		MLPSolution cs = new MLPSolution("solutionName", cu.getUserId(), false);
+		MLPSolution cs = new MLPSolution("solutionName", cu.getUserId(), true);
 		cs = client.createSolution(cs);
 		Assert.assertNotNull("Solution ID", cs.getSolutionId());
 		logger.info("Created solution " + cs.getSolutionId());
@@ -1778,8 +1798,11 @@ public class CdsControllerTest {
 		maps = client.getPeerSolutionGroupMaps(new RestPageRequest());
 		Assert.assertTrue(maps != null && maps.getNumberOfElements() > 0);
 
-		long access = client.checkPeerSolutionAccess(pr.getPeerId(), cs.getSolutionId());
+		long access = client.checkRestrictedAccessSolution(pr.getPeerId(), cs.getSolutionId());
 		Assert.assertTrue(access > 0);
+		RestPageResponse<MLPSolution> restrSols = client.findRestrictedAccessSolutions(pr.getPeerId(),
+				new RestPageRequest(0, 5));
+		Assert.assertTrue(restrSols != null && restrSols.getNumberOfElements() > 0);
 
 		client.unmapPeerSolutionGroups(pg1.getGroupId(), sg.getGroupId());
 		maps = client.getPeerSolutionGroupMaps(new RestPageRequest());
@@ -1800,18 +1823,18 @@ public class CdsControllerTest {
 		peersInGroup = client.getPeersInGroup(pg1.getGroupId(), new RestPageRequest());
 		Assert.assertTrue(peersInGroup != null && peersInGroup.getNumberOfElements() == 0);
 
-		access = client.checkPeerSolutionAccess(pr.getPeerId(), cs.getSolutionId());
-		Assert.assertTrue(access <= 0);
+		access = client.checkRestrictedAccessSolution(pr.getPeerId(), cs.getSolutionId());
+		Assert.assertTrue(access == 0);
 
 		// Invalid cases
 		try {
-			client.getPeersInGroup(99999999999L, new RestPageRequest());
+			client.getPeersInGroup(9999999L, new RestPageRequest());
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("getPeersInGroup failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.getSolutionsInGroup(99999999999L, new RestPageRequest());
+			client.getSolutionsInGroup(9999999L, new RestPageRequest());
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("getSolutionsInGroup failed as expected: {}", ex.getResponseBodyAsString());
@@ -1976,13 +1999,13 @@ public class CdsControllerTest {
 			logger.info("unmap peer peer groups failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.checkPeerSolutionAccess("peerId", "solutionId");
+			client.checkRestrictedAccessSolution("peerId", "solutionId");
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("checkPeerSolutionAccess failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.checkPeerSolutionAccess(pr.getPeerId(), "solutionId");
+			client.checkRestrictedAccessSolution(pr.getPeerId(), "solutionId");
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("checkPeerSolutionAccess failed as expected: {}", ex.getResponseBodyAsString());
@@ -2127,6 +2150,19 @@ public class CdsControllerTest {
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("addUsersInRole failed on bad role as expected {}", ex.getResponseBodyAsString());
+		}
+
+		try {
+			client.addUserTag("bogusUser", "bogusTag");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Add user tag failed on bad role as expected {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.dropUserTag("bogusUser", "bogusTag");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Drop user tag failed on bad role as expected {}", ex.getResponseBodyAsString());
 		}
 
 		String roleNm = "some name";
@@ -2564,6 +2600,40 @@ public class CdsControllerTest {
 		csr.setVersion(solRevVersion);
 
 		try {
+			MLPRevisionDescription rd = new MLPRevisionDescription("bogus", "XX", "bogus");
+			rd = client.createRevisionDescription(rd);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create revision description failed on bad ID as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPRevisionDescription rd = new MLPRevisionDescription(csr.getRevisionId(), "XX", "bogus");
+			rd = client.createRevisionDescription(rd);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Create revision description failed on bad code as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPRevisionDescription rd = new MLPRevisionDescription("bogus", "XX", "bogus");
+			client.updateRevisionDescription(rd);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Update revision description failed on bad ID as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPRevisionDescription rd = new MLPRevisionDescription(csr.getRevisionId(), "XX", "bogus");
+			client.updateRevisionDescription(rd);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Update revision description failed on bad code as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.deleteRevisionDescription("bogus", "XX");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Delete revision description failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
 			client.deleteSolutionValidation(
 					new MLPSolutionValidation("solId", "revId", "taskId", ValidationTypeCode.LC.name()));
 			throw new Exception("Unexpected success");
@@ -2685,7 +2755,18 @@ public class CdsControllerTest {
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Search artifacts failed as expected: {}", ex.getResponseBodyAsString());
 		}
-
+		try {
+			client.addSolutionRevisionArtifact(cs.getSolutionId(), "bogusRevId", "bogusArtId");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Add sol rev artifact failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.dropSolutionRevisionArtifact(cs.getSolutionId(), "bogusRevId", "bogusArtId");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Drop sol rev artifact failed as expected: {}", ex.getResponseBodyAsString());
+		}
 		client.addSolutionRevisionArtifact(cs.getSolutionId(), csr.getRevisionId(), ca.getArtifactId());
 		try {
 			ca.setUserId(s64);
@@ -2713,7 +2794,13 @@ public class CdsControllerTest {
 			client.getSolutionRatings("bogus", new RestPageRequest(0, 1));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("Get solution ratings users failed as expected: {}", ex.getResponseBodyAsString());
+			logger.info("Get solution ratings failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.getSolutionRating("bogus", "bogus");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Get solution rating failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
 			client.getSolutionRevisionsForArtifact("bogus");
@@ -2829,24 +2916,13 @@ public class CdsControllerTest {
 			logger.info("Delete sol download failed as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.createSolutionDownload(new MLPSolutionDownload(s64, "artId", s64));
+			MLPSolutionDownload sd = new MLPSolutionDownload(s64, "artId", s64);
+			sd.setSolutionId(null);
+			client.createSolutionDownload(sd);
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Create sol download failed on constraint as expected: {}", ex.getResponseBodyAsString());
 		}
-		try {
-			client.createSolutionDownload(new MLPSolutionDownload(cs.getSolutionId(), "artId", "userId"));
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Create sol download failed on bad artifact as expected: {}", ex.getResponseBodyAsString());
-		}
-		try {
-			client.createSolutionDownload(new MLPSolutionDownload(cs.getSolutionId(), ca.getArtifactId(), "userId"));
-			throw new Exception("Unexpected success");
-		} catch (HttpStatusCodeException ex) {
-			logger.info("Create sol download failed on bad user as expected: {}", ex.getResponseBodyAsString());
-		}
-
 		try {
 			client.deleteSolutionRating(new MLPSolutionRating("solutionId", "userId", 1));
 			throw new Exception("Unexpected success");
@@ -2893,7 +2969,13 @@ public class CdsControllerTest {
 			client.getSolutionDeployments("bogus", "bogus", new RestPageRequest());
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("Get solution deployments failed as expected: {}", ex.getResponseBodyAsString());
+			logger.info("Get solution deployments failed on bad sol ID as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.getSolutionDeployments(cs.getSolutionId(), "bogus", new RestPageRequest());
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Get solution deployments failed on bad rev ID as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
 			client.createSolutionDeployment(new MLPSolutionDeployment("bogus", csr.getRevisionId(), cu.getUserId(),
@@ -3252,7 +3334,19 @@ public class CdsControllerTest {
 			client.getUserSolutionDeployments("solId", "revId", "userId", new RestPageRequest(0, 1));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("Get user soln deps failed as expected: {}", ex.getResponseBodyAsString());
+			logger.info("Get user soln deps failed on bad sol id as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.getUserSolutionDeployments(cs.getSolutionId(), "revId", "userId", new RestPageRequest(0, 1));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Get user soln deps failed on bad rev id as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.getUserSolutionDeployments(cs.getSolutionId(), csr.getRevisionId(), "userId", new RestPageRequest(0, 1));
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("Get user soln deps failed on bad user id as expected: {}", ex.getResponseBodyAsString());
 		}
 
 		try {
@@ -3302,6 +3396,44 @@ public class CdsControllerTest {
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("delete publish request failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.getDocument("bogus");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("get document failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPDocument doc = new MLPDocument("bogusId", "name", "uri", 100, "bogusUserId");
+			doc = client.createDocument(doc);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("create document failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			MLPDocument doc = new MLPDocument("bogusId", "name", "uri", 100, "bogusUserId");
+			client.updateDocument(doc);
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("update document failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.deleteDocument("bogusId");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("delete document failed as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.addCompositeSolutionMember("parent", "child");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("add composite solution member failed on bad sol id as expected: {}", ex.getResponseBodyAsString());
+		}
+		try {
+			client.addCompositeSolutionMember(cs.getSolutionId(), "child");
+			throw new Exception("Unexpected success");
+		} catch (HttpStatusCodeException ex) {
+			logger.info("add composite solution member failed on bad sol id as expected: {}", ex.getResponseBodyAsString());
 		}
 
 		try {

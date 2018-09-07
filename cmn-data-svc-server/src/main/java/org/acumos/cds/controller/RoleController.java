@@ -93,8 +93,7 @@ public class RoleController extends AbstractController {
 	@ResponseBody
 	public Page<MLPRole> getRoles(Pageable pageable) {
 		logger.info("getRoles query {}", pageable);
-		Page<MLPRole> result = roleRepository.findAll(pageable);
-		return result;
+		return roleRepository.findAll(pageable);
 	}
 
 	@ApiOperation(value = "Searches for entities with attribute values matching the field name - field value pairs specified as query parameters. " //
@@ -119,8 +118,7 @@ public class RoleController extends AbstractController {
 		}
 		try {
 			Map<String, Object> convertedQryParm = convertQueryParameters(MLPRole.class, queryParameters);
-			Object result = roleSearchService.findRoles(convertedQryParm, isOr, pageRequest);
-			return result;
+			return roleSearchService.findRoles(convertedQryParm, isOr, pageRequest);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			logger.warn("searchRoles failed: {}", ex.toString());
@@ -236,8 +234,7 @@ public class RoleController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + roleId, null);
 		}
-		Object result = roleFunctionRepository.findByRoleId(roleId);
-		return result;
+		return roleFunctionRepository.findByRoleId(roleId);
 	}
 
 	@ApiOperation(value = "Gets the role function for the specified role and function IDs. Returns bad request if an ID is not found.", //

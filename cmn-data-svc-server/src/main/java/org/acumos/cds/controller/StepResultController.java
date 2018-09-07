@@ -74,8 +74,7 @@ public class StepResultController extends AbstractController {
 	@ResponseBody
 	public Page<MLPStepResult> getStepResults(Pageable pageRequest) {
 		logger.info("getStepResults {}", pageRequest);
-		Page<MLPStepResult> result = stepResultRepository.findAll(pageRequest);
-		return result;
+		return stepResultRepository.findAll(pageRequest);
 	}
 
 	@ApiOperation(value = "Gets the step result for the specified ID. Returns bad request if the ID is not found.", //
@@ -116,8 +115,7 @@ public class StepResultController extends AbstractController {
 		}
 		try {
 			Map<String, Object> convertedQryParm = convertQueryParameters(MLPStepResult.class, queryParameters);
-			Object result = stepResultSearchService.findStepResults(convertedQryParm, isOr, pageRequest);
-			return result;
+			return stepResultSearchService.findStepResults(convertedQryParm, isOr, pageRequest);
 		} catch (Exception ex) {
 			logger.warn("searchStepResults failed: {}", ex.toString());
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

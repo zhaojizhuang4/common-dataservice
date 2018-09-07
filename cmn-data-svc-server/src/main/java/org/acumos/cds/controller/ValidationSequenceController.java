@@ -63,8 +63,7 @@ public class ValidationSequenceController extends AbstractController {
 	@ResponseBody
 	public Iterable<MLPValidationSequence> getValidationSequenceList() {
 		logger.info("getValidationSequenceList");
-		Iterable<MLPValidationSequence> result = validationSequenceRepository.findAll();
-		return result;
+		return validationSequenceRepository.findAll();
 	}
 
 	@ApiOperation(value = "Creates a new validation sequence record.", response = MLPValidationSequence.class)

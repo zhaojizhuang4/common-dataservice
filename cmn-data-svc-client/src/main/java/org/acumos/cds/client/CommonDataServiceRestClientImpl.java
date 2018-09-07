@@ -170,7 +170,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 			return encodeBase62(randomNum);
 		}
 
-		private final String base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		private static final String base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 		/**
 		 * Encodes the given Long in base 62. <BR>
@@ -1589,7 +1589,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public RestPageResponse<MLPUserNotification> getUserNotifications(String userId, RestPageRequest pageRequest) {
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.NOTIFICATION_PATH }, null,
+		URI uri = buildUri(new String[] { CCDSConstants.NOTIFICATION_PATH, CCDSConstants.USER_PATH, userId }, null,
 				pageRequest);
 		logger.debug("getUserNotifications: url {}", uri);
 		ResponseEntity<RestPageResponse<MLPUserNotification>> response = restTemplate.exchange(uri, HttpMethod.GET,
@@ -1601,7 +1601,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	@Override
 	public void addUserToNotification(String notificationId, String userId) {
 		URI uri = buildUri(
-				new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.NOTIFICATION_PATH, notificationId }, null,
+				new String[] { CCDSConstants.NOTIFICATION_PATH, notificationId, CCDSConstants.USER_PATH, userId }, null,
 				null);
 		logger.debug("addNotificationUser: url {}", uri);
 		MLPNotifUserMap map = new MLPNotifUserMap(notificationId, userId);
@@ -1611,7 +1611,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	@Override
 	public void dropUserFromNotification(String notificationId, String userId) {
 		URI uri = buildUri(
-				new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.NOTIFICATION_PATH, notificationId }, null,
+				new String[] { CCDSConstants.NOTIFICATION_PATH, notificationId, CCDSConstants.USER_PATH, userId }, null,
 				null);
 		logger.debug("dropNotificationUser: url {}", uri);
 		restTemplate.delete(uri);
@@ -1620,7 +1620,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	@Override
 	public void setUserViewedNotification(String notificationId, String userId) {
 		URI uri = buildUri(
-				new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.NOTIFICATION_PATH, notificationId }, null,
+				new String[] { CCDSConstants.NOTIFICATION_PATH, notificationId, CCDSConstants.USER_PATH, userId }, null,
 				null);
 		logger.debug("addNotificationUser: url {}", uri);
 		MLPNotifUserMap map = new MLPNotifUserMap(notificationId, userId);
@@ -1998,8 +1998,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public MLPStepResult getStepResult(long stepResultId) {
-		URI uri = buildUri(new String[] { CCDSConstants.STEP_RESULT_PATH, Long.toString(stepResultId) }, null,
-				null);
+		URI uri = buildUri(new String[] { CCDSConstants.STEP_RESULT_PATH, Long.toString(stepResultId) }, null, null);
 		logger.debug("getStepResult: uri {}", uri);
 		ResponseEntity<MLPStepResult> response = restTemplate.exchange(uri, HttpMethod.GET, null,
 				new ParameterizedTypeReference<MLPStepResult>() {
@@ -2040,24 +2039,22 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public void updateStepResult(MLPStepResult stepResult) {
-		URI uri = buildUri(
-				new String[] { CCDSConstants.STEP_RESULT_PATH, Long.toString(stepResult.getStepResultId()) }, null,
-				null);
+		URI uri = buildUri(new String[] { CCDSConstants.STEP_RESULT_PATH, Long.toString(stepResult.getStepResultId()) },
+				null, null);
 		logger.debug("updateStepResult: url {}", uri);
 		restTemplate.put(uri, stepResult);
 	}
 
 	@Override
 	public void deleteStepResult(Long stepResultId) {
-		URI uri = buildUri(new String[] { CCDSConstants.STEP_RESULT_PATH, Long.toString(stepResultId) }, null,
-				null);
+		URI uri = buildUri(new String[] { CCDSConstants.STEP_RESULT_PATH, Long.toString(stepResultId) }, null, null);
 		logger.debug("deleteStepResult: url {}", uri);
 		restTemplate.delete(uri);
 	}
 
 	@Override
 	public MLPUserNotifPref getUserNotificationPreference(Long usrNotifPrefId) {
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.NOTIFICATION_PREF_PATH,
+		URI uri = buildUri(new String[] { CCDSConstants.NOTIFICATION_PATH, CCDSConstants.NOTIFICATION_PREF_PATH,
 				Long.toString(usrNotifPrefId) }, null, null);
 		logger.debug("getUserNotificationPreference: url {}", uri);
 		ResponseEntity<MLPUserNotifPref> response = restTemplate.exchange(uri, HttpMethod.GET, null,
@@ -2067,26 +2064,16 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public List<MLPUserNotifPref> getUserNotificationPreferences(String userId) {
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.NOTIFICATION_PREF_PATH }, null,
-				null);
-		logger.debug("getUserNotificationPreferences: url {}", uri);
-		ResponseEntity<List<MLPUserNotifPref>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<MLPUserNotifPref>>() {
-				});
-		return response.getBody();
-	}
-
-	@Override
 	public MLPUserNotifPref createUserNotificationPreference(MLPUserNotifPref usrNotifPref) {
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.NOTIFICATION_PREF_PATH }, null, null);
+		URI uri = buildUri(new String[] { CCDSConstants.NOTIFICATION_PATH, CCDSConstants.NOTIFICATION_PREF_PATH }, null,
+				null);
 		logger.debug("createUserNotificationPreference: uri {}", uri);
 		return restTemplate.postForObject(uri, usrNotifPref, MLPUserNotifPref.class);
 	}
 
 	@Override
 	public void updateUserNotificationPreference(MLPUserNotifPref usrNotifPref) {
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.NOTIFICATION_PREF_PATH,
+		URI uri = buildUri(new String[] { CCDSConstants.NOTIFICATION_PATH, CCDSConstants.NOTIFICATION_PREF_PATH,
 				Long.toString(usrNotifPref.getUserNotifPrefId()) }, null, null);
 		logger.debug("updateUserNotificationPreference: url {}", uri);
 		restTemplate.put(uri, usrNotifPref);
@@ -2094,10 +2081,21 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public void deleteUserNotificationPreference(Long userNotifPrefId) {
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, CCDSConstants.NOTIFICATION_PREF_PATH,
+		URI uri = buildUri(new String[] { CCDSConstants.NOTIFICATION_PATH, CCDSConstants.NOTIFICATION_PREF_PATH,
 				Long.toString(userNotifPrefId) }, null, null);
 		logger.debug("deleteUserNotificationPreference: url {}", uri);
 		restTemplate.delete(uri);
+	}
+
+	@Override
+	public List<MLPUserNotifPref> getUserNotificationPreferences(String userId) {
+		URI uri = buildUri(new String[] { CCDSConstants.NOTIFICATION_PATH, CCDSConstants.NOTIFICATION_PREF_PATH,
+				CCDSConstants.USER_PATH, userId }, null, null);
+		logger.debug("getUserNotificationPreferences: url {}", uri);
+		ResponseEntity<List<MLPUserNotifPref>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<MLPUserNotifPref>>() {
+				});
+		return response.getBody();
 	}
 
 	@Override
@@ -2274,7 +2272,7 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
-	public long checkPeerSolutionAccess(String peerId, String solutionId) {
+	public long checkRestrictedAccessSolution(String peerId, String solutionId) {
 		URI uri = buildUri(new String[] { CCDSConstants.GROUP_PATH, CCDSConstants.PEER_PATH, peerId,
 				CCDSConstants.SOLUTION_PATH, solutionId, CCDSConstants.ACCESS_PATH }, null, null);
 		logger.debug("checkPeerSolutionAccess: uri {}", uri);
@@ -2282,6 +2280,18 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 				new ParameterizedTypeReference<CountTransport>() {
 				});
 		return response.getBody().getCount();
+	}
+
+	@Override
+	public RestPageResponse<MLPSolution> findRestrictedAccessSolutions(String peerId, RestPageRequest pageRequest) {
+		URI uri = buildUri(
+				new String[] { CCDSConstants.GROUP_PATH, CCDSConstants.PEER_PATH, peerId, CCDSConstants.SOLUTION_PATH },
+				null, null);
+		logger.debug("getRestrictedSolutions: uri {}", uri);
+		ResponseEntity<RestPageResponse<MLPSolution>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPSolution>>() {
+				});
+		return response.getBody();
 	}
 
 	@Override
@@ -2496,16 +2506,14 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 
 	@Override
 	public void addUserTag(String userId, String tag) {
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.TAG_PATH, tag }, null,
-				null);
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.TAG_PATH, tag }, null, null);
 		logger.debug("addUserTag: uri {}", uri);
 		restTemplate.postForLocation(uri, null);
 	}
 
 	@Override
 	public void dropUserTag(String userId, String tag) {
-		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.TAG_PATH, tag }, null,
-				null);
+		URI uri = buildUri(new String[] { CCDSConstants.USER_PATH, userId, CCDSConstants.TAG_PATH, tag }, null, null);
 		logger.debug("dropUserTag: uri {}", uri);
 		restTemplate.delete(uri);
 	}

@@ -87,8 +87,7 @@ public class ArtifactController extends AbstractController {
 	@ResponseBody
 	public Page<MLPArtifact> getArtifacts(Pageable pageRequest) {
 		logger.info("getArtifacts {}", pageRequest);
-		Page<MLPArtifact> page = artifactRepository.findAll(pageRequest);
-		return page;
+		return artifactRepository.findAll(pageRequest);
 	}
 
 	@ApiOperation(value = "Gets the entity for the specified ID. Returns bad request if the ID is not found.", //
@@ -113,8 +112,7 @@ public class ArtifactController extends AbstractController {
 	@ResponseBody
 	public Iterable<MLPArtifact> like(@RequestParam(CCDSConstants.TERM_PATH) String term, Pageable pageRequest) {
 		logger.info("like pageRequest {}", pageRequest);
-		Iterable<MLPArtifact> i = artifactRepository.findBySearchTerm(term, pageRequest);
-		return i;
+		return artifactRepository.findBySearchTerm(term, pageRequest);
 	}
 
 	/*
@@ -123,11 +121,12 @@ public class ArtifactController extends AbstractController {
 	 * but that is not supported by Swagger web UI. Now allows use from that web UI
 	 * at the cost of hard-coding many field names from the MLPArtifact class.
 	 */
-	private final String artifactTypeCodeField = "artifactTypeCode";
-	private final String nameField = "name";
-	private final String uriField = "uri";
-	private final String versionField = "version";
-	private final String userIdField = "userId";
+	private static final String artifactTypeCodeField = "artifactTypeCode";
+	private static final String nameField = "name";
+	private static final String uriField = "uri";
+	private static final String versionField = "version";
+	private static final String userIdField = "userId";
+
 	@ApiOperation(value = "Searches for artifacts with attributes matching the values specified as query parameters. " //
 			+ "Defaults to match all (conjunction); send junction query parameter '_j=o' to match any (disjunction).", //
 			response = MLPArtifact.class, responseContainer = "Page")
@@ -167,8 +166,7 @@ public class ArtifactController extends AbstractController {
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
 		}
 		try {
-			Object result = artifactService.findArtifacts(queryParameters, isOr, pageRequest);
-			return result;
+			return artifactService.findArtifacts(queryParameters, isOr, pageRequest);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			logger.warn("searchArtifacts failed: {}", ex.toString());
@@ -191,8 +189,7 @@ public class ArtifactController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + artifactId, null);
 		}
-		Object result = solutionRevisionRepository.findByArtifactId(artifactId);
-		return result;
+		return solutionRevisionRepository.findByArtifactId(artifactId);
 	}
 
 	@ApiOperation(value = "Creates a new entity and generates an ID if needed. Returns bad request on constraint violation etc.", //
@@ -245,8 +242,7 @@ public class ArtifactController extends AbstractController {
 			artifact.setArtifactId(artifactId);
 			// Update the existing row
 			artifactRepository.save(artifact);
-			Object result = new SuccessTransport(HttpServletResponse.SC_OK, null);
-			return result;
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);

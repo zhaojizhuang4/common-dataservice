@@ -73,11 +73,10 @@ public class PublishRequestController extends AbstractController {
 	@ResponseBody
 	public Page<MLPPublishRequest> getPublishRequests(Pageable pageRequest) {
 		logger.info("getPublishRequests {}", pageRequest);
-		Page<MLPPublishRequest> result = publishRequestRepository.findAll(pageRequest);
-		return result;
+		return publishRequestRepository.findAll(pageRequest);
 	}
 
-	@ApiOperation(value = "Gets the entity for the specified ID. Returns bad request if the ID is not found.", //
+	@ApiOperation(value = "Gets the request for the specified ID. Returns bad request if the ID is not found.", //
 			response = MLPPublishRequest.class)
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{requestId}", method = RequestMethod.GET)
@@ -92,7 +91,7 @@ public class PublishRequestController extends AbstractController {
 		return sr;
 	}
 
-	@ApiOperation(value = "Searches for entities with attribute values matching the field name - field value pairs specified as query parameters. " //
+	@ApiOperation(value = "Searches for requests with attribute values matching the field name - field value pairs specified as query parameters. " //
 			+ "Defaults to and (conjunction); send junction query parameter '_j=o' for or (disjunction).", //
 			response = MLPPublishRequest.class, responseContainer = "Page")
 	@ApiPageable
@@ -124,7 +123,7 @@ public class PublishRequestController extends AbstractController {
 		}
 	}
 
-	@ApiOperation(value = "Creates a new entity with a generated ID. Returns bad request on constraint violation etc.", //
+	@ApiOperation(value = "Creates a new request with a generated ID. Returns bad request on constraint violation etc.", //
 			response = MLPPublishRequest.class)
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(method = RequestMethod.POST)
@@ -149,7 +148,7 @@ public class PublishRequestController extends AbstractController {
 		}
 	}
 
-	@ApiOperation(value = "Updates an existing entity with the supplied data. Returns bad request on constraint violation etc.", //
+	@ApiOperation(value = "Updates an existing request with the supplied data. Returns bad request on constraint violation etc.", //
 			response = SuccessTransport.class)
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{requestId}", method = RequestMethod.PUT)
@@ -179,7 +178,7 @@ public class PublishRequestController extends AbstractController {
 		}
 	}
 
-	@ApiOperation(value = "Deletes the entity with the specified ID. Returns bad request if the ID is not found.", //
+	@ApiOperation(value = "Deletes the request with the specified ID. Returns bad request if the ID is not found.", //
 			response = SuccessTransport.class)
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/{requestId}", method = RequestMethod.DELETE)

@@ -83,8 +83,7 @@ public class RevisionController extends AbstractController {
 	public Iterable<MLPArtifact> getRevisionArtifacts(@PathVariable("revisionId") String revisionId,
 			HttpServletResponse response) {
 		logger.info("getSolRevArtifacts: revisionId {}", revisionId);
-		Iterable<MLPArtifact> result = artifactRepository.findByRevision(revisionId);
-		return result;
+		return artifactRepository.findByRevision(revisionId);
 	}
 
 	@ApiOperation(value = "Adds an artifact to the revision.", response = SuccessTransport.class)
@@ -164,8 +163,7 @@ public class RevisionController extends AbstractController {
 			description.setRevisionId(revisionId);
 			description.setAccessTypeCode(accessTypeCode);
 			// Create a new row
-			MLPRevisionDescription result = revisionDescRepository.save(description);
-			return result;
+			return revisionDescRepository.save(description);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn("createRevisionDescription failed: {}", cve.toString());
@@ -235,8 +233,7 @@ public class RevisionController extends AbstractController {
 	public Iterable<MLPDocument> getSolRevDocuments(@PathVariable("revisionId") String revisionId,
 			@PathVariable("accessTypeCode") String accessTypeCode, HttpServletResponse response) {
 		logger.info("getSolRevDocuments: revisionId {} accessType {}", revisionId, accessTypeCode);
-		Iterable<MLPDocument> result = documentRepository.findByRevisionAccess(revisionId, accessTypeCode);
-		return result;
+		return documentRepository.findByRevisionAccess(revisionId, accessTypeCode);
 	}
 
 	@ApiOperation(value = "Adds a user document to the specified revision and access type.", //

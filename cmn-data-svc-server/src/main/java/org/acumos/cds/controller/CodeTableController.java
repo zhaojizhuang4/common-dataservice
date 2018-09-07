@@ -82,8 +82,7 @@ public class CodeTableController extends AbstractController {
 		CodeNameType type;
 		try {
 			type = CodeNameType.valueOf(valueSetName);
-			Object result = codeNameService.getCodeNamePairs(type);
-			return result;
+			return codeNameService.getCodeNamePairs(type);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			logger.warn("getCodeNamePairs failed: {}", ex.toString());

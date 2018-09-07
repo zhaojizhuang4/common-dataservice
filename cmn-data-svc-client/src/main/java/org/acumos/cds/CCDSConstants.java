@@ -93,8 +93,8 @@ public interface CCDSConstants {
 	public static final String LOGIN_API_PATH = "loginapi";
 	public static final String VERIFY_PATH = "verify";
 	public static final String CHPASS_PATH = "chgpw";
-	
-	//Actions on datasets
+
+	// Actions on datasets
 	public static final String DATASET_PATH = "dataset";
 
 	// Portal search interface

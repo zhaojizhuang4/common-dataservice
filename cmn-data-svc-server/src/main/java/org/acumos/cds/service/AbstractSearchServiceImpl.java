@@ -66,8 +66,8 @@ public abstract class AbstractSearchServiceImpl {
 	}
 
 	/**
-	 * Builds a disjunction ("OR") criterion to check if field value occurs in the list,
-	 * with special handling ("isNull") for null.
+	 * Builds a disjunction ("OR") criterion to check if field value occurs in the
+	 * list, with special handling ("isNull") for null.
 	 * 
 	 * @param fieldName
 	 *            POJO field name

@@ -44,6 +44,6 @@ public interface PeerSolAccMapRepository
 			+ " AND ps.granted = true " //
 			+ " AND ps.solutionGroupId = sg.groupId " //
 			+ " AND sg.solutionId = :solutionId")
-	Long checkPeerSolutionAccess(@Param("peerId") String peerId, @Param("solutionId") String solutionId);
+	long checkPeerSolutionAccess(@Param("peerId") String peerId, @Param("solutionId") String solutionId);
 
 }

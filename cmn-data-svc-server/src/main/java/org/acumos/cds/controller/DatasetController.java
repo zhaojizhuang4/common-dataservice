@@ -51,7 +51,7 @@ import io.swagger.annotations.ApiResponses;
 public class DatasetController extends AbstractController {
 
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-	
+
 	@ApiOperation(value = "Gets the dataset for the specified ID. Returns bad request if the ID is not found.", //
 			response = Map.class)
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
@@ -59,8 +59,7 @@ public class DatasetController extends AbstractController {
 	@ResponseBody
 	public Object getDataset(@PathVariable("datasetId") String datasetId, HttpServletResponse response) {
 		logger.info("getDataset ID {}", datasetId);
-		Map<String, Object> dummy = new HashMap<>();
-		return dummy;
+		return new HashMap<>();
 	}
 
 }

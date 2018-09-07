@@ -84,8 +84,7 @@ public class PeerController extends AbstractController {
 	@ResponseBody
 	public Page<MLPPeer> getPeers(Pageable pageable) {
 		logger.info("getPeers {}", pageable);
-		Page<MLPPeer> result = peerRepository.findAll(pageable);
-		return result;
+		return peerRepository.findAll(pageable);
 	}
 
 	@ApiOperation(value = "Searches for entities with attribute values matching the field name - field value pairs specified as query parameters. " //
@@ -110,8 +109,7 @@ public class PeerController extends AbstractController {
 		}
 		try {
 			Map<String, Object> convertedQryParm = convertQueryParameters(MLPPeer.class, queryParameters);
-			Object result = peerSearchService.findPeers(convertedQryParm, isOr, pageable);
-			return result;
+			return peerSearchService.findPeers(convertedQryParm, isOr, pageable);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			logger.warn("searchPeers failed: {}", ex.toString());
@@ -191,8 +189,7 @@ public class PeerController extends AbstractController {
 			peer.setPeerId(peerId);
 			// Update the existing row
 			peerRepository.save(peer);
-			Object result = new SuccessTransport(HttpServletResponse.SC_OK, null);
-			return result;
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
@@ -243,8 +240,7 @@ public class PeerController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerId, null);
 		}
-		Object result = peerSubRepository.findByPeerId(peerId);
-		return result;
+		return peerSubRepository.findByPeerId(peerId);
 	}
 
 	@ApiOperation(value = "Gets the peer subscription for the specified ID.", response = MLPPeerSubscription.class)
@@ -315,8 +311,7 @@ public class PeerController extends AbstractController {
 			peerSub.setSubId(subId);
 			// Update the existing row
 			peerSubRepository.save(peerSub);
-			Object result = new SuccessTransport(HttpServletResponse.SC_OK, null);
-			return result;
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);

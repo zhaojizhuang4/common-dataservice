@@ -189,8 +189,7 @@ public class SolutionController extends AbstractController {
 	@ResponseBody
 	public Page<MLPSolution> getSolutions(Pageable pageable, HttpServletResponse response) {
 		logger.info("getSolutions {}", pageable);
-		Page<MLPSolution> result = solutionRepository.findAll(pageable);
-		return result;
+		return solutionRepository.findAll(pageable);
 	}
 
 	@ApiOperation(value = "Searches for entities with names or descriptions that contain the search term using the like operator.", //
@@ -200,8 +199,7 @@ public class SolutionController extends AbstractController {
 	public Page<MLPSolution> findSolutionsByLikeKeyword(@RequestParam(CCDSConstants.TERM_PATH) String term,
 			Pageable pageRequest, HttpServletResponse response) {
 		logger.info("findSolutionsByLikeKeyword {}", term);
-		Page<MLPSolution> result = solutionRepository.findBySearchTerm(term, pageRequest);
-		return result;
+		return solutionRepository.findBySearchTerm(term, pageRequest);
 	}
 
 	@ApiOperation(value = "Gets a page of solutions matching the specified tag.", response = MLPSolution.class, responseContainer = "Page")
@@ -211,8 +209,7 @@ public class SolutionController extends AbstractController {
 	public Object findSolutionsByTag(@RequestParam("tag") String tag, Pageable pageRequest,
 			HttpServletResponse response) {
 		logger.info("findSolutionsByTag {}", tag);
-		Page<MLPSolution> result = solutionRepository.findByTag(tag, pageRequest);
-		return result;
+		return solutionRepository.findByTag(tag, pageRequest);
 	}
 
 	@ApiOperation(value = "Searches for entities with attribute values matching the field name - field value pairs specified as query parameters. " //
@@ -487,7 +484,7 @@ public class SolutionController extends AbstractController {
 	@ResponseBody
 	public Object incrementViewCount(@PathVariable("solutionId") String solutionId, HttpServletResponse response) {
 		logger.info("incrementViewCount: ID {}", solutionId);
-		// Get the existing one
+		// Get the existing one; the update command doesn't fail on invalid ID
 		MLPSolutionWeb existing = solutionWebRepository.findOne(solutionId);
 		if (existing == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -560,8 +557,7 @@ public class SolutionController extends AbstractController {
 	@ResponseBody
 	public Iterable<MLPSolutionRevision> getListOfRevisions(@PathVariable("solutionId") String[] solutionIds) {
 		logger.info("getListOfRevisions: solution IDs {}", Arrays.toString(solutionIds));
-		Iterable<MLPSolutionRevision> result = solutionRevisionRepository.findBySolutionIdIn(solutionIds);
-		return result;
+		return solutionRevisionRepository.findBySolutionIdIn(solutionIds);
 	}
 
 	@ApiOperation(value = "Gets the revision for the specified ID. Returns bad request if the ID is not found.", //
@@ -610,8 +606,7 @@ public class SolutionController extends AbstractController {
 			// Ensure correct solution ID
 			revision.setSolutionId(solutionId);
 			// Create a new row
-			MLPSolutionRevision result = solutionRevisionRepository.save(revision);
-			return result;
+			return solutionRevisionRepository.save(revision);
 		} catch (Exception ex) {
 			Exception cve = findConstraintViolationException(ex);
 			logger.warn("createSolutionRevision failed: {}", cve.toString());
@@ -682,8 +677,7 @@ public class SolutionController extends AbstractController {
 	@ResponseBody
 	public Iterable<MLPTag> getTagsForSolution(@PathVariable("solutionId") String solutionId) {
 		logger.info("getTagsForSolution: solutionId {}", solutionId);
-		Iterable<MLPTag> result = tagRepository.findBySolution(solutionId);
-		return result;
+		return tagRepository.findBySolution(solutionId);
 	}
 
 	@ApiOperation(value = "Adds a tag to the solution. Returns bad request if the ID is not found.", //
@@ -742,8 +736,7 @@ public class SolutionController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
-		Iterable<MLPSolutionDownload> da = solutionDownloadRepository.findBySolutionId(solutionId, pageRequest);
-		return da;
+		return solutionDownloadRepository.findBySolutionId(solutionId, pageRequest);
 	}
 
 	@ApiOperation(value = "Creates a new solution download record. Returns bad request on constraint violation etc.", //
@@ -756,19 +749,6 @@ public class SolutionController extends AbstractController {
 			@PathVariable("userId") String userId, @PathVariable("artifactId") String artifactId,
 			@RequestBody MLPSolutionDownload sd, HttpServletResponse response) {
 		logger.info("createSolutionDownload: solutionId {} userId {} artifactId {}", solutionId, userId, artifactId);
-		// These validations duplicate the constraints but are much user friendlier.
-		if (solutionRepository.findOne(solutionId) == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
-		}
-		if (artifactRepository.findOne(artifactId) == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + artifactId, null);
-		}
-		if (userRepository.findOne(userId) == null) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
-		}
 		try {
 			// Create a new row using path IDs
 			sd.setSolutionId(solutionId);
@@ -782,10 +762,11 @@ public class SolutionController extends AbstractController {
 			updateSolutionDownloadStats(solutionId);
 			return result;
 		} catch (Exception ex) {
-			logger.error("createSolutionDownload failed: {}", ex.toString());
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-					ex.getCause() != null ? ex.getCause().getMessage() : "createSolutionDownload failed", ex);
+			Exception cve = findConstraintViolationException(ex);
+			logger.error("createSolutionDownload failed: {}", cve.toString());
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+					ex.getCause() != null ? ex.getCause().getMessage() : "createSolutionDownload failed", cve);
 		}
 	}
 
@@ -823,8 +804,7 @@ public class SolutionController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + solutionId, null);
 		}
-		Iterable<MLPSolutionRating> sr = solutionRatingRepository.findBySolutionId(solutionId, pageRequest);
-		return sr;
+		return solutionRatingRepository.findBySolutionId(solutionId, pageRequest);
 	}
 
 	@ApiOperation(value = "Gets an existing solution rating. Returns bad request if the ID is not found", //
@@ -959,8 +939,7 @@ public class SolutionController extends AbstractController {
 	@ResponseBody
 	public Iterable<MLPUser> getSolutionACL(@PathVariable("solutionId") String solutionId) {
 		logger.info("getSolutionACL: solutionId {}", solutionId);
-		Iterable<MLPUser> result = solUserAccMapRepository.getUsersForSolution(solutionId);
-		return result;
+		return solUserAccMapRepository.getUsersForSolution(solutionId);
 	}
 
 	@ApiOperation(value = "Adds a user to the ACL for the specified solution. Returns bad request if an ID is not found", //
@@ -1014,8 +993,7 @@ public class SolutionController extends AbstractController {
 	public Page<MLPSolution> getAccessibleSolutions(@PathVariable("userId") String userId, Pageable pageable,
 			HttpServletResponse response) {
 		logger.info("getAccessibleSolutions: user {}", userId);
-		Page<MLPSolution> result = solUserAccMapRepository.getSolutionsForUser(userId, pageable);
-		return result;
+		return solUserAccMapRepository.getSolutionsForUser(userId, pageable);
 	}
 
 	@ApiOperation(value = "Gets validation results for the specified solution and revision. Returns bad request if an ID is not found", //
@@ -1157,9 +1135,7 @@ public class SolutionController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + revisionId, null);
 		}
-		Page<MLPSolutionDeployment> da = solutionDeploymentRepository.findBySolutionIdAndRevisionId(solutionId,
-				revisionId, pageRequest);
-		return da;
+		return solutionDeploymentRepository.findBySolutionIdAndRevisionId(solutionId, revisionId, pageRequest);
 	}
 
 	@ApiOperation(value = "Gets the deployments for the specified solution, revision and user IDs. Returns bad request if an ID is not found.", //
@@ -1186,9 +1162,8 @@ public class SolutionController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + userId, null);
 		}
-		Page<MLPSolutionDeployment> da = solutionDeploymentRepository.findBySolutionIdAndRevisionIdAndUserId(solutionId,
-				revisionId, userId, pageRequest);
-		return da;
+		return solutionDeploymentRepository.findBySolutionIdAndRevisionIdAndUserId(solutionId, revisionId, userId,
+				pageRequest);
 	}
 
 	@ApiOperation(value = "Creates a new deployment record for the specified solution and revision. Returns bad request if an ID is not found.", //

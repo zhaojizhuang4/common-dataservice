@@ -83,8 +83,7 @@ public class ThreadController extends AbstractController {
 	@ResponseBody
 	public Page<MLPThread> getThreads(Pageable pageable) {
 		logger.info("getThreads {}", pageable);
-		Page<MLPThread> result = threadRepository.findAll(pageable);
-		return result;
+		return threadRepository.findAll(pageable);
 	}
 
 	@ApiOperation(value = "Gets the count of threads for the solution and revision IDs.", //
@@ -108,8 +107,7 @@ public class ThreadController extends AbstractController {
 	public Page<MLPThread> getSolutionRevisionThreads(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, Pageable pageable) {
 		logger.info("getSolutionRevisionThreads: solutionId {} revisionId {}", solutionId, revisionId);
-		Page<MLPThread> result = threadRepository.findBySolutionIdAndRevisionId(solutionId, revisionId, pageable);
-		return result;
+		return threadRepository.findBySolutionIdAndRevisionId(solutionId, revisionId, pageable);
 	}
 
 	@ApiOperation(value = "Gets the thread for the specified ID. Returns bad request if an ID is not found.", //
@@ -228,8 +226,7 @@ public class ThreadController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + threadId, null);
 		}
-		Object result = commentRepository.findByThreadId(threadId, pageable);
-		return result;
+		return commentRepository.findByThreadId(threadId, pageable);
 	}
 
 	@ApiOperation(value = "Gets comment count for the solution revision.", response = CountTransport.class)
@@ -253,8 +250,7 @@ public class ThreadController extends AbstractController {
 	public Page<MLPComment> getSolutionRevisionComments(@PathVariable("solutionId") String solutionId,
 			@PathVariable("revisionId") String revisionId, Pageable pageable) {
 		logger.info("getSolutionRevisionComments: solutionId {} revisionId {}", solutionId, revisionId);
-		Page<MLPComment> result = commentRepository.findBySolutionIdAndRevisionId(solutionId, revisionId, pageable);
-		return result;
+		return commentRepository.findBySolutionIdAndRevisionId(solutionId, revisionId, pageable);
 	}
 
 	@ApiOperation(value = "Gets the comment for the specified ID. Returns bad request if the ID is not found.", //

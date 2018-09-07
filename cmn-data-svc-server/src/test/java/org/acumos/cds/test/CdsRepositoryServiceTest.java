@@ -523,7 +523,7 @@ public class CdsRepositoryServiceTest {
 			boolean active = true;
 			String[] userIds = { cu.getUserId() };
 			String[] modelTypeCodes = { ModelTypeCode.CL.name() };
-			String[] accTypeCodes = { AccessTypeCode.PR.name() };
+			String[] accTypeCodes = { AccessTypeCode.PR.name(), AccessTypeCode.OR.name() };
 			String[] valStatusCodes = { ValidationStatusCode.NV.name() };
 			String[] searchTags = { solTag1.getTag() };
 			String[] searchAuths = null;
@@ -695,11 +695,6 @@ public class CdsRepositoryServiceTest {
 			String[] valStatuses = new String[] { ValidationStatusCode.NV.name() };
 			Date anHourAgo = new java.util.Date();
 			anHourAgo.setTime(new Date().getTime() - (1000L * 60 * 60));
-
-			Page<MLPSolution> solByJoin = solutionRepository.findByModifiedDate(true, accessTypes, valStatuses,
-					anHourAgo, new PageRequest(0, 5));
-			logger.info("Solutions by date via join: {}", solByJoin);
-			Assert.assertFalse(solByJoin.getContent().isEmpty());
 
 			Page<MLPSolution> solByCriteria = solutionSearchService.findSolutionsByModifiedDate(true, accessTypes,
 					valStatuses, anHourAgo, new PageRequest(0, 5));
@@ -1338,21 +1333,21 @@ public class CdsRepositoryServiceTest {
 		Assert.assertNotNull("User ID", cu.getUserId());
 		logger.info("Created user " + cu);
 
-		MLPSolution cs1 = new MLPSolution("solutionName", cu.getUserId(), false);
+		MLPSolution cs1 = new MLPSolution("solutionName", cu.getUserId(), true);
 		cs1 = solutionRepository.save(cs1);
 		Assert.assertNotNull("Solution ID", cs1.getSolutionId());
 		logger.info("Created solution " + cs1);
 
-		MLPSolution cs2 = new MLPSolution("solutionName2", cu.getUserId(), false);
+		MLPSolution cs2 = new MLPSolution("solutionName2", cu.getUserId(), true);
 		cs2 = solutionRepository.save(cs2);
 		Assert.assertNotNull("Solution ID", cs2.getSolutionId());
 		logger.info("Created solution " + cs2);
 
 		final String peerName = "Peer-" + Long.toString(new Date().getTime());
-		MLPPeer pr = new MLPPeer(peerName, "x." + Long.toString(new Date().getTime()), "http://peer-api", true, false,
+		MLPPeer pr1 = new MLPPeer(peerName, "x." + Long.toString(new Date().getTime()), "http://peer-api", true, false,
 				"contact", PeerStatusCode.AC.name(), ValidationStatusCode.FA.name());
-		pr = peerRepository.save(pr);
-		logger.info("Created peer " + pr);
+		pr1 = peerRepository.save(pr1);
+		logger.info("Created peer " + pr1);
 
 		final String peerName2 = "Peer-" + Long.toString(new Date().getTime());
 		MLPPeer pr2 = new MLPPeer(peerName2, "x." + Long.toString(new Date().getTime()), "http://peer-api", true, false,
@@ -1360,7 +1355,7 @@ public class CdsRepositoryServiceTest {
 		pr2 = peerRepository.save(pr2);
 		logger.info("Created second peer " + pr2);
 
-		MLPPeerGroup pg1 = new MLPPeerGroup("RepSvcTst peer group 1");
+		MLPPeerGroup pg1 = new MLPPeerGroup("RepSvcTest peer group 1");
 		pg1 = peerGroupRepository.save(pg1);
 		Assert.assertNotNull(pg1.getGroupId());
 		logger.info("Created peer group " + pg1);
@@ -1370,14 +1365,15 @@ public class CdsRepositoryServiceTest {
 		Assert.assertNotNull(pg2.getGroupId());
 		logger.info("Created peer group " + pg2);
 
-		MLPSolutionGroup sg = new MLPSolutionGroup("RevSvcTst sol group 1");
+		MLPSolutionGroup sg = new MLPSolutionGroup("RevSvcTest sol group 1");
 		sg = solutionGroupRepository.save(sg);
 		Assert.assertNotNull(sg.getGroupId());
 		logger.info("Created solution group " + sg);
 
+		// Used heavily below
 		PageRequest pageable = new PageRequest(0, 3);
 
-		MLPPeerGrpMemMap pgm1 = new MLPPeerGrpMemMap(pg1.getGroupId(), pr.getPeerId());
+		MLPPeerGrpMemMap pgm1 = new MLPPeerGrpMemMap(pg1.getGroupId(), pr1.getPeerId());
 		pgm1 = peerGroupMemMapRepository.save(pgm1);
 		logger.info("Created peer group map " + pgm1);
 		Page<MLPPeer> peers1 = peerGroupMemMapRepository.findPeersByGroupId(pg1.getGroupId(), pageable);
@@ -1410,18 +1406,20 @@ public class CdsRepositoryServiceTest {
 		MLPPeerPeerAccMap ppMap = peerPeerAccMapRepository.findOne(ppKey);
 		Assert.assertNotNull(ppMap);
 
-		List<MLPPeer> accessPeers = peerPeerAccMapRepository.findAccessPeers(pr.getPeerId());
+		List<MLPPeer> accessPeers = peerPeerAccMapRepository.findAccessPeers(pr1.getPeerId());
 		Assert.assertTrue(accessPeers != null && !accessPeers.isEmpty());
 
 		List<MLPPeer> accessPeers2 = peerPeerAccMapRepository.findAccessPeers(pr2.getPeerId());
 		Assert.assertTrue(accessPeers2 != null && accessPeers2.isEmpty());
 
-		long yesAccess = peerSolAccMapRepository.checkPeerSolutionAccess(pr.getPeerId(), cs1.getSolutionId());
+		long yesAccess = peerSolAccMapRepository.checkPeerSolutionAccess(pr1.getPeerId(), cs1.getSolutionId());
 		Assert.assertTrue(yesAccess > 0);
 		logger.info("Access count: " + yesAccess);
-		long noAccess = peerSolAccMapRepository.checkPeerSolutionAccess(pr.getPeerId(), cs2.getSolutionId());
-		Assert.assertTrue(noAccess <= 0);
+		long noAccess = peerSolAccMapRepository.checkPeerSolutionAccess(pr1.getPeerId(), cs2.getSolutionId());
+		Assert.assertTrue(noAccess == 0);
 		logger.info("No access count: " + noAccess);
+		Page<MLPSolution> restrSols = solutionRepository.findRestrictedSolutions(pr1.getPeerId(), pageable);
+		Assert.assertTrue(restrSols != null && restrSols.getNumberOfElements() > 0);
 
 		peerPeerAccMapRepository.delete(gppm);
 		peerSolAccMapRepository.delete(gpsm);
@@ -1432,7 +1430,7 @@ public class CdsRepositoryServiceTest {
 		peerGroupRepository.delete(pg2);
 		peerGroupRepository.delete(pg1);
 		peerRepository.delete(pr2);
-		peerRepository.delete(pr);
+		peerRepository.delete(pr1);
 		solutionRepository.delete(cs2);
 		solutionRepository.delete(cs1);
 		userRepository.delete(cu);

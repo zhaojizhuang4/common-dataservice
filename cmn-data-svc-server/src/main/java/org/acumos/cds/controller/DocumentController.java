@@ -121,8 +121,7 @@ public class DocumentController extends AbstractController {
 			document.setDocumentId(documentId);
 			// Update the existing row
 			documentRepository.save(document);
-			Object result = new SuccessTransport(HttpServletResponse.SC_OK, null);
-			return result;
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);

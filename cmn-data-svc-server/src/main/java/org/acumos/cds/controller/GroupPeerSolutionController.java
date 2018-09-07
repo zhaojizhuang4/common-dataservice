@@ -32,6 +32,7 @@ import org.acumos.cds.domain.MLPPeerGrpMemMap;
 import org.acumos.cds.domain.MLPPeerPeerAccMap;
 import org.acumos.cds.domain.MLPPeerSolAccMap;
 import org.acumos.cds.domain.MLPSolGrpMemMap;
+import org.acumos.cds.domain.MLPSolution;
 import org.acumos.cds.domain.MLPSolutionGroup;
 import org.acumos.cds.repository.PeerGroupRepository;
 import org.acumos.cds.repository.PeerGrpMemMapRepository;
@@ -66,6 +67,8 @@ import io.swagger.annotations.ApiResponses;
 /**
  * Provides methods to manage peer groups and solution groups, peer group and
  * solution group memberships, and also peer group and solution group access.
+ * 
+ * The prefix "group" is pretty generic.
  */
 @Controller
 @RequestMapping(value = "/" + CCDSConstants.GROUP_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -97,8 +100,7 @@ public class GroupPeerSolutionController extends AbstractController {
 	@ResponseBody
 	public Page<MLPPeerGroup> getPeerGroups(Pageable pageRequest) {
 		logger.info("getPeerGroups {}", pageRequest);
-		Page<MLPPeerGroup> result = peerGroupRepository.findAll(pageRequest);
-		return result;
+		return peerGroupRepository.findAll(pageRequest);
 	}
 
 	@ApiOperation(value = "Creates a new entity with a generated ID. Returns bad request on constraint violation etc.", //
@@ -109,8 +111,7 @@ public class GroupPeerSolutionController extends AbstractController {
 	public Object createPeerGroup(@RequestBody MLPPeerGroup group, HttpServletResponse response) {
 		logger.info("createPeerGroup: group {}", group);
 		try {
-			MLPPeerGroup result = peerGroupRepository.save(group);
-			return result;
+			return peerGroupRepository.save(group);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
@@ -139,8 +140,7 @@ public class GroupPeerSolutionController extends AbstractController {
 			group.setGroupId(groupId);
 			// Update the existing row
 			peerGroupRepository.save(group);
-			Object result = new SuccessTransport(HttpServletResponse.SC_OK, null);
-			return result;
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
@@ -181,8 +181,7 @@ public class GroupPeerSolutionController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + groupId, null);
 		}
-		Object result = peerGroupMemMapRepository.findPeersByGroupId(groupId, pageRequest);
-		return result;
+		return peerGroupMemMapRepository.findPeersByGroupId(groupId, pageRequest);
 	}
 
 	@ApiOperation(value = "Adds the specified peer as a member of the specified peer group.", //
@@ -231,8 +230,7 @@ public class GroupPeerSolutionController extends AbstractController {
 	@ResponseBody
 	public Page<MLPSolutionGroup> getSolutionGroups(Pageable pageRequest) {
 		logger.info("getSolutionGroups {}", pageRequest);
-		Page<MLPSolutionGroup> result = solutionGroupRepository.findAll(pageRequest);
-		return result;
+		return solutionGroupRepository.findAll(pageRequest);
 	}
 
 	@ApiOperation(value = "Creates a new entity with a generated ID. Returns bad request on constraint violation etc.", //
@@ -272,8 +270,7 @@ public class GroupPeerSolutionController extends AbstractController {
 			group.setGroupId(groupId);
 			// Update the existing row
 			solutionGroupRepository.save(group);
-			Object result = new SuccessTransport(HttpServletResponse.SC_OK, null);
-			return result;
+			return new SuccessTransport(HttpServletResponse.SC_OK, null);
 		} catch (Exception ex) {
 			// e.g., EmptyResultDataAccessException is NOT an internal server error
 			Exception cve = findConstraintViolationException(ex);
@@ -314,8 +311,7 @@ public class GroupPeerSolutionController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + groupId, null);
 		}
-		Object result = solGroupMemMapRepository.findSolutionsByGroupId(groupId, pageRequest);
-		return result;
+		return solGroupMemMapRepository.findSolutionsByGroupId(groupId, pageRequest);
 	}
 
 	@ApiOperation(value = "Adds the specified solution as a member of the specified solution group.", //
@@ -334,19 +330,11 @@ public class GroupPeerSolutionController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + groupId, null);
 		}
-		try {
-			// Use path parameters only
-			map.setGroupId(groupId);
-			map.setSolutionId(solutionId);
-			solGroupMemMapRepository.save(map);
-			return new SuccessTransport(HttpServletResponse.SC_OK, null);
-		} catch (Exception ex) {
-			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			Exception cve = findConstraintViolationException(ex);
-			logger.warn("addSolutionToGroup failed: {}", cve.toString());
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "addSolutionToGroup failed", cve);
-		}
+		// Use path parameters only
+		map.setGroupId(groupId);
+		map.setSolutionId(solutionId);
+		solGroupMemMapRepository.save(map);
+		return new SuccessTransport(HttpServletResponse.SC_OK, null);
 	}
 
 	@ApiOperation(value = "Drops the specified solution as a member of the specified solution group.", //
@@ -377,8 +365,7 @@ public class GroupPeerSolutionController extends AbstractController {
 	@ResponseBody
 	public Page<MLPPeerSolAccMap> getPeerSolutionGroupMaps(Pageable pageRequest) {
 		logger.info("getPeerSolutionGroupMaps request {}", pageRequest);
-		Page<MLPPeerSolAccMap> result = peerSolAccMapRepository.findAll(pageRequest);
-		return result;
+		return peerSolAccMapRepository.findAll(pageRequest);
 	}
 
 	@ApiOperation(value = "Grants access for the specified peer group to the specified solution group.", //
@@ -515,6 +502,18 @@ public class GroupPeerSolutionController extends AbstractController {
 		return new CountTransport(count);
 	}
 
+	@ApiOperation(value = "Gets a page of non-public solutions accessible to specified peer", response = MLPSolution.class, responseContainer = "Page")
+	@ApiPageable
+	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
+	@RequestMapping(value = CCDSConstants.PEER_PATH + "/{peerId}/"
+			+ CCDSConstants.SOLUTION_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public Page<MLPSolution> getRestrictedSolutions(@PathVariable("peerId") String peerId, Pageable pageRequest,
+			HttpServletResponse response) {
+		logger.info("getRestrictedSolutions: peerId {} ", peerId);
+		return solutionRepository.findRestrictedSolutions(peerId, pageRequest);
+	}
+
 	@ApiOperation(value = "Gets peers accessible to the specified peer.", response = MLPPeer.class, responseContainer = "List")
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = CCDSConstants.PEER_PATH + "/{peerId}/"
@@ -526,8 +525,7 @@ public class GroupPeerSolutionController extends AbstractController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, NO_ENTRY_WITH_ID + peerId, null);
 		}
-		Object result = peerPeerAccMapRepository.findAccessPeers(peerId);
-		return result;
+		return peerPeerAccMapRepository.findAccessPeers(peerId);
 	}
 
 }

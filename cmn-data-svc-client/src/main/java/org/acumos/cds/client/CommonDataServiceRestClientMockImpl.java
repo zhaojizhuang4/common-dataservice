@@ -210,7 +210,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private MLPStepResult stepResultById;
 	private List<MLPCodeNamePair> pairs;
 	private List<String> valueSetNames;
-	private String requestId;
+	private String cachedRequestId;
 	private List<String> solutionMembers;
 	private RestPageResponse<MLPSolution> userSolutions;
 	private long solutionRevisionCommentCount;
@@ -222,6 +222,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	private RestPageResponse<MLPPublishRequest> publishRequests;
 	private RestPageResponse<MLPPublishRequest> searchPublishRequests;
 	private MLPPublishRequest publishRequest;
+	private RestPageResponse<MLPSolution> restrictedSolutions;
 
 	/**
 	 * No-argument constructor.
@@ -260,13 +261,13 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 
 	public CommonDataServiceRestClientMockImpl(final String webapiUrl, final String user, final String pass) {
 		this();
-		logger.info("Ctor 2: webapiUrl=" + webapiUrl + ", user=" + user + ", pass=" + pass);
+		logger.info("Ctor 2: webapiUrl={}, user={}, pass={}", webapiUrl, user, pass);
 	}
 
 	public CommonDataServiceRestClientMockImpl(final String webapiUrl, final RestTemplate restTemplate) {
 		this();
 		this.restTemplate = restTemplate;
-		logger.info("Ctor 3: webapiUrl=" + webapiUrl);
+		logger.info("Ctor 3: webapiUrl={}", webapiUrl);
 	}
 
 	protected RestTemplate getRestTemplate() {
@@ -1699,7 +1700,7 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 	}
 
 	@Override
-	public long checkPeerSolutionAccess(String peerId, String solutionId) {
+	public long checkRestrictedAccessSolution(String peerId, String solutionId) {
 		return peerSolutionAccess;
 	}
 
@@ -1712,10 +1713,19 @@ public class CommonDataServiceRestClientMockImpl implements ICommonDataServiceRe
 		return peerAccessList;
 	}
 
+	public void setRestrictedSolutions(RestPageResponse<MLPSolution> restrictedSolutions) {
+		this.restrictedSolutions = restrictedSolutions;
+	}
+
+	@Override
+	public RestPageResponse<MLPSolution> findRestrictedAccessSolutions(String peerId, RestPageRequest pageRequest) {
+		return restrictedSolutions;
+	}
+
 	@Override
 	public void setRequestId(String requestId) {
-		this.requestId = requestId;
-		logger.info("set request id {}", this.requestId);
+		this.cachedRequestId = requestId;
+		logger.info("set request id {}", this.cachedRequestId);
 	}
 
 	public void setCompositeSolutionMembers(List<String> members) {

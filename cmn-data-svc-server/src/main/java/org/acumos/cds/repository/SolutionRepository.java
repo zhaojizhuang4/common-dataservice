@@ -20,8 +20,6 @@
 
 package org.acumos.cds.repository;
 
-import java.util.Date;
-
 import org.acumos.cds.domain.MLPSolution;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -66,40 +64,25 @@ public interface SolutionRepository extends JpaRepository<MLPSolution, String>, 
 	Page<MLPSolution> findByTag(@Param("tag") String tag, Pageable pageRequest);
 
 	/**
-	 * Gets all solutions with any modifications after the specified date, including
-	 * the solution, revision and artifact entities. Returns no results for a
-	 * solution with no revision(s) and/or no artifact(s).
+	 * Searches for active solutions accessible to the specified peer by traversing
+	 * the peer group and solution group membership mapping tables. Those solutions
+	 * are expected to have only private revisions, but that's not checked here.
 	 * 
 	 * Uses a nested query because the BLOB column in the solution table cannot be
 	 * used to select a distinct set of rows.
 	 * 
-	 * @param active
-	 *            Solution status; use true to find active solutions, false to find
-	 *            inactive solutions.
-	 * @param accessTypeCodes
-	 *            Array of access-type codes
-	 * @param valStatusCodes
-	 *            Array of validation-status codes
-	 * @param theDate
-	 *            Date threshold
+	 * @param peerId
+	 *            Peer ID
 	 * @param pageRequest
 	 *            Page and sort criteria
-	 * @return Page of MLPSolution
+	 * @return Page of MLPSolution, which may be empty
 	 */
-	@Query(value = "SELECT s FROM MLPSolution s WHERE s.solutionId in "
-			+ " ( SELECT DISTINCT s.solutionId FROM MLPSolution s, MLPSolutionRevision r, MLPSolRevArtMap m, MLPArtifact a "
-			+ " WHERE s.active = :active " //
-			+ "   AND s.solutionId = r.solutionId " //
-			+ "   AND r.revisionId = m.revisionId " //
-			+ "   AND m.artifactId = a.artifactId " //
-			+ "   AND r.accessTypeCode in :accessTypeCodes " //
-			+ "   AND r.validationStatusCode in :valStatusCodes " //
-			+ "   AND " //
-			+ "   ( s.modified >= :theDate " //
-			+ "  OR r.modified >= :theDate " //
-			+ "  OR a.modified >= :theDate ) )")
-	Page<MLPSolution> findByModifiedDate(@Param("active") Boolean active,
-			@Param("accessTypeCodes") String[] accessTypeCodes, @Param("valStatusCodes") String[] valStatusCodes,
-			@Param("theDate") Date theDate, Pageable pageRequest);
+	@Query(value = "SELECT s FROM MLPSolution s WHERE s.active = true and s.solutionId in "
+			+ " ( SELECT DISTINCT sg.solutionId FROM MLPPeerGrpMemMap pg, MLPPeerSolAccMap psg, MLPSolGrpMemMap sg "
+			+ " WHERE pg.peerId = :peerId "//
+			+ "   AND pg.groupId = psg.peerGroupId " //
+			+ "   AND psg.solutionGroupId = sg.groupId " //
+			+ "  ) ")
+	Page<MLPSolution> findRestrictedSolutions(@Param("peerId") String peerId, Pageable pageRequest);
 
 }
