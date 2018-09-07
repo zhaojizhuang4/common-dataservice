@@ -350,6 +350,13 @@ public class CdsRepositoryServiceTest {
 			MLPPeerSubscription ps = new MLPPeerSubscription(pr.getPeerId(), cu.getUserId(),
 					SubscriptionScopeCode.FL.name(), AccessTypeCode.PB.name());
 			ps = peerSubscriptionRepository.save(ps);
+			Assert.assertNotNull(ps.getSubId());
+			// Column was defined as timestamp with autoupdate :(
+			Assert.assertNull(ps.getProcessed());
+			Date processed = new Date();
+			ps.setProcessed(processed);
+			ps = peerSubscriptionRepository.save(ps);
+			Assert.assertEquals(processed, ps.getProcessed());
 			logger.info("Peer subscription {}", ps);
 
 			logger.info("Fetching PeerSubscriptions");
