@@ -66,19 +66,17 @@ public abstract class AbstractSearchServiceImpl {
 	}
 
 	/**
-	 * Builds criterion to check exact match of any value in the list, with special
-	 * handling for null.
+	 * Builds a disjunction ("OR") criterion to check if field value occurs in the list,
+	 * with special handling ("isNull") for null.
 	 * 
 	 * @param fieldName
 	 *            POJO field name
 	 * @param values
 	 *            Set of values; null is permitted
-	 * @param isOr
-	 *            If true, treat the query as a disjunction; else as a conjunction.
 	 * @return Criterion
 	 */
-	protected Criterion buildEqualsListCriterion(String fieldName, Object[] values, boolean isOr) {
-		Junction junction = isOr ? Restrictions.disjunction() : Restrictions.conjunction();
+	protected Criterion buildEqualsListCriterion(String fieldName, Object[] values) {
+		Junction junction = Restrictions.disjunction();
 		for (Object v : values) {
 			if (v == null)
 				junction.add(Restrictions.isNull(fieldName));

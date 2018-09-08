@@ -205,7 +205,7 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		if (nameKeywords != null && nameKeywords.length > 0)
 			criteria.add(buildLikeListCriterion("name", nameKeywords, true));
 		if (modelTypeCode != null && modelTypeCode.length > 0)
-			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode, false));
+			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode));
 		if ((accessTypeCode != null && accessTypeCode.length > 0) //
 				|| (descKeywords != null && descKeywords.length > 0)
 				|| (validationStatusCode != null && validationStatusCode.length > 0)
@@ -214,9 +214,9 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			// revisions are optional, but a solution without them is useless
 			criteria.createAlias("revisions", revAlias);
 			if (accessTypeCode != null && accessTypeCode.length > 0)
-				criteria.add(buildEqualsListCriterion(revAlias + ".accessTypeCode", accessTypeCode, false));
+				criteria.add(buildEqualsListCriterion(revAlias + ".accessTypeCode", accessTypeCode));
 			if (validationStatusCode != null && validationStatusCode.length > 0)
-				criteria.add(buildEqualsListCriterion(revAlias + ".validationStatusCode", validationStatusCode, false));
+				criteria.add(buildEqualsListCriterion(revAlias + ".validationStatusCode", validationStatusCode));
 			if (authorKeywords != null && authorKeywords.length > 0)
 				criteria.add(buildLikeListCriterion(revAlias + ".authors", authorKeywords, true));
 			if (publisherKeywords != null && publisherKeywords.length > 0)
@@ -277,16 +277,16 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		if (nameKeywords != null && nameKeywords.length > 0)
 			criteria.add(buildLikeListCriterion("name", nameKeywords, false));
 		if (modelTypeCode != null && modelTypeCode.length > 0)
-			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode, false));
+			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode));
 		if ((accessTypeCode != null && accessTypeCode.length > 0) //
 				|| (descKeywords != null && descKeywords.length > 0) //
 				|| (validationStatusCode != null && validationStatusCode.length > 0)) {
 			// revisions are optional, but a solution without them is useless
 			criteria.createAlias("revisions", revAlias);
 			if (accessTypeCode != null && accessTypeCode.length > 0)
-				criteria.add(buildEqualsListCriterion(revAlias + ".accessTypeCode", accessTypeCode, false));
+				criteria.add(buildEqualsListCriterion(revAlias + ".accessTypeCode", accessTypeCode));
 			if (validationStatusCode != null && validationStatusCode.length > 0)
-				criteria.add(buildEqualsListCriterion(revAlias + ".validationStatusCode", validationStatusCode, false));
+				criteria.add(buildEqualsListCriterion(revAlias + ".validationStatusCode", validationStatusCode));
 			if (descKeywords != null && descKeywords.length > 0) {
 				criteria.createAlias(revAlias + ".descriptions", descsAlias,
 						org.hibernate.sql.JoinType.LEFT_OUTER_JOIN);
@@ -366,14 +366,14 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 			keywordDisjunction.add(buildLikeListCriterion(revAlias + ".authors", keywords, false));
 			keywordDisjunction.add(buildLikeListCriterion(revAlias + ".publisher", keywords, false));
 			// Also match on IDs, but exact only
-			keywordDisjunction.add(buildEqualsListCriterion("solutionId", keywords, false));
-			keywordDisjunction.add(buildEqualsListCriterion(revAlias + ".revisionId", keywords, false));
+			keywordDisjunction.add(buildEqualsListCriterion("solutionId", keywords));
+			keywordDisjunction.add(buildEqualsListCriterion(revAlias + ".revisionId", keywords));
 			criteria.add(keywordDisjunction);
 		}
 		if (modelTypeCode != null && modelTypeCode.length > 0)
-			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode, false));
+			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode));
 		if (accessTypeCode != null && accessTypeCode.length > 0)
-			criteria.add(buildEqualsListCriterion(revAlias + ".accessTypeCode", accessTypeCode, false));
+			criteria.add(buildEqualsListCriterion(revAlias + ".accessTypeCode", accessTypeCode));
 		if (userIds != null && userIds.length > 0) {
 			criteria.createAlias("owner", ownerAlias);
 			criteria.add(Restrictions.in(ownerAlias + ".userId", userIds));

@@ -715,7 +715,7 @@ public class CdsControllerTest {
 			logger.info("Got solutions accessible by user {}", cu.getUserId());
 
 			MLPSolutionRevision cr = new MLPSolutionRevision(cs.getSolutionId(), "1.0R", cu.getUserId(), //
-					AccessTypeCode.PR.name(), "NV");
+					AccessTypeCode.PB.name(), "NV");
 			cr.setAuthors(new AuthorTransport[] { new AuthorTransport("my name", "http://github") });
 			cr.setPublisher("publisher 1");
 			cr = client.createSolutionRevision(cr);
@@ -725,7 +725,7 @@ public class CdsControllerTest {
 			client.updateSolutionRevision(cr);
 
 			MLPSolutionRevision crOrg = new MLPSolutionRevision(csOrg.getSolutionId(), "1.0R", cu.getUserId(), //
-					AccessTypeCode.PR.name(), "NV");
+					AccessTypeCode.OR.name(), "NV");
 			crOrg.setAuthors(new AuthorTransport[] { new AuthorTransport("your name", "email") });
 			crOrg.setPublisher("publisher 2");
 			crOrg = client.createSolutionRevision(crOrg);
@@ -815,6 +815,14 @@ public class CdsControllerTest {
 					null, null, bogusTags, null, null, new RestPageRequest(0, 5));
 			Assert.assertTrue(portalTagNoMatches != null && portalTagNoMatches.getNumberOfElements() == 0);
 
+			// Check fetch by ID to ensure both are found
+			logger.info("Querying for solutions by id");
+			String[] ids = { cs.getSolutionId(), csOrg.getSolutionId() };
+			RestPageResponse<MLPSolution> idSearchResult = client.findPortalSolutionsByKw(ids, true, null, null, null,
+					null, new RestPageRequest(0, 2));
+			Assert.assertTrue(idSearchResult != null && idSearchResult.getNumberOfElements() == 2);
+			logger.info("Found models by id total " + idSearchResult.getTotalElements());
+
 			// Both keywords must occur in the same field for a match
 			logger.info("Querying for solutions by keyword");
 			String[] kw = { "solution", "organization" };
@@ -828,24 +836,23 @@ public class CdsControllerTest {
 					inactiveUser.getUserId(), null, null, null, null, new RestPageRequest(0, 5));
 			Assert.assertTrue(userSols != null && userSols.getNumberOfElements() > 0);
 
+			// find active solutions
 			String[] nameKw = null;
 			String[] descKw = null;
 			String[] owners = { cu.getUserId() };
-			String[] accessTypeCodes = { AccessTypeCode.PR.name() };
+			String[] accessTypeCodes = { AccessTypeCode.OR.name(), AccessTypeCode.PB.toString() };
 			String[] valStatusCodes = { ValidationStatusCode.NV.name() };
 			String[] modelTypeCodes = null;
 			String[] authKw = { "github" };
 			String[] pubKw = { "publisher" };
 			searchTags = null;
-
-			// find active solutions
 			RestPageResponse<MLPSolution> portalActiveMatches = client.findPortalSolutions(nameKw, descKw, true, owners,
 					accessTypeCodes, modelTypeCodes, valStatusCodes, searchTags, authKw, pubKw,
 					new RestPageRequest(0, 5));
 			Assert.assertTrue(portalActiveMatches != null && portalActiveMatches.getNumberOfElements() > 0);
 
 			// Requires revisions and artifacts!
-			String[] searchAccessTypeCodes = new String[] { AccessTypeCode.PR.name() };
+			String[] searchAccessTypeCodes = new String[] { AccessTypeCode.OR.name() };
 			String[] searchValidationStatusCodes = new String[] { ValidationStatusCode.NV.name() };
 			Date anHourAgo = new java.util.Date();
 			anHourAgo.setTime(new Date().getTime() - 1000L * 60 * 60);
