@@ -23,10 +23,11 @@ Common Data Service Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
-Version 1.18.1, 10 Sep 2018
+Version 1.18.1, 11 Sep 2018
 ---------------------------
 
 * New client method to find restricted solutions (ACUMOS-1611)
+* Add role "Publisher" to base 1.18 DML/DDL script (ACUMOS-1642)
 * Defend against null arguments (ACUMOS-1696)
 * Add default value in database scripts for timestamp-type columns (ACUMOS-1703)
 * Fix bug in method that builds criteria for querying on value list (ACUMOS-1707)

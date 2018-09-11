@@ -524,8 +524,17 @@ CREATE TABLE C_HISTORY (
 
 -- DML --
 
-# Base role
-INSERT INTO C_ROLE (ROLE_ID, NAME, ACTIVE_YN) VALUES ('12345678-abcd-90ab-cdef-1234567890ab', 'MLP System User', 'Y');
+# Base roles; names are case sensitive
+INSERT INTO C_ROLE (ROLE_ID, NAME, ACTIVE_YN, CREATED_DATE) VALUES ('12345678-abcd-90ab-cdef-1234567890ab', 'MLP System User', 'Y', CURRENT_TIMESTAMP());
+INSERT INTO C_ROLE (ROLE_ID, NAME, ACTIVE_YN, CREATED_DATE) VALUES ('8c850f07-4352-4afd-98b1-00cbceca569f', 'Admin', 'Y', CURRENT_TIMESTAMP());
+INSERT INTO C_ROLE (ROLE_ID, NAME, ACTIVE_YN, CREATED_DATE) VALUES ('9d961018-5464-5b0e-a9c2-11dcdfdb67a0', 'Publisher', 'Y', CURRENT_TIMESTAMP());
+
+-- Base admin user
+INSERT INTO C_USER (USER_ID, LOGIN_NAME, LOGIN_HASH, FIRST_NAME, LAST_NAME, EMAIL, CREATED_DATE) VALUES ('12345678-abcd-90ab-cdef-1234567890ab', 'admin', '$2a$10$nogCM69/Vc0rEsZbHXlEm.nxSdGuD88Kd6NlW6fnKJz3AIz0PdOwa', 'Acumos', 'Admin', 'noreply@acumos.org', CURRENT_TIMESTAMP());
+
+-- Grant all roles to admin user
+INSERT INTO C_USER_ROLE_MAP (USER_ID, ROLE_ID) VALUES ('12345678-abcd-90ab-cdef-1234567890ab', '8c850f07-4352-4afd-98b1-00cbceca569f');
+INSERT INTO C_USER_ROLE_MAP (USER_ID, ROLE_ID) VALUES ('12345678-abcd-90ab-cdef-1234567890ab', '9d961018-5464-5b0e-a9c2-11dcdfdb67a0');
 
 # Default configuration of Portal/Marketplace features.
 # Unfortunately JSON does not allow embedded newlines.
@@ -533,11 +542,3 @@ INSERT INTO C_SITE_CONFIG (CONFIG_KEY, CONFIG_VAL) VALUES (
   'site_config',
   '{"fields":[{"type":"text","name":"siteInstanceName","label":"Site Instance Name","required":"true","data":"Acumos"}, {"type":"file","name":"headerLogo","label":"Header Logo","data":{"lastModified":1510831880727,"lastModifiedDate":"2017-11-16T11:31:20.727Z","name":"acumos_logo_white.png","size":3657,"type":"image/png"}},{"type":"file","name":"footerLogo","label":"Footer Logo","data":{"lastModified":1510831874776,"lastModifiedDate":"2017-11-16T11:31:14.776Z","name":"footer_logo.png","size":3127,"type":"image/png"}},{"type":"heading","name":"ConnectionConfig","label":"Connection Configuration","required":"true","subFields":[{"type":"text","name":"socketTimeout","label":"Socket Timeout","required":"true","data":"300"},{"type":"text","name":"connectionTimeout","label":"Connection Timeout","required":"true","data":"10"}]},{"type":"select","name":"enableOnBoarding","label":"Enable On-Boarding","options":[{"name":"Enabled"},{"name":"Disabled"}],"required":true,"data":{"name":"Enabled"}},{"type":"textarea","name":"validationText","label":"Model Validation Keyword Scan Entries (CSV)","required":"false","data":"test"},{"type":"select","name":"EnableDCAE","label":"Enable DCAE","options":[{"name":"Enabled"},{"name":"Disabled"}],"required":true,"data":{"name":"Enabled"}}]}'
 );
-
--- Initial user, role setups for admin
-INSERT INTO C_USER (USER_ID, LOGIN_NAME, LOGIN_HASH, FIRST_NAME, LAST_NAME, EMAIL) VALUES ('12345678-abcd-90ab-cdef-1234567890ab', 'admin', '$2a$10$nogCM69/Vc0rEsZbHXlEm.nxSdGuD88Kd6NlW6fnKJz3AIz0PdOwa', 'Acumos', 'Admin', 'noreply@acumos.org');
-
--- Role name is case sensitive
-INSERT INTO C_ROLE (ROLE_ID, NAME, ACTIVE_YN) VALUES ('8c850f07-4352-4afd-98b1-00cbceca569f', 'Admin', 'Y');
-
-INSERT INTO C_USER_ROLE_MAP (USER_ID, ROLE_ID) VALUES ('12345678-abcd-90ab-cdef-1234567890ab', '8c850f07-4352-4afd-98b1-00cbceca569f');
