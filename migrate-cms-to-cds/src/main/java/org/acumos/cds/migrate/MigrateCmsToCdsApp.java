@@ -60,6 +60,8 @@ public class MigrateCmsToCdsApp {
 
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+	// I think this will grow
+	private static final String specialCharRegex = "[!@#$%^&*()<>{}|:?+=.\\s]+";
 	/**
 	 * Migrates data.
 	 * 
@@ -175,8 +177,8 @@ public class MigrateCmsToCdsApp {
 									cdsClient.createRevisionDescription(cdsRevDesc);
 									++migrDescSucc;
 								} catch (HttpStatusCodeException ex2) {
-									logger.error("Failed to create revision description: {}",
-											ex2.getResponseBodyAsString());
+									// Should never happen
+									logger.error("Failed to create revision description at CDS", ex2);
 									++migrDescFail;
 								}
 							}
@@ -190,54 +192,61 @@ public class MigrateCmsToCdsApp {
 						} else {
 							List<MLPDocument> cdsRevDocs = cdsClient.getSolutionRevisionDocuments(r.getRevisionId(),
 									ws.getCdsKey());
-							for (String docName : cmsRevDocs.getResponse_body()) {
-								if (findDocNameInCdsList(docName, cdsRevDocs)) {
-									// CDS has already
-									logger.info("Revision {} access {} document {} already migrated",
-											r.getAccessTypeCode(), ws.getCmsKey(), docName);
+							for (String cmsDocName : cmsRevDocs.getResponse_body()) {
+								final String[] cmsDocParts = splitFileBaseExt(cmsDocName);
+								// Give up if no suffix; don't want to guess
+								if (cmsDocParts.length != 2) {
+									logger.error(
+											"No suffix available for packaging; skipping revision {} access {} document {}",
+											r.getRevisionId(), ws.getCmsKey(), cmsDocName);
+									++migrDocFail;
 								} else {
-									final String[] docNames = splitFileBaseExt(docName);
-									if (docNames.length != 2) {
-										logger.error(
-												"No suffix available for packaging; skipping revision {} access {} document {}",
-												r.getRevisionId(), ws.getCmsKey(), docName);
-										++migrDocFail;
+									// Produce a clean basename for Nexus by replacing special characters
+									final String nexusDocBase = cmsDocParts[0].replaceAll(specialCharRegex, "-");	
+									final String nexusDocSuffix = cmsDocParts[1];
+									final String nexusDocName = nexusDocBase + "." + nexusDocSuffix;
+									if (findDocNameInCdsList(nexusDocName, cdsRevDocs)) {
+										// CDS has already
+										logger.info("Revision {} access {} document {} already migrated",
+												r.getAccessTypeCode(), ws.getCmsKey(), nexusDocName);
 									} else {
-										// clean the base name by rewriting any dots to dashes.
-										docNames[0].replace('.', '-');
 										final String groupId = createNexusGroupId(nexusPrefix, s.getSolutionId(),
 												r.getRevisionId());
 										byte[] cmsDoc = null;
 										try {
 											cmsDoc = cmsClient.getRevisionDocument(s.getSolutionId(), r.getRevisionId(),
-													ws.getCmsKey(), docName);
+													ws.getCmsKey(), cmsDocName);
 										} catch (Exception ex) {
-											logger.error("Failed to get revision {} document {} content: {}",
-													r.getRevisionId(), docName, ex.toString());
+											logger.error("Failed to get CMS revision {} document {}; exception follows",
+													r.getRevisionId(), cmsDocName);
+											logger.error("Exception in fetch", ex);
 											++migrDocFail;
 										}
 										if (cmsDoc != null) {
 											InputStream inputStream = new ByteArrayInputStream(cmsDoc);
 											UploadArtifactInfo uploadInfo = null;
-											logger.info("Uploading revision {} access {} document {} to Nexus group {}",
-													r.getRevisionId(), ws.getCmsKey(), docName, groupId);
+											logger.info(
+													"Uploading revision {} access {} document {}.{} to Nexus group {}",
+													r.getRevisionId(), ws.getCmsKey(), nexusDocBase, nexusDocSuffix,
+													groupId);
 											try {
-												uploadInfo = nexusClient.uploadArtifact(groupId, docNames[0],
-														ws.getCdsKey(), docNames[1], cmsDoc.length, inputStream);
+												uploadInfo = nexusClient.uploadArtifact(groupId, nexusDocBase,
+														ws.getCdsKey(), nexusDocSuffix, cmsDoc.length, inputStream);
 											} catch (Exception ex) {
 												logger.error(
-														"Failed to upload revision {} document {} as nexus artifact: {}",
-														r.getRevisionId(), docName, ex.toString());
+														"Failed to upload revision {} doc base {} doc suffix as nexus artifact; exception follows",
+														r.getRevisionId(), nexusDocBase,  nexusDocSuffix);
+												logger.error("Exception in upload", ex);
 												++migrDocFail;
 											}
 											if (uploadInfo != null) {
 												MLPDocument cdsDoc = new MLPDocument();
-												cdsDoc.setName(docName);
+												cdsDoc.setName(nexusDocName);
 												cdsDoc.setUri(uploadInfo.getArtifactMvnPath());
 												cdsDoc.setSize(cmsDoc.length);
 												cdsDoc.setUserId(r.getUserId());
 												logger.info("Creating revision {} access {} document {} metadata",
-														r.getRevisionId(), ws.getCmsKey(), docName);
+														r.getRevisionId(), ws.getCmsKey(), nexusDocName);
 												try {
 													cdsDoc = cdsClient.createDocument(cdsDoc);
 													cdsClient.addSolutionRevisionDocument(r.getRevisionId(),
@@ -245,8 +254,9 @@ public class MigrateCmsToCdsApp {
 													++migrDocSucc;
 												} catch (HttpStatusCodeException ex) {
 													logger.error(
-															"Failed to create revision {} document {} metadata: {}",
-															r.getRevisionId(), docName, ex.getResponseBodyAsString());
+															"Failed to create revision {} document {}; server response {}",
+															r.getRevisionId(), nexusDocName,
+															ex.getResponseBodyAsString());
 													++migrDocFail;
 												}
 											}

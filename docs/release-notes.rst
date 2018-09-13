@@ -31,6 +31,7 @@ Version 1.18.1, 11 Sep 2018
 * Defend against null arguments (ACUMOS-1696)
 * Add default value in database scripts for timestamp-type columns (ACUMOS-1703)
 * Fix bug in method that builds criteria for querying on value list (ACUMOS-1707)
+* Extend migration tool for special characters in file names (ACUMOS-1733)
 * Refactor artifact-search controller annotations for Swagger web UI
 * Add example federation selector to Swagger annotation
 * Move some methods from user to notification controller

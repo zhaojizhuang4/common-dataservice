@@ -36,12 +36,14 @@ This utility migrates the following data items:
   at the PUBLIC access level. In other words, every revision can have an arbitrary number
   of supporting documents, divided into two sets.
 
+
 Prerequisites
 -------------
 
 This migration tool requires Acumos Common Data Service at version 1.17.0 or later,
 credentials to read from the CMS instance, credentials to write to the CDS instance, 
 and also credentials to write to the Nexus instance (3 sets of username/password pairs).
+
 
 Configuration
 -------------
@@ -77,9 +79,9 @@ Clone the Git repository and build the tool as follows::
 Usage
 -----
 
-Run the migration tool like this::
+Run the migration tool as below, after replacing "x" with the current version number::
 
-    java target/migrate-cms-to-cds-1.0.0-SNAPSHOT-spring-boot.jar
+    java -jar target/migrate-cms-to-cds-1.0.x-SNAPSHOT-spring-boot.jar
 
 The tool expects to find file "migrate.properties" in the current directory.
 It will write a log file to the current directory.
@@ -87,22 +89,22 @@ It will write a log file to the current directory.
 The migration tool discovers the list of solutions by querying CDS, checks the content
 of each solution by querying CMS, and migrates content to CDS and Nexus as needed.
 
-In case of error, the tool can be run repeatedly on the same source and targets.
+In case of error, the tool can be run repeatedly on the same source and target.
 It will not re-migrate data to CDS nor Nexus for any item.
 
 When the tool is finished it reports statistics in this format::
 
-    14:37:06.784 [main] INFO  o.a.cds.migrate.MigrateCmsToCdsApp - Migration statistics:
-    14:37:06.784 [main] INFO  o.a.cds.migrate.MigrateCmsToCdsApp - Solutions checked: 1392
-    14:37:06.785 [main] INFO  o.a.cds.migrate.MigrateCmsToCdsApp - Revisions checked: 2379
-    14:37:06.785 [main] INFO  o.a.cds.migrate.MigrateCmsToCdsApp - Pictures migrated: 2 success, 0 fail
-    14:37:06.785 [main] INFO  o.a.cds.migrate.MigrateCmsToCdsApp - Descriptions migrated: 0 success, 0 fail
-    14:37:06.785 [main] INFO  o.a.cds.migrate.MigrateCmsToCdsApp - Documents migrated: 0 success, 4 fail
+    2018-09-13T11:03:00.986Z [main] INFO  o.a.cds.migrate.MigrateCmsToCdsApp - Migration statistics:
+    2018-09-13T11:03:00.986Z [main] INFO  o.a.cds.migrate.MigrateCmsToCdsApp - Solutions checked: 1485
+    2018-09-13T11:03:00.986Z [main] INFO  o.a.cds.migrate.MigrateCmsToCdsApp - Revisions checked: 2578
+    2018-09-13T11:03:00.986Z [main] INFO  o.a.cds.migrate.MigrateCmsToCdsApp - Pictures migrated: 2 success, 0 fail
+    2018-09-13T11:03:00.986Z [main] INFO  o.a.cds.migrate.MigrateCmsToCdsApp - Descriptions migrated: 0 success, 0 fail
+    2018-09-13T11:03:00.986Z [main] INFO  o.a.cds.migrate.MigrateCmsToCdsApp - Documents migrated: 0 success, 4 fail
 
 
 Troubleshooting
 ---------------
 
-The migration tool expects every document to have a file suffix that indicates the type of document;
-e.g., ".doc" or ".xlsx".  A document without any suffix cannot be migrated.  Revise the revision to
-fix this problem, then re-run the migration.
+The migration tool requires every document to have a file suffix that indicates the type of document;
+e.g., ".doc" or ".xlsx".  A document without any suffix cannot be migrated.  Add a suffix to the document
+name to fix this problem, then re-run the migration process.
