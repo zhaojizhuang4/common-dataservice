@@ -20,23 +20,38 @@
 Common Data Service Overview
 ============================
 
-The Acumos Common Data Service provides a storage and query layer between Acumos system components and a relational database.
-The server component is a Spring-Boot application that provides REST service to callers.
+The Acumos Common Data Service provides a storage and query layer between Acumos system
+components and a relational database.
+The server component is a Java Spring-Boot application that provides REST service to callers
+and uses Hibernate to manage the persistent store.
 The client component is a Java library that provides business objects (models) and
 methods to simplify the use of the REST service.
 
+Architecture
+------------
+
+The following picture shows how the service components are used by other Acumos components.
+The client uses HTTP/REST to communicate with the server.  The server uses JDBC to communicate
+with the database.
+
+.. image:: cmn-data-svc-arch.png
+    :align: center
+    :alt: Common Data Service Architecture
+
+Developer Resources
+-------------------
 The source is available from the Linux Foundation Gerrit server:
+ 
+    `<https://gerrit.acumos.org/r/gitweb?p=common-dataservice.git;a=summary>`_
 
-    https://gerrit.acumos.org/r/gitweb?p=common-dataservice.git;a=summary
+The build (CI) jobs are in the Linux Foundation Jenkins server:
 
-The CI/CD jobs are in the Linux Foundation Jenkins server:
-
-    https://jenkins.acumos.org/view/common-dataservice/
+    `<https://jenkins.acumos.org/view/common-dataservice/>`_
 
 Issues are tracked in the Linux Foundation Jira server:
 
-    https://jira.acumos.org/secure/Dashboard.jspa
+    `<https://jira.acumos.org/secure/Dashboard.jspa>`_
 
-Further information is available from the Linux Foundation Wiki:
+Project information is available in the Linux Foundation Wiki:
 
-    https://wiki.acumos.org/
+    `<https://wiki.acumos.org/>`_

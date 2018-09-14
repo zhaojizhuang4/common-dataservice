@@ -21,8 +21,8 @@ CMS User Data Migration Tool
 ============================
 
 This document explains a utility that migrates user-supplied data from the
-Hippo-CMS system to the Common Data Service and the Nexus repository.
-This utility migrates the following data items:
+Hippo-CMS system to the Common Data Service (version 1.17 or later) and a Nexus
+repository.  This utility migrates the following data items:
 
 # Solution picture: a user can add a picture to a solution.
 
@@ -51,19 +51,19 @@ Configuration
 After obtaining valid URLs and appropriate user names and passwords for all three systems,
 enter them in a file named "migrate.properties" using the following structure::
 
-	cds.url = http://cdshost.myproject.org:8001/ccds
-	cds.user =
-	cds.pass =
-	
-	cms.url = http://cmshost.myproject.org:8085/site
-	cms.user =
-	cms.pass =
-	
-	nexus.url = http://nexushost.myproject.org:8081/repository/repo_name
-	nexus.user =
-	nexus.pass =
-	# this is the group prefix; a UUID compnent will be added
-	nexus.prefix = org.acumos
+    cds.url = http://cdshost.myproject.org:8001/ccds
+    cds.user =
+    cds.pass =
+
+    cms.url = http://cmshost.myproject.org:8085/site
+    cms.user =
+    cms.pass =
+
+    nexus.url = http://nexushost.myproject.org:8081/repository/repo_name
+    nexus.user =
+    nexus.pass =
+    # this is the group prefix; a UUID compnent will be added
+    nexus.prefix = org.acumos
 
 
 Build Instructions

@@ -26,12 +26,12 @@ Maven Nexus repository. The server is deployed as a Docker image to a Docker reg
 Version 1.18.1, 11 Sep 2018
 ---------------------------
 
-* New client method to find restricted solutions (ACUMOS-1611)
-* Add role "Publisher" to base 1.18 DML/DDL script (ACUMOS-1642)
-* Defend against null arguments (ACUMOS-1696)
-* Add default value in database scripts for timestamp-type columns (ACUMOS-1703)
-* Fix bug in method that builds criteria for querying on value list (ACUMOS-1707)
-* Extend migration tool for special characters in file names (ACUMOS-1733)
+* New client method to find restricted solutions (`ACUMOS-1611 <https://jira.acumos.org/browse/ACUMOS-1611>`_)
+* Add role "Publisher" to base 1.18 DML/DDL script (`ACUMOS-1642 <https://jira.acumos.org/browse/ACUMOS-1642>`_)
+* Defend against null arguments (`ACUMOS-1696 <https://jira.acumos.org/browse/ACUMOS-1696>`_)
+* Add default value in database scripts for timestamp-type columns (`ACUMOS-1703 <https://jira.acumos.org/browse/ACUMOS-1703>`_)
+* Fix bug in method that builds criteria for querying on value list (`ACUMOS-1707 <https://jira.acumos.org/browse/ACUMOS-1707>`_)
+* Extend migration tool for special characters in file names (`ACUMOS-1733 <https://jira.acumos.org/browse/ACUMOS-1733>`_)
 * Refactor artifact-search controller annotations for Swagger web UI
 * Add example federation selector to Swagger annotation
 * Move some methods from user to notification controller
@@ -42,73 +42,73 @@ Version 1.18.1, 11 Sep 2018
 Version 1.18.0, 31 Aug 2018
 ---------------------------
 
-* Add publish request entity with supporting methods (ACUMOS-1642)
-* Add tags to User entity (ACUMOS-1643)
+* Add publish request entity with supporting methods (`ACUMOS-1642 <https://jira.acumos.org/browse/ACUMOS-1642>`_)
+* Add tags to User entity (`ACUMOS-1643 <https://jira.acumos.org/browse/ACUMOS-1643>`_)
 * Refactor find-solution methods to enable Swagger UI
 * Requires database schema version 1.18
 
 Version 1.17.3, 31 Aug 2018
 ---------------------------
 
-* Added new API endpoint to get Dataset info, right now it is just prototype (ACUMOS-1182)
+* Added new API endpoint to get Dataset info, right now it is just prototype (`ACUMOS-1182 <https://jira.acumos.org/browse/ACUMOS-1182>`_)
 
 Version 1.17.2, 28 Aug 2018
 ---------------------------
 
-* Revise logging for ONAP recommended output pattern (ACUMOS-625)
-* Include solution and revision ID fields in search (ACUMOS-1576)
-* Revise message sent when user is locked out temporarily (ACUMOS-1597)
-* Filter search results using all tags not any tag (ACUMOS-1601)
-* Document Pageable request parameters in Swagger (ACUMOS-1608)
-* Enhance search for revision description (ACUMOS-1614)
-* Add API to count top-level comments on a revision (ACUMOS-1644)
+* Revise logging for ONAP recommended output pattern (`ACUMOS-625 <https://jira.acumos.org/browse/ACUMOS-625>`_)
+* Include solution and revision ID fields in search (`ACUMOS-1576 <https://jira.acumos.org/browse/ACUMOS-1576>`_)
+* Revise message sent when user is locked out temporarily (`ACUMOS-1597 <https://jira.acumos.org/browse/ACUMOS-1597>`_)
+* Filter search results using all tags not any tag (`ACUMOS-1601 <https://jira.acumos.org/browse/ACUMOS-1601>`_)
+* Document Pageable request parameters in Swagger (`ACUMOS-1608 <https://jira.acumos.org/browse/ACUMOS-1608>`_)
+* Enhance search for revision description (`ACUMOS-1614 <https://jira.acumos.org/browse/ACUMOS-1614>`_)
+* Add API to count top-level comments on a revision (`ACUMOS-1644 <https://jira.acumos.org/browse/ACUMOS-1644>`_)
 * Requires database schema version 1.17
 
 Version 1.17.1, 10 Aug 2018
 ---------------------------
 
-* Create tags automatically when creating or updating a solution (ACUMOS-1546)
-* Change data type of picture fields from Byte[] to byte [] (ACUMOS-1557)
+* Create tags automatically when creating or updating a solution (`ACUMOS-1546 <https://jira.acumos.org/browse/ACUMOS-1546>`_)
+* Change data type of picture fields from Byte[] to byte [] (`ACUMOS-1557 <https://jira.acumos.org/browse/ACUMOS-1557>`_)
 * Requires database schema version 1.17
 
 Version 1.17.0, 9 Aug 2018
 --------------------------
 
-* Store metadata for user documents in Nexus (ACUMOS-1235)
-* Load capitalized role name "Admin" not "admin" (ACUMOS-1526)
+* Store metadata for user documents in Nexus (`ACUMOS-1235 <https://jira.acumos.org/browse/ACUMOS-1235>`_)
+* Load capitalized role name "Admin" not "admin" (`ACUMOS-1526 <https://jira.acumos.org/browse/ACUMOS-1526>`_)
 * Requires database schema version 1.17
 
 Version 1.16.1, 2 Aug 2018
 --------------------------
 
-* Store API token encrypted, not hashed (ACUMOS-1487)
+* Store API token encrypted, not hashed (`ACUMOS-1487 <https://jira.acumos.org/browse/ACUMOS-1487>`_)
 * Requires database schema version 1.16
 
 Version 1.16.0, 24 July 2018
 ----------------------------
 
-* Add column for solution picture; add table for revision description (ACUMOS-1235)
-* Rename ownerId to userId in solution, revision, artifact, peer subscription (ACUMOS-1359)
-* Add authors; move provider in solution to publisher in revision (ACUMOS-1359)
-* Extend findPortalSolutions to search authors and publisher (ACUMOS-1359)
-* Add verification token and expiration date (ACUMOS-1386)
-* Add API token attribute to user entity, add loginApi method (ACUMOS-1424)
-* Add attributes to track failed login attempts (ACUMOS-1442)
-* Enable the admin role in newly created database (ACUMOS-1446)
+* Add column for solution picture; add table for revision description (`ACUMOS-1235 <https://jira.acumos.org/browse/ACUMOS-1235>`_)
+* Rename ownerId to userId in solution, revision, artifact, peer subscription (`ACUMOS-1359 <https://jira.acumos.org/browse/ACUMOS-1359>`_)
+* Add authors; move provider in solution to publisher in revision (`ACUMOS-1359 <https://jira.acumos.org/browse/ACUMOS-1359>`_)
+* Extend findPortalSolutions to search authors and publisher (`ACUMOS-1359 <https://jira.acumos.org/browse/ACUMOS-1359>`_)
+* Add verification token and expiration date (`ACUMOS-1386 <https://jira.acumos.org/browse/ACUMOS-1386>`_)
+* Add API token attribute to user entity, add loginApi method (`ACUMOS-1424 <https://jira.acumos.org/browse/ACUMOS-1424>`_)
+* Add attributes to track failed login attempts (`ACUMOS-1442 <https://jira.acumos.org/browse/ACUMOS-1442>`_)
+* Enable the admin role in newly created database (`ACUMOS-1446 <https://jira.acumos.org/browse/ACUMOS-1446>`_)
 * Add support for proxy when getting a CDS client instance
 * Requires database schema version 1.16
 
 Version 1.15.4, 6 July 2018
 ---------------------------
 
-* Add method to get solution revision comment count (ACUMOS-1270)
-* Show exception details in log files (ACUMOS-1328)
+* Add method to get solution revision comment count (`ACUMOS-1270 <https://jira.acumos.org/browse/ACUMOS-1270>`_)
+* Show exception details in log files (`ACUMOS-1328 <https://jira.acumos.org/browse/ACUMOS-1328>`_)
 * Requires database schema version 1.15
 
 Version 1.15.3, 27 June 2018
 ----------------------------
 
-* Add search method to find user's co-owned solutions (ACUMOS-1257)
+* Add search method to find user's co-owned solutions (`ACUMOS-1257 <https://jira.acumos.org/browse/ACUMOS-1257>`_)
 * Add methods to manage composite solution parent-child membership
 * Update Spring library versions to address vulnerabilities flagged by CLM 
 * Requires database schema version 1.15
@@ -116,78 +116,78 @@ Version 1.15.3, 27 June 2018
 Version 1.15.2, 6 June 2018
 ---------------------------
 
-* Add toolkit type codes CO, SP (ACUMOS-1013)
-* Repair findPortalSolutions API behavior on untagged solutions (ACUMOS-1045)
+* Add toolkit type codes CO, SP (`ACUMOS-1013 <https://jira.acumos.org/browse/ACUMOS-1013>`_)
+* Repair findPortalSolutions API behavior on untagged solutions (`ACUMOS-1045 <https://jira.acumos.org/browse/ACUMOS-1045>`_)
 * Requires database schema version 1.15
 
 Version 1.15.1, 18 May 2018
 ---------------------------
 
-* Call audit logger in controller methods (ACUMOS-625)
-* Add artifact type code LG - Log File (ACUMOS-765)
-* Define C_USER table PICTURE column as type LONGBLOB (ACUMOS-888)
+* Call audit logger in controller methods (`ACUMOS-625 <https://jira.acumos.org/browse/ACUMOS-625>`_)
+* Add artifact type code LG - Log File (`ACUMOS-765 <https://jira.acumos.org/browse/ACUMOS-765>`_)
+* Define C_USER table PICTURE column as type LONGBLOB (`ACUMOS-888 <https://jira.acumos.org/browse/ACUMOS-888>`_)
 * Requires database schema version 1.15
 
 Version 1.15.0, 6 April 2018
 ----------------------------
 
-* Move the acccess-type and validation-status attributes from Solution to Solution Revision entity (ACUMOS-196)
-* Revise field labels in site_config table entry (ACUMOS-346)
-* Add unique constraints for name columns; e.g., role name (ACUMOS-435)
-* Add fields to site_config table entry (ACUMOS-486)
-* Search solutions returns unexpectedly few results (ACUMOS-529)
-* User email attribute should not accept null (ACUMOS-603)
-* Write details about security-related events to the audit log (ACUMOS-618)
-* Check user (in)active status in login and change password methods (ACUMOS-639)
-* Define admin user with well-known username and password for all-in-one install (ACUMOS-388)
+* Move the acccess-type and validation-status attributes from Solution to Solution Revision entity (`ACUMOS-196 <https://jira.acumos.org/browse/ACUMOS-196>`_)
+* Revise field labels in site_config table entry (`ACUMOS-346 <https://jira.acumos.org/browse/ACUMOS-346>`_)
+* Add unique constraints for name columns; e.g., role name (`ACUMOS-435 <https://jira.acumos.org/browse/ACUMOS-435>`_)
+* Add fields to site_config table entry (`ACUMOS-486 <https://jira.acumos.org/browse/ACUMOS-486>`_)
+* Search solutions returns unexpectedly few results (`ACUMOS-529 <https://jira.acumos.org/browse/ACUMOS-529>`_)
+* User email attribute should not accept null (`ACUMOS-603 <https://jira.acumos.org/browse/ACUMOS-603>`_)
+* Write details about security-related events to the audit log (`ACUMOS-618 <https://jira.acumos.org/browse/ACUMOS-618>`_)
+* Check user (in)active status in login and change password methods (`ACUMOS-639 <https://jira.acumos.org/browse/ACUMOS-639>`_)
+* Define admin user with well-known username and password for all-in-one install (`ACUMOS-388 <https://jira.acumos.org/browse/ACUMOS-388>`_)
 * Requires database schema version 1.15
 
 Version 1.14.5, 6 June 2018
 ---------------------------
 
-* Add toolkit type codes CO, SP (ACUMOS-1013)
+* Add toolkit type codes CO, SP (`ACUMOS-1013 <https://jira.acumos.org/browse/ACUMOS-1013>`_)
 * Requires database schema version 1.14
 
 Version 1.14.4, 3 May 2018
 --------------------------
 
-* Add artifact type code LG - Log File (ACUMOS-765)
+* Add artifact type code LG - Log File (`ACUMOS-765 <https://jira.acumos.org/browse/ACUMOS-765>`_)
 * Requires database schema version 1.14
 
 Version 1.14.3, 26 March 2018
 -----------------------------
 
-* Search solutions returns unexpectedly few results (ACUMOS-529)
+* Search solutions returns unexpectedly few results (`ACUMOS-529 <https://jira.acumos.org/browse/ACUMOS-529>`_)
 * Requires database schema version 1.14
 
 Version 1.14.2, 15 March 2018
 -----------------------------
 
-* Refactor code-name value sets to use properties (ACUMOS-376)
-* Add Swagger annotations to required fields in domain models (ACUMOS-399)
+* Refactor code-name value sets to use properties (`ACUMOS-376 <https://jira.acumos.org/browse/ACUMOS-376>`_)
+* Add Swagger annotations to required fields in domain models (`ACUMOS-399 <https://jira.acumos.org/browse/ACUMOS-399>`_)
 * Requires database schema version 1.14
 
 Version 1.14.1, 9 March 2018
 ----------------------------
 
-* Define created-date columns as "DEFAULT 0" to stop Mariadb from setting to now() on update (ACUMOS-243)
-* Cascade solution delete to associated step results (ACUMOS-328)
-* Drop unneeded queries in server-side repository methods (ACUMOS-344)
-* Add copy constructors to all domain POJO classes (ACUMOS-345)
+* Define created-date columns as "DEFAULT 0" to stop Mariadb from setting to now() on update (`ACUMOS-243 <https://jira.acumos.org/browse/ACUMOS-243>`_)
+* Cascade solution delete to associated step results (`ACUMOS-328 <https://jira.acumos.org/browse/ACUMOS-328>`_)
+* Drop unneeded queries in server-side repository methods (`ACUMOS-344 <https://jira.acumos.org/browse/ACUMOS-344>`_)
+* Add copy constructors to all domain POJO classes (`ACUMOS-345 <https://jira.acumos.org/browse/ACUMOS-345>`_)
 * Requires database schema version 1.14
 
 Version 1.14.0, 1 March 2018
 ----------------------------
 
-* Add search-by-date method for federation subscription update (ACUMOS-61)
-* Add peer group, solution group and mapping features for federation access control (ACUMOS-62)
-* Refactor to drop code-name database tables (ACUMOS-144)
-* Add feature for user notification preference and user notification (ACUMOS-166)
-* Assert unique constraint on peer subjectName attribute (ACUMOS-214)
-* Revise peer status code/name value set (ACUMOS-215)
-* Add new toolkit type code for ONAP (ACUMOS-232)
-* Add license headers to sql files (ACUMOS-275)
-* Apply distinct transformer to avoid duplicate search results (ACUMOS-298)
+* Add search-by-date method for federation subscription update (`ACUMOS-61 <https://jira.acumos.org/browse/ACUMOS-61>`_)
+* Add peer group, solution group and mapping features for federation access control (`ACUMOS-62 <https://jira.acumos.org/browse/ACUMOS-62>`_)
+* Refactor to drop code-name database tables (`ACUMOS-144 <https://jira.acumos.org/browse/ACUMOS-144>`_)
+* Add feature for user notification preference and user notification (`ACUMOS-166 <https://jira.acumos.org/browse/ACUMOS-166>`_)
+* Assert unique constraint on peer subjectName attribute (`ACUMOS-214 <https://jira.acumos.org/browse/ACUMOS-214>`_)
+* Revise peer status code/name value set (`ACUMOS-215 <https://jira.acumos.org/browse/ACUMOS-215>`_)
+* Add new toolkit type code for ONAP (`ACUMOS-232 <https://jira.acumos.org/browse/ACUMOS-232>`_)
+* Add license headers to sql files (`ACUMOS-275 <https://jira.acumos.org/browse/ACUMOS-275>`_)
+* Apply distinct transformer to avoid duplicate search results (`ACUMOS-298 <https://jira.acumos.org/browse/ACUMOS-298>`_)
 * Report consistent error message when an item is not found
 * Requires database schema version 1.14
 
@@ -201,11 +201,12 @@ Version 1.13.1, 9 February 2018
 Version 1.13.0, 7 February 2018
 -------------------------------
 
-* Add workflow step feature for onboarding and validation result persistence (ACUMOS-56)
-* Add origin attribute to solution and revision entities (ACUMOS-59)
+* Add workflow step feature for onboarding and validation result persistence (`ACUMOS-56 <https://jira.acumos.org/browse/ACUMOS-56>`_)
+* Add origin attribute to solution and revision entities (`ACUMOS-59 <https://jira.acumos.org/browse/ACUMOS-59>`_)
 * Revise search methods to return a page of results
-* Revise peer and peer subscription attributes (ACUMOS-60, ACUMOS-167)
-* Add toolkit type PB - Probe (ACUMOS-168)
+* Revise peer and peer subscription attributes (`ACUMOS-60 <https://jira.acumos.org/browse/ACUMOS-60>`_, `ACUMOS-167 <https://jira.acumos.org/browse/ACUMOS-167>`_)
+* Add toolkit type PB - Probe (`ACUMOS-168
+  <https://jira.acumos.org/browse/ACUMOS-168>`_)
 * Requires database schema version 1.13
 
 Version 1.12.1, 26 January 2018

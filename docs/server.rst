@@ -27,9 +27,9 @@ Supported Methods and Objects
 -----------------------------
 
 The microservice endpoints and objects are documented using Swagger. A running server documents itself at a URL like the following, but
-consult the server's configuration for the exact port number (e.g., "8080") and context root (e.g., "ccds") to use::
+consult the server's configuration for the exact port number (e.g., "8000") and context root (e.g., "ccds") to use::
 
-    http://localhost:8080/ccds/swagger-ui.html
+    http://localhost:8000/ccds/swagger-ui.html
 
 
 Building and Packaging
@@ -234,7 +234,7 @@ Launch Instructions
 Once the configuration is provided either in an application.properties file or in an environment variable,
 start the application with the following command::
 
-    java -Xms128m -Xmx512m -Djava.security.egd=file:/dev/./urandom -jar common-dataservice-N.N.N.jar
+    java -Xms128m -Xmx1024m -Djava.security.egd=file:/dev/./urandom -jar common-dataservice-N.N.N.jar
 
 Quickstart Version Upgrade
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -244,25 +244,25 @@ This documents the steps required to upgrade an installation to a new(er) versio
 1. Create a new database. If needed, create a new user and grant access to the database for the new user.  Example commands to do this are in script "cmn-data-svc-basemysql.sql" and are something like this::
 
     % sudo mysql
-    > create database cds1140m;
+    > create database cds118;
     > create user 'CDS_USER'@'%' identified by 'CDS_PASS';
-    > grant all on cds1140m.* to 'CDS_USER'@'%';
+    > grant all on cds118.* to 'CDS_USER'@'%';
 
 2. Migrate the old database to the new database.  For example, if working on the Mysql/Mariadb database server the command is something like the following, depending on system configuration and user privileges::
 
-    sudo mysqldump cds1130m | sudo mysql cds1140m
+    sudo mysqldump cds117 | sudo mysql cds118
 
 3. Upgrade the new database to the latest structure by running the appropriate upgrade script.  For example, the command sequence may be something like this::
 
     % sudo mysql
-    > use cds1140m;
-    > source cds-mysql-upgrade-1-13-to-1-14.sql;
+    > use cds118;
+    > source cds-mysql-upgrade-1-17-to-1-18.sql;
 
 4. Configure the docker image for the new version.  Assuming that the docker compose is being used, revise the appropriate docker-compose file to have an entry for the new version, using an available network port.
 
 5. Use an appropriate docker-compose start script (varies by environment) to start the new image, for example::
 
-    docker-compose up -d common-dataservice-1140
+    docker-compose up -d common-dataservice-1181
 
 Troubleshooting
 ---------------

@@ -38,7 +38,7 @@ The client jar is deployed to these Nexus repositories at the Linux Foundation::
 		<url>https://nexus.acumos.org/content/repositories/releases</url> 
 	</repository>
 
-Use this dependency information; please note the version number shown below might not reflect the latest release::
+Use this dependency information, ideally with the latest version number shown in the release notes::
 
 	<dependency>
 		<groupId>org.acumos.common-dataservice</groupId>
@@ -55,7 +55,7 @@ using Gerrit and Jenkins.  This section describes how to perform local builds fo
 Prerequisites
 ~~~~~~~~~~~~~
 
-The build machine needs the following:
+The build and test machine needs the following:
 
 1. Java version 1.8
 2. Maven version 3
@@ -65,14 +65,7 @@ Use maven to build and package the client jar using this command::
 
     mvn package
 
-Test Prerequisites
-------------------
-
-The test machine needs the following:
-
-1. Java version 1.8
-2. A running Common Data Service server.
-3. A username/password combination to access the service.
+Unit tests are run with an in-memory Apache Derby database.
 
 Client Usage Example
 --------------------
