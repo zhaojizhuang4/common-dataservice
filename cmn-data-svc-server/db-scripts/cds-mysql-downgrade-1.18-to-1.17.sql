@@ -20,6 +20,10 @@
 -- FROM version 1.18.x TO version 1.17.x.
 -- No database is specified to allow flexible deployment!
 
+
+-- 6
+DELETE FROM C_USER_ROLE_MAP WHERE ROLE_ID = '9d961018-5464-5b0e-a9c2-11dcdfdb67a0';
+DELETE FROM C_ROLE WHERE ROLE_ID = '9d961018-5464-5b0e-a9c2-11dcdfdb67a0' and NAME = 'Publisher';
 -- 5
 ALTER TABLE C_SOLUTION_WEB CHANGE LAST_DOWNLOAD LAST_DOWNLOAD TIMESTAMP;
 -- 4 
