@@ -89,7 +89,8 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
-			<!-- Spring-boot sets the version -->
+			<!-- Override Spring-boot choice of 1.11.1 to avoid security vulnerability -->
+			<version>1.2.0</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
