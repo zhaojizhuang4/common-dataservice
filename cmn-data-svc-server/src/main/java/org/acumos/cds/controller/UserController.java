@@ -22,6 +22,7 @@ package org.acumos.cds.controller;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +74,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -371,30 +371,67 @@ public class UserController extends AbstractController {
 		return page;
 	}
 
-	@ApiOperation(value = "Searches for entities with attribute values matching the field name - field value pairs specified as query parameters. " //
-			+ "Defaults to and (conjunction); send junction query parameter '_j=o' for or (disjunction).", //
+	/*
+	 * This method was an early attempt to provide a search feature. Originally
+	 * written with a generic map request parameter to avoid binding field names,
+	 * but that is not supported by Swagger web UI. Now allows use from that web UI
+	 * at the cost of hard-coding many class field names.
+	 */
+	private static final String firstNameField = "firstName";
+	private static final String middleNameField = "middleName";
+	private static final String lastNameField = "lastName";
+	private static final String orgNameField = "orgName";
+	private static final String emailField = "email";
+	private static final String loginNameField = "loginName";
+	private static final String activeField = "active";
+
+	@ApiOperation(value = "Searches for users with attributes matching the values specified as query parameters. " //
+			+ "Defaults to match all (conjunction); send junction query parameter '_j=o' to match any (disjunction).", //
 			response = MLPUser.class, responseContainer = "Page")
 	@ApiPageable
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchUsers(
-			// This actually IS required; set flag to false for swagger UI
-			@ApiParam(value = "Field name - field value pairs as request parameters in the format name=value, minimum 1; repeats allowed. " //
-					+ "Not supported by Swagger web UI.", allowMultiple = true, type = "Array[string]", required = false) //
-			@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageable,
-			HttpServletResponse response) {
-		logger.info("searchUsers: query {}", queryParameters);
-		cleanPageableParameters(queryParameters);
-		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
-		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
+	public Object searchUsers(@ApiParam(value = "Junction", allowableValues = "a,o") //
+	@RequestParam(name = CCDSConstants.JUNCTION_QUERY_PARAM, required = false) String junction, //
+			@ApiParam(value = "First name") //
+			@RequestParam(name = firstNameField, required = false) String firstName, //
+			@ApiParam(value = "Middle name") //
+			@RequestParam(name = middleNameField, required = false) String middleName, //
+			@ApiParam(value = "Last name") //
+			@RequestParam(name = lastNameField, required = false) String lastName, //
+			@ApiParam(value = "Org name") //
+			@RequestParam(name = orgNameField, required = false) String orgName, //
+			@ApiParam(value = "Email") //
+			@RequestParam(name = emailField, required = false) String email, //
+			@ApiParam(value = "Login name") //
+			@RequestParam(name = loginNameField, required = false) String loginName, //
+			@ApiParam(value = "Active") //
+			@RequestParam(name = activeField, required = false) Boolean active, //
+			Pageable pageRequest, HttpServletResponse response) {
+		logger.info("searchUsers enter");
+		boolean isOr = junction != null && "o".equals(junction);
+		Map<String, Object> queryParameters = new HashMap<>();
+		if (firstName != null)
+			queryParameters.put(firstNameField, firstName);
+		if (middleName != null)
+			queryParameters.put(middleNameField, middleName);
+		if (lastName != null)
+			queryParameters.put(lastNameField, lastName);
+		if (orgName != null)
+			queryParameters.put(orgNameField, orgName);
+		if (email != null)
+			queryParameters.put(emailField, email);
+		if (loginName != null)
+			queryParameters.put(loginNameField, loginName);
+		if (active != null)
+			queryParameters.put(activeField, active);
 		if (queryParameters.size() == 0) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
 		}
 		try {
-			Map<String, Object> convertedQryParm = convertQueryParameters(MLPUser.class, queryParameters);
-			Page<MLPUser> userPage = userSearchService.findUsers(convertedQryParm, isOr, pageable);
+			Page<MLPUser> userPage = userSearchService.findUsers(queryParameters, isOr, pageRequest);
 			// Wipe hash values
 			Iterator<MLPUser> userIter = userPage.iterator();
 			while (userIter.hasNext()) {
@@ -406,9 +443,9 @@ public class UserController extends AbstractController {
 			}
 			return userPage;
 		} catch (Exception ex) {
-			logger.warn("searchUsers failed: {}", ex.toString());
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+			logger.error("searchUsers failed: {}", ex.toString());
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchUsers failed", ex);
 		}
 	}

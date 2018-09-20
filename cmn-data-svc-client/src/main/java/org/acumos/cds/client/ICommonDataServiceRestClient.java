@@ -376,12 +376,12 @@ public interface ICommonDataServiceRestClient {
 			String[] tags, RestPageRequest pageRequest);
 
 	/**
-	 * Searches the solutions for matches on attribute values.
+	 * Searches solutions for exact matches.
 	 * 
 	 * @param queryParameters
 	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Only fields defined on solution may be used. Accepts Boolean,
-	 *            Date, Integer, Long, String values; also Array of those types.
+	 *            Accepts these field names: name, active, userId, sourceId,
+	 *            modelTypeCode, toolkitTypeCode, origin.
 	 * @param isOr
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
@@ -633,12 +633,12 @@ public interface ICommonDataServiceRestClient {
 	RestPageResponse<MLPArtifact> findArtifactsBySearchTerm(String searchTerm, RestPageRequest pageRequest);
 
 	/**
-	 * Searches artifacts.
+	 * Searches artifacts for exact matches.
 	 * 
 	 * @param queryParameters
 	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Accepts Boolean, Date, Integer, Long, String values; also Array of
-	 *            those types.
+	 *            Accepts these field names: artifactTypeCode, name, uri, version,
+	 *            userId
 	 * @param isOr
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
@@ -722,8 +722,8 @@ public interface ICommonDataServiceRestClient {
 	 * 
 	 * @param queryParameters
 	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Accepts Boolean, Date, Integer, Long, String values; also Array of
-	 *            those types.
+	 *            Accepts these field names: firstName, middleName, lastName,
+	 *            orgName, email, loginName, active.
 	 * @param isOr
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
@@ -954,8 +954,7 @@ public interface ICommonDataServiceRestClient {
 	 * 
 	 * @param queryParameters
 	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Accepts Boolean, Date, Integer, Long, String values; also Array of
-	 *            those types.
+	 *            Accepts these field names: name, active.
 	 * @param isOr
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
@@ -1076,8 +1075,8 @@ public interface ICommonDataServiceRestClient {
 	 * 
 	 * @param queryParameters
 	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Accepts Boolean, Date, Integer, Long, String values; also Array of
-	 *            those types.
+	 *            Accepts these field names: name, subjectName, apiUrl, webUrl,
+	 *            isSelf, isLocal, contact1, statusCode.
 	 * @param isOr
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
@@ -1780,12 +1779,12 @@ public interface ICommonDataServiceRestClient {
 	RestPageResponse<MLPStepResult> getStepResults(RestPageRequest pageRequest);
 
 	/**
-	 * Searches step results.
+	 * Searches step results for exact matches.
 	 * 
 	 * @param queryParameters
 	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Accepts Boolean, Date, Integer, Long, String values; also Array of
-	 *            those types.
+	 *            Accepts these field names: trackingId, stepCode, solutionId,
+	 *            revisionId, artifactId, userId, statusCode, name.
 	 * @param isOr
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs
@@ -2266,12 +2265,12 @@ public interface ICommonDataServiceRestClient {
 	RestPageResponse<MLPPublishRequest> getPublishRequests(RestPageRequest pageRequest);
 
 	/**
-	 * Searches publish requests.
+	 * Searches publish requests for exact matches.
 	 * 
 	 * @param queryParameters
 	 *            Map of field-name, field-value pairs to use as query criteria.
-	 *            Accepts Boolean, Date, Integer, Long, String values; also Array of
-	 *            those types.
+	 *            Accepts these field names: solutionId, revisionId, requestUserId,
+	 *            reviewUserId, statusCode.
 	 * @param isOr
 	 *            If true, finds matches on any field-value pair (conditions are
 	 *            OR-ed together); otherwise finds matches on all field-value pairs

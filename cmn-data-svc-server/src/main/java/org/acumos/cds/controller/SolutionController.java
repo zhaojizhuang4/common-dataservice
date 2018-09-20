@@ -24,6 +24,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -212,34 +212,71 @@ public class SolutionController extends AbstractController {
 		return solutionRepository.findByTag(tag, pageRequest);
 	}
 
-	@ApiOperation(value = "Searches for entities with attribute values matching the field name - field value pairs specified as query parameters. " //
-			+ "Only checks solution attributes; does not search any child entities, tags, etc. " //
-			+ "Defaults to and (conjunction); send junction query parameter '_j=o' for or (disjunction).", //
+	/*
+	 * This method was an early attempt to provide a search feature. Originally
+	 * written with a generic map request parameter to avoid binding field names,
+	 * but that is not supported by Swagger web UI. Now allows use from that web UI
+	 * at the cost of hard-coding many class field names.
+	 */
+	private static final String nameField = "name";
+	private static final String activeField = "active";
+	private static final String userIdField = "userId";
+	private static final String sourceIdField = "sourceId";
+	private static final String modelTypeCodeField = "modelTypeCode";
+	private static final String toolkitTypeCodeField = "toolkitTypeCode";
+	private static final String originField = "origin";
+
+	@ApiOperation(value = "Searches for peers with attributes matching the values specified as query parameters. " //
+			+ "Defaults to match all (conjunction); send junction query parameter '_j=o' to match any (disjunction).", //
 			response = MLPSolution.class, responseContainer = "Page")
 	@ApiPageable
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchSolutions(
-			// This actually IS required; set flag to false for swagger UI
-			@ApiParam(value = "Field name - field value pairs as request parameters in the format name=value, minimum 1; repeats allowed. " //
-					+ "Not supported by Swagger web UI.", allowMultiple = true, type = "Array[string]", required = false) //
-			@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageRequest,
-			HttpServletResponse response) {
-		logger.info("searchSolutions: query {}", queryParameters);
-		cleanPageableParameters(queryParameters);
-		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
-		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
+	public Object searchSolutions( //
+			@ApiParam(value = "Junction", allowableValues = "a,o") //
+			@RequestParam(name = CCDSConstants.JUNCTION_QUERY_PARAM, required = false) String junction, //
+			@ApiParam(value = "Name") //
+			@RequestParam(name = nameField, required = false) String name, //
+			@ApiParam(value = "Active") //
+			@RequestParam(name = activeField, required = false) Boolean active, //
+			@ApiParam(value = "User ID") //
+			@RequestParam(name = userIdField, required = false) String userId, //
+			@ApiParam(value = "Source ID") //
+			@RequestParam(name = sourceIdField, required = false) String sourceId, //
+			@ApiParam(value = "Model type code") //
+			@RequestParam(name = modelTypeCodeField, required = false) String modelTypeCode, //
+			@ApiParam(value = "Toolkit type code") //
+			@RequestParam(name = toolkitTypeCodeField, required = false) String toolkitTypeCode, //
+			@ApiParam(value = "Origin URI") //
+			@RequestParam(name = originField, required = false) String origin, //
+			Pageable pageRequest, HttpServletResponse response) {
+		logger.info("searchSolutions enter");
+		boolean isOr = junction != null && "o".equals(junction);
+		Map<String, Object> queryParameters = new HashMap<>();
+		if (name != null)
+			queryParameters.put(nameField, name);
+		if (active != null)
+			queryParameters.put(activeField, active);
+		if (userId != null)
+			queryParameters.put(userIdField, userId);
+		if (sourceId != null)
+			queryParameters.put(sourceIdField, sourceId);
+		if (modelTypeCode != null)
+			queryParameters.put(modelTypeCodeField, modelTypeCode);
+		if (toolkitTypeCode != null)
+			queryParameters.put(toolkitTypeCodeField, toolkitTypeCode);
+		if (origin != null)
+			queryParameters.put(originField, origin);
 		if (queryParameters.size() == 0) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
 		}
 		try {
-			Map<String, Object> convertedQryParm = convertQueryParameters(MLPSolution.class, queryParameters);
-			return solutionSearchService.findSolutions(convertedQryParm, isOr, pageRequest);
+			return solutionSearchService.findSolutions(queryParameters, isOr, pageRequest);
 		} catch (Exception ex) {
-			logger.error("searchSolutions failed", ex);
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+			logger.error("searchSolutions failed: {}", ex.toString());
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchSolutions failed", ex);
 		}
 	}

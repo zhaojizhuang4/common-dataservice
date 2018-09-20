@@ -21,7 +21,7 @@
 package org.acumos.cds.controller;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -46,7 +46,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -87,34 +86,76 @@ public class PeerController extends AbstractController {
 		return peerRepository.findAll(pageable);
 	}
 
-	@ApiOperation(value = "Searches for entities with attribute values matching the field name - field value pairs specified as query parameters. " //
-			+ "Defaults to and (conjunction); send junction query parameter '_j=o' for or (disjunction).", //
+	/*
+	 * This method was an early attempt to provide a search feature. Originally
+	 * written with a generic map request parameter to avoid binding field names,
+	 * but that is not supported by Swagger web UI. Now allows use from that web UI
+	 * at the cost of hard-coding many class field names.
+	 */
+	private static final String nameField = "name";
+	private static final String subjectNameField = "subjectName";
+	private static final String apiUrlField = "apiUrl";
+	private static final String webUrlField = "webUrl";
+	private static final String isSelfField = "isSelf";
+	private static final String isLocalField = "isLocal";
+	private static final String contact1Field = "contact1";
+	private static final String statusCodeField = "statusCode";
+
+	@ApiOperation(value = "Searches for peers with attributes matching the values specified as query parameters. " //
+			+ "Defaults to match all (conjunction); send junction query parameter '_j=o' to match any (disjunction).", //
 			response = MLPPeer.class, responseContainer = "Page")
 	@ApiPageable
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchPeers(
-			// This actually IS required; set flag to false for swagger UI
-			@ApiParam(value = "Field name - field value pairs as request parameters in the format name=value, minimum 1; repeats allowed. " //
-					+ "Not supported by Swagger web UI.", allowMultiple = true, type = "Array[string]", required = false) //
-			@RequestParam MultiValueMap<String, String> queryParameters, Pageable pageable,
-			HttpServletResponse response) {
-		logger.info("searchPeers {}", queryParameters);
-		cleanPageableParameters(queryParameters);
-		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
-		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
+	public Object searchPeers( //
+			@ApiParam(value = "Junction", allowableValues = "a,o") //
+			@RequestParam(name = CCDSConstants.JUNCTION_QUERY_PARAM, required = false) String junction, //
+			@ApiParam(value = "Name") //
+			@RequestParam(name = nameField, required = false) String name, //
+			@ApiParam(value = "Subject name") //
+			@RequestParam(name = subjectNameField, required = false) String subjectName, //
+			@ApiParam(value = "API URL") //
+			@RequestParam(name = apiUrlField, required = false) String apiUrl, //
+			@ApiParam(value = "Web URL") //
+			@RequestParam(name = webUrlField, required = false) String webUrl, //
+			@ApiParam(value = "isSelf") //
+			@RequestParam(name = isSelfField, required = false) Boolean isSelf, //
+			@ApiParam(value = "isLocal") //
+			@RequestParam(name = isLocalField, required = false) Boolean isLocal, //
+			@ApiParam(value = "Contact 1") //
+			@RequestParam(name = contact1Field, required = false) String contact1, //
+			@ApiParam(value = "Status code") //
+			@RequestParam(name = statusCodeField, required = false) String statusCode, //
+			Pageable pageRequest, HttpServletResponse response) {
+		logger.info("searchPeer enter");
+		boolean isOr = junction != null && "o".equals(junction);
+		Map<String, Object> queryParameters = new HashMap<>();
+		if (name != null)
+			queryParameters.put(nameField, name);
+		if (subjectName != null)
+			queryParameters.put(subjectNameField, subjectName);
+		if (apiUrl != null)
+			queryParameters.put(apiUrlField, apiUrl);
+		if (webUrl != null)
+			queryParameters.put(webUrlField, webUrl);
+		if (isSelf != null)
+			queryParameters.put(isSelfField, isSelf);
+		if (isLocal != null)
+			queryParameters.put(isLocalField, isLocal);
+		if (contact1 != null)
+			queryParameters.put(contact1Field, contact1);
+		if (statusCode != null)
+			queryParameters.put(statusCodeField, statusCode);
 		if (queryParameters.size() == 0) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
 		}
 		try {
-			Map<String, Object> convertedQryParm = convertQueryParameters(MLPPeer.class, queryParameters);
-			return peerSearchService.findPeers(convertedQryParm, isOr, pageable);
+			return peerSearchService.findPeers(queryParameters, isOr, pageRequest);
 		} catch (Exception ex) {
-			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn("searchPeers failed: {}", ex.toString());
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+			logger.error("searchPeers failed: {}", ex.toString());
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchPeers failed", ex);
 		}
 	}

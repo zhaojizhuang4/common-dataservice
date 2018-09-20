@@ -20,7 +20,7 @@
 package org.acumos.cds.controller;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -42,7 +42,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,34 +90,61 @@ public class PublishRequestController extends AbstractController {
 		return sr;
 	}
 
-	@ApiOperation(value = "Searches for requests with attribute values matching the field name - field value pairs specified as query parameters. " //
-			+ "Defaults to and (conjunction); send junction query parameter '_j=o' for or (disjunction).", //
+	/*
+	 * This method was an early attempt to provide a search feature. Originally
+	 * written with a generic map request parameter to avoid binding field names,
+	 * but that is not supported by Swagger web UI. Now allows use from that web UI
+	 * at the cost of hard-coding many field names from the MLPArtifact class.
+	 */
+	private static final String solutionIdField = "solutionId";
+	private static final String revisionIdField = "revisionId";
+	private static final String requestUserIdField = "requestUserId";
+	private static final String reviewUserIdField = "reviewUserId";
+	private static final String statusCodeField = "statusCode";
+
+	@ApiOperation(value = "Searches for requests with attributes matching the values specified as query parameters. " //
+			+ "Defaults to match all (conjunction); send junction query parameter '_j=o' to match any (disjunction).", //
 			response = MLPPublishRequest.class, responseContainer = "Page")
 	@ApiPageable
 	@ApiResponses({ @ApiResponse(code = 400, message = "Bad request", response = ErrorTransport.class) })
 	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH, method = RequestMethod.GET)
 	@ResponseBody
-	public Object searchPublishRequests(
-			// This actually IS required; set flag to false for swagger UI
-			@ApiParam(value = "Field name - field value pairs as request parameters in the format name=value, minimum 1; repeats allowed. " //
-					+ "Not supported by Swagger web UI.", allowMultiple = true, type = "Array[string]", required = false) //
-			@RequestParam MultiValueMap<String, String> queryParameters, HttpServletResponse response,
-			Pageable pageRequest) {
-		logger.info("searchPublishRequests {}", queryParameters);
-		cleanPageableParameters(queryParameters);
-		List<String> junction = queryParameters.remove(CCDSConstants.JUNCTION_QUERY_PARAM);
-		boolean isOr = junction != null && junction.size() == 1 && "o".equals(junction.get(0));
+	public Object searchPublishRequests(@ApiParam(value = "Junction", allowableValues = "a,o") //
+	@RequestParam(name = CCDSConstants.JUNCTION_QUERY_PARAM, required = false) String junction, //
+			@ApiParam(value = "Solution ID") //
+			@RequestParam(name = solutionIdField, required = false) String solutionId, //
+			@ApiParam(value = "Revision ID") //
+			@RequestParam(name = revisionIdField, required = false) String revisionId, //
+			@ApiParam(value = "Request user ID") //
+			@RequestParam(name = requestUserIdField, required = false) String requestUserId, //
+			@ApiParam(value = "Review user ID") //
+			@RequestParam(name = reviewUserIdField, required = false) String reviewUserId, //
+			@ApiParam(value = "Status code") //
+			@RequestParam(name = statusCodeField, required = false) String statusCode, //
+			Pageable pageRequest, HttpServletResponse response) {
+		logger.info("searchArtifacts enter");
+		boolean isOr = junction != null && "o".equals(junction);
+		Map<String, Object> queryParameters = new HashMap<>();
+		if (solutionId != null)
+			queryParameters.put(solutionIdField, solutionId);
+		if (revisionId != null)
+			queryParameters.put(revisionIdField, revisionId);
+		if (requestUserId != null)
+			queryParameters.put(requestUserIdField, requestUserId);
+		if (reviewUserId != null)
+			queryParameters.put(reviewUserIdField, reviewUserId);
+		if (statusCode != null)
+			queryParameters.put(statusCodeField, statusCode);
 		if (queryParameters.size() == 0) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST, "Missing query", null);
 		}
 		try {
-			Map<String, Object> convertedQryParm = convertQueryParameters(MLPPublishRequest.class, queryParameters);
-			return publishRequestSearchService.findPublishRequests(convertedQryParm, isOr, pageRequest);
+			return publishRequestSearchService.findPublishRequests(queryParameters, isOr, pageRequest);
 		} catch (Exception ex) {
-			logger.warn("searchPublishRequests failed: {}", ex.toString());
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+			logger.error("searchPublishRequests failed: {}", ex.toString());
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchPublishRequests failed", ex);
 		}
 	}

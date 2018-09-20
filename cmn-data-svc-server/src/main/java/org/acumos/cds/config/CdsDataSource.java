@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  * Builds a data source from configuration properties.
  */
 @Component
-public class CommonDataServiceDataSource {
+public class CdsDataSource {
 
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -58,7 +58,8 @@ public class CommonDataServiceDataSource {
 	 */
 	@Bean
 	public DataSource dataSource() {
-		logger.info("dataSource: using URL {}", dbUrl);
+		// Force this onto the console
+		logger.warn("dataSource: using URL {}", dbUrl);
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(dbDriverClassName);
 		dataSource.setUrl(dbUrl);

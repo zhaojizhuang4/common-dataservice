@@ -119,7 +119,7 @@ public class ArtifactController extends AbstractController {
 	 * This method was an early attempt to provide a search feature. Originally
 	 * written with a generic map request parameter to avoid binding field names,
 	 * but that is not supported by Swagger web UI. Now allows use from that web UI
-	 * at the cost of hard-coding many field names from the MLPArtifact class.
+	 * at the cost of hard-coding many class field names.
 	 */
 	private static final String artifactTypeCodeField = "artifactTypeCode";
 	private static final String nameField = "name";
@@ -168,10 +168,9 @@ public class ArtifactController extends AbstractController {
 		try {
 			return artifactService.findArtifacts(queryParameters, isOr, pageRequest);
 		} catch (Exception ex) {
-			// e.g., EmptyResultDataAccessException is NOT an internal server error
-			logger.warn("searchArtifacts failed: {}", ex.toString());
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+			logger.error("searchArtifacts failed: {}", ex.toString());
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return new ErrorTransport(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					ex.getCause() != null ? ex.getCause().getMessage() : "searchArtifacts failed", ex);
 		}
 	}

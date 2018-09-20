@@ -65,7 +65,8 @@ public class CdsApplication implements ApplicationContextAware {
 			logger.warn("main: no configuration found in environment {}", CONFIG_ENV_VAR_NAME);
 		}
 		ConfigurableApplicationContext cxt = SpringApplication.run(CdsApplication.class, args);
-		logger.info("main: context is {}", cxt);
+		// Force this onto the console
+		logger.warn("main: successful start, Spring context is {}", cxt);
 		// Closing the context stops the application, so ignore
 		// the Sonar advice that the context must be closed here!
 	}

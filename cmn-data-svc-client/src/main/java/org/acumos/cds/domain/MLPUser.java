@@ -175,8 +175,7 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 	private byte[] picture;
 
 	/**
-	 * This field models the API token stored on disk. Transported as clear text,
-	 * stored as cipher text.
+	 * This field models the API token stored on disk.
 	 */
 	@Column(name = "API_TOKEN", columnDefinition = "VARCHAR(64)")
 	@Size(max = 64)

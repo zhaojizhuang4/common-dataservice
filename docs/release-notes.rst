@@ -28,6 +28,7 @@ Version 1.18.2, ?? Sep 2018
 
 * Upgrade Spring-Boot from 1.15.15.RELEASE to 1.15.16.RELEASE
 * Limit console log output to level WARN and above
+* Refactor additional search controller annotations for Swagger web UI
 * Requires database schema version 1.18
 
 Version 1.18.1, 11 Sep 2018

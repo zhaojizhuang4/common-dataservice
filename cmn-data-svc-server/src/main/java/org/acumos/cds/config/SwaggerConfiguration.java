@@ -20,18 +20,16 @@
 
 package org.acumos.cds.config;
 
-import java.util.ArrayList;
-
 import org.acumos.cds.CdsApplication;
 import org.acumos.cds.controller.AbstractController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
-import springfox.documentation.service.VendorExtension;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -55,20 +53,19 @@ public class SwaggerConfiguration {
 				.apiInfo(apiInfo());
 	}
 
-	@SuppressWarnings("rawtypes")
 	private ApiInfo apiInfo() {
 		final String version = CdsApplication.class.getPackage().getImplementationVersion();
-		return new ApiInfo("Acumos Common Data Service REST API", // title
-				"Provides create, retrieve, update and delete (CRUD) services for " //
-						+ " Acumos data including solutions, artifacts and users."//
-						+ " All service endpoints require basic HTTP authentication.", // description
-				version == null ? "version not available" : version, // version
-				"Terms of service", // TOS
-				new Contact("Acumos Common Data Service Team", // name
-						"http://acumos.readthedocs.io/en/latest/submodules/common-dataservice/docs/", // URL
-						"no-reply@acumos.org"), // email
-				"Apache 2.0", // License
-				"https://www.apache.org/licenses/LICENSE-2.0", // License URL
-				new ArrayList<VendorExtension>()); // vendor extensions
+		return new ApiInfoBuilder() //
+				.title("Acumos Common Data Service REST API") //
+				.description("Provides create, retrieve, update and delete (CRUD) services for " //
+						+ " Acumos data including solutions, artifacts and users. "//
+						+ " All service endpoints require basic HTTP authentication.")
+				.termsOfServiceUrl("Terms of service") //
+				.contact(new Contact("Acumos Dev Team", //
+						"http://acumos.readthedocs.io/en/latest/submodules/common-dataservice/docs/", //
+						"noreply@acumos.org")) //
+				.license("Apache 2.0 License").licenseUrl("http://www.apache.org/licenses/LICENSE-2.0") //
+				.version(version == null ? "version not available" : version) //
+				.build();
 	}
 }
