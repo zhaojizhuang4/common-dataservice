@@ -706,6 +706,34 @@ public class CommonDataServiceRestClientImpl implements ICommonDataServiceRestCl
 	}
 
 	@Override
+	public RestPageResponse<MLPSolution> findPortalSolutionsByKwAndTags(String[] keywords, boolean active,
+			String[] userIds, String[] accessTypeCodes, String[] modelTypeCodes, String[] allTags, String[] anyTags,
+			RestPageRequest pageRequest) {
+		HashMap<String, Object> parms = new HashMap<>();
+		// This is the only required parameter.
+		parms.put(CCDSConstants.SEARCH_ACTIVE, active);
+		if (keywords != null && keywords.length > 0)
+			parms.put(CCDSConstants.SEARCH_KW, keywords);
+		if (userIds != null && userIds.length > 0)
+			parms.put(CCDSConstants.SEARCH_USERS, userIds);
+		if (accessTypeCodes != null && accessTypeCodes.length > 0)
+			parms.put(CCDSConstants.SEARCH_ACCESS_TYPES, accessTypeCodes);
+		if (modelTypeCodes != null && modelTypeCodes.length > 0)
+			parms.put(CCDSConstants.SEARCH_MODEL_TYPES, modelTypeCodes);
+		if (allTags != null && allTags.length > 0)
+			parms.put(CCDSConstants.SEARCH_ALL_TAGS, allTags);
+		if (anyTags != null && anyTags.length > 0)
+			parms.put(CCDSConstants.SEARCH_ANY_TAGS, anyTags);
+		URI uri = buildUri(new String[] { CCDSConstants.SOLUTION_PATH, CCDSConstants.SEARCH_PATH,
+				CCDSConstants.PORTAL_PATH, CCDSConstants.KW_TAG_PATH }, parms, pageRequest);
+		logger.debug("findPortalSolutionsByKwAndTags: uri {}", uri);
+		ResponseEntity<RestPageResponse<MLPSolution>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
+				new ParameterizedTypeReference<RestPageResponse<MLPSolution>>() {
+				});
+		return response.getBody();
+	}
+
+	@Override
 	public RestPageResponse<MLPSolution> findUserSolutions(String[] nameKeywords, String[] descriptionKeywords,
 			boolean active, String userId, String[] accessTypeCodes, String[] modelTypeCodes,
 			String[] validationStatusCodes, String[] tags, RestPageRequest pageRequest) {

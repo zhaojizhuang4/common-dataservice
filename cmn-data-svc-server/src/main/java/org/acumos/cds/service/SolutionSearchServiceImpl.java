@@ -392,4 +392,60 @@ public class SolutionSearchServiceImpl extends AbstractSearchServiceImpl impleme
 		return result;
 	}
 
+	/*
+	 * Provides flexible treatment of tags.
+	 */
+	@Override
+	public Page<MLPSolution> findPortalSolutionsByKwAndTags(String[] keywords, boolean active, String[] userIds,
+			String[] modelTypeCode, String[] accessTypeCode, String[] allTags, String[] anyTags, Pageable pageable) {
+		// build the query using FOM to access child attributes
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MLPSolutionFOM.class, solAlias);
+		criteria.add(Restrictions.eq("active", active));
+		// A solution should ALWAYS have revisions.
+		criteria.createAlias("revisions", revAlias);
+		// Descriptions are optional, so must use outer join
+		if (keywords != null && keywords.length > 0) {
+			criteria.createAlias(revAlias + ".descriptions", descsAlias, org.hibernate.sql.JoinType.LEFT_OUTER_JOIN);
+			Disjunction keywordDisjunction = Restrictions.disjunction();
+			keywordDisjunction.add(buildLikeListCriterion("name", keywords, false));
+			keywordDisjunction.add(buildLikeListCriterion(descsAlias + ".description", keywords, false));
+			keywordDisjunction.add(buildLikeListCriterion(revAlias + ".authors", keywords, false));
+			keywordDisjunction.add(buildLikeListCriterion(revAlias + ".publisher", keywords, false));
+			// Also match on IDs, but exact only
+			keywordDisjunction.add(buildEqualsListCriterion("solutionId", keywords));
+			keywordDisjunction.add(buildEqualsListCriterion(revAlias + ".revisionId", keywords));
+			criteria.add(keywordDisjunction);
+		}
+		if (modelTypeCode != null && modelTypeCode.length > 0)
+			criteria.add(buildEqualsListCriterion("modelTypeCode", modelTypeCode));
+		if (accessTypeCode != null && accessTypeCode.length > 0)
+			criteria.add(buildEqualsListCriterion(revAlias + ".accessTypeCode", accessTypeCode));
+		if (userIds != null && userIds.length > 0) {
+			criteria.createAlias("owner", ownerAlias);
+			criteria.add(Restrictions.in(ownerAlias + ".userId", userIds));
+		}
+		if (allTags != null && allTags.length > 0) {
+			// https://stackoverflow.com/questions/51992269/hibernate-java-criteria-query-for-instances-with-multiple-collection-members-lik
+			DetachedCriteria allTagsQuery = DetachedCriteria.forClass(MLPSolutionFOM.class, subqAlias)
+					.add(Restrictions.eqProperty(subqAlias + ".id", solAlias + ".id")) //
+					.createAlias("tags", tagsFieldAlias) //
+					.add(Restrictions.in(tagValueField, allTags)) //
+					.setProjection(Projections.count(tagValueField));
+			criteria.add(Subqueries.eq((long) allTags.length, allTagsQuery));
+		}
+		if (anyTags != null && anyTags.length > 0) {
+			final String subq2Alias = "subsol2";
+			final String tag2Alias = "anytag";
+			final String tag2ValueField = tag2Alias + ".tag";
+			DetachedCriteria anyTagsQuery = DetachedCriteria.forClass(MLPSolutionFOM.class, subq2Alias)
+					.add(Restrictions.eqProperty(subq2Alias + ".id", solAlias + ".id")) //
+					.createAlias("tags", tag2Alias) //
+					.add(Restrictions.in(tag2ValueField, anyTags)).setProjection(Projections.count(tag2ValueField));
+			criteria.add(Subqueries.lt(0L, anyTagsQuery));
+		}
+		Page<MLPSolution> result = runSolutionFomQuery(criteria, pageable);
+		logger.info("findPortalSolutionsByKwAndTags: result size={}", result.getNumberOfElements());
+		return result;
+	}
+
 }

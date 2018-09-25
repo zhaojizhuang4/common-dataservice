@@ -32,6 +32,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -66,6 +67,7 @@ public class MLPRole extends MLPTimestampedEntity implements Serializable {
 	private String name;
 
 	@Column(name = "ACTIVE_YN", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y'")
+	@Type(type = "yes_no")
 	@ApiModelProperty(required = true, value = "Boolean indicator")
 	private boolean active;
 

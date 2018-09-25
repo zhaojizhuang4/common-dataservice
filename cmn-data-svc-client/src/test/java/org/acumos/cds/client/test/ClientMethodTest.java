@@ -203,6 +203,24 @@ public class ClientMethodTest {
 			logger.info("Client failed as expected: {}", ex.toString());
 		}
 		try {
+			client.findPortalSolutionsByKw(null, true, null, null, null, null, new RestPageRequest(0, 1));
+		} catch (IllegalArgumentException ex) {
+			logger.info("Client failed on null as expected: {}", ex.toString());
+		}
+		try {
+			String[] array = new String[] { "I'm a string" };
+			client.findPortalSolutionsByKw(array, true, array, array, array, array, new RestPageRequest(0, 1));
+		} catch (ResourceAccessException ex) {
+			logger.info("Client failed as expected: {}", ex.toString());
+		}
+		try {
+			String[] array = new String[] { "I'm a string" };
+			client.findPortalSolutionsByKwAndTags(array, true, array, array, array, array, array,
+					new RestPageRequest(0, 1));
+		} catch (ResourceAccessException ex) {
+			logger.info("Client failed as expected: {}", ex.toString());
+		}
+		try {
 			String[] array = new String[] { "I'm a string" };
 			client.findUserSolutions(array, array, true, "user", array, array, array, array, new RestPageRequest(0, 1));
 		} catch (ResourceAccessException ex) {

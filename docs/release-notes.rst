@@ -23,9 +23,11 @@ Common Data Service Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
-Version 1.18.2, ?? Sep 2018
+Version 1.18.2, 25 Sep 2018
 ---------------------------
 
+* New client method to search solutions with all/any tags (ACUMOS-1763)
+* Use N/Y instead of 0/1 in table C_ROLE column ACTIVE_YN (ACUMOS-1788)
 * Upgrade Spring-Boot from 1.15.15.RELEASE to 1.15.16.RELEASE
 * Limit console log output to level WARN and above
 * Refactor additional search controller annotations for Swagger web UI

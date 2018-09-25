@@ -851,6 +851,16 @@ public class CdsControllerTest {
 			Assert.assertTrue(kwSearchResult != null && kwSearchResult.getNumberOfElements() > 0);
 			logger.info("Found models by kw total " + kwSearchResult.getTotalElements());
 
+			logger.info("Querying for solutions by tags");
+			String[] allTags = new String[] { tagName1 };
+			String[] anyTags = null; //new String[] { tagName2 };
+			RestPageResponse<MLPSolution> allAnyTagsSearchResult = client.findPortalSolutionsByKwAndTags(null, true, null,
+					null, null, allTags, anyTags, new RestPageRequest(0, 2));
+			logger.info("Found models by tag total " + allAnyTagsSearchResult.getTotalElements());
+			Assert.assertTrue(allAnyTagsSearchResult != null && allAnyTagsSearchResult.getNumberOfElements() > 0);
+			MLPSolution taggedSol = allAnyTagsSearchResult.getContent().get(0);
+			Assert.assertTrue(taggedSol.getTags().contains(new MLPTag(tagName1)));
+
 			logger.info("Querying for user solutions via flexible i/f");
 			RestPageResponse<MLPSolution> userSols = client.findUserSolutions(null, null, true,
 					inactiveUser.getUserId(), null, null, null, null, new RestPageRequest(0, 5));
@@ -3343,7 +3353,8 @@ public class CdsControllerTest {
 			logger.info("Get user soln deps failed on bad rev id as expected: {}", ex.getResponseBodyAsString());
 		}
 		try {
-			client.getUserSolutionDeployments(cs.getSolutionId(), csr.getRevisionId(), "userId", new RestPageRequest(0, 1));
+			client.getUserSolutionDeployments(cs.getSolutionId(), csr.getRevisionId(), "userId",
+					new RestPageRequest(0, 1));
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
 			logger.info("Get user soln deps failed on bad user id as expected: {}", ex.getResponseBodyAsString());
@@ -3427,13 +3438,15 @@ public class CdsControllerTest {
 			client.addCompositeSolutionMember("parent", "child");
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("add composite solution member failed on bad sol id as expected: {}", ex.getResponseBodyAsString());
+			logger.info("add composite solution member failed on bad sol id as expected: {}",
+					ex.getResponseBodyAsString());
 		}
 		try {
 			client.addCompositeSolutionMember(cs.getSolutionId(), "child");
 			throw new Exception("Unexpected success");
 		} catch (HttpStatusCodeException ex) {
-			logger.info("add composite solution member failed on bad sol id as expected: {}", ex.getResponseBodyAsString());
+			logger.info("add composite solution member failed on bad sol id as expected: {}",
+					ex.getResponseBodyAsString());
 		}
 
 		try {

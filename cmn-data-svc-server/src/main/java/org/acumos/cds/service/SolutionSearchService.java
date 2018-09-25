@@ -95,9 +95,9 @@ public interface SolutionSearchService {
 			String[] tags, String[] authorKeywords, String[] publisherKeywords, Pageable pageable);
 
 	/**
-	 * * Gets a page of solutions matching all query parameters, with the caveat
-	 * that any one keyword can match and multiple text fields are searched. If
-	 * keywords are supplied this will be slow because it requires table scans.
+	 * Gets a page of solutions matching all query parameters, with the caveat that
+	 * any one keyword can match and multiple text fields are searched. If keywords
+	 * are supplied this will be slow because it requires table scans.
 	 * 
 	 * @param keywords
 	 *            Keywords to find in the name, revision description, author,
@@ -124,6 +124,40 @@ public interface SolutionSearchService {
 	 */
 	Page<MLPSolution> findPortalSolutionsByKw(String[] keywords, boolean active, String[] userIds,
 			String[] modelTypeCodes, String[] accessTypeCodes, String[] tags, Pageable pageable);
+
+	/**
+	 * Gets a page of solutions matching all query parameters, with the caveat that
+	 * any one keyword can match and multiple text fields are searched. If keywords
+	 * are supplied this will be slow because it requires table scans.
+	 * 
+	 * @param keywords
+	 *            Keywords to find in the name, revision description, author,
+	 *            publisher and other fields; ignored if null or empty.
+	 * @param active
+	 *            Active status: true or false; required.
+	 * @param userIds
+	 *            Limits match to solutions with one of the specified values;
+	 *            ignored if null or empty
+	 * @param modelTypeCodes
+	 *            Limits match to solutions with one of the specified values
+	 *            including null (not the 4-character sequence "null"); ignored if
+	 *            null or empty
+	 * @param accessTypeCodes
+	 *            Limits match to solutions containing revisions with one of the
+	 *            specified values including null (not the 4-character sequence
+	 *            "null"); ignored if null or empty
+	 * @param allTags
+	 *            Solutions must have ALL tags in the supplied set; ignored if null
+	 *            or empty
+	 * @param anyTags
+	 *            Solutions must have ANY tag in the supplied set (one or more);
+	 *            ignored if null or empty.
+	 * @param pageable
+	 *            Page and sort info
+	 * @return Page of matches
+	 */
+	Page<MLPSolution> findPortalSolutionsByKwAndTags(String[] keywords, boolean active, String[] userIds,
+			String[] modelTypeCodes, String[] accessTypeCodes, String[] allTags, String[] anyTags, Pageable pageable);
 
 	/**
 	 * Gets a page of user-accessible solutions. This includes the user's own

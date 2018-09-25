@@ -551,6 +551,15 @@ public class CdsRepositoryServiceTest {
 			Assert.assertTrue(idSearchResult != null && idSearchResult.getNumberOfElements() == 1);
 			logger.info("Found models by id total " + idSearchResult.getTotalElements());
 
+			logger.info("Check all vs any tags single match");
+			String[] allTags = new String[] { solTag1.getTag() };
+			String[] anyTags = new String[] { solTag2.getTag(), "other" };
+			Page<MLPSolution> allAnyTagsSearchResult = solutionSearchService.findPortalSolutionsByKwAndTags(null,
+					active, userIds, modelTypeCodes, accTypeCodes, allTags, anyTags, new PageRequest(0, 5));
+			Assert.assertTrue(allAnyTagsSearchResult != null && allAnyTagsSearchResult.getNumberOfElements() > 0);
+			MLPSolution taggedSol = allAnyTagsSearchResult.getContent().get(0);
+			Assert.assertTrue(taggedSol.getTags().contains(solTag1) && taggedSol.getTags().contains(solTag2));
+
 			// All keywords must occur in the same field to match
 			String[] kw = { "Big", "Data" };
 			Page<MLPSolution> kwSearchResult = solutionSearchService.findPortalSolutionsByKw(kw, active, userIds,

@@ -51,6 +51,7 @@ public interface CCDSConstants {
 	public static final String FUNCTION_PATH = "function";
 	public static final String GROUP_PATH = "group";
 	public static final String KEYWORD_PATH = "kw";
+	public static final String KW_TAG_PATH = "kwtag";
 	public static final String NOTIFICATION_PATH = "notif";
 	public static final String NOTIFICATION_PREF_PATH = "notifpref";
 	public static final String PEER_PATH = "peer";
@@ -106,6 +107,8 @@ public interface CCDSConstants {
 	public static final String SEARCH_MODEL_TYPES = "mtc";
 	public static final String SEARCH_NAME = "name";
 	public static final String SEARCH_TAGS = "tag";
+	public static final String SEARCH_ALL_TAGS = "alltag";
+	public static final String SEARCH_ANY_TAGS = "anytag";
 	public static final String SEARCH_VAL_STATUSES = "vsc";
 	public static final String SEARCH_DATE = "datems";
 	public static final String SEARCH_AUTH = "auth";

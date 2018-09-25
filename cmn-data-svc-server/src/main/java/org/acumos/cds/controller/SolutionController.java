@@ -355,6 +355,42 @@ public class SolutionController extends AbstractController {
 		}
 	}
 
+	@ApiOperation(value = "Finds solutions matching the specified attribute values and/or child attribute values " //
+			+ " with flexible handling of tags to allow all/any matches. "
+			+ " Checks multiple fields for the supplied keywords, including ID, name, description etc.", //
+			response = MLPSolution.class, responseContainer = "Page")
+	@ApiPageable
+	@RequestMapping(value = "/" + CCDSConstants.SEARCH_PATH + "/" + CCDSConstants.PORTAL_PATH + "/"
+			+ CCDSConstants.KW_TAG_PATH, method = RequestMethod.GET)
+	@ResponseBody
+	public Object findPortalSolutionsByKwAndTags( //
+			@ApiParam(value = "Active Y/N", required = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_ACTIVE, required = true) boolean active, //
+			@ApiParam(value = "Access type codes", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_ACCESS_TYPES, required = false) String[] accTypeCodes, //
+			@ApiParam(value = "Model type codes", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_MODEL_TYPES, required = false) String[] modelTypeCodes, //
+			@ApiParam(value = "Key words", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_KW, required = false) String[] kws, //
+			@ApiParam(value = "User IDs", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_USERS, required = false) String[] userIds, //
+			@ApiParam(value = "All tags", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_ALL_TAGS, required = false) String[] allTags, //
+			@ApiParam(value = "Any tags", allowMultiple = true) //
+			@RequestParam(name = CCDSConstants.SEARCH_ANY_TAGS, required = false) String[] anyTags, //
+			Pageable pageRequest, HttpServletResponse response) {
+		logger.info("findPortalSolutionsByKwAndTags: active {} kw {}", active, kws);
+		try {
+			return solutionSearchService.findPortalSolutionsByKwAndTags(kws, active, userIds, modelTypeCodes,
+					accTypeCodes, allTags, anyTags, pageRequest);
+		} catch (Exception ex) {
+			logger.error("findPortalSolutionsByKwAndTags failed", ex);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new ErrorTransport(HttpServletResponse.SC_BAD_REQUEST,
+					ex.getCause() != null ? ex.getCause().getMessage() : "findPortalSolutionsByKwAndTags failed", ex);
+		}
+	}
+
 	@ApiOperation(value = "Finds user-accessible solutions matching the specified attribute values. "
 			+ "Keywords are processed using LIKE-operator search.  Does not search any child entities.", //
 			response = MLPSolution.class, responseContainer = "Page")

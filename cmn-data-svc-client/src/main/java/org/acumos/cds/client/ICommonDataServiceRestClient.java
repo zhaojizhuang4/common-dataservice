@@ -338,6 +338,40 @@ public interface ICommonDataServiceRestClient {
 			String[] accessTypeCodes, String[] modelTypeCodes, String[] tags, RestPageRequest pageRequest);
 
 	/**
+	 * Gets a page of solutions that match every condition, with the caveat that any
+	 * one of the keywords can match, and multiple free-text fields are searched.
+	 * Other facets such as userId, model type code, etc. must match. This will be
+	 * slow because it requires table scans.
+	 * 
+	 * @param keywords
+	 *            Keywords to find in the name, revision description, author,
+	 *            publisher and other field; ignored if null or empty
+	 * @param active
+	 *            Solution active status; true for active, false for inactive
+	 * @param userIds
+	 *            User IDs who created the solution; ignored if null or empty
+	 * @param accessTypeCodes
+	 *            Access type codes; use four-letter sequence "null" to match a null
+	 *            value; ignored if null or empty
+	 * @param modelTypeCodes
+	 *            Model type codes; use four-letter sequence "null" to match a null
+	 *            value; ignored if null or empty
+	 * @param allTags
+	 *            Solutions must have ALL tags in the supplied set; ignored if null
+	 *            or empty
+	 * @param anyTags
+	 *            Solutions must have ANY tag in the supplied set (one or more);
+	 *            ignored if null or empty.
+	 * @param pageRequest
+	 *            Page index, page size and sort information; defaults to page 0 of
+	 *            size 20 if null.
+	 * @return Page of solution objects.
+	 */
+	RestPageResponse<MLPSolution> findPortalSolutionsByKwAndTags(String[] keywords, boolean active, String[] userIds,
+			String[] accessTypeCodes, String[] modelTypeCodes, String[] allTags, String[] anyTags,
+			RestPageRequest pageRequest);
+
+	/**
 	 * Finds solutions editable by the specified user ('my models'). This includes
 	 * the user's private solutions and solutions co-owned by (shared with) the
 	 * user. This special-purpose method supports a dynamic search page on the
