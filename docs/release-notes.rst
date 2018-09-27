@@ -27,6 +27,7 @@ Version 1.18.2, 27 Sep 2018
 ---------------------------
 
 * Add peer status code RM=Removed (ACUMOS-1596)
+* Use ONAP/Athena logging output pattern (ACUMOS-1752)
 * Upgrade Spring-Boot to 1.15.16.RELEASE (ACUMOS-1754)
 * New client method to search solutions with all/any tags (ACUMOS-1763)
 * Use N/Y instead of 0/1 in table C_ROLE column ACTIVE_YN (ACUMOS-1788)

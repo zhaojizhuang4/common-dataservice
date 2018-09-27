@@ -53,6 +53,7 @@ public class LoggingHandlerInterceptor extends HandlerInterceptorAdapter {
 
 		addKey(ONAPLogConstants.MDCs.SERVER_FQDN, InetAddress.getLocalHost().getCanonicalHostName());
 		addKey(ONAPLogConstants.MDCs.CLIENT_IP_ADDRESS, request.getRemoteAddr());
+		addKey(ONAPLogConstants.MDCs.SERVICE_NAME, request.getRequestURI());
 		final String requestId = request.getHeader("X-Request-ID");
 		if (requestId != null)
 			addKey(ONAPLogConstants.MDCs.REQUEST_ID, requestId);
