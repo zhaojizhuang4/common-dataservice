@@ -39,7 +39,7 @@
 	<property name="p_1_LogTimestamp"       value="${LogTimestamp}" />
 	<property name="p_2_EntryTimestamp"     value="%X{EntryTimestamp}" />
 	<property name="p_3_InvokeTimestamp"    value="%X{InvokeTimestamp}" />
-	<property name="p_4_RequestID"          value="%X{RequestId}" />
+	<property name="p_4_RequestID"          value="%X{RequestID}" />
 	<property name="p_5_InvocationID"       value="%X{InvocationId}" />
 	<property name="p_6_InstanceID"         value="%X{InstanceUUID}" /> <!--  previously InstanceUUID -->
 	<property name="p_7_ServiceInstanceID"  value="%X{ServiceInstanceId}" />
