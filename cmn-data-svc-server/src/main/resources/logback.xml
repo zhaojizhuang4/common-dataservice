@@ -98,7 +98,7 @@
 		</rollingPolicy>
 		<triggeringPolicy
 			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<maxFileSize>5MB</maxFileSize>
+			<maxFileSize>10MB</maxFileSize>
 		</triggeringPolicy>
 		<encoder>
 			<pattern>${singleLineAthenaPattern}</pattern>
