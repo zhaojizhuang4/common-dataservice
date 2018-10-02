@@ -31,6 +31,7 @@ Version 1.18.2, 27 Sep 2018
 * Upgrade Spring-Boot to 1.15.16.RELEASE (ACUMOS-1754)
 * New client method to search solutions with all/any tags (ACUMOS-1763)
 * Use N/Y instead of 0/1 in table C_ROLE column ACTIVE_YN (ACUMOS-1788)
+* Disable Build-for-ONAP/DCAE by default (ACUMOS-1812)
 * Limit console log output to level WARN and above
 * Refactor additional search controller annotations for Swagger web UI
 * Requires database schema version 1.18
