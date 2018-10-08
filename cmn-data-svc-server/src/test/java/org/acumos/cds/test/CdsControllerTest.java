@@ -593,8 +593,9 @@ public class CdsControllerTest {
 			filtered = client.searchArtifacts(restr, true, new RestPageRequest(0, 10));
 			Assert.assertTrue(filtered.getNumberOfElements() == 0);
 
-			final String tagName1 = "tag1-" + Long.toString(new Date().getTime());
-			final String tagName2 = "tag-2" + Long.toString(new Date().getTime());
+			// Also check that Spring doesn't truncate last path variable
+			final String tagName1 = Long.toString(new Date().getTime()) + ".tag.1";
+			final String tagName2 =  Long.toString(new Date().getTime()) + ".tag.2";
 			MLPTag tag1 = new MLPTag(tagName1);
 			MLPTag tag2 = new MLPTag(tagName2);
 			tag1 = client.createTag(tag1);
@@ -612,6 +613,8 @@ public class CdsControllerTest {
 			} catch (HttpStatusCodeException ex) {
 				logger.info("Failed to tag user a second time as expected");
 			}
+			MLPUser taggedUser = client.getUser(cu.getUserId());
+			Assert.assertTrue(taggedUser.getTags().contains(tag1));
 			client.dropUserTag(cu.getUserId(), tagName1);
 
 			MLPSolution cs = new MLPSolution("solution name", cu.getUserId(), true);
@@ -619,7 +622,7 @@ public class CdsControllerTest {
 			cs.setModelTypeCode(ModelTypeCode.CL.name());
 			cs.setToolkitTypeCode(ToolkitTypeCode.CP.name());
 			// This tag should spring into existence here
-			MLPTag newTag = new MLPTag("new-solution-tag");
+			MLPTag newTag = new MLPTag("new-solution-tag.3");
 			cs.getTags().add(newTag);
 			cs = client.createSolution(cs);
 			Assert.assertNotNull(cs.getSolutionId());

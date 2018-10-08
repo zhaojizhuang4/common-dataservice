@@ -23,15 +23,23 @@ Common Data Service Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
+Version 1.18.3, 9 Oct 2018
+--------------------------
+
+* Add site-config data in 1.18 SQL script to silence 400 errors (`ACUMOS-857 <https://jira.acumos.org/browse/ACUMOS-857>`_)
+* Restore exception logging in ONAP/Athena logging output pattern (`ACUMOS-1752 <https://jira.acumos.org/browse/ACUMOS-1752>`_)
+* Add configuration to stop dropping file suffixes in path variables (`ACUMOS-1836 <https://jira.acumos.org/browse/ACUMOS-1836>`_)
+* Requires database schema version 1.18
+
 Version 1.18.2, 27 Sep 2018
 ---------------------------
 
-* Add peer status code RM=Removed (ACUMOS-1596)
-* Use ONAP/Athena logging output pattern (ACUMOS-1752)
-* Upgrade Spring-Boot to 1.15.16.RELEASE (ACUMOS-1754)
-* New client method to search solutions with all/any tags (ACUMOS-1763)
-* Use N/Y instead of 0/1 in table C_ROLE column ACTIVE_YN (ACUMOS-1788)
-* Disable Build-for-ONAP/DCAE by default (ACUMOS-1812)
+* Add peer status code RM=Removed (`ACUMOS-1596 <https://jira.acumos.org/browse/ACUMOS-1596>`_)
+* Use ONAP/Athena logging output pattern (`ACUMOS-1752 <https://jira.acumos.org/browse/ACUMOS-1752>`_)
+* Upgrade Spring-Boot to 1.15.16.RELEASE (`ACUMOS-1754 <https://jira.acumos.org/browse/ACUMOS-1754>`_)
+* New client method to search solutions with all/any tags (`ACUMOS-1763 <https://jira.acumos.org/browse/ACUMOS-1763>`_)
+* Use N/Y instead of 0/1 in table C_ROLE column ACTIVE_YN (`ACUMOS-1788 <https://jira.acumos.org/browse/ACUMOS-1788>`_)
+* Disable Build-for-ONAP/DCAE by default (`ACUMOS-1812 <https://jira.acumos.org/browse/ACUMOS-1812>`_)
 * Limit console log output to level WARN and above
 * Refactor additional search controller annotations for Swagger web UI
 * Requires database schema version 1.18

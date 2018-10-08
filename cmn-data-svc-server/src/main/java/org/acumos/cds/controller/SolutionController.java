@@ -374,9 +374,9 @@ public class SolutionController extends AbstractController {
 			@RequestParam(name = CCDSConstants.SEARCH_KW, required = false) String[] kws, //
 			@ApiParam(value = "User IDs", allowMultiple = true) //
 			@RequestParam(name = CCDSConstants.SEARCH_USERS, required = false) String[] userIds, //
-			@ApiParam(value = "All tags", allowMultiple = true) //
+			@ApiParam(value = "All tags, solution must have every one", allowMultiple = true) //
 			@RequestParam(name = CCDSConstants.SEARCH_ALL_TAGS, required = false) String[] allTags, //
-			@ApiParam(value = "Any tags", allowMultiple = true) //
+			@ApiParam(value = "Any tags, solution must have at least one", allowMultiple = true) //
 			@RequestParam(name = CCDSConstants.SEARCH_ANY_TAGS, required = false) String[] anyTags, //
 			Pageable pageRequest, HttpServletResponse response) {
 		logger.info("findPortalSolutionsByKwAndTags: active {} kw {}", active, kws);

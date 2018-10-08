@@ -27,15 +27,15 @@
 	<!-- gather files in a subdirectory - usually a volume in docker -->
 	<property name="logDirectory" value="logs/ccds" />
 
-	<!-- From https://wiki.acumos.org/display/OAM/Log+Standards -->
+	<!-- Based on https://wiki.acumos.org/display/OAM/Log+Standards -->
 	<property name="LogTimestamp"   value="%d{&quot;yyyy-MM-dd'T'HH:mm:ss.SSSXXX&quot;, UTC}"/>
 	<property name="Level"          value="%.-5level"/>
+	<!-- Logger yields original class name for SLF4J loggers, useless EELF class name for EELF loggers -->
 	<property name="Logger"         value="%logger"/>
 	<property name="Mdc"            value="%replace(%replace(%mdc){'\t','\\\\t'}){'\n','\\\\n'}"/>
 	<property name="Message"        value="%replace(%replace(%msg){'\t','\\\\t'}){'\n','\\\\n'}"/>
-	<property name="RootException"  value="%replace(%replace(%rootException){'\t', '\\\\t'}){'\n','\\\\n'}"/>
+	<property name="Exception"      value="%replace(%replace(%ex){'\t', '\\\\t'}){'\n','\\\\n'}"/>
 	<property name="Marker"         value="%replace(%replace(%marker){'\t','\\\\t'}){'\n','\\\\n'}"/>
-	<property name="Thread"         value="%thread"/>
 	<property name="p_1_LogTimestamp"       value="${LogTimestamp}" />
 	<property name="p_2_EntryTimestamp"     value="%X{EntryTimestamp}" />
 	<property name="p_3_InvokeTimestamp"    value="%X{InvokeTimestamp}" />
@@ -62,22 +62,19 @@
 	<property name="p_24_TargetElement"     value="%X{TargetElement}" />
 	<property name="p_25_User"              value="%X{User}" />
 	<property name="p_26_logger"            value="${Logger}" />
+	<!-- Repeating all the MDC values sent by previous patterns adds useless clutter -->
+	<!-- so instead define a no-op pattern for field 27 that is always blank.  -->
 	<property name="p_27_mdc"               value="${Mdc}" />
-	<property name="p_27_no_mdc"            value="%X{DO_NOT_REPEAT_MDC}" /> <!-- a no-op -->
+	<property name="p_27_no_mdc"            value="%X{NO_MDC}" />
 	<property name="p_28_message"           value="${Message}" />
+	<!-- Code sends no markers in Athena release -->
 	<property name="p_29_marker"            value="${Marker}" />
-	<property name="singleLineAthenaPattern" value="%nopexception${p_1_LogTimestamp}|${p_2_EntryTimestamp}|${p_3_InvokeTimestamp}|${p_4_RequestID}|${p_5_InvocationID}|${p_6_InstanceID}|${p_7_ServiceInstanceID}|${p_8_thread}|${p_9_ServiceName}|${p_10_PartnerName}|${p_11_StatusCode}|${p_12_ResponseCode}|${p_13_ResponseDesc}|${p_14_level}|${p_15_Severity}|${p_16_ServerIPAddress}|${p_17_ElapsedTime}|${p_18_ServerFQDN}|${p_19_ClientIPAddress}|${p_20_VirtualServerName}|${p_21_ContextName}|${p_22_TargetEntity}|${p_23_TargetServiceName}|${p_24_TargetElement}|${p_25_User}|${p_26_logger}|${p_27_no_mdc}|${p_28_message}|${p_29_marker}%n" />
-    
-	<property name="p_tim" value="%d{&quot;yyyy-MM-dd'T'HH:mm:ss.SSSXXX&quot;, UTC}" />
-	<property name="p_thr" value="%thread" />
-	<property name="p_lvl" value="%level" />
-	<property name="p_log" value="%logger" />
-	<property name="p_mdc" value="%replace(%replace(%mdc){'\t','\\\\t'}){'\n', '\\\\n'}" />
-	<property name="p_msg" value="%replace(%replace(%msg){'\t', '\\\\t'}){'\n','\\\\n'}" />
-	<property name="p_exc" value="%replace(%replace(%rootException){'\t', '\\\\t'}){'\n','\\\\n'}" />
-	<property name="p_mrk" value="%replace(%replace(%marker){'\t', '\\\\t'}){'\n','\\\\n'}" />
-	<property name="singleLineBoreasPattern" value="%nopexception${p_tim}\t${p_thr}\t${p_lvl}\t${p_log}\t${p_mdc}\t${p_msg}\t${p_exc}\t${p_mrk}\t%n" />
-	<property name="multiLineBoreasPattern" value="%nopexception${p_tim}\t${p_thr}\t${p_lvl}\t${p_log}\t%mdc\t%msg\t%rootException\t%marker\t%n" />
+	<!-- Show exception details in field 29 because that's VALUABLE information -->
+	<property name="p_29_exception"         value="${Exception}" />
+	<!-- Exception stack trace in field 29 includes linebreaks, useful for console and people -->
+	<property name="multiLineAthenaPattern"  value="${p_1_LogTimestamp}|${p_2_EntryTimestamp}|${p_3_InvokeTimestamp}|${p_4_RequestID}|${p_5_InvocationID}|${p_6_InstanceID}|${p_7_ServiceInstanceID}|${p_8_thread}|${p_9_ServiceName}|${p_10_PartnerName}|${p_11_StatusCode}|${p_12_ResponseCode}|${p_13_ResponseDesc}|${p_14_level}|${p_15_Severity}|${p_16_ServerIPAddress}|${p_17_ElapsedTime}|${p_18_ServerFQDN}|${p_19_ClientIPAddress}|${p_20_VirtualServerName}|${p_21_ContextName}|${p_22_TargetEntity}|${p_23_TargetServiceName}|${p_24_TargetElement}|${p_25_User}|${p_26_logger}|${p_27_no_mdc}|${p_28_message}|%ex%n" />
+	<!-- Exception stack trace in field 29 has no linebreaks, useful for log file; use %nopexception to disable Logback default behavior of appending %ex -->
+	<property name="singleLineAthenaPattern" value="%nopexception${p_1_LogTimestamp}|${p_2_EntryTimestamp}|${p_3_InvokeTimestamp}|${p_4_RequestID}|${p_5_InvocationID}|${p_6_InstanceID}|${p_7_ServiceInstanceID}|${p_8_thread}|${p_9_ServiceName}|${p_10_PartnerName}|${p_11_StatusCode}|${p_12_ResponseCode}|${p_13_ResponseDesc}|${p_14_level}|${p_15_Severity}|${p_16_ServerIPAddress}|${p_17_ElapsedTime}|${p_18_ServerFQDN}|${p_19_ClientIPAddress}|${p_20_VirtualServerName}|${p_21_ContextName}|${p_22_TargetEntity}|${p_23_TargetServiceName}|${p_24_TargetElement}|${p_25_User}|${p_26_logger}|${p_27_no_mdc}|${p_28_message}|${p_29_exception}%n" />
 
 	<!-- Passes only events with level WARN or above -->
 	<appender name="console-warn" class="ch.qos.logback.core.ConsoleAppender">
@@ -85,7 +82,7 @@
 			<level>WARN</level>
 		</filter>
 		<encoder>
-			<pattern>${singleLineAthenaPattern}</pattern>
+			<pattern>${multiLineAthenaPattern}</pattern>
 		</encoder>
 	</appender>
 
@@ -110,8 +107,8 @@
 		<appender-ref ref="file-rolling" />
 	</appender>
 
-	<!-- The root level is the default for loggers, NOT a filter/threshold value.
-		 It can be set with property logging.level.root=LEVEL. -->
+	<!-- The root level is the default for all loggers, NOT a filter on any appender.
+		 This level can be set with property logging.level.root=LEVEL. -->
 	<root level="INFO">
 		<appender-ref ref="file-async" />
 		<appender-ref ref="console-warn" />
