@@ -98,6 +98,7 @@ public class MLPStepResult implements MLPEntity, Serializable {
 
 	@Column(name = "RESULT", columnDefinition = "VARCHAR(512)")
 	@Size(max = 512)
+	@ApiModelProperty(value = "Step result details")
 	private String result;
 
 	@Column(name = "START_DATE", nullable = false, updatable = false)

@@ -79,6 +79,7 @@ public class MLPSolutionDeployment extends MLPTimestampedEntity implements Seria
 
 	@Column(name = "TARGET", columnDefinition = "VARCHAR(64)")
 	@Size(max = 64)
+	@ApiModelProperty(value = "Deployment target name")
 	private String target;
 
 	@Column(name = "DETAIL", columnDefinition = "VARCHAR(1024)")

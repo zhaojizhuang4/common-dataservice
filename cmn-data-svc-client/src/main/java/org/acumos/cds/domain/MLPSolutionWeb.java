@@ -32,6 +32,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Type;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Model for solution website metadata, which transports descriptive statistics
  * recorded on the server to the client. Never used for update from the client,
@@ -55,25 +57,32 @@ public class MLPSolutionWeb implements MLPEntity, Serializable {
 	@Id
 	@Column(name = SOL_ID_COL_NAME, nullable = false, columnDefinition = "CHAR(36)")
 	@Size(max = 36)
+	@ApiModelProperty(required = true, value = "UUID", example = "12345678-abcd-90ab-cdef-1234567890ab")
 	private String solutionId;
 
 	@Column(name = "VIEW_COUNT", columnDefinition = "INT")
+	@ApiModelProperty(value = "View count", example = "1")
 	private Long viewCount = 0L;
 
 	@Column(name = "DOWNLOAD_COUNT", columnDefinition = "INT")
+	@ApiModelProperty(value = "Download count", example = "1")
 	private Long downloadCount = 0L;
 
 	@Column(name = "LAST_DOWNLOAD", columnDefinition = "TIMESTAMP")
+	@ApiModelProperty(value = "Date of most recent download")
 	private Date lastDownload;
 
 	@Column(name = "RATING_COUNT", columnDefinition = "INT")
+	@ApiModelProperty(value = "Rating count", example = "1")
 	private Long ratingCount = 0L;
 
 	@Column(name = "RATING_AVG_TENTHS", columnDefinition = "INT")
+	@ApiModelProperty(value = "Rating average in tenths; e.g., value 35 means 3.5", example = "35")
 	private Long ratingAverageTenths = 0L;
 
 	@Column(name = "FEATURED_YN", columnDefinition = "CHAR(1)")
 	@Type(type = "yes_no")
+	@ApiModelProperty(value = "Featured indicator")
 	private boolean featured;
 
 	/**

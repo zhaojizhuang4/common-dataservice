@@ -114,6 +114,7 @@ public class MLPSolutionRating extends MLPTimestampedEntity implements Serializa
 
 	@Column(name = "TEXT_REVIEW", columnDefinition = "VARCHAR(1024)")
 	@Size(max = 1024)
+	@ApiModelProperty(example = "Free-text comments")
 	private String textReview;
 
 	/**

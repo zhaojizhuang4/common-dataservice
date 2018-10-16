@@ -23,6 +23,8 @@ package org.acumos.cds.domain;
 import java.util.Date;
 import java.util.Objects;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * A user notification object has all the notification fields plus a "viewed"
  * date stamp. This is a transport model, to carry results of a HQL join out to
@@ -31,6 +33,8 @@ import java.util.Objects;
 public class MLPUserNotification extends MLPNotification {
 
 	private static final long serialVersionUID = -6305213486711160636L;
+
+	@ApiModelProperty(value = "Millisec since the Epoch", example = "1521202458867")
 	private Date viewed;
 
 	/**

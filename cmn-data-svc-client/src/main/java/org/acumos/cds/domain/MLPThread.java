@@ -64,6 +64,7 @@ public class MLPThread implements MLPEntity, Serializable {
 
 	@Column(name = "TITLE", columnDefinition = "VARCHAR(100)")
 	@Size(max = 100)
+	@ApiModelProperty(value = "Thread title", example = "How to model this?")
 	private String title;
 
 	/**

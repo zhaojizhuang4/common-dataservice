@@ -90,6 +90,7 @@ public class MLPAbstractArtifact extends MLPTimestampedEntity {
 
 	@Column(name = "METADATA", columnDefinition = "VARCHAR(1024)")
 	@Size(max = 1024)
+	@ApiModelProperty(value = "JSON", example = "{ \"tag\" : \"value\" }")
 	private String metadata;
 
 	/**

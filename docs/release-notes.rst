@@ -23,6 +23,13 @@ Common Data Service Release Notes
 The client and server are released together.  The client is deployed as a jar file to a
 Maven Nexus repository. The server is deployed as a Docker image to a Docker registry.
 
+Version 1.18.4, ? Oct 2018
+--------------------------
+
+* Add missing API model annotations to benefit Swagger
+* Add test case for find-by-modified-date
+* Requires database schema version 1.18
+
 Version 1.18.3, 9 Oct 2018
 --------------------------
 

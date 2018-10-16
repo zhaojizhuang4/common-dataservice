@@ -416,23 +416,31 @@ public class CdsRepositoryServiceTest {
 			logger.info("Deleting test role");
 			roleRepository.delete(cr2.getRoleId());
 
-			logger.info("Creating artifact");
+			logger.info("Creating artifacts");
 			MLPArtifact ca = new MLPArtifact();
 			ca.setVersion("1.0A");
 			ca.setName("test artifact name");
-			ca.setUri("http://nexus/artifact");
+			ca.setUri("http://nexus/artifact1");
 			ca.setArtifactTypeCode(ArtifactTypeCode.DI.name());
 			ca.setUserId(cu.getUserId());
 			ca.setSize(123);
 			ca = artifactRepository.save(ca);
-			Assert.assertTrue(artifactRepository.count() > 0);
+			MLPArtifact ca2 = new MLPArtifact();
+			ca2.setVersion("2.0B");
+			ca2.setName("second artifact name");
+			ca2.setUri("http://nexus/artifact2");
+			ca2.setArtifactTypeCode(ArtifactTypeCode.CD.name());
+			ca2.setUserId(cu.getUserId());
+			ca2.setSize(456);
+			ca2 = artifactRepository.save(ca2);
+			Assert.assertTrue(artifactRepository.count() == 2);
 
 			// Fetch artifact back
 			Map<String, String> artParms = new HashMap<>();
 			artParms.put("name", ca.getName());
 			Page<MLPArtifact> searchArts = artifactSearchService.findArtifacts(artParms, false,
 					new PageRequest(0, 5, null));
-			Assert.assertTrue(searchArts.getNumberOfElements() > 0);
+			Assert.assertTrue(searchArts.getNumberOfElements() == 1);
 
 			MLPTag solTag1 = new MLPTag("soltag1");
 			solTag1 = solutionTagRepository.save(solTag1);
@@ -505,12 +513,12 @@ public class CdsRepositoryServiceTest {
 			Assert.assertNotNull("Revision ID", rev2.getRevisionId());
 			logger.info("Created solution revision " + rev2.getRevisionId());
 
-			logger.info("Adding artifact to revision");
+			logger.info("Adding artifact 1 to revision 1");
 			solRevArtMapRepository.save(new MLPSolRevArtMap(cr.getRevisionId(), ca.getArtifactId()));
 			logger.info("Added" + cr.getRevisionId() + " and " + ca.getArtifactId());
 
-			solRevArtMapRepository.save(new MLPSolRevArtMap(rev2.getRevisionId(), ca.getArtifactId()));
-			logger.info("Added" + rev2.getRevisionId() + " and " + ca.getArtifactId());
+			solRevArtMapRepository.save(new MLPSolRevArtMap(rev2.getRevisionId(), ca2.getArtifactId()));
+			logger.info("Added" + rev2.getRevisionId() + " and " + ca2.getArtifactId());
 
 			MLPRevisionDescription revDesc = new MLPRevisionDescription(cr.getRevisionId(), "PB",
 					"Some bogus description");
@@ -628,6 +636,22 @@ public class CdsRepositoryServiceTest {
 					modifiedDate, new PageRequest(0, 5, null));
 			Assert.assertTrue(solsByDate != null && solsByDate.getNumberOfElements() > 0);
 			logger.info("Found sols by date {}", solsByDate);
+
+			// Touch artifact then search again.
+			// Zero/tiny time difference works on derby (code and db in same Java VM)
+			// but not when talking to a separate DB server on the same host, note that
+			// Derby TIMESTAMP has high precision but Mariadb TIMESTAMP has low precision.
+			// Get separation from the previous actions
+			Thread.sleep(1000);
+			Date justAboutNow = new Date();
+			// Get a bit more separation
+			Thread.sleep(1000);
+			ca.setDescription(ca.getDescription() + " a bit more");
+			artifactRepository.save(ca);
+			Page<MLPSolution> recentlyUpdated = solutionSearchService.findSolutionsByModifiedDate(true, accTypes, valCodes,
+					justAboutNow, new PageRequest(0, 5, null));
+			Assert.assertTrue(recentlyUpdated != null && recentlyUpdated.getNumberOfElements() == 1);
+			logger.info("Found recently updated sols {}", recentlyUpdated);
 
 			// Create Solution download
 			MLPSolutionDownload sd = new MLPSolutionDownload(cs.getSolutionId(), ca.getArtifactId(), cu.getUserId());
@@ -779,7 +803,7 @@ public class CdsRepositoryServiceTest {
 			if (cleanup) {
 				logger.info("Removing newly added entities");
 				solRevArtMapRepository
-						.delete(new MLPSolRevArtMap.SolRevArtMapPK(rev2.getRevisionId(), ca.getArtifactId()));
+						.delete(new MLPSolRevArtMap.SolRevArtMapPK(rev2.getRevisionId(), ca2.getArtifactId()));
 				revisionRepository.delete(rev2);
 				revisionRepository.delete(cr);
 				solutionRatingRepository.delete(solrate);
@@ -788,6 +812,7 @@ public class CdsRepositoryServiceTest {
 				solutionDownloadRepository.delete(sd);
 				solutionRepository.delete(cs2.getSolutionId());
 				solutionRepository.delete(cs.getSolutionId());
+				artifactRepository.delete(ca2);
 				artifactRepository.delete(ca);
 				peerSubscriptionRepository.delete(ps);
 				peerRepository.delete(pr);

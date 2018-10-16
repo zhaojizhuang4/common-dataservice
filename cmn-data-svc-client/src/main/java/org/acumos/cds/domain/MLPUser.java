@@ -69,22 +69,27 @@ public class MLPUser extends MLPTimestampedEntity implements Serializable {
 
 	@Column(name = "FIRST_NAME", columnDefinition = "VARCHAR(50)")
 	@Size(max = 50)
+	@ApiModelProperty(value = "User first name", example = "Mary")
 	private String firstName;
 
 	@Column(name = "MIDDLE_NAME", columnDefinition = "VARCHAR(50)")
 	@Size(max = 50)
+	@ApiModelProperty(value = "User middle name", example = "Jane")
 	private String middleName;
 
 	@Column(name = "LAST_NAME", columnDefinition = "VARCHAR(50)")
 	@Size(max = 50)
+	@ApiModelProperty(value = "User last name", example = "Doe")
 	private String lastName;
 
 	@Column(name = "ORG_NAME", columnDefinition = "VARCHAR(50)")
 	@Size(max = 50)
+	@ApiModelProperty(value = "Organization name", example = "The Modeling Company")
 	private String orgName;
 
 	@Column(name = "EMAIL", nullable = false, unique = true, columnDefinition = "VARCHAR(50)")
 	@Size(max = 50)
+	@ApiModelProperty(required = true, value = "User email address", example = "Mary.Jane.Doe@TheModelingCompany.org")
 	private String email;
 
 	@Column(name = "LOGIN_NAME", nullable = false, unique = true, columnDefinition = "VARCHAR(25)")

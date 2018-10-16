@@ -128,6 +128,7 @@ public class MLPSolutionValidation extends MLPTimestampedEntity implements Seria
 
 	@Column(name = "VAL_STATUS_CD", columnDefinition = "CHAR(2)")
 	@Size(max = 2)
+	@ApiModelProperty(value = "Validation status code", example = "NV")
 	private String validationStatusCode;
 
 	@Column(name = "DETAIL", columnDefinition = "VARCHAR(8192)")
