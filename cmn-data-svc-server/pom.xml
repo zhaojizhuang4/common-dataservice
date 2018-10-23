@@ -45,7 +45,7 @@
 		<!-- Supplied by Jenkins -->
 		<build.number>${env.BUILD_NUMBER}</build.number>
 		<!-- Not supplied to all jobs; e.g., Javadoc -->
-		<docker.pull.registry>http://124.127.117.21:8081/repository/dockerproxy/</docker.pull.registry>
+		<docker.pull.registry></docker.pull.registry>
 		<!-- Supplied by Jenkins -->
 		<docker.push.registry>http://192.168.19.21:8081/repository/docker/</docker.push.registry>
 	</properties>
