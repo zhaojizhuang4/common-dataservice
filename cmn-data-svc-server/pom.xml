@@ -45,7 +45,7 @@
 		<!-- Supplied by Jenkins -->
 		<build.number>${env.BUILD_NUMBER}</build.number>
 		<!-- Not supplied to all jobs; e.g., Javadoc -->
-		<docker.pull.registry>hub.docker.com</docker.pull.registry>
+		<docker.pull.registry>nexus3.acumos.org:10001</docker.pull.registry>
 		<!-- Supplied by Jenkins -->
 		<docker.push.registry>http://192.168.19.21:8081/repository/docker/</docker.push.registry>
 	</properties>
